@@ -37,7 +37,8 @@ public abstract class TemplateBasedFileGenerator<T> implements FileGenerator<T> 
         _ve = new VelocityEngine();
         _ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "class");
         _ve.setProperty("class.resource.loader.class", PhoenixResourceLoader.class.getName());
-        _ve.setProperty("class.resource.loader.cache", true);
+        _ve.setProperty("class.resource.loader.cache", false);
+        _ve.setProperty("webapp.resource.loader.cache", false);
         _ve.setProperty("class.resource.loader.modificationCheckInterval", "-1");
         _ve.setProperty("input.encoding", "UTF-8");
         _ve.setProperty("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.NullLogSystem");
