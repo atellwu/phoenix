@@ -9,10 +9,10 @@
     <include file="struts-default.xml" />
     <include file="struts-plugin.xml" />
 
-    <!-- <constant name="struts.velocity.toolboxlocation" value="WEB-INF/softbalance/velocity/toolbox.xml" 
-        /> -->
-    <!-- <constant name="struts.velocity.configfile" value="WEB-INF/softbalance/velocity/velocity.properties" 
-        /> -->
+    <constant name="struts.velocity.toolboxlocation" value="WEB-INF/softbalance/velocity/toolbox.xml" 
+        />
+    <constant name="struts.velocity.configfile" value="WEB-INF/softbalance/velocity/velocity.properties" 
+        />
     <constant name="struts.action.extension" value="" />
     <constant name="struts.custom.properties" value="classpath:/softbalance/struts.properties" />
     <constant name="struts.objectFactory"
@@ -31,9 +31,9 @@
 
         <action name="index" class="indexAction">
             <result name="success" type="httl">
-                proxy.httl
+                /visual/main.httl
             </result>
-            <result name="input" type="httl">/error.htm</result>
+            <result name="input" type="httl">/visual/main.httl</result>
         </action>
 
         <action name="login" class="loginAction">

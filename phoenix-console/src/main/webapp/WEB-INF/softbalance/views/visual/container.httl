@@ -1,0 +1,17 @@
+<div class="content">
+  <div class="header">
+    <div class="stats">${include("stats.httl")}</div>
+    <h1 class="page-title">$!{pageTitle}</h1>
+  </div>
+  ${include("breadcrumb.httl")}
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div id="alertMessageDiv" style="text-align: center;"></div>
+      <div class="row-fluid">
+      main
+      </div>
+      ${include("../common/simplefooter.httl")}
+    </div>
+  </div>
+
+</div>
