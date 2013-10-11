@@ -9,17 +9,17 @@
     <include file="struts-default.xml" />
     <include file="struts-plugin.xml" />
 
-    <constant name="struts.velocity.toolboxlocation" value="WEB-INF/softbalance/velocity/toolbox.xml" 
-        />
-    <constant name="struts.velocity.configfile" value="WEB-INF/softbalance/velocity/velocity.properties" 
-        />
+    <constant name="struts.velocity.toolboxlocation" value="WEB-INF/softbalance/velocity/toolbox.xml" />
+    <constant name="struts.velocity.configfile"
+        value="WEB-INF/softbalance/velocity/velocity.properties" />
+
     <constant name="struts.action.extension" value="" />
     <constant name="struts.custom.properties" value="classpath:/softbalance/struts.properties" />
     <constant name="struts.objectFactory"
         value="org.apache.struts2.spring.StrutsSpringObjectFactory" />
     <constant name="struts.action.excludePattern" value=".*/js/.*,.*/css/.*,.*/images/.*,.*/font/.*" />
 
-    <package name="softbalance" extends="httl-default">
+    <package name="softbalance" extends="struts-default">
 
         <interceptors>
             <interceptor-stack name="myStack">
@@ -29,16 +29,27 @@
             </interceptor-stack>
         </interceptors>
 
-        <action name="index" class="indexAction">
-            <result name="success" type="httl">
-                /visual/main.httl
+        <action name="/" class="virtualAction">
+            <result name="success" type="velocity">
+                /virtual/main.htm
             </result>
-            <result name="input" type="httl">/visual/main.httl</result>
         </action>
 
-        <action name="login" class="loginAction">
-            <result type="httl">
-                <param name="location">login.httl</param>
+        <action name="virtual" class="virtualAction">
+            <result name="success" type="velocity">
+                /virtual/main.htm
+            </result>
+        </action>
+
+        <action name="pool" class="poolAction">
+            <result name="success" type="velocity">
+                /pool/main.htm
+            </result>
+        </action>
+
+        <action name="node" class="nodeAction">
+            <result name="success" type="velocity">
+                /node/main.htm
             </result>
         </action>
 

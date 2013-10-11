@@ -8,10 +8,10 @@ import com.opensymphony.xwork2.ActionSupport;
 /**
  * @author wukezhu
  */
-@Component("indexAction")
-public class IndexAction extends ActionSupport {
+@Component("poolAction")
+public class PoolAction extends ActionSupport {
 
-    private String path = "visual";
+    private String path = "pool";
 
     private String contextPath;
 

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
-<head> ${include("../common/header.httl")}
+<head> #parse("common/header.htm")
 </head>
 <!--[if lt IE 7 ]> <body class="ie ie6"> <![endif]-->
 <!--[if IE 7 ]> <body class="ie ie7 "> <![endif]-->
@@ -10,9 +10,9 @@
 <body class="">
   <!--<![endif]-->
 
-  ${include("../common/navbar.httl")} ${include("../common/sidebar.httl")} 
+  #parse("common/navbar.htm") #parse("common/sidebar.htm") 
   
-  ${include("container.httl")}
+  #parse("${path}/container.htm")
   
   <!-- 成功的消息条 -->
   <div style="display: none" id="alert_success">
@@ -55,7 +55,7 @@
   <script type="text/javascript" src="${contextPath}/softbalance-style/js/s2.min.js"></script>
   <script type="text/javascript" src="${contextPath}/softbalance-style/alishare.#springMessage('jsEnv').js?t=20130623"></script>
 
-  ${include("initJs.httl")}
+  #parse("${path}/initJs.htm")
   <!-- HTML5 shim, for IE6-8 support of HTML elements -->
   <!--[if lt IE 9]>
     <script src="${contextPath}/softbalance-style/js/html5.js"></script>

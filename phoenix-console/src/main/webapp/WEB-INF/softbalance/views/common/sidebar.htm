@@ -1,0 +1,11 @@
+<div class="sidebar-nav">
+  <a href="#dashboard-menu" class="nav-header" data-toggle="collapse"><i class="icon-group"></i>功能</a>
+  <ul id="dashboard-menu" class="nav nav-list collapse in">
+    <li class="#if($path=="virtual")active#end"><a href="${contextPath}/softbalance/virtual"><i
+        class="icon-wrench #if($path=="virtual")icon-white#end"></i> Virtual Servers </a></li>
+    <li class="#if($path=="pool")active#end"><a href="${contextPath}/softbalance/pool"><i
+        class="icon-map-marker #if($path=="pool")icon-white#end"></i> Pool </a></li>
+    <li class="#if($path=="node")active#end"><a href="${contextPath}/softbalance/node"><i
+        class="icon-map-marker #if($path=="node")icon-white#end -->"></i> Node </a></li>
+  </ul>
+</div>

@@ -1,0 +1,63 @@
+<virtualServer name="www">
+	<domain>www.dianping.com</domain>
+	<!--host表示这个virtualServer对应的nginx机器是哪些，可以用于分发对应的nginx.conf到这些host上-->
+	<hosts>
+		<host>10.2.1.1</host>
+		<host>10.2.1.2</host>
+	</hosts>
+	<!--指定这个virtualServer对应的nginx.conf的模板，模板中包含一些nginx基本设置，如是否gzip等-->
+	<template>www-nginx-conf.vm</template>
+	<port>80</port>
+	<defaultPool>
+		<pool ref="Web.Index"/>
+	</defaultPool>
+	<dispatchActions>
+		<dispatchAction>
+			<!--前缀匹配, prior如果为true，则使用^~操作符，否则使用/操作符 -->
+			<prefixUrlMatcher prior=true>/download</prefixUrlMatcher>
+			<steps>
+				<!--对应nginx的url rewrite-->
+				<rewrite>
+					<before>^(/download/.*)/media/(.*)\..*$</before>
+					<after>$1/mp3/$2.mp3</after>
+					<next>break</next>
+				</rewrite>
+				<rewrite>
+					<before>^(/download/.*)/audio/(.*)\..*$</before>
+					<after>$1/mp3/$2.ra</after>
+					<next>last</next>
+				</rewrite>
+				<!--直接返回403-->
+				<return>403</return>
+			</steps>
+		</dispatchAction>
+		<dispatchAction>
+			<!--完全匹配-->
+			<exactUrlMatcher>/shanghai</exactUrlMatcher>
+			<accesslog>
+				<dest>logs/access.log</dest>
+				<format>main</format>
+			</accesslog>
+			<steps>
+				<rewrite>
+					<before>^(/shanghai/.*)/media/(.*)\..*$</before>
+					<after>$1/mp3/$2.mp3</after>
+					<next>break</next>
+				</rewrite>
+				<forward>
+					<pool ref="Web.Tuangou"/>
+				</forward>
+			</steps>
+		</dispatchAction>
+		<dispatchAction>
+			<!--正则匹配-->
+			<regexUrlMatcher caseSensitive=true>^/(images|javascript|js|css|flash|media|static)/</regexUrlMatcher>
+			<steps>
+				<staticResource>
+					<root>/var/www/virtual/big.server.com/htdocs</root>
+					<expires>30d</expires>
+				</staticResource>
+			</steps>
+		</dispatchAction>
+	</dispatchActions>
+</virtualServer>

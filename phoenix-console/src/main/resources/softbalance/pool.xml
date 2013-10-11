@@ -1,0 +1,52 @@
+<pools>
+	<pool name="Web.Tuangou">
+		<lbStrategy>
+			<hash>
+				<target>uri</target>
+				<method>crc32</method>
+			</hash>
+		</lbStrategy>
+		<minAvailMemberPct>50</minAvailMemberPct>
+		<poolMembers>
+			<member>
+				<node ref="tuangou-web01"/>
+				<port>8080</port>
+				<weight>5</weight>
+				<maxFails>5</maxFails>
+				<failTimeout>30s</failTimeout>
+			</member>
+			<member>
+				<node ref="tuangou-web02"/>
+				<port>8080</port>
+				<weight>5</weight>
+				<maxFails>5</maxFails>
+				<failTimeout>30s</failTimeout>
+			</member>
+		</poolMembers>
+	</pool>
+	<pool name="Web.Index">
+		<lbStrategy>
+			<hash>
+				<target>uri</target>
+				<method>crc32</method>
+			</hash>
+		</lbStrategy>
+		<minAvailMemberPct>50</minAvailMemberPct>
+		<poolMembers>
+			<member>
+				<node ref="index-web01"/>
+				<port>8080</port>
+				<weight>5</weight>
+				<maxFails>5</maxFails>
+				<failTimeout>30s</failTimeout>
+			</member>
+			<member>
+				<node ref="index-web02"/>
+				<port>8080</port>
+				<weight>5</weight>
+				<maxFails>5</maxFails>
+				<failTimeout>30s</failTimeout>
+			</member>
+		</poolMembers>
+	</pool>
+</pools>

@@ -1,0 +1,14 @@
+<nodes>
+    <node name="tuangou-web01">
+        <address>10.1.1.1</address>
+    </node>
+    <node name="tuangou-web02">
+        <address>10.1.1.2</address>
+    </node>
+    <node name="index-web01">
+        <address>10.1.1.60</address>
+    </node>
+    <node name="index-web02">
+        <address>10.1.1.61</address>
+    </node>
+</nodes>

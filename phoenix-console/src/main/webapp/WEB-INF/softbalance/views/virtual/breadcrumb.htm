@@ -1,0 +1,16 @@
+<ul class="breadcrumb">
+  <li class="active" style="color: #333333;">VirtualServer:</li>&nbsp;&nbsp;&nbsp;
+  #foreach($virtualServer in $virtualServers)
+    #if($velocityCount == 1)
+  <li class="active">$virtualServer.domain</li>
+    #else
+  <li><a href="?date=${dateFormatUtils.format($date0,"yyyyMMdd")}">$virtualServer.domain</a></li>
+    #end
+    #if($veloctiyCount < $virtual.size() ) 
+  <span class="divider">|</span>
+    #end
+  #end
+   <li class="active">www.dianping.com</li><span class="divider">|</span>
+  <li><a href="?date=${dateFormatUtils.format($date0,"yyyyMMdd")}">t.dianping.com</a></li><span class="divider">|</span>
+  <li><a href="?date=${dateFormatUtils.format($date0,"yyyyMMdd")}">v.dianping.com</a></li>
+</ul>
