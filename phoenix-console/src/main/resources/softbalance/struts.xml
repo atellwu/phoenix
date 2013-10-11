@@ -21,6 +21,11 @@
 
     <package name="softbalance" extends="struts-default">
 
+        <result-types>
+            <result-type name="velocity"
+                class="com.dianping.phoenix.softbalance.action.VelocityLayoutResult" />
+        </result-types>
+
         <interceptors>
             <interceptor-stack name="myStack">
                 <interceptor-ref name="timer" />
@@ -31,25 +36,25 @@
 
         <action name="/" class="virtualAction">
             <result name="success" type="velocity">
-                /virtual/main.htm
+                /container.htm
             </result>
         </action>
 
         <action name="virtual" class="virtualAction">
             <result name="success" type="velocity">
-                /virtual/main.htm
+                /container.htm
             </result>
         </action>
 
         <action name="pool" class="poolAction">
             <result name="success" type="velocity">
-                /pool/main.htm
+                /container.htm
             </result>
         </action>
 
         <action name="node" class="nodeAction">
             <result name="success" type="velocity">
-                /node/main.htm
+                /container.htm
             </result>
         </action>
 
