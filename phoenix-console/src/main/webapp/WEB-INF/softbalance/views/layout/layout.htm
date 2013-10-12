@@ -51,9 +51,10 @@
   <script type="text/javascript" src="${contextPath}/softbalance-style/jquery.dateFormat-1.0.min.js"></script>
   <script src="${contextPath}/softbalance-style/js/bs.min.js"></script>
   <script type="text/javascript" src="${contextPath}/softbalance-style/js/s2.min.js"></script>
-  <script type="text/javascript" src="${contextPath}/softbalance-style/alishare.#springMessage('jsEnv').js?t=20130623"></script>
+  <script type="text/javascript" src="${contextPath}/softbalance-style/application.js?t=20130623"></script>
 
-  #parse("${path}/initJs.htm")
+${tabName}
+  ##parse("${tabName}/initJs.htm")
   <!-- HTML5 shim, for IE6-8 support of HTML elements -->
   <!--[if lt IE 9]>
     <script src="${contextPath}/softbalance-style/js/html5.js"></script>

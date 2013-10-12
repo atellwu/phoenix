@@ -1,0 +1,17 @@
+<ul class="breadcrumb">
+  <li class="active" style="color: #333333;">&nbsp;&nbsp;&nbsp;</li> #if($tabName=="rules")
+  <li class="active">&nbsp;rules&nbsp;</li> #else
+  <li><a href="${contextPath}/softbalance/${virtualServerName}/rules"> &nbsp;rules&nbsp; </a></li> #end
+  <span class="divider">|</span>
+  #if($tabName=="pools")
+  <li class="active">&nbsp;pools&nbsp;</li> #else
+  <li><a href="${contextPath}/softbalance/${virtualServerName}/pools"> &nbsp;pools&nbsp; </a></li> #end
+  <span class="divider">|</span>
+  #if($tabName=="nodes")
+  <li class="active">&nbsp;nodes&nbsp;</li> #else
+  <li><a href="${contextPath}/softbalance/${virtualServerName}/nodes"> &nbsp;nodes&nbsp; </a></li> #end
+  <span class="divider">|</span>
+  #if($tabName=="profile")
+  <li class="active">&nbsp;profile&nbsp;</li> #else
+  <li><a href="${contextPath}/softbalance/${virtualServerName}/profile"> &nbsp;profile&nbsp; </a></li> #end
+</ul>

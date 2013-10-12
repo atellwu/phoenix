@@ -1,0 +1,131 @@
+<div class="well">
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="width: 30px;">编号</th>
+        <th>Name</th>
+        <th>Address</th>
+        <th>Availability</th>
+        <th>State</th>
+        <th style="width: 160px;">创建时间</th>
+        <th style="width: 160px;">最近修改时间</th>
+        <th style="width: 130px;">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id="tr_1293018473">
+        <td>1</td>
+        <td><a href="#" target="_blank">abc</a></td>
+        <td>10.2.4.88</td>
+        <td>Available (Enabled)</td>
+        <td>
+          <div class="btn-group" data-toggle="buttons-radio">
+            <button type="button" id="sequenceSend" class="btn btn-mini btn-info">开</button>
+            <button type="button" class="btn btn-mini btn-danger">关</button>
+          </div>
+        </td>
+        <td>2013/10/10 00:45</td>
+        <td>2013/10/10 00:45</td>
+        <td><a onclick="javascript:;" href="javascript:;"><span class="label label-info"> 编辑 </span></a>&nbsp;<a
+          onclick="javascript:;" href="javascript:;"><span class="label">删除</span></a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 添加帐号 -->
+<div aria-hidden="true" role="dialog" class="modal hide" id="addNodeModal" style="min-with:500px;">
+  <div class="modal-header">
+    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+    <h3>添加节点</h3>
+  </div>
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <div class="alert alert-info">
+        <strong>温馨提示</strong>： ！
+      </div>
+      <div id="usernameDiv" class="control-group">
+        <label class="control-label">Name</label>
+        <div class="controls">
+          <input id="username" type="text" placeholder="请输入"> <span class="muted">（只能含字母，下划线和数字）</span>
+        </div>
+      </div>
+      <div id="passwordDiv" class="control-group">
+        <label class="control-label">Address</label>
+        <div class="controls">
+          <div class="input-prepend">
+            <span class="add-on"><i class="icon-lock"></i></span><input id="password" type="text"
+              onkeyup="if(event.keyCode==13)alishare.addSocialAccount()" placeholder="请输入ip地址">
+          </div>
+        </div>
+      </div>
+      <div id="accountAlertDiv"></div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button onclick="alishare.addSocialAccount()" class="btn btn-primary">确定</button>
+    <button data-dismiss="modal" class="btn">取消</button>
+  </div>
+</div>
+<!-- 修改帐号 -->
+<div aria-hidden="true" role="dialog" class="modal hide" id="modAccountModal" style="">
+  <div class="modal-header">
+    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+    <h3>修改密码</h3>
+  </div>
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <div class="alert alert-info">
+        <strong>温馨提示</strong>：！
+      </div>
+      <div class="control-group">
+        <label class="control-label">邮箱</label>
+        <div class="controls">
+          <!-- 有input text,在password上enter才不提交 -->
+          <input type="text" style="display: none"> <span id="modUsername" class="input-large uneditable-input"></span>
+          <input id="modId" type="hidden" value="">
+        </div>
+      </div>
+      <div id="modPasswordDiv" class="control-group">
+        <label class="control-label">密码</label>
+        <div class="controls">
+          <div class="input-prepend">
+            <span class="add-on"><i class="icon-lock"></i></span><input id="modPassword"
+              onkeyup="if(event.keyCode==13)alishare.modSocialAccountPasswd()" type="password" placeholder="请输入新的密码">
+          </div>
+          <span class="muted">（已使用<a style="border-bottom: 1px dotted #999999; color: #999" title="点击查看什么是安全通道"
+            href="http://baike.baidu.com/view/14121.htm" target="blank">安全通道</a>）
+          </span>
+        </div>
+      </div>
+      <div id="modAccountAlertDiv"></div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button onclick="alishare.modSocialAccountPasswd()" class="btn btn-primary">确定</button>
+    <button data-dismiss="modal" class="btn">取消</button>
+  </div>
+</div>
+<!-- 删除帐号 -->
+<div aria-hidden="true" data-backdrop="true" role="dialog" tabindex="-1" class="modal hide" id="delAccountModal"
+  style="">
+  <div class="modal-header">
+    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+    <h3>
+      删除
+    </h3>
+  </div>
+  <div class="modal-body">
+    <p style="text-align: center;">
+      <i class="icon-warning-sign"></i> 您是否确定要删除帐号
+      <code id="delUsername"></code>
+      ？
+    </p>
+    <p class="muted" style="font-size: 11px; text-align: center;">温馨提示：删除后，您随时可以重新添加该帐号喔！</p>
+    <input id="delId" type="hidden" value="">
+  </div>
+  <div class="modal-footer">
+    <button onclick="alishare.delSocialAccount()" class="btn btn-primary">确定</button>
+    <button data-dismiss="modal" class="btn">取消</button>
+  </div>
+</div>

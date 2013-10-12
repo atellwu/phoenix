@@ -17,9 +17,16 @@
     <constant name="struts.custom.properties" value="classpath:/softbalance/struts.properties" />
     <constant name="struts.objectFactory"
         value="org.apache.struts2.spring.StrutsSpringObjectFactory" />
-    <constant name="struts.action.excludePattern" value=".*/js/.*,.*/css/.*,.*/images/.*,.*/font/.*" />
+    <constant name="struts.patternMatcher" value="namedVariable" />
+    <constant name="struts.action.excludePattern" value=".*/js/.*,.*/css/.*,.*/images/.*,.*/font/.*,.*/softbalance-style/.*" />
 
-    <package name="softbalance" extends="struts-default">
+    <constant name="struts.enable.SlashesInActionNames" value="true" />
+    <constant name="struts.mapper.alwaysSelectFullNamespace"
+        value="false" />
+    <constant name="struts.patternMatcher" value="regex" />
+
+    <package name="softbalance" namespace="/softbalance"
+        extends="struts-default">
 
         <result-types>
             <result-type name="velocity"
@@ -34,28 +41,18 @@
             </interceptor-stack>
         </interceptors>
 
-        <action name="/" class="virtualAction">
+        <action name="/{virtualServerName}/{tabName}" class="mainAction">
             <result name="success" type="velocity">
                 /container.htm
             </result>
+            <!-- <param name="virtualServerName">{1}</param> <param name="tabName">{2}</param> -->
         </action>
 
-        <action name="virtual" class="virtualAction">
+        <action name="/{virtualServerName}" class="mainAction">
             <result name="success" type="velocity">
                 /container.htm
             </result>
-        </action>
-
-        <action name="pool" class="poolAction">
-            <result name="success" type="velocity">
-                /container.htm
-            </result>
-        </action>
-
-        <action name="node" class="nodeAction">
-            <result name="success" type="velocity">
-                /container.htm
-            </result>
+            <param name="tabName">rules</param>
         </action>
 
     </package>
