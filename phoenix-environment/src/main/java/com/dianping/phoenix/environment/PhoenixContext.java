@@ -129,4 +129,11 @@ public class PhoenixContext {
         set(GUID, guid);
     }
 
+    /**
+     * 返回ThreadLocal中的map，map包含所有已存放的key-value
+     */
+    public Map<String, Object> getMap() {
+        return new HashMap<String, Object>(map.get());
+    }
+
 }

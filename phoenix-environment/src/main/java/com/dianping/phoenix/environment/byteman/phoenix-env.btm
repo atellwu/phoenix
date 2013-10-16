@@ -1,0 +1,9 @@
+RULE phoenix env
+CLASS java.util.concurrent.ThreadPoolExecutor
+METHOD execute(Runnable)
+HELPER com.dianping.phoenix.environment.byteman.PhoenixEnvironmentHelper
+AT ENTRY
+IF true
+DO
+    $1=proxyRunnable($1);
+ENDRULE
