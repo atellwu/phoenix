@@ -37,12 +37,13 @@ public class RunnableProxy implements InvocationHandler {
                 PhoenixContext.getInstance().set(entry.getKey(), entry.getValue());
             }
 
-            Object re = method.invoke(this.runnable, args);
-
-            //清理该线程的PhoenixContext
-            PhoenixContext.getInstance().clear();
-
-            return re;
+            try {
+                Object re = method.invoke(this.runnable, args);
+                return re;
+            } finally {
+                //清理该线程的PhoenixContext
+                PhoenixContext.getInstance().clear();
+            }
 
         } else {
             return method.invoke(this.runnable, args);
