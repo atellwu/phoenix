@@ -9,13 +9,14 @@ import com.dianping.phoenix.environment.PhoenixContext;
 
 public class RunnableProxy implements InvocationHandler {
 
-    Runnable                    runnable;
+    /** 被代理的对象 */
+    private Runnable            runnable;
 
+    /** 存放PhoenixContext的环境变量（使用map，目前包括requestId,referRequestId,guid） */
     private Map<String, Object> map;
 
     /**
-     * 将动态代理绑定到指定的Runnable
-     * 
+     * 返回Runnable的动态代理
      */
     public Runnable bind(Runnable task) {
         this.runnable = task;
@@ -28,17 +29,17 @@ public class RunnableProxy implements InvocationHandler {
      * 方法调用拦截器，拦截run方法
      */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        // 如果调用的是print方法，则替换掉
+        // 拦截Runnable的run方法
         if ("run".equals(method.getName())) {
 
-            //取出map然后放到ThreadLocal
+            //取出map然后放到PhoenixContext
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 PhoenixContext.getInstance().set(entry.getKey(), entry.getValue());
             }
 
             Object re = method.invoke(this.runnable, args);
 
-            //清理该线程的ThreadLocal
+            //清理该线程的PhoenixContext
             PhoenixContext.getInstance().clear();
 
             return re;
