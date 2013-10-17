@@ -9,9 +9,10 @@ import org.junit.Test;
 public class TestByteman {
 
     private static final String    TEST_REQUEST_ID = "test-request-id";
+    private static final String    TEST_GUID       = "test-guid";
     private static ExecutorService executor;
     static {
-        executor = Executors.newFixedThreadPool(1);
+        executor = Executors.newFixedThreadPool(2);
     }
 
     /**
@@ -25,10 +26,12 @@ public class TestByteman {
     public void test() throws Exception {
         Runnable task = new Task();
         PhoenixContext.getInstance().setRequestId(TEST_REQUEST_ID);
+        PhoenixContext.getInstance().setGuid(TEST_GUID);
 
         executor.execute(task);
         executor.execute(task);
 
+        Thread.sleep(1000);
         executor.shutdown();
     }
 
@@ -36,7 +39,9 @@ public class TestByteman {
         @Override
         public void run() {
             System.out.println(PhoenixContext.getInstance().getRequestId());
+            System.out.println(PhoenixContext.getInstance().getGuid());
             Assert.assertEquals(TEST_REQUEST_ID, PhoenixContext.getInstance().getRequestId());
+            Assert.assertEquals(TEST_GUID, PhoenixContext.getInstance().getGuid());
         }
     }
 
