@@ -4,9 +4,12 @@ public class PhoenixEnvironmentHelper {
 
     public Runnable proxyRunnable(Runnable runnable) {
 
+        if (runnable == null) {
+            return runnable;//不能抛出NPE异常，否则byteman会报错
+        }
+
         RunnableProxy proxy = new RunnableProxy();
         return proxy.bind(runnable);
-        //        new WrapRunnable(runnable);
-        //        return new WrapRunnable(runnable);
     }
+
 }

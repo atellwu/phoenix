@@ -32,17 +32,28 @@ public class RunnableProxy implements InvocationHandler {
         // 拦截Runnable的run方法
         if ("run".equals(method.getName())) {
 
-            //取出map然后放到PhoenixContext
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                PhoenixContext.getInstance().set(entry.getKey(), entry.getValue());
+            //是否需要初始化PhoenixContext（如果PhoenixContext的map已经存在，则不需要初始化）
+            boolean needInitEnv = true;
+
+            Map<String, Object> currentMap = PhoenixContext.getInstance().getMap();
+            if (currentMap.size() > 0) {
+                needInitEnv = false;
+            }
+
+            //如果needInitEnv为true，取出map然后放到PhoenixContext
+            if (needInitEnv) {
+                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                    PhoenixContext.getInstance().set(entry.getKey(), entry.getValue());
+                }
             }
 
             try {
                 Object re = method.invoke(this.runnable, args);
                 return re;
             } finally {
-                //清理该线程的PhoenixContext
-                PhoenixContext.getInstance().clear();
+                if (needInitEnv) {//如果needInitEnv为true，清理该线程的PhoenixContext
+                    PhoenixContext.getInstance().clear();
+                }
             }
 
         } else {

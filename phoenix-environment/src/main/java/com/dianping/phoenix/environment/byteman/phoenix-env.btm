@@ -1,4 +1,4 @@
-RULE phoenix env
+RULE phoenix env (trigger at ThreadPoolExecutor)
 CLASS java.util.concurrent.ThreadPoolExecutor
 METHOD execute(Runnable)
 HELPER com.dianping.phoenix.environment.byteman.PhoenixEnvironmentHelper
@@ -7,3 +7,18 @@ IF true
 DO
     $1=proxyRunnable($1);
 ENDRULE
+
+RULE phoenix env (trigger at ScheduledThreadPoolExecutor)
+CLASS java.util.concurrent.ScheduledThreadPoolExecutor
+METHOD delayedExecute(Runnable)
+HELPER com.dianping.phoenix.environment.byteman.PhoenixEnvironmentHelper
+AT ENTRY
+IF true
+DO
+    $1=proxyRunnable($1);
+ENDRULE
+
+
+
+
+ 
