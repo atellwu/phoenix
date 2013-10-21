@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.phoenix.environment.handler.RequestIdContextHandler;
+
 public class PhoenixEnvironmentFilter implements Filter {
 
     private static final Logger LOG = LoggerFactory.getLogger(PhoenixEnvironmentFilter.class);
@@ -31,11 +33,11 @@ public class PhoenixEnvironmentFilter implements Filter {
                 HttpServletRequest hRequest = (HttpServletRequest) request;
 
                 //从request中或去id
-                String requestId = hRequest.getHeader(PhoenixContext.MOBILE_REQUEST_ID);
+                String requestId = hRequest.getHeader(RequestIdContextHandler.MOBILE_REQUEST_ID);
                 String referRequestId = null;
 
                 if (requestId != null) {//如果存在requestId，则说明是移动api的web端
-                    referRequestId = hRequest.getHeader(PhoenixContext.MOBILE_REFER_REQUEST_ID);
+                    referRequestId = hRequest.getHeader(RequestIdContextHandler.MOBILE_REFER_REQUEST_ID);
 
                 } else {//普通web端  TODO 待第二期实现
                     //requestId不存在，则生成
@@ -63,7 +65,7 @@ public class PhoenixEnvironmentFilter implements Filter {
 
         } finally {
             //清除ThreadLocal
-            PhoenixContext.getInstance().clear();
+            PhoenixContext.remove();
         }
 
     }
