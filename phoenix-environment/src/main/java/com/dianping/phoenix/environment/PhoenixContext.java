@@ -3,7 +3,9 @@ package com.dianping.phoenix.environment;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.dianping.phoenix.environment.handler.RequestIdContextHandler;
+import javax.servlet.http.HttpServletRequest;
+
+import com.dianping.phoenix.environment.handler.RequestIdContext;
 
 /**
  * 基于ThreadLocal的通用内存容器，用于在各个平台级别的组件中传递变量
@@ -15,173 +17,115 @@ import com.dianping.phoenix.environment.handler.RequestIdContextHandler;
  */
 public class PhoenixContext {
 
-    public static final String                                                 ENV           = "phoenixEnvironment";
+    public static final String                          ENV           = "phoenixEnvironment";
 
-    private static ThreadLocal<PhoenixContext>                                 s_threadLocal = new ThreadLocal<PhoenixContext>() {
-                                                                                                 @Override
-                                                                                                 protected PhoenixContext initialValue() {
-                                                                                                     return new PhoenixContext();
-                                                                                                 }
-                                                                                             };
+    private static ThreadLocal<PhoenixContext>          s_threadLocal = new ThreadLocal<PhoenixContext>() {
+                                                                          @Override
+                                                                          protected PhoenixContext initialValue() {
+                                                                              return new PhoenixContext();
+                                                                          }
+                                                                      };
 
-    private Map<Class<? extends PhoenixContextHandler>, PhoenixContextHandler> m_map         = new HashMap<Class<? extends PhoenixContextHandler>, PhoenixContextHandler>();
+    private static Map<String, PhoenixContextInterface> m_map         = new HashMap<String, PhoenixContextInterface>();
 
-    private PhoenixContext() {
-    }
+    //    private PhoenixContextContainer() {
+    //    }
 
+    //ReuquetIdContext.setup()将做一些初始化，并将自己放到PhoenixContext中。
+
+    //ReuquetIdContext.xxx()从PhoenixContext获取当前的ReuquetIdContext对象(无则返回默认对象)
+
+    //ReuquetIdContext的数据存储在PhoenixContext中，这样才能通过PhoenixContext直接复制所有数据
+
+    //
+    //
     public static PhoenixContext get() {
         return s_threadLocal.get();
     }
 
-    public static void remove() {
+    private HttpServletRequest m_hRequest;
+
+    //对已注册的类型，进行初始化
+    public void init() {
+        for (Map.Entry<String, PhoenixContextInterface> entry : m_map.entrySet()) {
+            PhoenixContextInterface context = entry.getValue();
+            context.setup(this);
+        }
+    }
+
+    public void clear() {
+        for (Map.Entry<String, PhoenixContextInterface> entry : m_map.entrySet()) {
+            PhoenixContextInterface handler = entry.getValue();
+            handler.destroy();
+        }
+        //        m_map.remove();
         s_threadLocal.remove();
     }
 
-    public <T extends PhoenixContextHandler> void set(T handler) {
-        m_map.put(handler.getClass(), handler);
+    //将class类注册进来，这样init时会调用该类型的实例，进行初始化环境变量
+    public void register(Class<? extends PhoenixContextInterface> clazz) {
+        try {
+            m_map.put(clazz.getClass().getName(), clazz.newInstance());
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends PhoenixContextHandler> T get(Class<T> clazz) {
-        return (T) m_map.get(clazz);
-    }
-
-    public boolean isEmpty() {
-        return m_map.isEmpty();
-    }
-
-    public void copyTo(PhoenixContext phoenixContext) {
-        //TODO 完成复制
-    }
-
-    /**
-     * 清除ThreadLocal
-     */
-    public void clear() {
-        s_threadLocal.remove();
-    }
-
-    //*****************以下是兼容方法
-    /**
-     * @deprecated 改用PhoenixContext.get()
-     */
-    public static PhoenixContext getInstance() {
-        return s_threadLocal.get();
-    }
-
-    /**
-     * 获取metas，metas用于页头插入到html中
-     * 
-     * @deprecated 改用RequestIdContextHandler handler = get(RequestIdContextHandler.class); if(handler!=null)metas = handler.getMetas();
-     */
-    public String getMetas() {
-        RequestIdContextHandler handler = this.get(RequestIdContextHandler.class);
-        if (handler != null) {
-            return handler.getMetas();
-        }
-        return null;
-    }
-
-    /**
-     * 设置metas，metas用于页头插入到html中
-     * 
-     * @deprecated 改用RequestIdContextHandler handler = get(RequestIdContextHandler.class); if(handler!=null) handler.setMetas(metas);
-     */
-    public void setMetas(String metas) {
-        RequestIdContextHandler handler = this.get(RequestIdContextHandler.class);
+    public <T extends PhoenixContextInterface> T get(Class<T> clazz) {
+        T handler = (T) m_map.get(clazz.getName());
         if (handler == null) {
-            handler = new RequestIdContextHandler();
-            this.set(handler);
+            try {
+                handler = clazz.newInstance();
+            } catch (InstantiationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-        handler.setMetas(metas);
+        return handler;
     }
 
-    /**
-     * 从ThreadLocal中获取requestId
-     * 
-     * @deprecated 改用RequestIdContextHandler handler = get(RequestIdContextHandler.class);再从handler中获取需要的属性;
-     */
-    public String getRequestId() {
-        RequestIdContextHandler handler = this.get(RequestIdContextHandler.class);
-        if (handler != null) {
-            return handler.getRequestId();
-        }
-        return null;
-    }
-
-    /**
-     * 将requestId存放到ThreadLocal中
-     * 
-     * @deprecated 改用RequestIdContextHandler handler = get(RequestIdContextHandler.class); if(handler!=null) handler.setRequestId(requestId);
-     */
-    public void setRequestId(String requestId) {
-        RequestIdContextHandler handler = this.get(RequestIdContextHandler.class);
+    @SuppressWarnings("unchecked")
+    public <T extends PhoenixContextInterface> T get(String clazzName) {
+        T handler = (T) m_map.get(clazzName);
         if (handler == null) {
-            handler = new RequestIdContextHandler();
-            this.set(handler);
+            try {
+                handler = (T) Class.forName(clazzName).newInstance();
+            } catch (InstantiationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-        handler.setRequestId(requestId);
+
+        return handler;
     }
 
-    /**
-     * 从ThreadLocal中获取referRequestId
-     * 
-     * @deprecated
-     */
-    public String getReferRequestId() {
-        RequestIdContextHandler handler = this.get(RequestIdContextHandler.class);
-        if (handler != null) {
-            return handler.getReferRequestId();
-        }
-        return null;
+    public void setHttpServletRequest(HttpServletRequest hRequest) {
+        this.m_hRequest = hRequest;
     }
 
-    /**
-     * 将referRequestId存放到ThreadLocal中
-     * 
-     * @deprecated
-     */
-    public void setReferRequestId(String referRequestId) {
-        RequestIdContextHandler handler = this.get(RequestIdContextHandler.class);
-        if (handler == null) {
-            handler = new RequestIdContextHandler();
-            this.set(handler);
-        }
-        handler.setReferRequestId(referRequestId);
+    public HttpServletRequest getHttpServletRequest() {
+        return m_hRequest;
     }
 
-    /**
-     * 从ThreadLocal中获取guid
-     * 
-     * @deprecated
-     */
-    public String getGuid() {
-        RequestIdContextHandler handler = this.get(RequestIdContextHandler.class);
-        if (handler != null) {
-            return handler.getGuid();
+    public static void main(String[] args) {
+        //第三方业务，例如移动api使用时：
+        RequestIdContext context = PhoenixContext.get().get(RequestIdContext.class);
+        if (context == null) {
         }
-        return null;
     }
-
-    /**
-     * 将guid存放到ThreadLocal中
-     * 
-     * @deprecated
-     */
-    public void setGuid(String guid) {
-        RequestIdContextHandler handler = this.get(RequestIdContextHandler.class);
-        if (handler == null) {
-            handler = new RequestIdContextHandler();
-            this.set(handler);
-        }
-        handler.setGuid(guid);
-    }
-    //
-    //    /**
-    //     * 返回ThreadLocal中的map，map包含所有已存放的key-value
-    //     */
-    //    public Map<String, Object> getMap() {
-    //        return new HashMap<String, Object>(map.get());
-    //    }
 
 }

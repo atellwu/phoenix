@@ -1,8 +1,11 @@
 package com.dianping.phoenix.environment.handler;
 
-import com.dianping.phoenix.environment.PhoenixContextHandler;
+import javax.servlet.http.HttpServletRequest;
 
-public class RequestIdContextHandler implements PhoenixContextHandler {
+import com.dianping.phoenix.environment.PhoenixContextInterface;
+import com.dianping.phoenix.environment.PhoenixContext;
+
+public class RequestIdContext implements PhoenixContextInterface {
 
     public static final String MOBILE_REQUEST_ID       = "pragma-page-id";
     public static final String MOBILE_REFER_REQUEST_ID = "pragma-prev-page-id";
@@ -82,6 +85,30 @@ public class RequestIdContextHandler implements PhoenixContextHandler {
      */
     public void setGuid(String guid) {
         this.m_guid = guid;
+    }
+
+    @Override
+    public void destroy() {
+    }
+
+    @Override
+    public void setup(PhoenixContext context) {
+        HttpServletRequest request = context.getHttpServletRequest();
+
+        String requestId = request.getHeader(RequestIdContext.MOBILE_REQUEST_ID);
+        String referRequestId = null;
+
+        if (requestId != null) {//如果存在requestId，则说明是移动api的web端
+            referRequestId = request.getHeader(RequestIdContext.MOBILE_REFER_REQUEST_ID);
+
+        } else {//普通web端  TODO 待第二期实现
+            //requestId不存在，则生成
+            //referRequestId，异步通过pigeon去session服务器获取
+            //判断cookie中的guid是否存在，不存在则生成
+            //将所有id放入request属性，供页头使用
+            //request.setAttribute(PhoenixEnvironment.ENV, new PhoenixEnvironment());
+        }
+
     }
 
 }
