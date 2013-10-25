@@ -41,11 +41,11 @@ public class WrapRunnable implements Runnable {
     @Override
     public void run() {
         //是否需要初始化PhoenixContext（如果PhoenixContext的map已经存在，则不需要初始化）
-        boolean needInitEnv = false;
+        boolean needInitEnv = true;
 
         PhoenixContext phoenixContext = PhoenixContext.get();
-        if (phoenixContext.isEmpty()) {
-            needInitEnv = true;
+        if (phoenixContext.isSetuped()) {
+            needInitEnv = false;
         }
 
         //如果needInitEnv为true，取出map然后放到PhoenixContext
@@ -58,7 +58,7 @@ public class WrapRunnable implements Runnable {
         } finally {
             //清理该线程的ThreadLocal
             if (needInitEnv) {
-                PhoenixContext.remove();
+                phoenixContext.clear();
             }
         }
     }

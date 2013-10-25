@@ -2,8 +2,6 @@ package com.dianping.phoenix.environment;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -11,8 +9,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +28,8 @@ public class PhoenixContext {
 
     private static final Logger                                  LOG           = LoggerFactory.getLogger(PhoenixContext.class);
 
+    private static final String                                  DISABLES      = "disables";
+
     public static final String                                   ENV           = "phoenixEnvironment";
 
     private static final Pattern                                 PATTERN       = Pattern.compile("phoenix-env.properties");
@@ -48,19 +46,10 @@ public class PhoenixContext {
 
     private Map<String, PhoenixContextInterface>                 m_map         = new HashMap<String, PhoenixContextInterface>();
 
-    private HttpServletRequest                                   m_hRequest;
+    private Map<String, Object>                                  m_param       = new HashMap<String, Object>();
 
-    //    private PhoenixContextContainer() {
-    //    }
+    private boolean                                              m_setuped     = false;
 
-    //ReuquetIdContext.setup()将做一些初始化，并将自己放到PhoenixContext中。
-
-    //ReuquetIdContext.xxx()从PhoenixContext获取当前的ReuquetIdContext对象(无则返回默认对象)
-
-    //ReuquetIdContext的数据存储在PhoenixContext中，这样才能通过PhoenixContext直接复制所有数据
-
-    //
-    //
     public static PhoenixContext get() {
         return s_threadLocal.get();
     }
@@ -81,9 +70,22 @@ public class PhoenixContext {
                 throw new RuntimeException("Setup Error", e);
             }
         }
+        m_setuped = true;
     }
 
-    public void destroy() {
+    public boolean isSetuped() {
+        return m_setuped;
+    }
+
+    public void copyTo(PhoenixContext context) {
+        for (Map.Entry<String, PhoenixContextInterface> entry : m_map.entrySet()) {
+            PhoenixContextInterface c = entry.getValue();
+            context.m_map.put(entry.getKey(), c.clone());
+        }
+        context.m_param.putAll(m_param);
+    }
+
+    public void clear() {
         for (Map.Entry<String, PhoenixContextInterface> entry : m_map.entrySet()) {
             PhoenixContextInterface context = entry.getValue();
             context.destroy();
@@ -102,30 +104,32 @@ public class PhoenixContext {
                 String file = entry.getKey();
                 byte[] bytes = entry.getValue();
                 properties.load(new ByteArrayInputStream(bytes));
-                LOG.info("Loaded File: " + file);
+                LOG.info("Loaded config file: " + file);
             }
         }
-        Enumeration<?> names = properties.propertyNames();
-        while (names.hasMoreElements()) {
-            Object el = names.nextElement();
-            String className = (String) el;
-            Class<?> clazz;
-            try {
-                clazz = Class.forName(className);
-                if (clazz.isAssignableFrom(PhoenixContextInterface.class)) {
-                    m_set.add((Class<? extends PhoenixContextInterface>) clazz);
-                } else {
-                    LOG.warn("Define ignored because it's not implemented of PhoenixContextInterface: " + className);
+        //将class一一注册
+        for (Map.Entry<?, ?> entry : properties.entrySet()) {
+            String className = (String) entry.getKey();
+            String disables = (String) entry.getValue();
+            if (!DISABLES.equalsIgnoreCase(disables)) {
+                try {
+                    Class<?> clazz = Class.forName(className);
+                    register((Class<? extends PhoenixContextInterface>) clazz);
+                } catch (ClassNotFoundException e) {
+                    LOG.warn("Define ignored because class is not found: " + className);
                 }
-            } catch (ClassNotFoundException e) {
-                LOG.warn("Define ignored because class is not found: " + className);
             }
         }
     }
 
     //将class类注册进来
     public static void register(Class<? extends PhoenixContextInterface> clazz) {
-        m_set.add(clazz);
+        if (PhoenixContextInterface.class.isAssignableFrom(clazz)) {
+            m_set.add(clazz);
+            LOG.info("Loaded define class: " + clazz);
+        } else {
+            LOG.warn("Define class ignored, because it's not implemented of PhoenixContextInterface: " + clazz);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -135,11 +139,9 @@ public class PhoenixContext {
             try {
                 handler = clazz.newInstance();
             } catch (InstantiationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
         return handler;
@@ -152,31 +154,78 @@ public class PhoenixContext {
             try {
                 handler = (T) Class.forName(clazzName).newInstance();
             } catch (InstantiationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new RuntimeException(e);
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
 
         return handler;
     }
 
-    public void setHttpServletRequest(HttpServletRequest hRequest) {
-        this.m_hRequest = hRequest;
+    public void addParam(String key, Object value) {
+        m_param.put(key, value);
     }
 
-    public HttpServletRequest getHttpServletRequest() {
-        return m_hRequest;
+    public Object getParam(String key) {
+        return m_param.get(key);
+    }
+
+    //============以下是兼容方法==========
+    public static PhoenixContext getInstance() {
+        return get();
+    }
+
+    public void setRequestId(String requestId) {
+        RequestIdContext context = get(RequestIdContext.class);
+        context.setRequestId(requestId);
+    }
+
+    public String getRequestId() {
+        RequestIdContext context = get(RequestIdContext.class);
+        return context.getRequestId();
+    }
+
+    public void setReferRequestId(String referRequestId) {
+        RequestIdContext context = get(RequestIdContext.class);
+        context.setReferRequestId(referRequestId);
+    }
+
+    public String getReferRequestId() {
+        RequestIdContext context = get(RequestIdContext.class);
+        return context.getReferRequestId();
+    }
+
+    public void setGuid(String guid) {
+        RequestIdContext context = get(RequestIdContext.class);
+        context.setGuid(guid);
+    }
+
+    public String getGuid() {
+        RequestIdContext context = get(RequestIdContext.class);
+        return context.getGuid();
+    }
+
+    public void setMetas(String metas) {
+        RequestIdContext context = get(RequestIdContext.class);
+        context.setMetas(metas);
+    }
+
+    public String getMetas() {
+        RequestIdContext context = get(RequestIdContext.class);
+        return context.getMetas();
     }
 
     public static void main(String[] args) throws IOException {
-        //第三方业务，例如移动api使用时：
         PhoenixContext.init();
+
+        PhoenixContext context = PhoenixContext.get();
+        //        context.addParam(RequestIdContext.REQUEST, value);
+        context.setup();
+        RequestIdContext requestIdContext = PhoenixContext.get().get(RequestIdContext.class);
+        System.out.println(requestIdContext.getRequestId());
     }
 
 }

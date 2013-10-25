@@ -15,4 +15,6 @@ public interface PhoenixContextInterface {
     public void setup(PhoenixContext context);
 
     public void destroy();
+
+    public PhoenixContextInterface clone();
 }
