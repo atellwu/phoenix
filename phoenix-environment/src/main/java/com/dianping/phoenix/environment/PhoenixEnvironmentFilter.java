@@ -77,7 +77,7 @@ public class PhoenixEnvironmentFilter implements Filter {
 
             } finally {
                 //清除ThreadLocal
-                context.clear();
+                context.destroy();
             }
 
         }

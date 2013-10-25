@@ -1,11 +1,24 @@
 package com.dianping.phoenix.environment;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dianping.phoenix.environment.handler.RequestIdContext;
+import com.dianping.phoenix.environment.util.ResourceUtils;
 
 /**
  * 基于ThreadLocal的通用内存容器，用于在各个平台级别的组件中传递变量
@@ -17,16 +30,25 @@ import com.dianping.phoenix.environment.handler.RequestIdContext;
  */
 public class PhoenixContext {
 
-    public static final String                          ENV           = "phoenixEnvironment";
+    private static final Logger                                  LOG           = LoggerFactory.getLogger(PhoenixContext.class);
 
-    private static ThreadLocal<PhoenixContext>          s_threadLocal = new ThreadLocal<PhoenixContext>() {
-                                                                          @Override
-                                                                          protected PhoenixContext initialValue() {
-                                                                              return new PhoenixContext();
-                                                                          }
-                                                                      };
+    public static final String                                   ENV           = "phoenixEnvironment";
 
-    private static Map<String, PhoenixContextInterface> m_map         = new HashMap<String, PhoenixContextInterface>();
+    private static final Pattern                                 PATTERN       = Pattern.compile("phoenix-env.properties");
+
+    /** 已注册的Class */
+    private static Set<Class<? extends PhoenixContextInterface>> m_set         = new HashSet<Class<? extends PhoenixContextInterface>>();
+
+    private static ThreadLocal<PhoenixContext>                   s_threadLocal = new ThreadLocal<PhoenixContext>() {
+                                                                                   @Override
+                                                                                   protected PhoenixContext initialValue() {
+                                                                                       return new PhoenixContext();
+                                                                                   }
+                                                                               };
+
+    private Map<String, PhoenixContextInterface>                 m_map         = new HashMap<String, PhoenixContextInterface>();
+
+    private HttpServletRequest                                   m_hRequest;
 
     //    private PhoenixContextContainer() {
     //    }
@@ -43,36 +65,67 @@ public class PhoenixContext {
         return s_threadLocal.get();
     }
 
-    private HttpServletRequest m_hRequest;
-
-    //对已注册的类型，进行初始化
-    public void init() {
-        for (Map.Entry<String, PhoenixContextInterface> entry : m_map.entrySet()) {
-            PhoenixContextInterface context = entry.getValue();
-            context.setup(this);
+    //对已注册的类型，进行构建实例，并且初始化
+    public void setup() {
+        Iterator<Class<? extends PhoenixContextInterface>> it = m_set.iterator();
+        while (it.hasNext()) {
+            Class<? extends PhoenixContextInterface> contextClazz = it.next();
+            PhoenixContextInterface context;
+            try {
+                context = contextClazz.newInstance();
+                context.setup(this);
+                m_map.put(contextClazz.getName(), context);
+            } catch (InstantiationException e) {
+                throw new RuntimeException("Setup Error", e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Setup Error", e);
+            }
         }
     }
 
-    public void clear() {
+    public void destroy() {
         for (Map.Entry<String, PhoenixContextInterface> entry : m_map.entrySet()) {
-            PhoenixContextInterface handler = entry.getValue();
-            handler.destroy();
+            PhoenixContextInterface context = entry.getValue();
+            context.destroy();
         }
-        //        m_map.remove();
+        m_map.clear();
         s_threadLocal.remove();
     }
 
-    //将class类注册进来，这样init时会调用该类型的实例，进行初始化环境变量
-    public void register(Class<? extends PhoenixContextInterface> clazz) {
-        try {
-            m_map.put(clazz.getClass().getName(), clazz.newInstance());
-        } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+    @SuppressWarnings("unchecked")
+    public static void init() throws IOException {
+        //自动扫描phoenix-env.poperties文件，获取class
+        Properties properties = new Properties();
+        Map<String, byte[]> map = ResourceUtils.getResources(PATTERN);
+        if (map != null) {
+            for (Map.Entry<String, byte[]> entry : map.entrySet()) {
+                String file = entry.getKey();
+                byte[] bytes = entry.getValue();
+                properties.load(new ByteArrayInputStream(bytes));
+                LOG.info("Loaded File: " + file);
+            }
         }
+        Enumeration<?> names = properties.propertyNames();
+        while (names.hasMoreElements()) {
+            Object el = names.nextElement();
+            String className = (String) el;
+            Class<?> clazz;
+            try {
+                clazz = Class.forName(className);
+                if (clazz.isAssignableFrom(PhoenixContextInterface.class)) {
+                    m_set.add((Class<? extends PhoenixContextInterface>) clazz);
+                } else {
+                    LOG.warn("Define ignored because it's not implemented of PhoenixContextInterface: " + className);
+                }
+            } catch (ClassNotFoundException e) {
+                LOG.warn("Define ignored because class is not found: " + className);
+            }
+        }
+    }
+
+    //将class类注册进来
+    public static void register(Class<? extends PhoenixContextInterface> clazz) {
+        m_set.add(clazz);
     }
 
     @SuppressWarnings("unchecked")
@@ -121,11 +174,9 @@ public class PhoenixContext {
         return m_hRequest;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         //第三方业务，例如移动api使用时：
-        RequestIdContext context = PhoenixContext.get().get(RequestIdContext.class);
-        if (context == null) {
-        }
+        PhoenixContext.init();
     }
 
 }
