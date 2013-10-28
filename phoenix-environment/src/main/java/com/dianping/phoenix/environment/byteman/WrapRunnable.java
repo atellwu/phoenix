@@ -1,12 +1,24 @@
 package com.dianping.phoenix.environment.byteman;
 
+import java.util.concurrent.Delayed;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.RunnableScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dianping.phoenix.environment.PhoenixContext;
 
-public class WrapRunnable implements Runnable {
+public class WrapRunnable implements RunnableScheduledFuture<Object> {
 
-    private final Runnable runnable;
+    private static final Logger LOG = LoggerFactory.getLogger(WrapRunnable.class);
 
-    private PhoenixContext phoenixContext;
+    private final Runnable      runnable;
+
+    private PhoenixContext      phoenixContext;
 
     public WrapRunnable(Runnable runnable) {
         super();
@@ -48,9 +60,13 @@ public class WrapRunnable implements Runnable {
             needInitEnv = false;
         }
 
-        //如果needInitEnv为true，取出map然后放到PhoenixContext
+        //如果needInitEnv为true，则复制PhoenixContext
         if (needInitEnv) {
-            this.phoenixContext.copyTo(phoenixContext);
+            try {
+                this.phoenixContext.copyTo(phoenixContext);
+            } catch (CloneNotSupportedException e) {
+                LOG.error("Error in copying phoenixContext, copy is ingored.", e);
+            }
         }
 
         try {
@@ -61,6 +77,47 @@ public class WrapRunnable implements Runnable {
                 phoenixContext.clear();
             }
         }
+    }
+
+    @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        return ((Future<?>) runnable).cancel(mayInterruptIfRunning);
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return ((Future<?>) runnable).isCancelled();
+    }
+
+    @Override
+    public boolean isDone() {
+        return ((Future<?>) runnable).isDone();
+    }
+
+    @Override
+    public Object get() throws InterruptedException, ExecutionException {
+        return ((Future<?>) runnable).get();
+    }
+
+    @Override
+    public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        return ((Future<?>) runnable).get(timeout, unit);
+    }
+
+    @Override
+    public long getDelay(TimeUnit unit) {
+        return ((Delayed) runnable).getDelay(unit);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public int compareTo(Delayed o) {
+        return ((Comparable<Delayed>) runnable).compareTo(o);
+    }
+
+    @Override
+    public boolean isPeriodic() {
+        return ((RunnableScheduledFuture<?>) runnable).isPeriodic();
     }
 
 }

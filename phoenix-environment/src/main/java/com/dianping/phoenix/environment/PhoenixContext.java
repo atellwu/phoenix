@@ -26,29 +26,30 @@ import com.dianping.phoenix.environment.util.ResourceUtils;
  */
 public class PhoenixContext {
 
-    private static final Logger                                  LOG           = LoggerFactory.getLogger(PhoenixContext.class);
+    private static final Logger                              LOG           = LoggerFactory.getLogger(PhoenixContext.class);
 
-    private static final String                                  DISABLES      = "disables";
+    private static final String                              DISABLES      = "disables";
 
-    public static final String                                   ENV           = "phoenixEnvironment";
+    public static final String                               REQUEST       = "request";
+    public static final String                               ENV           = "phoenixEnvironment";
 
-    private static final Pattern                                 PATTERN       = Pattern.compile("phoenix-env.properties");
+    private static final Pattern                             PATTERN       = Pattern.compile("phoenix-env.properties");
 
     /** 已注册的Class */
-    private static Set<Class<? extends RegisterableContext>> m_set         = new HashSet<Class<? extends RegisterableContext>>();
+    private static Set<Class<? extends RegisterableContext>> s_set         = new HashSet<Class<? extends RegisterableContext>>();
 
-    private static ThreadLocal<PhoenixContext>                   s_threadLocal = new ThreadLocal<PhoenixContext>() {
-                                                                                   @Override
-                                                                                   protected PhoenixContext initialValue() {
-                                                                                       return new PhoenixContext();
-                                                                                   }
-                                                                               };
+    private static ThreadLocal<PhoenixContext>               s_threadLocal = new ThreadLocal<PhoenixContext>() {
+                                                                               @Override
+                                                                               protected PhoenixContext initialValue() {
+                                                                                   return new PhoenixContext();
+                                                                               }
+                                                                           };
 
     private Map<String, RegisterableContext>                 m_map         = new HashMap<String, RegisterableContext>();
 
-    private Map<String, Object>                                  m_param       = new HashMap<String, Object>();
+    private Map<String, Object>                              m_param       = new HashMap<String, Object>();
 
-    private boolean                                              m_setuped     = false;
+    private boolean                                          m_setuped     = false;
 
     public static PhoenixContext get() {
         return s_threadLocal.get();
@@ -56,7 +57,7 @@ public class PhoenixContext {
 
     //对已注册的类型，进行构建实例，并且初始化
     public void setup() {
-        Iterator<Class<? extends RegisterableContext>> it = m_set.iterator();
+        Iterator<Class<? extends RegisterableContext>> it = s_set.iterator();
         while (it.hasNext()) {
             Class<? extends RegisterableContext> contextClazz = it.next();
             RegisterableContext context;
@@ -77,7 +78,7 @@ public class PhoenixContext {
         return m_setuped;
     }
 
-    public void copyTo(PhoenixContext context) {
+    public void copyTo(PhoenixContext context) throws CloneNotSupportedException {
         for (Map.Entry<String, RegisterableContext> entry : m_map.entrySet()) {
             RegisterableContext c = entry.getValue();
             context.m_map.put(entry.getKey(), c.clone());
@@ -125,34 +126,25 @@ public class PhoenixContext {
     //将class类注册进来
     public static void register(Class<? extends RegisterableContext> clazz) {
         if (RegisterableContext.class.isAssignableFrom(clazz)) {
-            m_set.add(clazz);
+            s_set.add(clazz);
             LOG.info("Loaded define class: " + clazz);
         } else {
             LOG.warn("Define class ignored, because it's not implemented of PhoenixContextInterface: " + clazz);
         }
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends RegisterableContext> T get(Class<T> clazz) {
-        T handler = (T) m_map.get(clazz.getName());
-        if (handler == null) {
-            try {
-                handler = clazz.newInstance();
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return handler;
+        return get(clazz.getName());
     }
 
     @SuppressWarnings("unchecked")
     public <T extends RegisterableContext> T get(String clazzName) {
-        T handler = (T) m_map.get(clazzName);
-        if (handler == null) {
+        T context = (T) m_map.get(clazzName);
+        if (context == null) {
             try {
-                handler = (T) Class.forName(clazzName).newInstance();
+                context = (T) Class.forName(clazzName).newInstance();
+                context.setup(this);
+                m_map.put(clazzName, context);
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
@@ -162,7 +154,7 @@ public class PhoenixContext {
             }
         }
 
-        return handler;
+        return context;
     }
 
     public void addParam(String key, Object value) {
@@ -216,16 +208,6 @@ public class PhoenixContext {
     public String getMetas() {
         RequestIdContext context = get(RequestIdContext.class);
         return context.getMetas();
-    }
-
-    public static void main(String[] args) throws IOException {
-        PhoenixContext.init();
-
-        PhoenixContext context = PhoenixContext.get();
-        //        context.addParam(RequestIdContext.REQUEST, value);
-        context.setup();
-        RequestIdContext requestIdContext = PhoenixContext.get().get(RequestIdContext.class);
-        System.out.println(requestIdContext.getRequestId());
     }
 
 }

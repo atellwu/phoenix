@@ -14,8 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.phoenix.environment.requestid.RequestIdContext;
-
 public class PhoenixEnvironmentFilter implements Filter {
 
     private static final Logger LOG = LoggerFactory.getLogger(PhoenixEnvironmentFilter.class);
@@ -30,7 +28,7 @@ public class PhoenixEnvironmentFilter implements Filter {
             try {
                 HttpServletRequest hRequest = (HttpServletRequest) request;
 
-                context.addParam(RequestIdContext.REQUEST, hRequest);
+                context.addParam(PhoenixContext.REQUEST, hRequest);
                 context.setup();
 
             } catch (RuntimeException e) {

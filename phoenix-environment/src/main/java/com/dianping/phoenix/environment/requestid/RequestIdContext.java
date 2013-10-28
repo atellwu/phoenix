@@ -7,8 +7,6 @@ import com.dianping.phoenix.environment.PhoenixContext;
 
 public class RequestIdContext implements RegisterableContext {
 
-    public static final String REQUEST                 = "request";
-
     public static final String MOBILE_REQUEST_ID       = "pragma-page-id";
     public static final String MOBILE_REFER_REQUEST_ID = "pragma-prev-page-id";
     public static final String METAS                   = "metas";
@@ -93,13 +91,13 @@ public class RequestIdContext implements RegisterableContext {
     public void destroy() {
     }
 
-    public RequestIdContext clone() {
-        return this.clone();
+    public RequestIdContext clone() throws CloneNotSupportedException {
+        return (RequestIdContext) super.clone();
     }
 
     @Override
     public void setup(PhoenixContext context) {
-        HttpServletRequest request = (HttpServletRequest) context.getParam(REQUEST);
+        HttpServletRequest request = (HttpServletRequest) context.getParam(PhoenixContext.REQUEST);
 
         if (request != null) {
 

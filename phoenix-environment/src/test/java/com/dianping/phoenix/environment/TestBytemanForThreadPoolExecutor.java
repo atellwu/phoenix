@@ -5,7 +5,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -17,28 +19,37 @@ import org.junit.Test;
  */
 public class TestBytemanForThreadPoolExecutor {
 
-    private static final String    TEST_REQUEST_ID = "test-request-id";
-    private static final String    TEST_GUID       = "test-guid";
-    private static ExecutorService executor;
-    static {
-        executor = Executors.newFixedThreadPool(2);
+    private static final String TEST_REQUEST_ID = "test-request-id";
+    private static final String TEST_GUID       = "test-guid";
+
+    private ExecutorService     executor        = getExcutor();
+
+    @Before
+    public void setup() {
+        PhoenixContext.getInstance().setRequestId(TEST_REQUEST_ID);
+        PhoenixContext.getInstance().setGuid(TEST_GUID);
+    }
+
+    @After
+    public void clear() {
+        executor.shutdown();
     }
 
     @Test
-    public void test() throws Exception {
-        PhoenixContext.getInstance().setRequestId(TEST_REQUEST_ID);
-        PhoenixContext.getInstance().setGuid(TEST_GUID);
+    public void testRunnbale() throws Exception {
+        Task task = new Task();
+        Future<?> feature = executor.submit((Runnable) task);
+        feature.get();
 
-        Runnable task = new Task();
-        executor.execute(task);
-        executor.submit(task);
+        Assert.assertTrue(task.success);
+    }
 
+    @Test
+    public void testCallable() throws Exception {
         Callable<Boolean> callableTask = new Task();
         Future<Boolean> re = executor.submit(callableTask);
-        Assert.assertTrue(re.get());
 
-        Thread.sleep(1000);
-        executor.shutdown();
+        Assert.assertTrue(re.get());
     }
 
     @Test
@@ -50,7 +61,6 @@ public class TestBytemanForThreadPoolExecutor {
         try {
             executor.execute(task);
         } catch (NullPointerException e) {
-            System.out.println(e);
             return;
         } finally {
             executor.shutdown();
@@ -59,17 +69,24 @@ public class TestBytemanForThreadPoolExecutor {
         Assert.fail();
     }
 
+    /**
+     * 子类继承覆盖后，可以换成别的ExecutorService进行测试。
+     */
+    protected ExecutorService getExcutor() {
+        return Executors.newFixedThreadPool(2);
+    }
+
     public static class Task implements Runnable, Callable<Boolean> {
+
+        boolean success = false;
+
         @Override
         public void run() {
-            System.out.println(PhoenixContext.getInstance().getRequestId());
-            Assert.assertEquals(TEST_REQUEST_ID, PhoenixContext.getInstance().getRequestId());
-            Assert.assertEquals(TEST_GUID, PhoenixContext.getInstance().getGuid());
+            success = TEST_REQUEST_ID.equals(PhoenixContext.getInstance().getRequestId()) && TEST_GUID.equals(PhoenixContext.getInstance().getGuid());
         }
 
         @Override
         public Boolean call() throws Exception {
-            System.out.println(PhoenixContext.getInstance().getRequestId());
             return TEST_REQUEST_ID.equals(PhoenixContext.getInstance().getRequestId());
         }
     }
