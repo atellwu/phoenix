@@ -1,11 +1,11 @@
-package com.dianping.phoenix.environment.handler;
+package com.dianping.phoenix.environment.requestid;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.dianping.phoenix.environment.PhoenixContextInterface;
+import com.dianping.phoenix.environment.RegisterableContext;
 import com.dianping.phoenix.environment.PhoenixContext;
 
-public class RequestIdContext implements PhoenixContextInterface {
+public class RequestIdContext implements RegisterableContext {
 
     public static final String REQUEST                 = "request";
 

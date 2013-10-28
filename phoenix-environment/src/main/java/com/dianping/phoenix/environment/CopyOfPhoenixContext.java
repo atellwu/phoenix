@@ -3,7 +3,7 @@ package com.dianping.phoenix.environment;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.dianping.phoenix.environment.handler.RequestIdContext;
+import com.dianping.phoenix.environment.requestid.RequestIdContext;
 
 /**
  * 基于ThreadLocal的通用内存容器，用于在各个平台级别的组件中传递变量
@@ -24,7 +24,7 @@ public class CopyOfPhoenixContext {
                                                                  }
                                                              };
 
-    private Map<String, PhoenixContextInterface> m_map         = new HashMap<String, PhoenixContextInterface>();
+    private Map<String, RegisterableContext> m_map         = new HashMap<String, RegisterableContext>();
 
     private CopyOfPhoenixContext() {
     }
@@ -41,12 +41,12 @@ public class CopyOfPhoenixContext {
         
     }
 
-    public  void set(PhoenixContextInterface handler) {
+    public  void set(RegisterableContext handler) {
         m_map.put(handler.getClass().getName(), handler);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends PhoenixContextInterface> T get(Class<T> clazz) {
+    public <T extends RegisterableContext> T get(Class<T> clazz) {
         return (T) m_map.get(clazz.getName());
     }
 

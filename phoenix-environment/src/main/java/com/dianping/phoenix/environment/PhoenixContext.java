@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.phoenix.environment.handler.RequestIdContext;
+import com.dianping.phoenix.environment.requestid.RequestIdContext;
 import com.dianping.phoenix.environment.util.ResourceUtils;
 
 /**
@@ -35,7 +35,7 @@ public class PhoenixContext {
     private static final Pattern                                 PATTERN       = Pattern.compile("phoenix-env.properties");
 
     /** 已注册的Class */
-    private static Set<Class<? extends PhoenixContextInterface>> m_set         = new HashSet<Class<? extends PhoenixContextInterface>>();
+    private static Set<Class<? extends RegisterableContext>> m_set         = new HashSet<Class<? extends RegisterableContext>>();
 
     private static ThreadLocal<PhoenixContext>                   s_threadLocal = new ThreadLocal<PhoenixContext>() {
                                                                                    @Override
@@ -44,7 +44,7 @@ public class PhoenixContext {
                                                                                    }
                                                                                };
 
-    private Map<String, PhoenixContextInterface>                 m_map         = new HashMap<String, PhoenixContextInterface>();
+    private Map<String, RegisterableContext>                 m_map         = new HashMap<String, RegisterableContext>();
 
     private Map<String, Object>                                  m_param       = new HashMap<String, Object>();
 
@@ -56,10 +56,10 @@ public class PhoenixContext {
 
     //对已注册的类型，进行构建实例，并且初始化
     public void setup() {
-        Iterator<Class<? extends PhoenixContextInterface>> it = m_set.iterator();
+        Iterator<Class<? extends RegisterableContext>> it = m_set.iterator();
         while (it.hasNext()) {
-            Class<? extends PhoenixContextInterface> contextClazz = it.next();
-            PhoenixContextInterface context;
+            Class<? extends RegisterableContext> contextClazz = it.next();
+            RegisterableContext context;
             try {
                 context = contextClazz.newInstance();
                 context.setup(this);
@@ -78,16 +78,16 @@ public class PhoenixContext {
     }
 
     public void copyTo(PhoenixContext context) {
-        for (Map.Entry<String, PhoenixContextInterface> entry : m_map.entrySet()) {
-            PhoenixContextInterface c = entry.getValue();
+        for (Map.Entry<String, RegisterableContext> entry : m_map.entrySet()) {
+            RegisterableContext c = entry.getValue();
             context.m_map.put(entry.getKey(), c.clone());
         }
         context.m_param.putAll(m_param);
     }
 
     public void clear() {
-        for (Map.Entry<String, PhoenixContextInterface> entry : m_map.entrySet()) {
-            PhoenixContextInterface context = entry.getValue();
+        for (Map.Entry<String, RegisterableContext> entry : m_map.entrySet()) {
+            RegisterableContext context = entry.getValue();
             context.destroy();
         }
         m_map.clear();
@@ -114,7 +114,7 @@ public class PhoenixContext {
             if (!DISABLES.equalsIgnoreCase(disables)) {
                 try {
                     Class<?> clazz = Class.forName(className);
-                    register((Class<? extends PhoenixContextInterface>) clazz);
+                    register((Class<? extends RegisterableContext>) clazz);
                 } catch (ClassNotFoundException e) {
                     LOG.warn("Define ignored because class is not found: " + className);
                 }
@@ -123,8 +123,8 @@ public class PhoenixContext {
     }
 
     //将class类注册进来
-    public static void register(Class<? extends PhoenixContextInterface> clazz) {
-        if (PhoenixContextInterface.class.isAssignableFrom(clazz)) {
+    public static void register(Class<? extends RegisterableContext> clazz) {
+        if (RegisterableContext.class.isAssignableFrom(clazz)) {
             m_set.add(clazz);
             LOG.info("Loaded define class: " + clazz);
         } else {
@@ -133,7 +133,7 @@ public class PhoenixContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends PhoenixContextInterface> T get(Class<T> clazz) {
+    public <T extends RegisterableContext> T get(Class<T> clazz) {
         T handler = (T) m_map.get(clazz.getName());
         if (handler == null) {
             try {
@@ -148,7 +148,7 @@ public class PhoenixContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends PhoenixContextInterface> T get(String clazzName) {
+    public <T extends RegisterableContext> T get(String clazzName) {
         T handler = (T) m_map.get(clazzName);
         if (handler == null) {
             try {

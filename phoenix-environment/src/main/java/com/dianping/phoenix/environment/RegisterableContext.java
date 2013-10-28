@@ -5,7 +5,7 @@ package com.dianping.phoenix.environment;
  * @author kezhu.wu
  * 
  */
-public interface PhoenixContextInterface {
+public interface RegisterableContext {
 
     /**
      * 参数是当前的PhoenixContext,将当前拥有的变量给你处理，可包含HttpRequest等
@@ -16,5 +16,5 @@ public interface PhoenixContextInterface {
 
     public void destroy();
 
-    public PhoenixContextInterface clone();
+    public RegisterableContext clone();
 }
