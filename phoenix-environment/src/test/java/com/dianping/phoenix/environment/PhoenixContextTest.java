@@ -37,7 +37,7 @@ public class PhoenixContextTest {
 
     @After
     public void clearPhoenixContext() {
-        PhoenixContext.get().destroy();
+        PhoenixContext.get().clear();
     }
 
     @Test

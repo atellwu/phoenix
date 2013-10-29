@@ -74,7 +74,7 @@ public class WrapRunnable implements RunnableScheduledFuture<Object> {
         } finally {
             //清理该线程的ThreadLocal
             if (needInitEnv) {
-                phoenixContext.destroy();
+                phoenixContext.clear();
             }
         }
     }

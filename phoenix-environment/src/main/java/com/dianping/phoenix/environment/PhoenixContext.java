@@ -88,7 +88,7 @@ public class PhoenixContext {
         context.m_param.putAll(m_param);
     }
 
-    public void destroy() {
+    public void clear() {
         for (Map.Entry<String, RegisterableContext> entry : m_map.entrySet()) {
             RegisterableContext context = entry.getValue();
             context.destroy();
