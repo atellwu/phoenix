@@ -2,6 +2,8 @@ package com.dianping.phoenix.environment;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -115,9 +117,21 @@ public class PhoenixContext {
             if (!DISABLES.equalsIgnoreCase(disables)) {
                 try {
                     Class<?> clazz = Class.forName(className);
-                    register((Class<? extends RegisterableContext>) clazz);
+
+                    //检测是否有public的默认的构造方法
+                    Constructor<?> constructor = clazz.getDeclaredConstructor();
+                    if (constructor.getModifiers() != Modifier.PUBLIC) {
+                        LOG.warn("Define ignored because class's defaut constructor is not public: " + className);
+                    } else {
+                        register((Class<? extends RegisterableContext>) clazz);
+                    }
+
                 } catch (ClassNotFoundException e) {
                     LOG.warn("Define ignored because class is not found: " + className);
+                } catch (SecurityException e) {
+                    throw new RuntimeException("Init Error.", e);
+                } catch (NoSuchMethodException e) {
+                    LOG.warn("Define ignored because class has not defaut constructor: " + className);
                 }
             }
         }

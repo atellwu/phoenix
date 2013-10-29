@@ -2,6 +2,8 @@ package com.dianping.phoenix.environment;
 
 /**
  * 
+ * <note>实现类必须提供默认的构造方法。</note>
+ * 
  * @author kezhu.wu
  * 
  */
