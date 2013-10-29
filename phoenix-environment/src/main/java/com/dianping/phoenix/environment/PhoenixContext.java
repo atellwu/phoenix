@@ -179,7 +179,14 @@ public class PhoenixContext {
         return m_param.get(key);
     }
 
-    //============以下是兼容方法==========
+    //============以下是兼容0.1.0的常量和方法==========
+    public static final String MOBILE_REQUEST_ID       = RequestIdContext.MOBILE_REQUEST_ID;
+    public static final String MOBILE_REFER_REQUEST_ID = RequestIdContext.MOBILE_REFER_REQUEST_ID;
+    public static final String METAS                   = RequestIdContext.METAS;
+    public static final String REQUEST_ID              = RequestIdContext.REQUEST_ID;
+    public static final String REFER_REQUEST_ID        = RequestIdContext.REFER_REQUEST_ID;
+    public static final String GUID                    = RequestIdContext.GUID;
+
     public static PhoenixContext getInstance() {
         return get();
     }
