@@ -1,9 +1,5 @@
 <configure>
-	<strategies>
-		<strategy name="uri-hash" target="uri" method="crc32" creation-date="2013-10-15 16:40:00" last-modified-date="2013-10-15 16:40:00" />
-		<strategy />
-	</strategies>
-	<virtualServer name="www" state="ENABLED" availability="AVAILABLE" default-pool-name="Web.Index" domain="www.dianping.com"
+	<virtualServer name="tuangou" state="ENABLED" availability="AVAILABLE" default-pool-name="Web.Tuangou" domain="www.dianping.com"
 		port="80" creation-date="2013-10-15 16:40:00" last-modified-date="2013-10-15 16:40:00" version="1" access_log="logs/domain2.access.log  main">
 		<pools>
 			<pool name="Web.Tuangou" loadbalance-strategy-name="uri-hash" min-available-member-percentage="50">
@@ -12,7 +8,6 @@
 				<member name="tuangou-web02" ip="10.1.1.2" port="8080" weight="5" max-fails="5" fail-timeout="30s" state="ENABLED"
 					availability="AVAILABLE" />
 			</pool>
-			<pool />
 		</pools>
 		<instances>
 			<instance ip="10.2.1.1" />
@@ -34,5 +29,4 @@
 			</location>
 		</locations>
 	</virtualServer>
-	<virtualServer />
 </configure>
