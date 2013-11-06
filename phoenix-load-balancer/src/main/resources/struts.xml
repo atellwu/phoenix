@@ -39,14 +39,7 @@
             </interceptor-stack>
         </interceptors>
 
-        <action name="/{virtualServerName}/{tabName}" class="mainAction">
-            <result name="success" type="velocity">
-                /container.htm
-            </result>
-            <!-- <param name="virtualServerName">{1}</param> <param name="tabName">{2}</param> -->
-        </action>
-
-        <action name="/{virtualServerName}" class="mainAction">
+        <action name="main" class="mainAction">
             <result name="success" type="velocity">
                 /container.htm
             </result>

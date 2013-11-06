@@ -1,7 +1,7 @@
 (function(w) {
 	var app = {
 		"showPoolDetail" : function(name) {
-			$('#poolDetailDiv').html($('#poolDetail_' + name).html());
+			$('#poolDetailDiv>div').html($('#poolDetail_' + name).html());
 			$('#poolList').hide();
 			$('#poolDetailDiv').show();
 		},
@@ -90,6 +90,30 @@
 				}
 			} catch (err) {
 				alert('您的浏览器不支持该操作，请您点击浏览器的“收藏”菜单进行添加。');
+			}
+		},
+		"onHashChange" : function() {
+			var hash = window.location.hash;
+			if (hash.length > 0) {
+				// 去掉#号
+				hash = hash.substring(1);
+				var j, r;
+				$.each(hash.split('&'), function(i, part) {
+					var keyValue = part.split('=');
+					if (keyValue[0] == 'j') {
+						j = keyValue[1];
+						rundemo_app.changeJavaCodeFile(keyValue[1]);
+					} else if (keyValue[0] == 'r') {
+						r = keyValue[1];
+						rundemo_app.changeResourceFile(keyValue[1]);
+					}
+				});
+				if (j == 0 && r == 0) {
+					window.location.hash = "";
+				}
+			} else {
+				rundemo_app.changeJavaCodeFile(0);
+				rundemo_app.changeResourceFile(0);
 			}
 		}
 	};

@@ -1,8 +1,7 @@
-<div class="sidebar-nav">
+<div class="sidebar-nav" ng-controller="VsNameListController">
   <a href="#dashboard-menu" class="nav-header" data-toggle="collapse"><i class="icon-list-ul"></i>VirtualServers</a>
   <ul id="dashboard-menu" class="nav nav-list collapse in">
-    #foreach($vs in $virtualServers)
-    <li class="#if($virtualServer.name=="$vs.name")active#end"><a href="${contextPath}/$vs.name"><i
-        class="icon-globe #if($virtualServer.name=="$vs.name")#end"></i> $vs.name </a></li> #end
+    <li ng-repeat="vsName in vsNameList" class=""><a href="${contextPath}/$vs.name"><i class="icon-globe"></i>
+        {{ vsName.name }} </a></li>
   </ul>
 </div>

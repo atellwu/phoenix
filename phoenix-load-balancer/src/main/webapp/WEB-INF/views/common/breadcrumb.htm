@@ -1,14 +1,9 @@
+
 <ul class="breadcrumb">
-  <li class="active" style="color: #333333;">&nbsp;&nbsp;&nbsp;</li>#if($tabName=="profile")
-  <li class="active">&nbsp;profile&nbsp;</li> #else
-  <li><a href="${contextPath}/${virtualServerName}/profile"> &nbsp;profile&nbsp; </a></li> #end
-  <span class="divider">|</span> #if($tabName=="pool")
-  <li class="active">&nbsp;pool&nbsp;</li> #else
-  <li><a href="${contextPath}/${virtualServerName}/pool"> &nbsp;pool&nbsp; </a></li> #end
-  <span class="divider">|</span> #if($tabName=="node")
-  <li class="active">&nbsp;node&nbsp;</li> #else
-  <li><a href="${contextPath}/${virtualServerName}/node"> &nbsp;node&nbsp; </a></li> #end
-  <span class="divider">|</span> #if($tabName=="template")
-  <li class="active">&nbsp;template&nbsp;</li> #else
-  <li><a href="${contextPath}/${virtualServerName}/template"> &nbsp;template&nbsp; </a></li> #end
+  <li class="active" style="color: #333333;">&nbsp;&nbsp;&nbsp;</li>
+  <li class="active"><a href="#profile" data-toggle="tab">&nbsp;Profile&nbsp;</a></li>
+  <span class="divider">|</span>
+  <li><a href="#pool" data-toggle="tab">&nbsp;Pool&nbsp;</a></li>
+  <span class="divider">|</span>
+  <li><a href="#node" data-toggle="tab">&nbsp;Node&nbsp;</a></li>
 </ul>

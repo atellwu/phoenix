@@ -7,7 +7,14 @@
   <div class="container-fluid">
     <div class="row-fluid">
       <div id="alertMessageDiv" style="text-align: center;"></div>
-      <div class="row-fluid" style="min-height:500px;">#parse("$tabName/main.htm")</div>
+      <div class="row-fluid" style="min-height: 500px;">
+        <div class="tab-content">
+          <div class="tab-pane active" id="profile">#parse("/profile/main.htm")</div>
+          <div class="tab-pane" id="pool">#parse("/pool/main.htm")</div>
+          <div class="tab-pane" id="node">#parse("/node/main.htm")</div>
+        </div>
+        
+      </div>
       #parse("common/simplefooter.htm")
     </div>
   </div>
