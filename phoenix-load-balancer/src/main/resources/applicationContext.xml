@@ -11,7 +11,12 @@
     http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
     <!-- annotation scan -->
-    <context:component-scan base-package="com.dianping.phoenix.lb.action">
+    <context:component-scan base-package="com.dianping.phoenix.lb">
     </context:component-scan>
+
+    <bean id="modelStore"
+        class="com.dianping.phoenix.lb.dao.impl.LocalFileModelStoreImpl">
+        <property name="baseDir" value="/home/atell/softbalance_data/" />
+    </bean>
 
 </beans>

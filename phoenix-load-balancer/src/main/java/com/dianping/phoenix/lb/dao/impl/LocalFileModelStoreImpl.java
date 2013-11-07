@@ -11,8 +11,11 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import com.dianping.phoenix.lb.dao.ModelStore;
 import com.dianping.phoenix.lb.model.configure.entity.Configure;
@@ -37,6 +40,7 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
         this.baseDir = baseDir;
     }
 
+    @PostConstruct
     public void init() {
         try {
             File baseDirFile = new File(baseDir);

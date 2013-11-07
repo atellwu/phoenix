@@ -24,12 +24,14 @@
         value="false" />
     <constant name="struts.patternMatcher" value="regex" />
 
-    <package name="softbalance" namespace="/" extends="struts-default">
+    <package name="softbalance" namespace="/" extends="json-default">
 
         <result-types>
             <result-type name="velocity"
                 class="com.dianping.phoenix.lb.action.VelocityLayoutResult" />
         </result-types>
+        <!-- Result fragment -->
+
 
         <interceptors>
             <interceptor-stack name="myStack">
@@ -39,11 +41,45 @@
             </interceptor-stack>
         </interceptors>
 
+        <action name="main/{vsName}" class="mainAction">
+            <result name="success" type="velocity">
+                /container.htm
+            </result>
+        </action>
+
         <action name="main" class="mainAction">
             <result name="success" type="velocity">
                 /container.htm
             </result>
-            <param name="tabName">rules</param>
+        </action>
+
+        <action name="vsNamelist" class="vsNameListAction">
+            <result name="success" type="json">
+                <param name="root">virtualServers</param>
+                <param name="encoding">UTF-8</param>
+                <param name="excludeProperties">
+                    login.password,
+                    studentList.*\.sin
+                </param>
+            </result>
+        </action>
+
+        <action name="definedParamMap" class="definedParamMapAction">
+            <result name="success" type="json">
+                <param name="root">definedParamMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+
+        <action name="vs/{vsName}" class="ajaxAction">
+            <result name="success" type="json">
+                <param name="root">virtualServer</param>
+                <param name="encoding">UTF-8</param>
+                <param name="excludeProperties">
+                    login.password,
+                    studentList.*\.sin
+                </param>
+            </result>
         </action>
 
     </package>

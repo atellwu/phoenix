@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.dianping.phoenix.lb.constant.Constants;
 import com.dianping.phoenix.lb.constant.MessageID;
@@ -40,16 +41,17 @@ import com.dianping.phoenix.lb.visitor.NginxConfigVisitor;
  * @author Leo Liang
  * 
  */
+@Service
 public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate implements VirtualServerService {
-    @Autowired
+    
     private VirtualServerDao virtualServerDao;
-    @Autowired
     private StrategyDao      strategyDao;
 
     /**
      * @param virtualServerDao
      * @param templateDao
      */
+    @Autowired(required=true)
     public VirtualServerServiceImpl(VirtualServerDao virtualServerDao, StrategyDao strategyDao) {
         super();
         this.virtualServerDao = virtualServerDao;

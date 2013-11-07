@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,14 +16,10 @@ import com.opensymphony.xwork2.ActionSupport;
 /**
  * @author wukezhu
  */
-@Component("mainAction")
-public class MainAction extends ActionSupport {
+@Component("vsNameListAction")
+public class VsNameListAction extends ActionSupport {
 
-    private static final long    serialVersionUID = -1084994778030229218L;
-
-    private String               virtualServerName;
-
-    private String               vsName;
+    private static final long    serialVersionUID = 2150069350934991522L;
 
     private String               contextPath;
 
@@ -35,7 +30,19 @@ public class MainAction extends ActionSupport {
 
     @PostConstruct
     public void init() {
+        // mock virtualServers
+        //        VirtualServer vs1 = new VirtualServer();
+        //        vs1.setName("dpcomm");
+        //        vs1.setDomain("www.dianping.com");
+        //        VirtualServer vs2 = new VirtualServer();
+        //        vs2.setName("tuangou");
+        //        vs2.setDomain("t.dianping.com");
+        //
+        //        virtualServers.add(vs1);
+        //        virtualServers.add(vs2);
+
         virtualServers = virtualServerService.listVirtualServers();
+
     }
 
     public String getContextPath() {
@@ -52,35 +59,11 @@ public class MainAction extends ActionSupport {
     public void validate() {
         contextPath = ServletActionContext.getServletContext().getContextPath();
 
-        if (vsName == null) {
-            vsName = virtualServers.get(0).getName();
-        }
-
         super.validate();
-    }
-
-    public String getVirtualServerName() {
-        return virtualServerName;
-    }
-
-    public void setVirtualServerName(String virtualServerName) {
-        this.virtualServerName = virtualServerName;
-    }
-
-    public String getVsName() {
-        return vsName;
-    }
-
-    public void setVsName(String vsName) {
-        this.vsName = vsName;
     }
 
     public List<VirtualServer> getVirtualServers() {
         return virtualServers;
-    }
-
-    public void setVirtualServers(List<VirtualServer> virtualServers) {
-        this.virtualServers = virtualServers;
     }
 
 }

@@ -1,0 +1,71 @@
+<div class="well">
+  <div class="row">
+    <div class="dropdown" style="float: right; margin-right: 40px">
+      <a ng-click="save()" class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-plus"></i> 增加自定义参数<b
+        class="caret"></b></a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+        <li ng-repeat="definedParam in definedParamList"><a ng-click="addItem(1)" tabindex="-1"
+          href="javascript:void(0)">添加 {{ definedParam.name }}</a></li>
+        <li><a tabindex="-1" href="javascript:void(0)"><i class="icon-pencil"></i> 自定义参数 </a></li>
+      </ul>
+    </div>
+    <div class="span6">
+      <div class="control-group">
+        <label class="control-label" for="inputPassword">当前状态</label>
+        <div class="controls">
+          <label class="checkbox"> <span class="label label-important">{{ vs.state }}</span>
+          </label>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="inputPassword">状态控制</label>
+        <div class="controls">
+          <label class="radio inline"> <input ng-model="vs.availability" type="radio" name="optionsRadios"
+            id="optionsRadios1" value="OFFLINE"> OFFLINE
+          </label> <label class="radio inline"> <input ng-model="vs.availability" type="radio" name="optionsRadios"
+            id="optionsRadios2" value="AVAILABLE"> AVAILABLE
+          </label>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="">主机名</label>
+        <div class="controls">
+          <input type="text" ng-model="vs.domain" placeholder="domain">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="inputEmail">端口</label>
+        <div class="controls">
+          <input type="text" ng-model="vs.port" placeholder="domain">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="">默认Pool名</label>
+        <div class="controls">
+          <input ng-model="vs.defaultPoolName" type="text" placeholder="pool">
+        </div>
+      </div>
+    </div>
+    <div class="span3" style="margin-top: 40px;">
+      <div class="control-group" ng-repeat="(key, value) in vs.dynamicAttributes">
+        <label class="control-label" for="inputPassword">{{ key }}</label>
+        <div ng-show="getInputType('{{ key }}') == 'SELECT'" class="controls">
+          <select value="{{ value }}"> 
+            ##<option ng-repeat="(value0) in getValueList('{{ key }}')">{{ value0 }}</option>
+          </select>
+        </div>
+        <div ng-show="getInputType('{{ key }}') == 'TEXT'" class="controls">
+          <input type="text" placeholder="pool" value="{{ value }}">
+        </div>
+        <div ng-show="getInputType('{{ key }}') == 'RADIO'" class="controls">
+          <label ng-repeat="(value0) in getValueList('{{ key }}')" class="radio inline"> <input ng-model="vs.availability" type="radio" name="optionsRadios"
+            id="optionsRadios1" value="OFFLINE"> OFFLINE
+          </label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+

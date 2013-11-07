@@ -1,7 +1,7 @@
-var module = angular.module('MyApp', [ 'ngResource' ]);
+var module = angular.module('MyApp', [ 'ngResource', 'ngRoute' ]);
 
 module.config(function($routeProvider, $locationProvider, $resourceProvider) {
-	$routeProvider.when('#/:vsName/:controller', {
+	$routeProvider.when('#/:vsName/', {
 		controller : '{{ controller }}'
 	});
 	// $routeProvider.when('/Book/:bookId/ch/:chapterId', {
@@ -13,30 +13,35 @@ module.config(function($routeProvider, $locationProvider, $resourceProvider) {
 	$locationProvider.html5Mode(true);
 });
 
-module.factory('DataService', function() {
+module.factory('DataService', function($resource) {
 	var model = {};
+	var VsNameList = $resource('/vsNamelist');
+	model.vsNameList = VsNameList.query(function() {
+		if (model.vsNameList.length > 0) {
+			// $scope.vsName = $scope.vsNameList[0].name;
+		}
+	});
+
+	var DefinedParamMap = $resource('/definedParamMap');
+	model.definedParamMap = DefinedParamMap.get(function() {
+	});
 	return model;
 });
 
 module.controller('VsNameListController', function($scope, DataService, $route,
 		$resource) {
-	$scope.vsNameList = [ {
-		'name' : 'Nexus S',
-		'snippet' : 'Fast just got faster with Nexus S.'
-	}, {
-		'name' : 'Motorola',
-		'snippet' : 'The Next, Next Generation tablet.'
-	}, {
-		'name' : 'MOTOROLA',
-		'snippet' : 'The Next, Next Generation tablet.'
-	} ];
-	// alert('ProfileController');
-	// var CreditCard = $resource('/user/:userId/card/:cardId',
-	// {userId:123}, {
-	// charge: {method:'POST', params:{charge:true}}
-	// });
-	//	
-	// CreditCard.get();
+	$scope.isActive = function(tabName) {
+		var clazz = ($scope.vsName == tabName) ? 'active' : '';
+		return clazz;
+	};
+
+	$scope.setVsName = function(tabName) {
+		$scope.vsName = tabName;
+	};
+
+	$scope.vsNameList = DataService.vsNameList;
+
+	// $scope.selectedVaName = 'profile';
 
 	// $route.when('/book/:title', {
 	// template : '{{ title }}',
@@ -46,16 +51,48 @@ module.controller('VsNameListController', function($scope, DataService, $route,
 	// });
 });
 
-module.controller('"ProfileController"', function($scope, DataService, $route,
+module.controller('VsController', function($scope, DataService, $route,
 		$resource) {
-	$scope.vsNameList = [ {
-		'name' : 'Nexus S',
-		'snippet' : 'Fast just got faster with Nexus S.'
+	$scope.selectedTab = 'profile';
+	$scope.isActive = function(tabName) {
+		var clazz = ($scope.selectedTab == tabName) ? 'active' : '';
+		return clazz;
+	};
+	var Vs = $resource('/vs/:name', {
+		name : '@name'
 	}, {
-		'name' : 'Motorola',
-		'snippet' : 'The Next, Next Generation tablet.'
-	}, {
-		'name' : 'MOTOROLA',
-		'snippet' : 'The Next, Next Generation tablet.'
-	} ];
+		caches : 'dds'
+	});
+	$scope.getVs = function(vsName) {
+		console.log("getVs:" + vsName);
+		$scope.vs = Vs.get({
+			name : vsName
+		}, function() {
+			console.log($scope.vs);
+			console.log($scope.vs.name);
+		});
+	};
+	$scope.definedParamMap = DataService.definedParamMap;
+
+//	$scope.addedItems = [];
+//	$scope.addItem = function(index) {
+//		var newItem = $scope.definedParamList[index];
+//		$scope.addedItems.push(newItem);
+//		console.log($scope.addedItems);
+//	}
+	
+	$scope.getInputType = function(key) {
+//		console.log(key);
+//		console.log($scope.definedParamMap);
+		var definedParam = $scope.definedParamMap[key];
+		var inputType = definedParam.inputType;
+//		console.log(inputType);
+		return inputType;
+	}
+	
+	$scope.getValueList = function(key) {
+		var definedParam = $scope.definedParamMap[key];
+		console.log(key);
+		return definedParam.valueList;
+	}
 });

@@ -8,6 +8,9 @@ package com.dianping.phoenix.lb.dao.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.dianping.phoenix.lb.dao.ModelStore;
 import com.dianping.phoenix.lb.dao.VirtualServerDao;
 import com.dianping.phoenix.lb.exception.BizException;
@@ -17,11 +20,13 @@ import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
  * @author Leo Liang
  * 
  */
+@Service
 public class VirtualServerDaoImpl extends AbstractDao implements VirtualServerDao {
 
     /**
      * @param store
      */
+    @Autowired(required = true)
     public VirtualServerDaoImpl(ModelStore store) {
         super(store);
     }

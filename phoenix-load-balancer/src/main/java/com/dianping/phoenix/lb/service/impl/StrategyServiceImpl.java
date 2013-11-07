@@ -9,6 +9,7 @@ package com.dianping.phoenix.lb.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.dianping.phoenix.lb.dao.StrategyDao;
 import com.dianping.phoenix.lb.exception.BizException;
@@ -20,14 +21,15 @@ import com.dianping.phoenix.lb.service.StrategyService;
  * @author Leo Liang
  * 
  */
+@Service
 public class StrategyServiceImpl extends ConcurrentControlServiceTemplate implements StrategyService {
 
-    @Autowired
     private StrategyDao strategyDao;
 
     /**
      * @param strategyDao
      */
+    @Autowired(required=true)
     public StrategyServiceImpl(StrategyDao strategyDao) {
         super();
         this.strategyDao = strategyDao;
