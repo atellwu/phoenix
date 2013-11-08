@@ -74,25 +74,33 @@ module.controller('VsController', function($scope, DataService, $route,
 	};
 	$scope.definedParamMap = DataService.definedParamMap;
 
-//	$scope.addedItems = [];
-//	$scope.addItem = function(index) {
-//		var newItem = $scope.definedParamList[index];
-//		$scope.addedItems.push(newItem);
-//		console.log($scope.addedItems);
-//	}
-	
+	//动态参数的管理
+	$scope.addDynamicAttribute = function(key) {
+		if ($scope.vs.dynamicAttributes[key] != null) {
+			app.alertWarn('Param Already Exist.');
+		} else {
+			$scope.vs.dynamicAttributes[key] = '';
+		}
+	}
+	$scope.removeDynamicAttribute = function(key) {
+		delete $scope.vs.dynamicAttributes[key];
+	}
 	$scope.getInputType = function(key) {
-//		console.log(key);
-//		console.log($scope.definedParamMap);
+		console.log(key);
+		// console.log($scope.definedParamMap);
 		var definedParam = $scope.definedParamMap[key];
+		if (definedParam == null) {
+			return 'TEXT';
+		}
 		var inputType = definedParam.inputType;
-//		console.log(inputType);
 		return inputType;
 	}
-	
-	$scope.getValueList = function(key) {
+	$scope.valueList = [];
+	$scope.initValueList = function(key) {
 		var definedParam = $scope.definedParamMap[key];
-		console.log(key);
-		return definedParam.valueList;
+		if (definedParam) {
+			$scope.valueList = definedParam.valueList;
+		}
 	}
+	
 });

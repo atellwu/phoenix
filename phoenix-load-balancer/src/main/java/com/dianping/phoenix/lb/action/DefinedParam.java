@@ -13,7 +13,7 @@ public class DefinedParam {
     private List<String> valueList;
 
     public static enum InputType {
-        RADIO, CHECKBOX, TEXT
+        RADIO, CHECKBOX, TEXT, SELECT
     }
 
     public String getName() {

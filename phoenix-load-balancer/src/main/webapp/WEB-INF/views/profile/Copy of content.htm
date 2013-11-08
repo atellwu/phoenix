@@ -1,14 +1,15 @@
 <div class="well">
   <div class="row">
     <div class="dropdown" style="float: right; margin-right: 40px">
-      <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-plus"></i> 增加自定义参数<b class="caret"></b></a>
+      <a ng-click="save()" class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-plus"></i> 增加自定义参数<b
+        class="caret"></b></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-        <li ng-repeat="(key,definedParam) in definedParamMap"><a ng-click="addDynamicAttribute(key)" tabindex="-1"
-          href="javascript:void(0)">添加 {{ key }}</a></li>
+        <li ng-repeat="(key,definedParam) in definedParamMap"><a ng-click="addItem(1)" tabindex="-1"
+          href="javascript:void(0)">添加 {{ definedParam.name }}</a></li>
         <li><a tabindex="-1" href="javascript:void(0)"><i class="icon-pencil"></i> 自定义参数 </a></li>
       </ul>
     </div>
-    <div class="span5">
+    <div class="span6">
       <div class="control-group">
         <label class="control-label">当前状态</label>
         <div class="controls">
@@ -45,17 +46,26 @@
         </div>
       </div>
     </div>
-    <div class="span6" style="margin-top: 40px;">
+    <div class="span4" style="margin-top: 40px;">
       <div class="control-group" ng-repeat="(key, value) in vs.dynamicAttributes">
         <label class="control-label">{{ key }}</label>
         <div ng-show="getInputType(key) == 'SELECT'" class="controls" ng-init="initValueList(key)">
           <select ng-model="vs.dynamicAttributes[key]" ng-options="value0 for value0 in valueList"></select>
-          &nbsp;&nbsp;<a href="javascript:;" ng-click="removeDynamicAttribute(key)""><i class="icon-remove"></i></a>
         </div>
         <div ng-show="getInputType(key) == 'TEXT'" class="controls" ng-init="initValueList(key)">
-          <input ng-model="vs.dynamicAttributes[key]" type="text"> &nbsp;&nbsp;<a href="javascript:;"
-            ng-click="removeDynamicAttribute(key)"><i class="icon-remove"></i></a>
+          <input ng-model="vs.dynamicAttributes[key]" type="text">
         </div>
+        <div ng-show="getInputType(key) == 'RADIO'" class="controls" ng-init="initValueList(key)">
+          <label ng-repeat="value0 in valueList" class="radio inline"> <input
+            ng-model="vs.dynamicAttributes[key]" type="radio" name="{{ key }}" ng-value="value0"> {{ value0 }}
+          </label>
+        </div>
+        <div ng-show="getInputType(key) == 'SELECT'" class="controls" ng-init="initValueList(key)">
+          <label ng-repeat="value0 in valueList" class="checkbox inline"> <input type="checkbox"
+            ng-model="vs.dynamicAttributes[key]" name="{{ key }}" ng-value="value0"> {{ value0 }}
+          </label>
+        </div>
+
       </div>
     </div>
 
