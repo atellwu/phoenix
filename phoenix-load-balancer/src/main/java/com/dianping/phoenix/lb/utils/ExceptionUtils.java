@@ -6,7 +6,8 @@
  */
 package com.dianping.phoenix.lb.utils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.exception.BizException;
@@ -16,7 +17,7 @@ import com.dianping.phoenix.lb.exception.BizException;
  * 
  */
 public class ExceptionUtils {
-    private static final Logger log = Logger.getLogger(ExceptionUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(ExceptionUtils.class);
 
     public static void logAndRethrowBizException(Throwable e, MessageID messageId, Object... args) throws BizException {
         String msg = MessageUtils.getMessage(messageId, args);
@@ -25,7 +26,7 @@ public class ExceptionUtils {
     }
 
     public static void logAndRethrowBizException(Throwable e) throws BizException {
-        log.error(e);
+        log.error(e.getMessage(),e);
         throw new BizException(e);
     }
 

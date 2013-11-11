@@ -25,10 +25,10 @@
 			$("#alertMessageDiv > div > span > span").text(msg);
 		},
 		"appError" : function(title, errorMsg) {
-			alishare.alertErrorModal(title, errorMsg);
+			app.alertErrorModal(title, errorMsg);
 		},
 		"httpError" : function(xhr, textStatus, errorThrown) {
-			alishare.alertErrorModal('抱歉啦，亲', '抱歉，网络发生错误了，请刷新页面试试...');
+			app.alertErrorModal('抱歉啦，亲', '抱歉，网络发生错误了，请刷新页面试试...');
 		},
 		"alertErrorModal" : function(title, errorMsg) {
 			// 显示错误消息
