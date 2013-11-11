@@ -13,6 +13,19 @@ module.config(function($routeProvider, $locationProvider, $resourceProvider) {
 	$locationProvider.html5Mode(true);
 });
 
+module.directive('ngEnter', function() {
+    return function(scope, element, attrs) {
+        element.bind("keydown keypress", function(event) {
+            if(event.which === 13) {
+                scope.$apply(function(){
+                    scope.$eval(attrs.ngEnter);
+                });
+                event.preventDefault();
+            }
+        });
+    };
+});
+
 module.factory('DataService', function($resource) {
 	var model = {};
 	var VsNameList = $resource('/vsNamelist');
@@ -118,13 +131,25 @@ module.controller('VsController', function($scope, DataService, $route,
 	$scope.definedParamMap = DataService.definedParamMap;
 
 	// 动态参数的管理
-	$scope.addDynamicAttribute = function(key) {
+	$scope.addDynamicAttribute = function(key,value) {
+		if(key==null || key.trim() == ''){
+			app.appError('通知', "参数名不能为空！");
+			return;
+		}
 		if ($scope.vs.dynamicAttributes[key] != null) {
 			// app.alertWarn('Param Already Exist.');
-			app.appError('Warn', 'Param Already Exist.');
+			app.appError('通知', "该参数名( " + key + " )已经存在，不能添加！");
 		} else {
-			$scope.vs.dynamicAttributes[key] = '';
+			if(value != null){
+				$scope.vs.dynamicAttributes[key] = value;
+			}else{
+				$scope.vs.dynamicAttributes[key] = '';
+			}
 		}
+	}
+	$scope.addNewDynamicAttribute = function() {
+		$scope.addDynamicAttribute($('#addParamKey').val(),$('#addParamValue').val());
+		$('#addParamModal').modal('hide');
 	}
 	$scope.removeDynamicAttribute = function(key) {
 		delete $scope.vs.dynamicAttributes[key];

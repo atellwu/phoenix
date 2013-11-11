@@ -1,5 +1,11 @@
 (function(w) {
 	var app = {
+		"openAddParamModal" : function() {
+			$('#addParamKey').val('');
+			$('#addParamValue').val('');
+			$('#addParamModal').modal('show');
+			$('#addParamKey').focus();
+		},
 		"showPoolDetail" : function(name) {
 			$('#poolDetailDiv>div').html($('#poolDetail_' + name).html());
 			$('#poolList').hide();
