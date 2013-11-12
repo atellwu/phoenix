@@ -1,85 +1,89 @@
-<div class="well">
-  <div id="poolList">
-    <h5 style="margin-top: 30px">集群列表</h5>
-    <table class="table table-bordered" style="width: 80%">
+
+<div ng-show="showPoolList">
+  <h5 style="margin-top: 30px">集群列表</h5>
+  <table class="table table-bordered" style="width: 80%">
+    <thead>
+      <tr>
+        <th>集群名称</th>
+        <th>负载均衡策略</th>
+        <th>节点个数</th>
+        <th>最小活动节点占比</th>
+        <th style="width: 130px;">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="pool in vs.pools">
+        <td>{{pool.name}}</td>
+        <td>{{pool.loadbalanceStrategyName}}</td>
+        <td>{{pool.members.length}}</td>
+        <td>{{pool.minAvailableMemberPercentage}}</td>
+        <td><a href="javascript:void(0);" ng-click="switchPool(pool.name);">编辑</a>&nbsp;&nbsp;<a
+          href="javascript:;">删除</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div ng-repeat="pool in vs.pools" pool="{{pool.name}}" style="display: none">
+  <button style="float: right" class="btn" ng-click="switchPoolList();">
+    <i class="icon-reply"></i> 返回
+  </button>
+  <h5 style="margin-top: 30px">集群基本信息</h5>
+  <form class="form-horizontal" style="margin-top: 30px;">
+    <div class="control-group">
+      <label class="control-label">集群名</label>
+      <div class="controls">
+        <label class="checkbox"> <span>{{ pool.name }}</span>
+        </label>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="inputPassword">负载均衡策略</label>
+      <div class="controls">
+        <select class="span2" ng-model="pool.loadbalanceStrategyName"
+          ng-options="item.name as item.name for item in strategies"></select>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="inputEmail">最小活动节点占比</label>
+      <div class="controls">
+        <div class="input-append">
+          <input class="" ng-model="pool.minAvailableMemberPercentage" type="text" placeholder="输入1-100的数值"> <span
+            class="add-on">%</span>
+        </div>
+      </div>
+    </div>
+    <br>
+    <h5 style="margin-top: 30px">集群节点管理</h5>
+    <table class="table table-bordered" style="width: 100%">
       <thead>
         <tr>
-          <th>集群名称</th>
-          <th>负载均衡策略</th>
-          <th>节点个数</th>
-          <th style="width: 130px;">操作</th>
+          <th style="min-width:120px">节点名称</th>
+          <th>IP</th>
+          <th>端口</th>
+          <th>权重</th>
+          <th>最大失败次数</th>
+          <th>失败超时时间</th>
+          <th>状态</th>
+          <th style="width: 130px;">状态控制</th>
         </tr>
       </thead>
-      <tbody id="offerAdList">
-        <tr>
-          <td>name</td>
-          <td>round robin</td>
-          <td>5个</td>
-          <td><a href="javascript:app.showPoolDetail('name');">编辑</a>&nbsp;&nbsp;<a href="javascript:;">删除</a></td>
+      <tbody>
+        <tr ng-repeat="member in pool.members">
+          <td><input class="input-small" ng-model="member.name" type="text"></td>
+          <td><input class="input-small" ng-model="member.ip" type="text"></td>
+          <td><input class="input-mini" ng-model="member.port" type="text"></td>
+          <td><input class="input-mini" ng-model="member.weight" type="text"></td>
+          <td><input class="input-mini" ng-model="member.maxFails" type="text"></td>
+          <td><input class="input-mini" ng-model="member.failTimeout" type="text"></td>
+          <td>{{member.state}}</td>
+          <td><label class="radio inline"> <input ng-model="member.availability" type="radio"
+              value="OFFLINE"> OFFLINE
+          </label> <label class="radio inline"> <input ng-model="member.availability" type="radio" value="AVAILABLE">
+              AVAILABLE
+          </label></td>
         </tr>
       </tbody>
     </table>
-  </div>
-  <div id="poolDetailDiv" class="well" style="display: none">
-    <button style="" id="addOfferModalButton" class="btn btn-primary" onclick="alishare.openAddOfferAdModal();">
-      <i class="icon-plus"></i> 返回
-    </button>
-    <div></div>
-  </div>
-  <div id="poolDetail_name" style="display: none">
-    <form class="form-horizontal" style="margin-top: 30px;">
-      <div class="control-group">
-        <label class="control-label" for="inputPassword">集群名</label>
-        <div class="controls">
-          <input type="text" placeholder="">
-        </div>
-      </div>
-      <div class="control-group">
-        <label class="control-label" for="inputPassword">负载均衡策略</label>
-        <div class="controls">
-          <select class="span2">
-            <option>round robin</option>
-            <option>ip hash</option>
-          </select>
-        </div>
-      </div>
-      <div class="control-group">
-        <label class="control-label" for="inputEmail">最小活动节点占比</label>
-        <div class="controls">
-          <div class="input-append">
-            <input class="" id="appendedInput" type="text" placeholder="输入1-100的数值"> <span class="add-on">%</span>
-          </div>
-        </div>
-      </div>
-      <br>
-      <hr>
-      <h5 style="margin-top: 30px">集群节点管理</h5>
-      <table class="table table-bordered" style="width: 80%">
-        <thead>
-          <tr>
-            <th>节点名称</th>
-            <th>IP</th>
-            <th>端口</th>
-            <th>权重</th>
-            <th>最大失败次数</th>
-            <th>失败超时时间</th>
-            <th>状态</th>
-            <th style="width: 130px;">状态控制</th>
-          </tr>
-        </thead>
-        <tbody id="offerAdList">
-          <tr>
-            <td>asd</td>
-            <td>asd</td>
-            <td>das</td>
-            <td>das</td>
-            <td>asd</td>
-            <td>asd</td>
-            <td>das</td>
-            <td>das</td>
-          </tr>
-        </tbody>
-      </table>
-    </form>
-  </div>
+  </form>
 </div>

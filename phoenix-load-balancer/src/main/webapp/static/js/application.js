@@ -6,10 +6,9 @@
 			$('#addParamModal').modal('show');
 			$('#addParamKey').focus();
 		},
-		"showPoolDetail" : function(name) {
-			$('#poolDetailDiv>div').html($('#poolDetail_' + name).html());
-			$('#poolList').hide();
-			$('#poolDetailDiv').show();
+		"backPool" : function() {
+			$('div[pool]').hide();
+			$('div[pool='+name+']').show();
 		},
 		"isEmail" : function(email) {
 			var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;

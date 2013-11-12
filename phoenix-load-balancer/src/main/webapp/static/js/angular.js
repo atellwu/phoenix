@@ -14,16 +14,16 @@ module.config(function($routeProvider, $locationProvider, $resourceProvider) {
 });
 
 module.directive('ngEnter', function() {
-    return function(scope, element, attrs) {
-        element.bind("keydown keypress", function(event) {
-            if(event.which === 13) {
-                scope.$apply(function(){
-                    scope.$eval(attrs.ngEnter);
-                });
-                event.preventDefault();
-            }
-        });
-    };
+	return function(scope, element, attrs) {
+		element.bind("keydown keypress", function(event) {
+			if (event.which === 13) {
+				scope.$apply(function() {
+					scope.$eval(attrs.ngEnter);
+				});
+				event.preventDefault();
+			}
+		});
+	};
 });
 
 module.factory('DataService', function($resource) {
@@ -38,6 +38,11 @@ module.factory('DataService', function($resource) {
 	var DefinedParamMap = $resource('/definedParamMap');
 	model.definedParamMap = DefinedParamMap.get(function() {
 	});
+	
+	var Strategies = $resource('/strategies');
+	model.strategies = Strategies.query(function() {
+	});
+	
 	return model;
 });
 
@@ -78,7 +83,6 @@ module.controller('VsController', function($scope, DataService, $route,
 	// });
 
 	$scope.getVs = function(vsName) {
-		console.log("getVs:" + vsName);
 		$http({
 			method : 'GET',
 			url : '/vs/' + vsName
@@ -112,7 +116,8 @@ module.controller('VsController', function($scope, DataService, $route,
 		}).success(
 				function(data, status, headers, config) {
 					if (data.errorCode == 0) {
-						app.alertSuccess("保存成功");
+						app.alertSuccess("保存成功！ 即将刷新页面...");
+						setTimeout(app.refresh, 700);
 					} else {
 						app.alertError("保存失败[errorCode=" + data.errorCode
 								+ "]: " + data.errorMessage);
@@ -131,8 +136,8 @@ module.controller('VsController', function($scope, DataService, $route,
 	$scope.definedParamMap = DataService.definedParamMap;
 
 	// 动态参数的管理
-	$scope.addDynamicAttribute = function(key,value) {
-		if(key==null || key.trim() == ''){
+	$scope.addDynamicAttribute = function(key, value) {
+		if (key == null || key.trim() == '') {
 			app.appError('通知', "参数名不能为空！");
 			return;
 		}
@@ -140,22 +145,22 @@ module.controller('VsController', function($scope, DataService, $route,
 			// app.alertWarn('Param Already Exist.');
 			app.appError('通知', "该参数名( " + key + " )已经存在，不能添加！");
 		} else {
-			if(value != null){
+			if (value != null) {
 				$scope.vs.dynamicAttributes[key] = value;
-			}else{
+			} else {
 				$scope.vs.dynamicAttributes[key] = '';
 			}
 		}
 	}
 	$scope.addNewDynamicAttribute = function() {
-		$scope.addDynamicAttribute($('#addParamKey').val(),$('#addParamValue').val());
+		$scope.addDynamicAttribute($('#addParamKey').val(), $('#addParamValue')
+				.val());
 		$('#addParamModal').modal('hide');
 	}
 	$scope.removeDynamicAttribute = function(key) {
 		delete $scope.vs.dynamicAttributes[key];
 	}
 	$scope.getInputType = function(key) {
-		console.log(key);
 		// console.log($scope.definedParamMap);
 		var definedParam = $scope.definedParamMap[key];
 		if (definedParam == null) {
@@ -171,5 +176,19 @@ module.controller('VsController', function($scope, DataService, $route,
 			$scope.valueList = definedParam.valueList;
 		}
 	}
+
+	// pool
+	$scope.strategies = DataService.strategies;
+	$scope.showPoolList = true;
+	$scope.switchPool = function(name) {
+		$scope.showPoolList = false;
+		$('div[pool]').hide();
+		$("div[pool='" + name + "']").show();
+	}
+	$scope.switchPoolList = function(name) {
+		$scope.showPoolList = true;
+		$('div[pool]').hide();
+	}
+	
 
 });

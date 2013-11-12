@@ -1,6 +1,7 @@
 package com.dianping.phoenix.lb.action;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -14,9 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.configure.entity.Strategy;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
+import com.dianping.phoenix.lb.service.StrategyService;
 import com.dianping.phoenix.lb.service.VirtualServerService;
-import com.dianping.phoenix.lb.utils.GsonUtils;
 import com.dianping.phoenix.lb.utils.JsonBinder;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -44,9 +46,19 @@ public class VirtualServerAction extends ActionSupport {
     @Autowired
     private VirtualServerService virtualServerService;
 
+    @Autowired
+    private StrategyService      strategyService;
+
+    private List<Strategy>       strategies;
+
     @PostConstruct
     public void init() {
 
+    }
+
+    public String strategies() {
+        strategies = strategyService.listStrategies();
+        return SUCCESS;
     }
 
     @Override
@@ -116,6 +128,14 @@ public class VirtualServerAction extends ActionSupport {
 
     public void setVs(String vs) {
         this.vs = vs;
+    }
+
+    public List<Strategy> getStrategies() {
+        return strategies;
+    }
+
+    public void setStrategies(List<Strategy> strategies) {
+        this.strategies = strategies;
     }
 
 }

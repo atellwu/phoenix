@@ -35,9 +35,6 @@ public class DefinedParamMapAction extends ActionSupport {
         //        virtualServers.add(vs2);
 
         definedParamMap = DefinedParamUtils.loadDefinedParamMap();
-
-        System.out.println(definedParamMap);
-
     }
 
     @Override

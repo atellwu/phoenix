@@ -75,10 +75,14 @@
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
-                <param name="excludeProperties">
-                    login.password,
-                    studentList.*\.sin
-                </param>
+            </result>
+        </action>
+
+        <action name="strategies" class="virtualServerAction"
+            method="strategies">
+            <result name="success" type="json">
+                <param name="root">strategies</param>
+                <param name="encoding">UTF-8</param>
             </result>
         </action>
 
