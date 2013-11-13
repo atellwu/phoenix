@@ -20,6 +20,16 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit</artifactId>
+			<version>2.1.0.201209190230-r</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.7</version>
+		</dependency>
+		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
