@@ -6,9 +6,14 @@
 			$('#addParamModal').modal('show');
 			$('#addParamKey').focus();
 		},
+		"openAddPoolModal" : function() {
+			$('#addPoolName').val('');
+			$('#addPoolModal').modal('show');
+			$('#addPoolName').focus();
+		},
 		"backPool" : function() {
 			$('div[pool]').hide();
-			$('div[pool='+name+']').show();
+			$('div[pool=' + name + ']').show();
 		},
 		"isEmail" : function(email) {
 			var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -17,9 +22,13 @@
 		"refresh" : function() {
 			w.location.reload();
 		},
-		"alertError" : function(msg) {
-			$("#alertMessageDiv").html($("#alert_error").html());
-			$("#alertMessageDiv > div > span > span").text(msg);
+		"alertError" : function(msg, divId) {
+			if (!divId) {
+				divId = "alertMessageDiv";
+			}
+			console.log(divId);
+			$("#" + divId).html($("#alert_error").html());
+			$("#" + divId + " > div > span > span").text(msg);
 		},
 		"alertSuccess" : function(msg) {
 			$("#alertMessageDiv").html($("#alert_success").html());

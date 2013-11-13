@@ -38,11 +38,11 @@ module.factory('DataService', function($resource) {
 	var DefinedParamMap = $resource('/definedParamMap');
 	model.definedParamMap = DefinedParamMap.get(function() {
 	});
-	
+
 	var Strategies = $resource('/strategies');
 	model.strategies = Strategies.query(function() {
 	});
-	
+
 	return model;
 });
 
@@ -135,14 +135,119 @@ module.controller('VsController', function($scope, DataService, $route,
 
 	$scope.definedParamMap = DataService.definedParamMap;
 
+});
+
+module.controller('PoolController',
+		function($scope, DataService, $route, $resource, $http) {
+			$scope.strategies = DataService.strategies;
+			// pool视图切换
+			$scope.showPoolList = true;
+			$scope.switchPool = function(name) {
+				$scope.showPoolList = false;
+				$('div[pool]').hide();
+				$("div[pool='" + name + "']").show();
+				$scope.curPoolName = name;
+			}
+			var getPool = function(name){
+				var re = null;
+				$.each($scope.vs.pools, function(i, pool) {
+					if (pool.name == name) {
+						console.log(pool.members);
+						re =  pool;
+						return false;
+					}
+				});
+				return re;
+			}
+			$scope.switchPoolList = function() {
+				$scope.showPoolList = true;
+				$('div[pool]').hide();
+				$scope.curPoolName = '';
+			}
+			// pool增删
+			$scope.addPool = function() {
+				var name = $('#addPoolName').val();
+				if (name == null || name.trim() == '') {
+					app.alertError("集群名不能为空！", "addPoolAlertDiv");
+					return;
+				}
+				name = name.trim();
+				var exist = false;
+				$.each($scope.vs.pools, function(i, pool) {
+					if (pool.name == name) {
+						exist = true;
+						return false;
+					}
+				});
+				if (exist) {
+					app.alertError("该集群名( " + name + " )已经存在，不能添加！",
+							"addPoolAlertDiv");
+				} else {
+					var pool = new Object();
+					pool.name = name;
+					$scope.vs.pools.push(pool);
+					$('#addPoolModal').modal('hide');
+				}
+			}
+			$scope.removePool = function() {
+				var affirmRemovePoolId = $('#affirmRemovePoolId').val();
+				$scope.vs.pools.splice(affirmRemovePoolId, 1);
+				$('#affirmRemovePoolModal').modal('hide');
+			}
+			$scope.affirmRemovePoolModal = function(affirmRemovePoolId,affirmText) {
+				$('#affirmRemovePoolId').val(affirmRemovePoolId);
+				$('#affirmRemovePoolText').text(affirmText);
+				$('#affirmRemovePoolModal').modal('show');
+			}
+			// member增删
+			$scope.addPool = function() {
+				var name = $('#addMemberName').val();
+				if (name == null || name.trim() == '') {
+					app.alertError("集群名不能为空！", "addMemberAlertDiv");
+					return;
+				}
+				name = name.trim();
+				var exist = false;
+				$.each(getPool($scope.curPoolName).members, function(i, member) {
+					if (member.name == name) {
+						exist = true;
+						return false;
+					}
+				});
+				if (exist) {
+					app.alertError("该集群名( " + name + " )已经存在，不能添加！",
+							"addMemberAlertDiv");
+				} else {
+					var member = new Object();
+					member.name = name;
+					getPool($scope.curPoolName).members.push(member);
+					$('#addMemberModal').modal('hide');
+				}
+			}
+			$scope.removeMember = function() {
+				var affirmRemoveMemberId = $('#affirmRemoveMemberId').val();
+				console.log($scope.curPoolName);
+				var pool = getPool($scope.curPoolName);
+				pool.members.splice(affirmRemoveMemberId, 1);
+				$('#affirmRemoveMemberModal').modal('hide');
+			}
+			$scope.affirmRemoveMemberModal = function(affirmRemoveMemberId,affirmRemoveMemberText) {
+				$('#affirmRemoveMemberId').val(affirmRemoveMemberId);
+				$('#affirmRemoveMemberText').text(affirmRemoveMemberText);
+				$('#affirmRemoveMemberModal').modal('show');
+			}
+		});
+
+module.controller('ProfileController', function($scope, DataService, $route,
+		$resource, $http) {
 	// 动态参数的管理
 	$scope.addDynamicAttribute = function(key, value) {
 		if (key == null || key.trim() == '') {
-			app.appError('通知', "参数名不能为空！");
+			app.alertError("参数名不能为空！", "addParamAlertDiv");
 			return;
 		}
+		key = key.trim();
 		if ($scope.vs.dynamicAttributes[key] != null) {
-			// app.alertWarn('Param Already Exist.');
 			app.appError('通知', "该参数名( " + key + " )已经存在，不能添加！");
 		} else {
 			if (value != null) {
@@ -151,11 +256,11 @@ module.controller('VsController', function($scope, DataService, $route,
 				$scope.vs.dynamicAttributes[key] = '';
 			}
 		}
+		$('#addParamModal').modal('hide');
 	}
 	$scope.addNewDynamicAttribute = function() {
 		$scope.addDynamicAttribute($('#addParamKey').val(), $('#addParamValue')
 				.val());
-		$('#addParamModal').modal('hide');
 	}
 	$scope.removeDynamicAttribute = function(key) {
 		delete $scope.vs.dynamicAttributes[key];
@@ -177,18 +282,13 @@ module.controller('VsController', function($scope, DataService, $route,
 		}
 	}
 
-	// pool
-	$scope.strategies = DataService.strategies;
-	$scope.showPoolList = true;
-	$scope.switchPool = function(name) {
-		$scope.showPoolList = false;
-		$('div[pool]').hide();
-		$("div[pool='" + name + "']").show();
+	// instance
+	$scope.removeInstance = function(index) {
+		$scope.vs.instances.splice(index, 1);
 	}
-	$scope.switchPoolList = function(name) {
-		$scope.showPoolList = true;
-		$('div[pool]').hide();
+	$scope.addInstance = function() {
+		var instance = new Object();
+		instance.ip = '';
+		$scope.vs.instances.push(instance);
 	}
-	
-
 });

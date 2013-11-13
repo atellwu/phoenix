@@ -1,5 +1,10 @@
-
+<span style="font-size: 12px;">所在位置：<a href="javascript:;" ng-click="switchPoolList();">所有集群</a> &nbsp;&nbsp;<span
+  ng-show="curPoolName">/ &nbsp;&nbsp; {{curPoolName}}</span>
+</span>
 <div ng-show="showPoolList">
+  <a style="float: right; margin-right: 30px;" href="javascript:app.openAddPoolModal();"> <i class="icon-plus"></i>
+    添加新集群
+  </a>
   <h5 style="margin-top: 30px">集群列表</h5>
   <table class="table table-bordered" style="width: 80%">
     <thead>
@@ -18,16 +23,16 @@
         <td>{{pool.members.length}}</td>
         <td>{{pool.minAvailableMemberPercentage}}</td>
         <td><a href="javascript:void(0);" ng-click="switchPool(pool.name);">编辑</a>&nbsp;&nbsp;<a
-          href="javascript:;">删除</a></td>
+          href="javascript:void(0);" ng-click="affirmRemovePoolModal({{$index}},'{{pool.name}}');">删除</a></td>
       </tr>
     </tbody>
   </table>
 </div>
 
 <div ng-repeat="pool in vs.pools" pool="{{pool.name}}" style="display: none">
-  <button style="float: right" class="btn" ng-click="switchPoolList();">
-    <i class="icon-reply"></i> 返回
-  </button>
+  <a style="float: right; margin-right: 30px;" href="javascript:;" ng-click="switchPoolList();"> <i
+    class="icon-reply"></i> 返回集群列表
+  </a>
   <h5 style="margin-top: 30px">集群基本信息</h5>
   <form class="form-horizontal" style="margin-top: 30px;">
     <div class="control-group">
@@ -48,8 +53,8 @@
       <label class="control-label" for="inputEmail">最小活动节点占比</label>
       <div class="controls">
         <div class="input-append">
-          <input class="" ng-model="pool.minAvailableMemberPercentage" type="text" placeholder="输入1-100的数值"> <span
-            class="add-on">%</span>
+          <input class="" ng-model="pool.minAvailableMemberPercentage" type="text" placeholder="输入1-100的数值">
+          <span class="add-on">%</span>
         </div>
       </div>
     </div>
@@ -58,7 +63,7 @@
     <table class="table table-bordered" style="width: 100%">
       <thead>
         <tr>
-          <th style="min-width:120px">节点名称</th>
+          <th style="min-width: 120px">节点名称</th>
           <th>IP</th>
           <th>端口</th>
           <th>权重</th>
@@ -66,6 +71,7 @@
           <th>失败超时时间</th>
           <th>状态</th>
           <th style="width: 130px;">状态控制</th>
+          <th style="">操作</th>
         </tr>
       </thead>
       <tbody>
@@ -82,8 +88,79 @@
           </label> <label class="radio inline"> <input ng-model="member.availability" type="radio" value="AVAILABLE">
               AVAILABLE
           </label></td>
+          <td><a href="javascript:void(0);" ng-click="affirmRemoveMemberModal({{$index}},'{{member.name}}');"><span class='removeIcon'></span> 删除 </a></td>
         </tr>
       </tbody>
     </table>
   </form>
 </div>
+
+<!-- 输入key -->
+<div aria-hidden="true" role="dialog" class="modal hide" id="addPoolModal" style="display: none;">
+  <div class="modal-header">
+    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+    <h3>添加新集群</h3>
+  </div>
+  <div class="modal-body">
+    <h6 style="text-align: center;">此处填写集群名，详细集群的信息，请添加集群后，点击相应的集群进行编辑。</h6><br>
+    <div id="addPoolAlertDiv"></div>
+    <form class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label">集群名</label>
+        <div class="controls">
+          <div class="input-prepend">
+            <span class="add-on"></span><input id="addPoolName" ng-enter="addPool()" type="text"
+              class="input-small" placeholder="">
+          </div>
+          <span class="muted">（必填）</span>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" ng-click="addPool()" class="btn btn-primary">确定</button>
+    <button type="button" data-dismiss="modal" class="btn">取消</button>
+  </div>
+</div>
+
+ <!-- 确认对话框 -->
+  <div aria-hidden="true" data-backdrop="true" role="dialog" tabindex="-1" class="modal hide" id="affirmRemovePoolModal"
+    style="display: none;">
+    <div class="modal-header">
+      <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+      <h3>确认操作</h3>
+    </div>
+    <div class="modal-body">
+      <p style="text-align: center;">
+        <i class="icon-warning-sign"></i> 您是否确定要删除
+        <code id="affirmRemovePoolText"></code>
+        ？
+      </p>
+      <input id="affirmRemovePoolId" type="hidden" value="">
+    </div>
+    <div class="modal-footer">
+      <button ng-click="removePool();" class="btn btn-primary">确定</button>
+      <button data-dismiss="modal" class="btn">取消</button>
+    </div>
+  </div>
+  
+   <!-- 确认对话框 -->
+  <div aria-hidden="true" data-backdrop="true" role="dialog" tabindex="-1" class="modal hide" id="affirmRemoveMemberModal"
+    style="display: none;">
+    <div class="modal-header">
+      <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+      <h3>确认操作</h3>
+    </div>
+    <div class="modal-body">
+      <p style="text-align: center;">
+        <i class="icon-warning-sign"></i> 您是否确定要删除
+        <code id="affirmRemoveMemberText"></code>
+        ？
+      </p>
+      <input id="affirmRemoveMemberId" type="hidden" value="">
+    </div>
+    <div class="modal-footer">
+      <button ng-click="removeMember();" class="btn btn-primary">确定</button>
+      <button data-dismiss="modal" class="btn">取消</button>
+    </div>
+  </div>
