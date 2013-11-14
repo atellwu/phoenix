@@ -53,7 +53,8 @@
             </result>
         </action>
 
-        <action name="vsNamelist" class="vsNameListAction">
+        <action name="vsNamelist" class="virtualServerAction"
+            method="getVirtualServerList">
             <result name="success" type="json">
                 <param name="root">virtualServers</param>
                 <param name="encoding">UTF-8</param>

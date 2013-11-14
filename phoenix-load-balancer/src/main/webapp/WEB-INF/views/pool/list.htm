@@ -1,8 +1,8 @@
 <span style="font-size: 12px;">所在位置：<a href="javascript:;" ng-click="switchPoolList();">所有集群</a> &nbsp;&nbsp;<span
   ng-show="curPoolName">/ &nbsp;&nbsp; {{curPoolName}}</span>
 </span>
-<div ng-show="showPoolList">
-  <a style="float: right; margin-right: 30px;" href="javascript:app.openAddPoolModal();"> <i class="icon-plus"></i>
+<div ng-hide="poolEditing">
+  <a style="float: right; margin-right: 30px;" href="javascript:;" ng-click="openAddPoolModal()"> <i class="icon-plus"></i>
     添加新集群
   </a>
   <h5 style="margin-top: 30px">集群列表</h5>
@@ -22,14 +22,15 @@
         <td>{{pool.loadbalanceStrategyName}}</td>
         <td>{{pool.members.length}}</td>
         <td>{{pool.minAvailableMemberPercentage}}</td>
-        <td><a href="javascript:void(0);" ng-click="switchPool(pool.name);">编辑</a>&nbsp;&nbsp;<a
-          href="javascript:void(0);" ng-click="affirmRemovePoolModal({{$index}},'{{pool.name}}');">删除</a></td>
+        <td><a href="javascript:void(0);" ng-click="switchPool($index);"><i class="icon-edit"></i> 编辑 </a>&nbsp;&nbsp;<a
+          href="javascript:void(0);"
+          ng-click="affirmRemovePoolModal($index);">删除</a></td>
       </tr>
     </tbody>
   </table>
 </div>
 
-  #parse("pool/member.htm");
+  #parse("pool/detail.htm")
 
 <!-- 添加集群 -->
 <div aria-hidden="true" role="dialog" class="modal hide" id="addPoolModal" style="display: none;">
@@ -46,7 +47,7 @@
         <label class="control-label">集群名</label>
         <div class="controls">
           <div class="input-prepend">
-            <span class="add-on"></span><input id="addPoolName" ng-enter="addPool()" type="text" class="input-small"
+            <span class="add-on"></span><input ng-model="poolToBeAdd.name" id="addPoolName" ng-enter="addPool()" type="text" class="input-small"
               placeholder="">
           </div>
           <span class="muted">（必填）</span>
@@ -70,10 +71,9 @@
   <div class="modal-body">
     <p style="text-align: center;">
       <i class="icon-warning-sign"></i> 您是否确定要删除
-      <code id="affirmRemovePoolText"></code>
+      <code>{{poolToBeRemove.name}}</code>
       ？
     </p>
-    <input id="affirmRemovePoolId" type="hidden" value="">
   </div>
   <div class="modal-footer">
     <button ng-click="removePool();" class="btn btn-primary">确定</button>

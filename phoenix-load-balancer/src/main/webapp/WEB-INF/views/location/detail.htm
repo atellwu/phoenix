@@ -1,0 +1,93 @@
+<div ng-show="locationEditing">
+  <a style="float: right; margin-right: 30px;" href="javascript:;" ng-click="switchLocationList();"> <i
+    class="icon-reply"></i> 返回集群列表
+  </a>
+  <h5 style="margin-top: 30px">集群基本信息</h5>
+  <form class="form-horizontal">
+    <div class="control-group">
+      <label class="control-label" for="">集群名</label>
+      <div class="controls">
+        <select ng-model="locationEditing.domain" ng-options="pool.name as pool.name for pool in vs.pools"></select>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">匹配类型</label>
+      <div class="controls">
+        <select ng-model="locationEditing.matchType" ng-enter="addLocation()">
+          <option value="prefix">prefix</option>
+          <option value="regex">regex</option>
+          <option value="common">common</option>
+        </select>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">路径/正则表达式</label>
+      <div class="controls">
+        <input ng-model="locationEditing.pattern" ng-enter="addLocation()" type="text" class="input" placeholder="">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label"></label>
+      <div class="controls">
+        <label class="checkbox inline"> <input ng-model="locationEditing.caseSensitive" type="checkbox">
+          大小写敏感
+        </label>
+      </div>
+    </div>
+    <br> <a style="float: right; margin-right: 30px;" ng-click="addDirective();" href="javascript:;"> <i
+      class="icon-plus"></i> 添加新节点
+    </a>
+    <h5 style="margin-top: 0px">集群节点管理</h5>
+    <table class="table table-bordered" style="width: 100%">
+      <thead>
+        <tr>
+          <th style="min-width: 120px">节点名称</th>
+          <th>IP</th>
+          <th>端口</th>
+          <th>权重</th>
+          <th>最大失败次数</th>
+          <th>失败超时时间</th>
+          <th>状态</th>
+          <th style="width: 130px;">状态控制</th>
+          <th style="">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="directive in locationEditing.directives">
+          <td><input class="input-small" ng-model="directive.name" type="text"></td>
+          <td><input class="input-small" ng-model="directive.ip" type="text"></td>
+          <td><input class="input-mini" ng-model="directive.port" type="text"></td>
+          <td><input class="input-mini" ng-model="directive.weight" type="text"></td>
+          <td><input class="input-mini" ng-model="directive.maxFails" type="text"></td>
+          <td><input class="input-mini" ng-model="directive.failTimeout" type="text"></td>
+          <td>{{directive.state}}</td>
+          <td><label class="radio inline"> <input ng-model="directive.availability" type="radio"
+              value="OFFLINE"> OFFLINE
+          </label> <label class="radio inline"> <input ng-model="directive.availability" type="radio" value="AVAILABLE">
+              AVAILABLE
+          </label></td>
+          <td><a href="javascript:void(0);" ng-click="affirmRemoveDirectiveModal($index,'{{directive.name}}');"><span
+              class='removeIcon'></span> 删除 </a></td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</div>
+
+<!-- 确认删除directive的对话框 -->
+<div aria-hidden="true" data-backdrop="true" role="dialog" tabindex="-1" class="modal hide"
+  id="affirmRemoveDirectiveModal" style="display: none;">
+  <div class="modal-header">
+    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+    <h3>确认操作</h3>
+  </div>
+  <div class="modal-body">
+    <p style="text-align: center;">
+      <i class="icon-warning-sign"></i> 您是否确定要删除该节点 <span>{{directiveToBeRemove.name}}</span> ？
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button ng-click="removeDirective();" class="btn btn-primary">确定</button>
+    <button data-dismiss="modal" class="btn">取消</button>
+  </div>
+</div>

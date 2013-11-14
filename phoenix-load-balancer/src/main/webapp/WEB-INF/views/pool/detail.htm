@@ -1,4 +1,4 @@
-<div ng-repeat="pool in vs.pools" pool="{{pool.name}}" style="display: none">
+<div ng-show="poolEditing">
   <a style="float: right; margin-right: 30px;" href="javascript:;" ng-click="switchPoolList();"> <i
     class="icon-reply"></i> 返回集群列表
   </a>
@@ -7,14 +7,14 @@
     <div class="control-group">
       <label class="control-label">集群名</label>
       <div class="controls">
-        <label class="checkbox"> <span>{{ pool.name }}</span>
+        <label class="checkbox"> <span>{{ poolEditing.name }}</span>
         </label>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="inputPassword">负载均衡策略</label>
       <div class="controls">
-        <select class="span2" ng-model="pool.loadbalanceStrategyName"
+        <select class="span2" ng-model="poolEditing.loadbalanceStrategyName"
           ng-options="item.name as item.name for item in strategies"></select>
       </div>
     </div>
@@ -22,7 +22,7 @@
       <label class="control-label" for="inputEmail">最小活动节点占比</label>
       <div class="controls">
         <div class="input-append">
-          <input class="" ng-model="pool.minAvailableMemberPercentage" type="text" placeholder="输入1-100的数值"> <span
+          <input class="" ng-model="poolEditing.minAvailableMemberPercentage" type="text" placeholder="输入1-100的数值"> <span
             class="add-on">%</span>
         </div>
       </div>
@@ -47,7 +47,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="member in pool.members">
+        <tr ng-repeat="member in poolEditing.members">
           <td><input class="input-small" ng-model="member.name" type="text"></td>
           <td><input class="input-small" ng-model="member.ip" type="text"></td>
           <td><input class="input-mini" ng-model="member.port" type="text"></td>
@@ -60,7 +60,7 @@
           </label> <label class="radio inline"> <input ng-model="member.availability" type="radio" value="AVAILABLE">
               AVAILABLE
           </label></td>
-          <td><a href="javascript:void(0);" ng-click="affirmRemoveMemberModal({{$index}},'{{member.name}}');"><span
+          <td><a href="javascript:void(0);" ng-click="affirmRemoveMemberModal($index);"><span
               class='removeIcon'></span> 删除 </a></td>
         </tr>
       </tbody>
@@ -78,10 +78,9 @@
   <div class="modal-body">
     <p style="text-align: center;">
       <i class="icon-warning-sign"></i> 您是否确定要删除该节点
-      <span id="affirmRemoveMemberText"></span>
+      <span>{{memberToBeRemove.name}}</span>
       ？
     </p>
-    <input id="affirmRemoveMemberId" type="hidden" value="">
   </div>
   <div class="modal-footer">
     <button ng-click="removeMember();" class="btn btn-primary">确定</button>

@@ -51,6 +51,8 @@ public class VirtualServerAction extends ActionSupport {
 
     private List<Strategy>       strategies;
 
+    private List<VirtualServer>  virtualServers;
+
     @PostConstruct
     public void init() {
 
@@ -88,16 +90,21 @@ public class VirtualServerAction extends ActionSupport {
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Bussiness Error.", e);
+            LOG.error("Bussiness Error." + e.getMessage());
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error.", e);
+            LOG.error("Param Error." + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
             LOG.error(e.getMessage(), e);
         }
+        return SUCCESS;
+    }
+
+    public String getVirtualServerList() {
+        virtualServers = virtualServerService.listVirtualServers();
         return SUCCESS;
     }
 
@@ -118,10 +125,6 @@ public class VirtualServerAction extends ActionSupport {
         return dataMap;
     }
 
-    public void setDataMap(Map<String, Object> dataMap) {
-        this.dataMap = dataMap;
-    }
-
     public String getVs() {
         return vs;
     }
@@ -134,8 +137,8 @@ public class VirtualServerAction extends ActionSupport {
         return strategies;
     }
 
-    public void setStrategies(List<Strategy> strategies) {
-        this.strategies = strategies;
+    public List<VirtualServer> getVirtualServers() {
+        return virtualServers;
     }
 
 }
