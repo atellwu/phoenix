@@ -11,6 +11,11 @@
 			$('#addPoolModal').modal('show');
 			$('#addPoolName').focus();
 		},
+		"openAddMemberModal" : function() {
+			$('#addMemberName').val('');
+			$('#addMemberModal').modal('show');
+			$('#addMemberName').focus();
+		},
 		"backPool" : function() {
 			$('div[pool]').hide();
 			$('div[pool=' + name + ']').show();

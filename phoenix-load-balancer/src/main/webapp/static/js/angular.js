@@ -148,12 +148,11 @@ module.controller('PoolController',
 				$("div[pool='" + name + "']").show();
 				$scope.curPoolName = name;
 			}
-			var getPool = function(name){
+			var getPool = function(name) {
 				var re = null;
 				$.each($scope.vs.pools, function(i, pool) {
 					if (pool.name == name) {
-						console.log(pool.members);
-						re =  pool;
+						re = pool;
 						return false;
 					}
 				});
@@ -166,6 +165,7 @@ module.controller('PoolController',
 			}
 			// pool增删
 			$scope.addPool = function() {
+				console.log('das');
 				var name = $('#addPoolName').val();
 				if (name == null || name.trim() == '') {
 					app.alertError("集群名不能为空！", "addPoolAlertDiv");
@@ -194,35 +194,21 @@ module.controller('PoolController',
 				$scope.vs.pools.splice(affirmRemovePoolId, 1);
 				$('#affirmRemovePoolModal').modal('hide');
 			}
-			$scope.affirmRemovePoolModal = function(affirmRemovePoolId,affirmText) {
+			$scope.affirmRemovePoolModal = function(affirmRemovePoolId,
+					affirmText) {
 				$('#affirmRemovePoolId').val(affirmRemovePoolId);
 				$('#affirmRemovePoolText').text(affirmText);
 				$('#affirmRemovePoolModal').modal('show');
 			}
 			// member增删
-			$scope.addPool = function() {
-				var name = $('#addMemberName').val();
-				if (name == null || name.trim() == '') {
-					app.alertError("集群名不能为空！", "addMemberAlertDiv");
-					return;
+			$scope.addMember = function() {
+				var member = new Object();
+				var members = getPool($scope.curPoolName).members;
+				if(!members){
+					members = [];
+					getPool($scope.curPoolName).members = members;
 				}
-				name = name.trim();
-				var exist = false;
-				$.each(getPool($scope.curPoolName).members, function(i, member) {
-					if (member.name == name) {
-						exist = true;
-						return false;
-					}
-				});
-				if (exist) {
-					app.alertError("该集群名( " + name + " )已经存在，不能添加！",
-							"addMemberAlertDiv");
-				} else {
-					var member = new Object();
-					member.name = name;
-					getPool($scope.curPoolName).members.push(member);
-					$('#addMemberModal').modal('hide');
-				}
+				members.push(member);
 			}
 			$scope.removeMember = function() {
 				var affirmRemoveMemberId = $('#affirmRemoveMemberId').val();
@@ -231,7 +217,8 @@ module.controller('PoolController',
 				pool.members.splice(affirmRemoveMemberId, 1);
 				$('#affirmRemoveMemberModal').modal('hide');
 			}
-			$scope.affirmRemoveMemberModal = function(affirmRemoveMemberId,affirmRemoveMemberText) {
+			$scope.affirmRemoveMemberModal = function(affirmRemoveMemberId,
+					affirmRemoveMemberText) {
 				$('#affirmRemoveMemberId').val(affirmRemoveMemberId);
 				$('#affirmRemoveMemberText').text(affirmRemoveMemberText);
 				$('#affirmRemoveMemberModal').modal('show');
