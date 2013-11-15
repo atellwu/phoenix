@@ -27,18 +27,18 @@ module.controller('ProfileController', function($scope, DataService, $route,
 	}
 	$scope.getInputType = function(key) {
 		// console.log($scope.definedParamMap);
-		var definedParam = $scope.definedParamMap[key];
-		if (definedParam == null) {
+		var propertiesDefinedInput = $scope.propertiesDefinedInput[key];
+		if (propertiesDefinedInput == null) {
 			return 'TEXT';
 		}
-		var inputType = definedParam.inputType;
+		var inputType = propertiesDefinedInput.inputType;
 		return inputType;
 	}
 	$scope.valueList = [];
 	$scope.initValueList = function(key) {
-		var definedParam = $scope.definedParamMap[key];
-		if (definedParam) {
-			$scope.valueList = definedParam.valueList;
+		var propertiesDefinedInput = $scope.propertiesDefinedInput[key];
+		if (propertiesDefinedInput) {
+			$scope.valueList = propertiesDefinedInput.valueList;
 		}
 	}
 	// instance

@@ -2,7 +2,7 @@ package com.dianping.phoenix.lb.action;
 
 import java.util.List;
 
-public class DefinedParam {
+public class DefinedInput {
 
     private String       name;
 

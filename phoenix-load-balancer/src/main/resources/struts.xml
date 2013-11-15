@@ -65,12 +65,20 @@
             </result>
         </action>
 
-        <action name="definedParamMap" class="definedParamMapAction">
+        <action name="propertiesDefinedInput" class="definedInputAction">
             <result name="success" type="json">
-                <param name="root">definedParamMap</param>
+                <param name="root">propertiesDefinedInput</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
+
+        <action name="directiveDefinedInput" class="definedInputAction">
+            <result name="success" type="json">
+                <param name="root">directiveDefinedInput</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+
 
         <action name="vs/{vsName}" class="virtualServerAction">
             <result name="success" type="json">

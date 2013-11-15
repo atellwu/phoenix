@@ -35,8 +35,8 @@ module.factory('DataService', function($resource) {
 		}
 	});
 
-	var DefinedParamMap = $resource('/definedParamMap');
-	model.definedParamMap = DefinedParamMap.get(function() {
+	var PropertiesDefinedInput = $resource('/propertiesDefinedInput');
+	model.propertiesDefinedInput = PropertiesDefinedInput.get(function() {
 	});
 
 	var Strategies = $resource('/strategies');
@@ -144,6 +144,6 @@ module.controller('VsController', function($scope, DataService, $route,
 		// });
 	};
 
-	$scope.definedParamMap = DataService.definedParamMap;
+	$scope.propertiesDefinedInput = DataService.propertiesDefinedInput;
 
 });
