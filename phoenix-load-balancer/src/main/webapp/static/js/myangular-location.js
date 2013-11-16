@@ -76,4 +76,16 @@ module
 								$scope.directiveIndexToBeRemove, 1);
 						$('#affirmRemoveDirectiveModal').modal('hide');
 					}
+					//指令下的属性的增删
+					$scope.addDynamicAttribute = function(directive,name){
+						if (directive.dynamicAttributes[name] != null) {
+							app.appError('通知', "该参数名( " + name + " )已经存在，不能添加！");
+						} else {
+							directive.dynamicAttributes[name] = '';
+						}
+					}
+					$scope.removeDynamicAttribute = function(directive,name) {
+						delete directive.dynamicAttributes[name];
+					}
+					
 				});
