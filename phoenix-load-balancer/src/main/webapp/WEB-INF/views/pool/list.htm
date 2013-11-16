@@ -1,5 +1,5 @@
 <span style="font-size: 12px;">所在位置：<a href="javascript:;" ng-click="switchPoolList();">所有集群</a> &nbsp;&nbsp;<span
-  ng-show="curPoolName">/ &nbsp;&nbsp; {{curPoolName}}</span>
+  ng-show="poolEditing">/ &nbsp;&nbsp; {{poolEditing.name}}</span>
 </span>
 <div ng-hide="poolEditing">
   <a style="float: right; margin-right: 30px;" href="javascript:;" ng-click="openAddPoolModal()"> <i class="icon-plus"></i>

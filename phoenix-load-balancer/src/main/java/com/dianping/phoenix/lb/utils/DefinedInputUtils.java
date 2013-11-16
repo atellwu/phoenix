@@ -1,35 +1,86 @@
 package com.dianping.phoenix.lb.utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import org.apache.commons.io.FileUtils;
 
 import com.dianping.phoenix.lb.action.DefinedInput;
-import com.dianping.phoenix.lb.velocity.TemplateManager;
 
-public class DefinedInputUtils {
+/**
+ * @author wukezhu
+ * 
+ */
+public enum DefinedInputUtils {
+    INSTANCE;
 
-    private static final String DIR_NAME = "defined-properties";
+    public Map<String, DefinedInput> getPropertiesDefinedInputs() {
+        String dir = "ui-config/propertiesDefinedInput";
+        Map<String, DefinedInput> map = getDefinedInputByDir(dir);
+        return map;
+    }
 
-    public static Map<String, DefinedInput> loadPropertiesInput() {
+    public Map<String, DefinedInput> getDirectiveDefinedInputs(String type) {
+        String dir = "ui-config/directiveDefinedInput/" + type;
+        Map<String, DefinedInput> map = getDefinedInputByDir(dir);
+        return map;
+    }
+
+    public List<String> getDirectiveTypes() {
+        List<String> list = new ArrayList<String>();
+
+        String dir = "ui-config/directiveDefinedInput/";
+        File[] files = this.listFiles(dir);
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    list.add(file.getName());
+                }
+            }
+        }
+        return list;
+    }
+
+    private Map<String, DefinedInput> getDefinedInputByDir(String dir) {
         Map<String, DefinedInput> map = new HashMap<String, DefinedInput>();
-
-        Set<String> filenames = TemplateManager.INSTANCE.availableFiles(DIR_NAME);
-
-        if (filenames != null) {
-            for (String filename : filenames) {
-                String template = TemplateManager.INSTANCE.getTemplate(DIR_NAME, filename);
-                DefinedInput definedParam = GsonUtils.fromJson(template, DefinedInput.class);
-                definedParam.setName(filename);
-
-                map.put(filename, definedParam);
+        File[] files = this.listFiles(dir);
+        if (files != null) {
+            for (File file : files) {
+                DefinedInput definedInput = this.getDefinedInput(file);
+                map.put(definedInput.getName(), definedInput);
             }
         }
         return map;
     }
 
-    public static void main(String[] args) {
-        loadPropertiesInput();
+    private File[] listFiles(String dir) {
+        URL templateDirUrl = DefinedInputUtils.class.getClassLoader().getResource(dir);
+        File templateDir = FileUtils.toFile(templateDirUrl);
+        if (templateDir != null && templateDir.isDirectory()) {
+            return templateDir.listFiles();
+        }
+        return new File[0];
     }
 
+    private DefinedInput getDefinedInput(File file) {
+        String content;
+        try {
+            content = FileUtils.readFileToString(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        DefinedInput definedInput = GsonUtils.fromJson(content, DefinedInput.class);
+        definedInput.setName(file.getName());
+        return definedInput;
+    }
+    
+    public static void main(String[] args) {
+        System.out.println(DefinedInputUtils.INSTANCE.getDirectiveTypes());
+        System.out.println(DefinedInputUtils.INSTANCE.getDirectiveDefinedInputs("accesslog"));
+    }
 }

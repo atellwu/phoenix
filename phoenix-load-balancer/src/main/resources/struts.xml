@@ -65,16 +65,16 @@
             </result>
         </action>
 
-        <action name="propertiesDefinedInput" class="definedInputAction">
+        <action name="propertiesDefinedInputs" class="definedInputAction">
             <result name="success" type="json">
-                <param name="root">propertiesDefinedInput</param>
+                <param name="root">propertiesDefinedInputs</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
 
-        <action name="directiveDefinedInput" class="definedInputAction">
+        <action name="directiveDefinedInputs" class="definedInputAction">
             <result name="success" type="json">
-                <param name="root">directiveDefinedInput</param>
+                <param name="root">directiveDefinedInputs</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>

@@ -1273,3 +1273,13 @@ span.chooseTipsLine {
 .pager a, .pager span {
     border-radius: 0 0 0 0;
 }
+
+table.no-border  td{
+	border:0;
+	line-height: 10px;
+}
+
+table.no-border tbody {
+	border:1px #000;
+	margin:30px;
+}

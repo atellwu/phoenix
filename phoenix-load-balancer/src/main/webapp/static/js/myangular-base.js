@@ -35,8 +35,12 @@ module.factory('DataService', function($resource) {
 		}
 	});
 
-	var PropertiesDefinedInput = $resource('/propertiesDefinedInput');
-	model.propertiesDefinedInput = PropertiesDefinedInput.get(function() {
+	var PropertiesDefinedInputs = $resource('/propertiesDefinedInputs');
+	model.propertiesDefinedInputs = PropertiesDefinedInputs.get(function() {
+	});
+
+	var DirectiveDefinedInputs = $resource('/directiveDefinedInputs');
+	model.directiveDefinedInputs = DirectiveDefinedInputs.get(function() {
 	});
 
 	var Strategies = $resource('/strategies');
@@ -143,7 +147,5 @@ module.controller('VsController', function($scope, DataService, $route,
 		// console.log($scope.vs.name);
 		// });
 	};
-
-	$scope.propertiesDefinedInput = DataService.propertiesDefinedInput;
 
 });

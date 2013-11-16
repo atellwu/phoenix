@@ -1,11 +1,11 @@
 <div ng-show="locationEditing">
   <a style="float: right; margin-right: 30px;" href="javascript:;" ng-click="switchLocationList();"> <i
-    class="icon-reply"></i> 返回集群列表
+    class="icon-reply"></i> 返回规则列表
   </a>
-  <h5 style="margin-top: 30px">集群基本信息</h5>
+  <h5 style="margin-top: 30px">规则基本信息</h5>
   <form class="form-horizontal">
     <div class="control-group">
-      <label class="control-label" for="">集群名</label>
+      <label class="control-label" for="">映射的集群名</label>
       <div class="controls">
         <select ng-model="locationEditing.domain" ng-options="pool.name as pool.name for pool in vs.pools"></select>
       </div>
@@ -34,44 +34,63 @@
         </label>
       </div>
     </div>
-    <br> <a style="float: right; margin-right: 30px;" ng-click="addDirective();" href="javascript:;"> <i
-      class="icon-plus"></i> 添加新节点
-    </a>
-    <h5 style="margin-top: 0px">集群节点管理</h5>
-    <table class="table table-bordered" style="width: 100%">
-      <thead>
-        <tr>
-          <th style="min-width: 120px">节点名称</th>
-          <th>IP</th>
-          <th>端口</th>
-          <th>权重</th>
-          <th>最大失败次数</th>
-          <th>失败超时时间</th>
-          <th>状态</th>
-          <th style="width: 130px;">状态控制</th>
-          <th style="">操作</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="directive in locationEditing.directives">
-          <td><input class="input-small" ng-model="directive.name" type="text"></td>
-          <td><input class="input-small" ng-model="directive.ip" type="text"></td>
-          <td><input class="input-mini" ng-model="directive.port" type="text"></td>
-          <td><input class="input-mini" ng-model="directive.weight" type="text"></td>
-          <td><input class="input-mini" ng-model="directive.maxFails" type="text"></td>
-          <td><input class="input-mini" ng-model="directive.failTimeout" type="text"></td>
-          <td>{{directive.state}}</td>
-          <td><label class="radio inline"> <input ng-model="directive.availability" type="radio"
-              value="OFFLINE"> OFFLINE
-          </label> <label class="radio inline"> <input ng-model="directive.availability" type="radio" value="AVAILABLE">
-              AVAILABLE
-          </label></td>
-          <td><a href="javascript:void(0);" ng-click="affirmRemoveDirectiveModal($index,'{{directive.name}}');"><span
-              class='removeIcon'></span> 删除 </a></td>
-        </tr>
-      </tbody>
-    </table>
   </form>
+  <br> <a style="float: right; margin-right: 30px;" ng-click="openAddDirectiveModal();" href="javascript:;"> <i
+    class="icon-plus"></i> 添加新指令
+  </a>
+  <h5 style="margin-top: 0px; margin-bottom: 20px">指令列表</h5>
+  <table class="table table-bordered" style="width: 100%">
+    <thead>
+      <tr>
+        <th>指令类型</th>
+        <th>指令详细参数</th>
+        <th style="width: 130px;">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="directive in locationEditing.directives" ng-init="inputs = getInputs(directive.type)" ng-model="switch">
+        <td>{{directive.type}}</td>
+        <td ng-hide="switch"><span ng-repeat="(name, value) in directive.dynamicAttributes"
+          ng-init="input = inputs[name]"> {{ name }}="{{directive.dynamicAttributes[name]}}" &nbsp;</span> </td>
+        <td ng-show="switch">
+          <table class="table table-condensed no-border" style="margin: 0 auto; width: 80%">
+            <tr ng-repeat="(name, value) in directive.dynamicAttributes" ng-init="input = inputs[name]">
+              <td>{{ name }}</td>
+              <td><input ng-show="input.inputType == 'TEXT'" ng-model="directive.dynamicAttributes[name]"
+                type="text"> <select ng-show="input.inputType == 'SELECT'"
+                ng-model="directive.dynamicAttributes[name]" ng-options="value0 for value0 in input.valueList"></select></td>
+            </tr>
+          </table>
+        </td>
+        <td><a href="javascript:void(0);" ng-click="switch=(switch+1)%2"><i ng-hide="switch" class="icon-edit"></i><i ng-show="switch" class="icon-reply"></i></a>&nbsp;<a
+          style="margin-left: 10px;" href="javascript:void(0);" ng-click="affirmRemoveDirectiveModal($index)"><i class="icon-remove"></i></a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 添加规则 -->
+<div aria-hidden="true" role="dialog" class="modal hide" id="addDirectiveModal" style="display: none;">
+  <div class="modal-header">
+    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+    <h3>添加新规则</h3>
+  </div>
+  <div class="modal-body">
+    <div id="addDirectiveAlertDiv"></div>
+    <form class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label" for="">选择指令类型：</label>
+        <div class="controls">
+          <select id="addDirectiveType" ng-model="directiveToBeAdd.type"
+            ng-options="key as key for (key,directiveDefinedInput) in directiveDefinedInputs"></select>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" ng-click="addDirective()" class="btn btn-primary">确定</button>
+    <button type="button" data-dismiss="modal" class="btn">取消</button>
+  </div>
 </div>
 
 <!-- 确认删除directive的对话框 -->
@@ -83,7 +102,7 @@
   </div>
   <div class="modal-body">
     <p style="text-align: center;">
-      <i class="icon-warning-sign"></i> 您是否确定要删除该节点 <span>{{directiveToBeRemove.name}}</span> ？
+      <i class="icon-warning-sign"></i> 您是否确定要删除该指令（type为{{directiveToBeRemove.type}}) ？
     </p>
   </div>
   <div class="modal-footer">

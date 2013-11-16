@@ -1,6 +1,7 @@
 module.controller('ProfileController', function($scope, DataService, $route,
 		$resource, $http) {
 	// 动态参数的管理
+	$scope.propertiesDefinedInputs = DataService.propertiesDefinedInputs;
 	$scope.addDynamicAttribute = function(key, value) {
 		if (key == null || key.trim() == '') {
 			app.alertError("参数名不能为空！", "addParamAlertDiv");
@@ -27,19 +28,19 @@ module.controller('ProfileController', function($scope, DataService, $route,
 	}
 	$scope.getInputType = function(key) {
 		// console.log($scope.definedParamMap);
-		var propertiesDefinedInput = $scope.propertiesDefinedInput[key];
-		if (propertiesDefinedInput == null) {
+		var propertiesDefinedInputs = $scope.propertiesDefinedInputs[key];
+		if (propertiesDefinedInputs == null) {
 			return 'TEXT';
 		}
-		var inputType = propertiesDefinedInput.inputType;
+		var inputType = propertiesDefinedInputs.inputType;
 		return inputType;
 	}
-	$scope.valueList = [];
-	$scope.initValueList = function(key) {
-		var propertiesDefinedInput = $scope.propertiesDefinedInput[key];
-		if (propertiesDefinedInput) {
-			$scope.valueList = propertiesDefinedInput.valueList;
+	$scope.getValueList = function(name) {
+		var propertiesDefinedInputs = $scope.propertiesDefinedInputs[name];
+		if (propertiesDefinedInputs) {
+			return valueList = propertiesDefinedInputs.valueList;
 		}
+		return [];
 	}
 	// instance
 	$scope.removeInstance = function(index) {

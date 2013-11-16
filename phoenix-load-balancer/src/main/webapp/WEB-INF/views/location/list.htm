@@ -1,5 +1,5 @@
 <span style="font-size: 12px;">所在位置：<a href="javascript:;" ng-click="switchLocationList();">所有规则</a> &nbsp;&nbsp;<span
-  ng-show="curLocationName">/ &nbsp;&nbsp; {{curLocationName}}</span>
+  ng-show="locationEditing">/ &nbsp;&nbsp; 规则（{{locationEditing.pattern}}）</span>
 </span>
 <div  ng-hide="locationEditing">
   <a style="float: right; margin-right: 30px;" href="javascript:;" ng-click="openAddLocationModal()"> <i
@@ -9,21 +9,21 @@
   <table class="table table-bordered" style="width: 80%">
     <thead>
       <tr>
-        <th>集群名</th>
-        <th>匹配类型</th>
         <th>路径/正则表达式</th>
+        <th>匹配类型</th>
+        <th>集群名</th>
         <th>大小写敏感</th>
         <th style="width: 130px;">操作</th>
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="location in vs.locations">
-        <td>{{location.domain}}</td>
-        <td>{{location.matchType}}</td>
         <td>{{location.pattern}}</td>
+        <td>{{location.matchType}}</td>
+        <td>{{location.domain}}</td>
         <td><span ng-show="location.caseSensitive">是</span><span ng-hide="location.caseSensitive">否</span></td>
         <td><a href="javascript:void(0);" ng-click="switchLocation($index);"><i class="icon-edit"></i>
-            编辑 </a>&nbsp;&nbsp;<a href="javascript:void(0);"
+            详细 </a>&nbsp;&nbsp;<a href="javascript:void(0);"
           ng-click="affirmRemoveLocationModal($index);">删除</a></td>
       </tr>
     </tbody>

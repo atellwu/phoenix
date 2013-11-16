@@ -1,6 +1,7 @@
 package com.dianping.phoenix.lb.action;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -16,13 +17,22 @@ import com.opensymphony.xwork2.ActionSupport;
 @Component("definedInputAction")
 public class DefinedInputAction extends ActionSupport {
 
-    private static final long         serialVersionUID       = 2150069350934991522L;
+    private static final long                      serialVersionUID        = 2150069350934991522L;
 
-    private Map<String, DefinedInput> propertiesDefinedInput = new HashMap<String, DefinedInput>();
+    private Map<String, DefinedInput>              propertiesDefinedInputs = new HashMap<String, DefinedInput>();
+
+    private Map<String, Map<String, DefinedInput>> directiveDefinedInputs  = new HashMap<String, Map<String, DefinedInput>>();
 
     @PostConstruct
     public void init() {
-        propertiesDefinedInput = DefinedInputUtils.loadPropertiesInput();
+        propertiesDefinedInputs = DefinedInputUtils.INSTANCE.getPropertiesDefinedInputs();
+        List<String> types = DefinedInputUtils.INSTANCE.getDirectiveTypes();
+        if (types != null) {
+            for (String type : types) {
+                Map<String, DefinedInput> directiveDefinedInputs0 = DefinedInputUtils.INSTANCE.getDirectiveDefinedInputs(type);
+                directiveDefinedInputs.put(type, directiveDefinedInputs0);
+            }
+        }
     }
 
     @Override
@@ -36,12 +46,12 @@ public class DefinedInputAction extends ActionSupport {
         super.validate();
     }
 
-    public Map<String, DefinedInput> getPropertiesDefinedInput() {
-        return propertiesDefinedInput;
+    public Map<String, DefinedInput> getPropertiesDefinedInputs() {
+        return propertiesDefinedInputs;
     }
 
-    public void setPropertiesDefinedInput(Map<String, DefinedInput> propertiesDefinedInput) {
-        this.propertiesDefinedInput = propertiesDefinedInput;
+    public Map<String, Map<String, DefinedInput>> getDirectiveDefinedInputs() {
+        return directiveDefinedInputs;
     }
 
 }
