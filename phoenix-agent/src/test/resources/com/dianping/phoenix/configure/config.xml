@@ -10,6 +10,8 @@
 		<dryrun-port><![CDATA[3475]]></dryrun-port>
 		<kernel-doc-base-pattern><![CDATA[/data/webapps/phoenix/phoenix-kernel/%s]]></kernel-doc-base-pattern>
 		<agent-doc-base-pattern><![CDATA[/data/webapps/phoenix/phoenix-agent/]]></agent-doc-base-pattern>
+		<tengine-config-git-doc-base-pattern><![CDATA[/data/appdatas/phoenix/tengine-conf/]]></tengine-config-git-doc-base-pattern>
+		<tengine-config-doc-base-pattern><![CDATA[/usr/local/nginx/conf/phoenix-load-balance/]]></tengine-config-doc-base-pattern>
 		<temp-script-dir><![CDATA[/tmp/]]></temp-script-dir>
 		<domain-doc-base-keyword-pattern><![CDATA[/%1$s/current/%1$s.war]]></domain-doc-base-keyword-pattern>
 		<test-service-poll-interval>1000</test-service-poll-interval>
