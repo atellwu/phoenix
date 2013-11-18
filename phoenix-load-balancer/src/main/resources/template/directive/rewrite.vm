@@ -1,2 +1,1 @@
-#set($enable="true")
-rewrite $directive.getDynamicAttribute("matches") $directive.getDynamicAttribute("target-pattern") #if($directive.getDynamicAttribute("break") == $enable) break;#elseif($directive.getDynamicAttribute("last") == $enable)  last;#else ;#end
+rewrite $directive.getDynamicAttribute("matches") $directive.getDynamicAttribute("target-pattern") $!directive.getDynamicAttribute("flag");

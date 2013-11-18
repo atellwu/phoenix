@@ -249,14 +249,20 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
         }
 
         for (Location location : virtualServer.getLocations()) {
-            if (StringUtils.isBlank(location.getDomain())) {
-                ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_LOCATION_NO_DOMAIN);
-            }
+
+            boolean proxyPassExists = false;
 
             for (Directive directive : location.getDirectives()) {
                 if (!TemplateManager.INSTANCE.availableFiles("directive").contains(directive.getType())) {
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_DIRECTIVE_TYPE_NOT_SUPPORT,
                             directive.getType());
+                }
+                if ("proxy_pass".equals(directive.getType())) {
+                    if (!proxyPassExists) {
+                        proxyPassExists = true;
+                    } else {
+                        ExceptionUtils.throwBizException(MessageID.PROXY_PASS_MORE_THAN_ONE, location.getPattern());
+                    }
                 }
             }
 

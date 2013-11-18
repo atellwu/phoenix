@@ -1,1 +1,2 @@
-proxy_pass http://$directive.getDynamicAttribute("pool-name");
+dp_domain $dp_domain;
+        proxy_pass $dp_upstream;

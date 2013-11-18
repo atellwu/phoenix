@@ -33,6 +33,8 @@ public enum MessageID {
 
     POOL_LOWER_THAN_MINAVAIL_PCT("pool_lower_than_minavail_pct"), //
     POOL_NO_MEMBER("pool_no_member"), //
+    
+    PROXY_PASS_MORE_THAN_ONE("proxy_pass_more_than_one"), //
 
     ;
 

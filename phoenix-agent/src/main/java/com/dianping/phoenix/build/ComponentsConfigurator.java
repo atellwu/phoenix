@@ -24,6 +24,10 @@ import com.dianping.phoenix.agent.core.task.processor.kernel.qa.QaService;
 import com.dianping.phoenix.agent.core.task.processor.kernel.upgrade.DefaultKernelUpgradeStepProvider;
 import com.dianping.phoenix.agent.core.task.processor.kernel.upgrade.KernelUpgradeContext;
 import com.dianping.phoenix.agent.core.task.processor.kernel.upgrade.KernelUpgradeStepProvider;
+import com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeContext;
+import com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeStepProvider;
+import com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeTaskProcessor;
+import com.dianping.phoenix.agent.core.task.processor.slb.DefaultConfigUpgradeStepProvider;
 import com.dianping.phoenix.agent.core.task.processor.upgrade.AgentUpgradeContext;
 import com.dianping.phoenix.agent.core.task.processor.upgrade.AgentUpgradeStepProvider;
 import com.dianping.phoenix.agent.core.task.processor.upgrade.AgentUpgradeTaskProcessor;
@@ -64,6 +68,9 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 		all.add(C(TaskProcessor.class, "agent_upgrade", AgentUpgradeTaskProcessor.class) //
 				.req(SemaphoreWrapper.class, "kernel").req(TransactionManager.class) //
 				.req(Engine.class).req(LogFormatter.class));
+		all.add(C(TaskProcessor.class, "tengine_upgrade", ConfigUpgradeTaskProcessor.class) //
+                .req(SemaphoreWrapper.class, "kernel").req(TransactionManager.class) //
+                .req(Engine.class).req(LogFormatter.class));
 		all.add(C(TaskProcessorFactory.class));
 		all.add(C(TransactionManager.class, FileBasedTransactionManager.class));
 		all.add(C(Engine.class).req(LogFormatter.class));
@@ -71,10 +78,14 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 				.req(ScriptExecutor.class, KernelUpgradeStepProvider.class));
 		all.add(C(Context.class, "agent_ctx", AgentUpgradeContext.class).is(PER_LOOKUP) //
 				.req(ScriptExecutor.class, AgentUpgradeStepProvider.class));
+		all.add(C(Context.class, "tengine_ctx", ConfigUpgradeContext.class).is(PER_LOOKUP) //
+                .req(ScriptExecutor.class, ConfigUpgradeStepProvider.class));
 		all.add(C(KernelUpgradeStepProvider.class, DefaultKernelUpgradeStepProvider.class) //
 				.req(ConfigManager.class, QaService.class, ContainerManager.class));
 		all.add(C(AgentUpgradeStepProvider.class, DefaultAgentUpgradeStepProvider.class) //
 				.req(ConfigManager.class));
+		all.add(C(ConfigUpgradeStepProvider.class, DefaultConfigUpgradeStepProvider.class) //
+                .req(ConfigManager.class));
 
 		// Please keep it as last
 		defineWebComponents(all);
