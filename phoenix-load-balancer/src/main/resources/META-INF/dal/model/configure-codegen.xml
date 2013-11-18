@@ -56,8 +56,7 @@
     <attribute name="type" value-type="String" />
     <attribute name="matches" value-type="String" />
     <attribute name="target-pattern" value-type="String" />
-    <attribute name="break" value-type="boolean" />
-    <attribute name="last" value-type="boolean" />
+    <attribute name="flag" value-type="String" />
     <attribute name="response-code" value-type="int" />
     <attribute name="path" value-type="String" />
     <attribute name="format" value-type="String" />

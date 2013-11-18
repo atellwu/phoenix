@@ -60,8 +60,7 @@
 		<attribute name="type" value-type="String" />
 		<attribute name="matches" value-type="String" enabled="false" />
 		<attribute name="target-pattern" value-type="String" enabled="false" />
-		<attribute name="break" value-type="boolean" enabled="false" />
-		<attribute name="last" value-type="boolean" enabled="false" />
+		<attribute name="flag" value-type="boolean" enabled="false" />
 		<attribute name="response-code" value-type="int" enabled="false" />
 		<attribute name="path" value-type="String" enabled="false" />
 		<attribute name="format" value-type="String" enabled="false" />
