@@ -1,2 +1,2 @@
 hash $strategy.getDynamicAttribute("target");
-hash_method $strategy.getDynamicAttribute("method");
+    hash_method $strategy.getDynamicAttribute("method");
