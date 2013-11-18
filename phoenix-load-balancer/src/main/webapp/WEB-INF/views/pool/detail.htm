@@ -54,7 +54,15 @@
           <td><input class="input-mini" ng-model="member.weight" type="text"></td>
           <td><input class="input-mini" ng-model="member.maxFails" type="text"></td>
           <td><input class="input-mini" ng-model="member.failTimeout" type="text"></td>
-          <td>{{member.state}}</td>
+          <td><label class="radio inline"> <input ng-model="member.state" type="radio"
+              value="ENABLED"> ENABLED
+          </label> <label class="radio inline"> <input ng-model="member.state" type="radio" value="DISABLED">
+              DISABLED
+          </label>
+          <label class="radio inline"> <input ng-model="member.state" type="radio" value="FORCED_OFFLINE">
+              FORCED_OFFLINE
+          </label>
+          </td>
           <td><label class="radio inline"> <input ng-model="member.availability" type="radio"
               value="OFFLINE"> OFFLINE
           </label> <label class="radio inline"> <input ng-model="member.availability" type="radio" value="AVAILABLE">

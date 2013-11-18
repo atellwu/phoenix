@@ -13,17 +13,19 @@
     <div class="control-group">
       <label class="control-label">当前状态</label>
       <div class="controls">
-        <label class="checkbox"> <span class="label label-important">{{ vs.state }}</span>
+        <label class="checkbox"> <span class="label label-important">{{ getVsState() }}</span>
         </label>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label">状态控制</label>
       <div class="controls">
-        <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="OFFLINE">
-          OFFLINE
-        </label> <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="AVAILABLE">
-          AVAILABLE
+        <label class="radio inline"> <input ng-model="vs.state" type="radio" value="ENABLED">
+          ENABLED
+        </label> <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="DISABLED">
+          DISABLED
+        </label> <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="FORCED_OFFLINE">
+          FORCED_OFFLINE
         </label>
       </div>
     </div>

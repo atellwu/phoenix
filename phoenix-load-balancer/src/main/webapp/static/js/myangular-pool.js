@@ -46,6 +46,10 @@ module.controller('PoolController',
 				$scope.vs.pools.splice($scope.poolIndexToBeRemove, 1);
 				$('#affirmRemovePoolModal').modal('hide');
 			}
+			//存活的member
+			$scope.getAliveMemberCount = function(){
+				return '待咨询jinhua';
+			}
 			// member增删
 			$scope.addMember = function() {
 				var member = new Object();

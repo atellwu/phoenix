@@ -12,7 +12,7 @@
         <th>集群名称</th>
         <th>负载均衡策略</th>
         <th>节点个数</th>
-        <th>最小活动节点占比</th>
+        <th>活动节点数</th>
         <th style="width: 130px;">操作</th>
       </tr>
     </thead>
@@ -21,7 +21,7 @@
         <td>{{pool.name}}</td>
         <td>{{pool.loadbalanceStrategyName}}</td>
         <td>{{pool.members.length}}</td>
-        <td>{{pool.minAvailableMemberPercentage}}</td>
+        <td>{{getAliveMemberCount()}}</td>
         <td><a href="javascript:void(0);" ng-click="switchPool($index);"><i class="icon-edit"></i> 编辑 </a>&nbsp;&nbsp;<a
           href="javascript:void(0);"
           ng-click="affirmRemovePoolModal($index);">删除</a></td>
