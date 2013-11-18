@@ -8,7 +8,7 @@ import org.unidal.web.mvc.ErrorObject;
 import org.unidal.web.mvc.payload.annotation.FieldMeta;
 
 import com.dianping.phoenix.agent.AgentPage;
-import com.dianping.phoenix.agent.core.task.processor.lb.TengineConfigUpgradeTask;
+import com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeTask;
 
 public class Payload implements ActionPayload<AgentPage, Action> {
     private AgentPage m_page;
@@ -32,7 +32,7 @@ public class Payload implements ActionPayload<AgentPage, Action> {
     @FieldMeta("refreshPostData")
     private String    m_dynamicRefreshPostData;
     @FieldMeta("refreshMethod")
-    private String    m_dynamicRefreshMethod = TengineConfigUpgradeTask.HTTP_METHOD_GET;
+    private String    m_dynamicRefreshMethod = ConfigUpgradeTask.HTTP_METHOD_GET;
     @FieldMeta("offset")
     private int       m_offset;
     @FieldMeta("br")
@@ -175,9 +175,9 @@ public class Payload implements ActionPayload<AgentPage, Action> {
                 }
 
                 if (!Boolean.parseBoolean(m_reload) && StringUtils.isBlank(m_dynamicRefreshMethod)
-                        && !TengineConfigUpgradeTask.HTTP_METHOD_DELETE.equalsIgnoreCase(m_dynamicRefreshMethod)
-                        && !TengineConfigUpgradeTask.HTTP_METHOD_GET.equalsIgnoreCase(m_dynamicRefreshMethod)
-                        && !TengineConfigUpgradeTask.HTTP_METHOD_POST.equalsIgnoreCase(m_dynamicRefreshMethod)) {
+                        && !ConfigUpgradeTask.HTTP_METHOD_DELETE.equalsIgnoreCase(m_dynamicRefreshMethod)
+                        && !ConfigUpgradeTask.HTTP_METHOD_GET.equalsIgnoreCase(m_dynamicRefreshMethod)
+                        && !ConfigUpgradeTask.HTTP_METHOD_POST.equalsIgnoreCase(m_dynamicRefreshMethod)) {
                     ctx.addError(new ErrorObject("refreshMethod.missing"));
                 }
 

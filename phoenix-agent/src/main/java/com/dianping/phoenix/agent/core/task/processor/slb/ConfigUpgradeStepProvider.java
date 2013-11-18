@@ -1,8 +1,8 @@
-package com.dianping.phoenix.agent.core.task.processor.lb;
+package com.dianping.phoenix.agent.core.task.processor.slb;
 
 import com.dianping.phoenix.agent.core.task.workflow.Context;
 
-public interface TengineConfigUpgradeStepProvider {
+public interface ConfigUpgradeStepProvider {
 
 	int init(Context ctx) throws Exception;
 

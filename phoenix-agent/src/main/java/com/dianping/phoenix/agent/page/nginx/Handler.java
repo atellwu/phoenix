@@ -19,7 +19,7 @@ import com.dianping.phoenix.agent.core.Agent;
 import com.dianping.phoenix.agent.core.event.EventTracker;
 import com.dianping.phoenix.agent.core.task.Task;
 import com.dianping.phoenix.agent.core.task.processor.SubmitResult;
-import com.dianping.phoenix.agent.core.task.processor.lb.TengineConfigUpgradeTask;
+import com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeTask;
 import com.dianping.phoenix.agent.core.tx.Transaction;
 import com.dianping.phoenix.agent.core.tx.TransactionId;
 import com.dianping.phoenix.agent.core.tx.TransactionManager;
@@ -75,7 +75,7 @@ public class Handler implements PageHandler<Context> {
         switch (payload.getAction()) {
 
             case DEPLOY:
-                task = new TengineConfigUpgradeTask(payload.getVirtualServerName(), payload.getConfigFileName(),
+                task = new ConfigUpgradeTask(payload.getVirtualServerName(), payload.getConfigFileName(),
                         payload.getVersion(), payload.getGirUrl(), payload.isReload(), payload.getDynamicRefreshUrl(),
                         payload.getDynamicRefreshPostData(), payload.getDynamicRefreshMethod());
                 submitTask(task, txId, res, ctx);

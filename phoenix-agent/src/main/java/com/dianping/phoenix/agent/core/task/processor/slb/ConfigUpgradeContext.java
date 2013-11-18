@@ -1,4 +1,4 @@
-package com.dianping.phoenix.agent.core.task.processor.lb;
+package com.dianping.phoenix.agent.core.task.processor.slb;
 
 import org.unidal.lookup.annotation.Inject;
 
@@ -8,11 +8,11 @@ import com.dianping.phoenix.agent.core.task.Task;
 import com.dianping.phoenix.agent.core.task.processor.kernel.DeployTask;
 import com.dianping.phoenix.agent.core.task.workflow.Context;
 
-public class TengineConfigUpgradeContext extends Context {
+public class ConfigUpgradeContext extends Context {
 	@Inject
 	private ScriptExecutor scriptExecutor;
 	@Inject
-	private TengineConfigUpgradeStepProvider stepProvider;
+	private ConfigUpgradeStepProvider stepProvider;
 
 	private com.dianping.cat.message.Transaction c_kernelUpgrade;
 
@@ -20,7 +20,7 @@ public class TengineConfigUpgradeContext extends Context {
 		return scriptExecutor;
 	}
 
-	public TengineConfigUpgradeStepProvider getStepProvider() {
+	public ConfigUpgradeStepProvider getStepProvider() {
 		return stepProvider;
 	}
 
@@ -42,7 +42,7 @@ public class TengineConfigUpgradeContext extends Context {
 	@Override
 	public void setTask(Task task) {
 		super.setTask(task);
-		TengineConfigUpgradeTask tsk = (TengineConfigUpgradeTask) task;
+		ConfigUpgradeTask tsk = (ConfigUpgradeTask) task;
 		c_kernelUpgrade = Cat.getProducer().newTransaction("Tengine",
 				String.format("%s::%s", tsk.getVirtualServerName(), tsk.getVersion()));
 		try {

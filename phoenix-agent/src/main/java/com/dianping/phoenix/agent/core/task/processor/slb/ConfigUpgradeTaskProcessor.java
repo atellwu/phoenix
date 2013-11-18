@@ -1,4 +1,4 @@
-package com.dianping.phoenix.agent.core.task.processor.lb;
+package com.dianping.phoenix.agent.core.task.processor.slb;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,9 +18,9 @@ import com.dianping.phoenix.agent.core.tx.Transaction;
 import com.dianping.phoenix.agent.core.tx.Transaction.Status;
 import com.dianping.phoenix.agent.core.tx.TransactionId;
 
-public class TengineConfigUpgradeTaskProcessor extends AbstractSerialTaskProcessor<TengineConfigUpgradeTask> {
+public class ConfigUpgradeTaskProcessor extends AbstractSerialTaskProcessor<ConfigUpgradeTask> {
 
-    private final static Logger  logger        = Logger.getLogger(TengineConfigUpgradeTaskProcessor.class);
+    private final static Logger  logger        = Logger.getLogger(ConfigUpgradeTaskProcessor.class);
 
     @Inject
     Engine                       engine;
@@ -35,7 +35,7 @@ public class TengineConfigUpgradeTaskProcessor extends AbstractSerialTaskProcess
     protected Status doTransaction(final Transaction tx) throws IOException {
 
         currentTxRef.set(tx);
-        TengineConfigUpgradeTask task = (TengineConfigUpgradeTask) tx.getTask();
+        ConfigUpgradeTask task = (ConfigUpgradeTask) tx.getTask();
 
         eventTrackerChain.onEvent(new MessageEvent(tx.getTxId(), String.format("updating %s to version %s",
                 task.getVirtualServerName(), task.getVersion())));
@@ -59,7 +59,7 @@ public class TengineConfigUpgradeTaskProcessor extends AbstractSerialTaskProcess
     }
 
     private Status updateTengine(Context ctx) throws Exception {
-        int exitCode = engine.start(TengineConfigUpgradeStep.START, ctx);
+        int exitCode = engine.start(ConfigUpgradeStep.START, ctx);
         if (exitCode == Step.CODE_OK) {
             return Status.SUCCESS;
         } else {
@@ -80,8 +80,8 @@ public class TengineConfigUpgradeTaskProcessor extends AbstractSerialTaskProcess
     }
 
     @Override
-    public Class<TengineConfigUpgradeTask> handle() {
-        return TengineConfigUpgradeTask.class;
+    public Class<ConfigUpgradeTask> handle() {
+        return ConfigUpgradeTask.class;
     }
 
 }

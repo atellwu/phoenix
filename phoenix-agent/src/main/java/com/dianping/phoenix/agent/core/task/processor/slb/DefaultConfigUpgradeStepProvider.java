@@ -1,4 +1,4 @@
-package com.dianping.phoenix.agent.core.task.processor.lb;
+package com.dianping.phoenix.agent.core.task.processor.slb;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -10,20 +10,20 @@ import com.dianping.phoenix.agent.core.task.workflow.Context;
 import com.dianping.phoenix.agent.core.task.workflow.Step;
 import com.dianping.phoenix.configure.ConfigManager;
 
-public class DefaultTengineConfigUpgradeStepProvider extends ContainerHolder implements
-        TengineConfigUpgradeStepProvider {
+public class DefaultConfigUpgradeStepProvider extends ContainerHolder implements
+        ConfigUpgradeStepProvider {
 
     @Inject
     private ConfigManager config;
 
     private int runShellCmd(String shellFunc, Context ctx) throws Exception {
-        TengineConfigUpgradeContext myCtx = (TengineConfigUpgradeContext) ctx;
-        String script = jointShellCmd(shellFunc, (TengineConfigUpgradeTask) myCtx.getTask());
+        ConfigUpgradeContext myCtx = (ConfigUpgradeContext) ctx;
+        String script = jointShellCmd(shellFunc, (ConfigUpgradeTask) myCtx.getTask());
         int exitCode = myCtx.getScriptExecutor().exec(script, myCtx.getLogOut(), myCtx.getLogOut());
         return exitCode;
     }
 
-    private String jointShellCmd(String shellFunc, TengineConfigUpgradeTask task) {
+    private String jointShellCmd(String shellFunc, ConfigUpgradeTask task) {
         StringBuilder sb = new StringBuilder();
         String tengineConfigGitDocBase = String.format(config.getTengineConfigGitDocBasePattern(), task.getVersion());
         String tengineConfigDocBase = String.format(config.getTengineConfigDocBasePattern(),

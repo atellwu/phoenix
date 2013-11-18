@@ -1,4 +1,4 @@
-package com.dianping.phoenix.agent.core.task.processor.lb;
+package com.dianping.phoenix.agent.core.task.processor.slb;
 
 import java.util.Map;
 
@@ -7,16 +7,16 @@ import com.dianping.phoenix.agent.core.task.workflow.AbstractStep;
 import com.dianping.phoenix.agent.core.task.workflow.Context;
 import com.dianping.phoenix.agent.core.task.workflow.Step;
 
-public class TengineConfigUpgradeStep extends AbstractStep {
+public class ConfigUpgradeStep extends AbstractStep {
 
-	protected TengineConfigUpgradeStep(AbstractStep nextStepWhenSuccess, AbstractStep nextStepWhenFail, int stepSeq) {
+	protected ConfigUpgradeStep(AbstractStep nextStepWhenSuccess, AbstractStep nextStepWhenFail, int stepSeq) {
 		super(nextStepWhenSuccess, nextStepWhenFail, stepSeq);
 	}
 
-	private static TengineConfigUpgradeStep FAILED = new TengineConfigUpgradeStep(null, null, 8) {
+	private static ConfigUpgradeStep FAILED = new ConfigUpgradeStep(null, null, 8) {
 		@Override
 		public int doStep(Context ctx) throws Exception {
-			TengineConfigUpgradeContext myCtx = (TengineConfigUpgradeContext) ctx;
+			ConfigUpgradeContext myCtx = (ConfigUpgradeContext) ctx;
 			myCtx.setEndStep(FAILED);
 			myCtx.setExitCode(Step.CODE_ERROR);
 			com.dianping.cat.message.Transaction trans = myCtx.getCatTransaction();
@@ -41,10 +41,10 @@ public class TengineConfigUpgradeStep extends AbstractStep {
 
 	};
 
-	private static TengineConfigUpgradeStep SUCCESS = new TengineConfigUpgradeStep(null, null, 8) {
+	private static ConfigUpgradeStep SUCCESS = new ConfigUpgradeStep(null, null, 8) {
 		@Override
 		public int doStep(Context ctx) throws Exception {
-			TengineConfigUpgradeContext myCtx = (TengineConfigUpgradeContext) ctx;
+			ConfigUpgradeContext myCtx = (ConfigUpgradeContext) ctx;
 			myCtx.setEndStep(SUCCESS);
 			myCtx.setExitCode(Step.CODE_OK);
 			com.dianping.cat.message.Transaction trans = myCtx.getCatTransaction();
@@ -68,7 +68,7 @@ public class TengineConfigUpgradeStep extends AbstractStep {
 		}
 	};
 
-	private static TengineConfigUpgradeStep ROLLBACK = new TengineConfigUpgradeStep(FAILED, FAILED, 7) {
+	private static ConfigUpgradeStep ROLLBACK = new ConfigUpgradeStep(FAILED, FAILED, 7) {
 
 		@Override
 		protected int doActivity(Context ctx) throws Exception {
@@ -81,7 +81,7 @@ public class TengineConfigUpgradeStep extends AbstractStep {
 		}
 	};
 
-	private static TengineConfigUpgradeStep COMMIT = new TengineConfigUpgradeStep(SUCCESS, FAILED, 6) {
+	private static ConfigUpgradeStep COMMIT = new ConfigUpgradeStep(SUCCESS, FAILED, 6) {
 
 		@Override
 		protected int doActivity(Context ctx) throws Exception {
@@ -94,7 +94,7 @@ public class TengineConfigUpgradeStep extends AbstractStep {
 		}
 	};
 
-	private static TengineConfigUpgradeStep RELOAD_OR_DYNAMIC_REFRESH_CONFIG = new TengineConfigUpgradeStep(COMMIT, ROLLBACK, 5) {
+	private static ConfigUpgradeStep RELOAD_OR_DYNAMIC_REFRESH_CONFIG = new ConfigUpgradeStep(COMMIT, ROLLBACK, 5) {
 
 		@Override
 		protected int doActivity(Context ctx) throws Exception {
@@ -107,7 +107,7 @@ public class TengineConfigUpgradeStep extends AbstractStep {
 		}
 	};
 
-	private static TengineConfigUpgradeStep COPY_CONFIG = new TengineConfigUpgradeStep(RELOAD_OR_DYNAMIC_REFRESH_CONFIG, ROLLBACK, 4) {
+	private static ConfigUpgradeStep COPY_CONFIG = new ConfigUpgradeStep(RELOAD_OR_DYNAMIC_REFRESH_CONFIG, ROLLBACK, 4) {
 
 		@Override
 		protected int doActivity(Context ctx) throws Exception {
@@ -120,7 +120,7 @@ public class TengineConfigUpgradeStep extends AbstractStep {
 		}
 	};
 	
-	private static TengineConfigUpgradeStep GIT_PULL = new TengineConfigUpgradeStep(COPY_CONFIG, FAILED, 3) {
+	private static ConfigUpgradeStep GIT_PULL = new ConfigUpgradeStep(COPY_CONFIG, FAILED, 3) {
 
 		@Override
 		protected int doActivity(Context ctx) throws Exception {
@@ -133,7 +133,7 @@ public class TengineConfigUpgradeStep extends AbstractStep {
 		}
 	};
 
-	private static TengineConfigUpgradeStep CHECK_ARGUMENT = new TengineConfigUpgradeStep(GIT_PULL, FAILED, 2) {
+	private static ConfigUpgradeStep CHECK_ARGUMENT = new ConfigUpgradeStep(GIT_PULL, FAILED, 2) {
 
 		@Override
 		protected int doActivity(Context ctx) throws Exception {
@@ -146,7 +146,7 @@ public class TengineConfigUpgradeStep extends AbstractStep {
 		}
 	};
 
-	private static TengineConfigUpgradeStep INIT = new TengineConfigUpgradeStep(CHECK_ARGUMENT, FAILED, 1) {
+	private static ConfigUpgradeStep INIT = new ConfigUpgradeStep(CHECK_ARGUMENT, FAILED, 1) {
 
 		@Override
 		protected int doActivity(Context ctx) throws Exception {
@@ -159,7 +159,7 @@ public class TengineConfigUpgradeStep extends AbstractStep {
 		}
 	};
 
-	public static TengineConfigUpgradeStep START = new TengineConfigUpgradeStep(INIT, FAILED, 0) {
+	public static ConfigUpgradeStep START = new ConfigUpgradeStep(INIT, FAILED, 0) {
 		@Override
 		public int doStep(Context ctx) throws Exception {
 			return doActivity(ctx);
@@ -171,8 +171,8 @@ public class TengineConfigUpgradeStep extends AbstractStep {
 		}
 	};
 
-	private static TengineConfigUpgradeStepProvider getStepProvider(Context ctx) {
-		return ((TengineConfigUpgradeContext) ctx).getStepProvider();
+	private static ConfigUpgradeStepProvider getStepProvider(Context ctx) {
+		return ((ConfigUpgradeContext) ctx).getStepProvider();
 	}
 
 	@Override

@@ -1,11 +1,11 @@
-package com.dianping.phoenix.agent.core.task.processor.lb;
+package com.dianping.phoenix.agent.core.task.processor.slb;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
 import com.dianping.phoenix.agent.core.task.AbstractTask;
 
-public class TengineConfigUpgradeTask extends AbstractTask {
+public class ConfigUpgradeTask extends AbstractTask {
     public static final String HTTP_METHOD_GET    = "get";
     public static final String HTTP_METHOD_POST   = "post";
     public static final String HTTP_METHOD_DELETE = "delete";
@@ -19,7 +19,7 @@ public class TengineConfigUpgradeTask extends AbstractTask {
     private String             dynamicRefreshPostData;
     private String             refreshMethod      = HTTP_METHOD_GET;
 
-    public TengineConfigUpgradeTask(String virtualServerName, String configFileName, String version, String girUrl,
+    public ConfigUpgradeTask(String virtualServerName, String configFileName, String version, String girUrl,
             boolean reload, String dynamicRefreshUrl, String dynamicRefreshPostData, String refreshMethod) {
         super();
         this.virtualServerName = virtualServerName;
@@ -36,7 +36,7 @@ public class TengineConfigUpgradeTask extends AbstractTask {
      * for serialization
      */
     @SuppressWarnings("unused")
-    private TengineConfigUpgradeTask() {
+    private ConfigUpgradeTask() {
     }
 
     /**
@@ -112,7 +112,7 @@ public class TengineConfigUpgradeTask extends AbstractTask {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TengineConfigUpgradeTask other = (TengineConfigUpgradeTask) obj;
+        ConfigUpgradeTask other = (ConfigUpgradeTask) obj;
         if (configFileName == null) {
             if (other.configFileName != null)
                 return false;

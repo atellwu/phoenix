@@ -133,7 +133,7 @@
 		<component>
 			<role>com.dianping.phoenix.agent.core.task.processor.TaskProcessor</role>
 			<role-hint>tengine_upgrade</role-hint>
-			<implementation>com.dianping.phoenix.agent.core.task.processor.lb.TengineConfigUpgradeTaskProcessor</implementation>
+			<implementation>com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeTaskProcessor</implementation>
 			<requirements>
 				<requirement>
 					<role>com.dianping.phoenix.agent.core.task.processor.SemaphoreWrapper</role>
@@ -198,14 +198,14 @@
 		<component>
 			<role>com.dianping.phoenix.agent.core.task.workflow.Context</role>
 			<role-hint>tengine_ctx</role-hint>
-			<implementation>com.dianping.phoenix.agent.core.task.processor.lb.TengineConfigUpgradeContext</implementation>
+			<implementation>com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeContext</implementation>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<requirements>
 				<requirement>
 					<role>com.dianping.phoenix.agent.core.shell.ScriptExecutor</role>
 				</requirement>
 				<requirement>
-					<role>com.dianping.phoenix.agent.core.task.processor.lb.TengineConfigUpgradeStepProvider</role>
+					<role>com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeStepProvider</role>
 				</requirement>
 			</requirements>
 		</component>
@@ -234,8 +234,8 @@
 			</requirements>
 		</component>
 		<component>
-			<role>com.dianping.phoenix.agent.core.task.processor.lb.TengineConfigUpgradeStepProvider</role>
-			<implementation>com.dianping.phoenix.agent.core.task.processor.lb.DefaultTengineConfigUpgradeStepProvider</implementation>
+			<role>com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeStepProvider</role>
+			<implementation>com.dianping.phoenix.agent.core.task.processor.slb.DefaultConfigUpgradeStepProvider</implementation>
 			<requirements>
 				<requirement>
 					<role>com.dianping.phoenix.configure.ConfigManager</role>
