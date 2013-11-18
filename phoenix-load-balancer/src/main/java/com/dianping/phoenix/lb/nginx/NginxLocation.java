@@ -22,7 +22,6 @@ public class NginxLocation {
 
     private MatchType       matchType;
     private String          pattern;
-    private String          domain;
     private List<Directive> directives = new ArrayList<Directive>();
 
     /**
@@ -64,14 +63,6 @@ public class NginxLocation {
 
     public void addDirective(Directive directive) {
         this.directives.add(directive);
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
     }
 
 }

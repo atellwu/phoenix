@@ -47,7 +47,6 @@
     <attribute name="ip" value-type="String" />
   </entity>
   <entity name="location">
-    <attribute name="domain" value-type="String" />
     <attribute name="match-type" value-type="String" />
     <attribute name="pattern" value-type="String" />
     <attribute name="case-sensitive" value-type="boolean" />
@@ -57,8 +56,7 @@
     <attribute name="type" value-type="String" />
     <attribute name="matches" value-type="String" />
     <attribute name="target-pattern" value-type="String" />
-    <attribute name="break" value-type="boolean" />
-    <attribute name="last" value-type="boolean" />
+    <attribute name="flag" value-type="String" />
     <attribute name="response-code" value-type="int" />
     <attribute name="path" value-type="String" />
     <attribute name="format" value-type="String" />
