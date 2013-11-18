@@ -73,6 +73,9 @@ public class NginxVelocityTools {
         if (StringUtils.isNotBlank(template)) {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("directive", directive);
+            if("proxy_pass".equals(directive.getType())){
+                context.put("dp_domain", directive.getDynamicAttribute("pool-name"));
+            }
             return VelocityEngineManager.INSTANCE.merge(template, context);
         } else {
             return "";
