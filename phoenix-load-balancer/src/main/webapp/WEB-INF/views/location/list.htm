@@ -11,7 +11,7 @@
       <tr>
         <th>路径/正则表达式</th>
         <th>匹配类型</th>
-        <th>集群名</th>
+        <!-- <th>集群名</th>  -->
         <th>大小写敏感</th>
         <th style="width: 130px;">操作</th>
       </tr>
@@ -20,7 +20,7 @@
       <tr ng-repeat="location in vs.locations">
         <td>{{location.pattern}}</td>
         <td>{{location.matchType}}</td>
-        <td>{{location.domain}}</td>
+        <!-- <td>{{location.domain}}</td>  -->
         <td><span ng-show="location.caseSensitive">是</span><span ng-hide="location.caseSensitive">否</span></td>
         <td><a href="javascript:void(0);" ng-click="switchLocation($index);"><i class="icon-edit"></i>
             详细 </a>&nbsp;&nbsp;<a href="javascript:void(0);"
@@ -43,12 +43,12 @@
     <br>
     <div id="addLocationAlertDiv"></div>
     <form class="form-horizontal">
-      <div class="control-group">
+      <!-- <div class="control-group">
         <label class="control-label" for="">集群名</label>
         <div class="controls">
           <select ng-model="locationToBeAdd.domain" ng-options="pool.name as pool.name for pool in vs.pools"></select>
         </div>
-      </div>
+      </div>  -->
       <div class="control-group">
         <label class="control-label">匹配类型</label>
         <div class="controls">
@@ -90,8 +90,8 @@
   </div>
   <div class="modal-body">
     <p style="text-align: center;">
-      <i class="icon-warning-sign"></i> 您是否确定要删除
-      <code>{{locationToBeRemove.domain}}</code>
+      <i class="icon-warning-sign"></i> 您是否确定要删除该规则（路径/正则表达式为
+      <code>{{locationToBeRemove.pattern}}</code>）
       ？
     </p>
   </div>

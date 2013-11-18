@@ -18,9 +18,14 @@ module
 						$('#addLocationName').focus();
 					};
 					$scope.addLocation = function() {
-						var domain = $scope.locationToBeAdd.domain;
-						if (domain == null || domain.trim() == '') {
-							app.alertError("集群名必选！", "addLocationAlertDiv");
+						var matchType = $scope.locationToBeAdd.matchType;
+						if (matchType == null || matchType.trim() == '') {
+							app.alertError("匹配类型必选！", "addLocationAlertDiv");
+							return;
+						}
+						var pattern = $scope.locationToBeAdd.pattern;
+						if (pattern == null || pattern.trim() == '') {
+							app.alertError("正则表达式必填！", "addLocationAlertDiv");
 							return;
 						}
 						$scope.vs.locations.push($scope.locationToBeAdd);
@@ -41,8 +46,19 @@ module
 					$scope.getInputs = function(type) {
 						return $scope.directiveDefinedInputs[type];
 					}
-					$scope.getValueList = function(inputs, name) {
-						return inputs[name];
+					$scope.getValueList = function(input) {
+						if (!input) {
+							return;
+						}
+						if (input.name == 'pool-name') {// 对pool-name特殊处理
+							var list = [];
+							console.log("$scope.vs.pools:" + $scope.vs.pools);
+							for ( var i = 0; i < $scope.vs.pools.length; i++) {
+								list.push($scope.vs.pools[i].name);
+							}
+							console.log("list:" + list);
+							return list;
+						}
 						return input.valueList;
 					}
 					$scope.openAddDirectiveModal = function() {
@@ -76,16 +92,18 @@ module
 								$scope.directiveIndexToBeRemove, 1);
 						$('#affirmRemoveDirectiveModal').modal('hide');
 					}
-					//指令下的属性的增删
-					$scope.addDynamicAttribute = function(directive,name){
+					// 指令下的属性的增删
+					$scope.addDynamicAttribute = function(directive, name) {
 						if (directive.dynamicAttributes[name] != null) {
-							app.appError('通知', "该参数名( " + name + " )已经存在，不能添加！");
+							app
+									.appError('通知', "该参数名( " + name
+											+ " )已经存在，不能添加！");
 						} else {
 							directive.dynamicAttributes[name] = '';
 						}
 					}
-					$scope.removeDynamicAttribute = function(directive,name) {
+					$scope.removeDynamicAttribute = function(directive, name) {
 						delete directive.dynamicAttributes[name];
 					}
-					
+
 				});

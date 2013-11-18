@@ -12,6 +12,8 @@ public class DefinedInput {
 
     private List<String> valueList;
 
+    private boolean      unique = false;
+
     public static enum InputType {
         RADIO, CHECKBOX, TEXT, SELECT
     }
@@ -48,9 +50,12 @@ public class DefinedInput {
         this.valueList = valueList;
     }
 
-    @Override
-    public String toString() {
-        return "DefinedParam [name=" + name + ", desc=" + desc + ", inputType=" + inputType + ", valueList=" + valueList + "]";
+    public boolean isUnique() {
+        return unique;
+    }
+
+    public void setUnique(boolean unique) {
+        this.unique = unique;
     }
 
 }

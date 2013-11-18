@@ -4,12 +4,12 @@
   </a>
   <h5 style="margin-top: 30px">规则基本信息</h5>
   <form class="form-horizontal">
-    <div class="control-group">
+  <!--   <div class="control-group">
       <label class="control-label" for="">映射的集群名</label>
       <div class="controls">
         <select ng-model="locationEditing.domain" ng-options="pool.name as pool.name for pool in vs.pools"></select>
       </div>
-    </div>
+    </div>  -->
     <div class="control-group">
       <label class="control-label">匹配类型</label>
       <div class="controls">
@@ -68,7 +68,9 @@
               <div class="controls">
                 <input ng-show="input.inputType == 'TEXT'" ng-model="directive.dynamicAttributes[name]" type="text">
                 <select ng-show="input.inputType == 'SELECT'" ng-model="directive.dynamicAttributes[name]"
-                  ng-options="value0 for value0 in input.valueList"></select>&nbsp;<a style="margin-left: 10px;"
+                  ng-options="value0 for value0 in getValueList(input)"></select>
+                  &nbsp;
+                <a style="margin-left: 10px;"
                   href="javascript:void(0);" ng-click="removeDynamicAttribute(directive,name)"><i
                   class="icon-remove"></i></a>
               </div>

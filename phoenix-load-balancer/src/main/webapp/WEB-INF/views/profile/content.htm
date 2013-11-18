@@ -1,8 +1,8 @@
 <div class="dropdown" style="float: right; margin-right: 45px">
   <a class="dropdown-toggle" data-toggle="dropdown" href="#"> 增加自定义参数<b class="caret"></b></a>
   <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-    <li ng-repeat="(key,definedParam) in propertiesDefinedInputs"><a ng-click="addDynamicAttribute(key)" tabindex="-1"
-      href="javascript:void(0)"><i class="icon-plus"></i> 添加 {{ key }}</a></li>
+    <li ng-repeat="(key,definedParam) in propertiesDefinedInputs"><a ng-click="addDynamicAttribute(key)"
+      tabindex="-1" href="javascript:void(0)"><i class="icon-plus"></i> 添加 {{ key }}</a></li>
     <li class="divider"></li>
     <li><a tabindex="-1" href="javascript:app.openAddParamModal();"><i class="icon-pencil"></i> 自定义参数 </a></li>
   </ul>
@@ -19,6 +19,16 @@
     </div>
     <div class="control-group">
       <label class="control-label">状态控制</label>
+      <div class="controls">
+        <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="OFFLINE">
+          OFFLINE
+        </label> <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="AVAILABLE">
+          AVAILABLE
+        </label>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">可用性控制</label>
       <div class="controls">
         <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="OFFLINE">
           OFFLINE
