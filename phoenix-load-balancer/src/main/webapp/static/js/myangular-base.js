@@ -1,6 +1,6 @@
-var module = angular.module('MyApp', [ 'ngResource', 'ngRoute' ]);
+var module = angular.module('MyApp', [ 'ngResource' ]);
 
-module.config(function($routeProvider, $locationProvider, $resourceProvider) {
+module.config(function( $locationProvider, $resourceProvider) {
 	// configure html5 to get links working on jsfiddle
 	$locationProvider.html5Mode(true);
 });
@@ -38,7 +38,7 @@ module.factory('DataService', function($resource) {
 	return model;
 });
 
-module.controller('VsController', function($scope, DataService, $route,
+module.controller('VsController', function($scope, DataService,
 		$resource, $http) {
 	$scope.selectedTab = 'profile';
 	//获取hash，设置给selectedTab
@@ -87,7 +87,9 @@ module.controller('VsController', function($scope, DataService, $route,
 		}).success(function(data, status, headers, config) {
 			if (data.errorCode == 0) {
 				app.alertSuccess("保存成功！ 即将刷新页面...");
-				setTimeout(app.refresh, 700);
+				setTimeout(function(){
+					window.location = window.contextpath + "/" + $scope.vs.name;
+				}, 700);
 			} else {
 				app.alertError("保存失败: " + data.errorMessage);
 			}
@@ -108,7 +110,7 @@ module.controller('VsController', function($scope, DataService, $route,
 					window.location = window.contextpath + "/";
 				}, 700);
 			} else {
-				app.alertError("删除失败: " + data.errorMessage);
+				app.alertError("删除失败: " + data.errorMessage,"removeVirtualServerAlertDiv");
 			}
 		}).error(function(data, status, headers, config) {
 			app.appError("响应错误", data);

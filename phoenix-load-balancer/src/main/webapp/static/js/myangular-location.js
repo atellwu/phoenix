@@ -1,7 +1,7 @@
 module
 		.controller(
 				'LocationController',
-				function($scope, DataService, $route, $resource, $http) {
+				function($scope, DataService, $resource, $http) {
 					// location视图切换
 					$scope.locationEditing = null;
 					$scope.switchLocation = function(index) {

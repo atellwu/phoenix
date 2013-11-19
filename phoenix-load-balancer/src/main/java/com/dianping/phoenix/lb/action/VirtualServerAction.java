@@ -48,27 +48,28 @@ public class VirtualServerAction extends ActionSupport {
 
     private String               contextPath;
 
+    private String               editOrShow            = "show";
+
     @PostConstruct
     public void init() {
         virtualServers = virtualServerService.listVirtualServers();
     }
 
-    public String show() {
+    public String index() {
         if (virtualServers.size() == 0) {
             return "noneVs";
         }
-        if (virtualServerName == null) {
-            virtualServerName = virtualServers.get(0).getName();//将重定向
-            return "redirect";
-        } else {
-            return SUCCESS;
-        }
+        virtualServerName = virtualServers.get(0).getName();//重定向
+        return "redirect";
+    }
+
+    public String show() {
+        editOrShow = "show";
+        return SUCCESS;
     }
 
     public String edit() {
-        if (virtualServerName == null) {
-            virtualServerName = virtualServers.get(0).getName();
-        }
+        editOrShow = "edit";
         return SUCCESS;
     }
 
@@ -192,6 +193,10 @@ public class VirtualServerAction extends ActionSupport {
 
     public void setVirtualServerName(String virtualServerName) {
         this.virtualServerName = virtualServerName;
+    }
+
+    public String getEditOrShow() {
+        return editOrShow;
     }
 
 }

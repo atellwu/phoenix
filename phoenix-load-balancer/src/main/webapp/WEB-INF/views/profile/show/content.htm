@@ -1,13 +1,3 @@
-<div class="dropdown" style="float: right; margin-right: 45px">
-  <a class="dropdown-toggle" data-toggle="dropdown" href="#"> 增加自定义参数<b class="caret"></b></a>
-  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-    <li ng-repeat="(key,definedParam) in propertiesDefinedInputs"><a ng-click="addDynamicAttribute(key)"
-      tabindex="-1" href="javascript:void(0)"><i class="icon-plus"></i> 添加 {{ key }}</a></li>
-    <li class="divider"></li>
-    <li><a tabindex="-1" href="javascript:app.openAddParamModal();"><i class="icon-pencil"></i> 自定义参数 </a></li>
-  </ul>
-</div>
-
 <div class="row">
   <div class="span5">
     <div class="control-group">
@@ -20,11 +10,11 @@
     <div class="control-group">
       <label class="control-label">状态控制</label>
       <div class="controls">
-        <label class="radio inline"> <input ng-model="vs.state" type="radio" value="ENABLED">
+        <label class="radio inline"> <input disabled ng-model="vs.state" type="radio" value="ENABLED">
           ENABLED
-        </label> <label class="radio inline"> <input ng-model="vs.state" type="radio" value="DISABLED">
+        </label> <label class="radio inline"> <input disabled ng-model="vs.state" type="radio" value="DISABLED">
           DISABLED
-        </label> <label class="radio inline"> <input ng-model="vs.state" type="radio" value="FORCED_OFFLINE">
+        </label> <label class="radio inline"> <input disabled ng-model="vs.state" type="radio" value="FORCED_OFFLINE">
           FORCED_OFFLINE
         </label>
       </div>
@@ -32,9 +22,9 @@
     <div class="control-group">
       <label class="control-label">可用性控制</label>
       <div class="controls">
-        <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="OFFLINE">
+        <label class="radio inline"> <input disabled ng-model="vs.availability" type="radio" value="OFFLINE">
           OFFLINE
-        </label> <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="AVAILABLE">
+        </label> <label class="radio inline"> <input disabled ng-model="vs.availability" type="radio" value="AVAILABLE">
           AVAILABLE
         </label>
       </div>
@@ -42,27 +32,25 @@
     <div class="control-group">
       <label class="control-label" for="">域名</label>
       <div class="controls">
-        <input type="text" ng-model="vs.domain" placeholder="domain">
+        <input disabled type="text" ng-model="vs.domain" placeholder="domain">
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="inputEmail">端口</label>
       <div class="controls">
-        <input type="text" ng-model="vs.port" placeholder="domain">
+        <input disabled type="text" ng-model="vs.port" placeholder="domain">
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="">默认Pool名</label>
       <div class="controls">
-        <select ng-model="vs.defaultPoolName" ng-options="pool.name as pool.name for pool in vs.pools"></select>
+        <select disabled ng-model="vs.defaultPoolName" ng-options="pool.name as pool.name for pool in vs.pools"></select>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="">目标nginx机器ip</label>
       <div class="controls" style="margin-bottom: 10px" ng-repeat="instance in vs.instances">
-        <input class="input-small" ng-model="instance.ip" type="text">&nbsp;&nbsp; <a ng-show="!$first"
-          href="javascript:;" ng-click="removeInstance($index);"><i class="icon-remove"></i></a> <a ng-show="$first"
-          href="javascript:;" ng-click="addInstance();"><i class="icon-plus"></i></a>
+        <input class="input-small" disabled ng-model="instance.ip" type="text">
       </div>
     </div>
   </div>
@@ -70,12 +58,10 @@
     <div class="control-group" ng-repeat="(key, value) in vs.dynamicAttributes" ng-init="valueList = getValueList(key)">
       <label class="control-label">{{ key }}</label>
       <div ng-show="getInputType(key) == 'SELECT'" class="controls">
-        <select ng-model="vs.dynamicAttributes[key]" ng-options="value0 for value0 in valueList"></select> &nbsp;&nbsp;<a
-          href="javascript:;" ng-click="removeDynamicAttribute(key)""><i class="icon-remove"></i></a>
+        <select disabled ng-model="vs.dynamicAttributes[key]" ng-options="value0 for value0 in valueList"></select>
       </div>
       <div ng-show="getInputType(key) == 'TEXT'" class="controls">
-        <input ng-model="vs.dynamicAttributes[key]" type="text"> &nbsp;&nbsp;<a href="javascript:;"
-          ng-click="removeDynamicAttribute(key)"><i class="icon-remove"></i></a>
+        <input disabled ng-model="vs.dynamicAttributes[key]" type="text">
       </div>
     </div>
   </div>

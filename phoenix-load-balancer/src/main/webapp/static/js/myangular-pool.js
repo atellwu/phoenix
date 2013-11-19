@@ -1,5 +1,5 @@
 module.controller('PoolController',
-		function($scope, DataService, $route, $resource, $http) {
+		function($scope, DataService, $resource, $http) {
 			$scope.strategies = DataService.strategies;
 			// pool视图切换
 			$scope.poolEditing = null;

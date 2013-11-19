@@ -1,12 +1,9 @@
-module.controller('ProfileController', function($scope, DataService, $route,
+module.controller('ProfileController', function($scope, DataService,
 		$resource, $http) {
 	//计算状态
 	$scope.getVsState = function(){
 		return '待询问jinhua';
 	}
-//	if($scope.vs.state=='DISABLED' ){
-//		
-//	}
 	// 动态参数的管理
 	$scope.propertiesDefinedInputs = DataService.propertiesDefinedInputs;
 	$scope.addDynamicAttribute = function(key, value) {

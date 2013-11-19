@@ -40,7 +40,7 @@
             </interceptor-stack>
         </interceptors>
 
-        <action name="" class="virtualServerAction" method="show">
+        <action name="" class="virtualServerAction" method="index">
             <result name="redirect" type="redirect">
                 <param name="location">${virtualServerName}</param>
             </result>
