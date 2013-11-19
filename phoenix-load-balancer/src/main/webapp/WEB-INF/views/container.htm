@@ -9,9 +9,9 @@
       <button ng-click="save()" style="float: right; margin-top: 15px" class="btn btn-primary">保存</button>
       <div style="margin: 0 auto; margin-top: 15px;" class="tabbable">
         <ul ng-model="selectedTab" class="nav nav-pills">
-          <li ng-class="isActive('profile')"><a href="javascript:void(0);" ng-click="selectedTab='profile'">&nbsp;基本配置&nbsp;</a></li>
-          <li ng-class="isActive('pool')"><a href="javascript:void(0);" ng-click="selectedTab='pool'">&nbsp;集群管理&nbsp;</a></li>
-          <li ng-class="isActive('location')"><a href="javascript:void(0);" ng-click="selectedTab='location'">&nbsp;映射规则&nbsp;</a></li>
+          <li ng-class="isActive('profile')"><a href="#profile" ng-click="selectedTab='profile'">&nbsp;基本配置&nbsp;</a></li>
+          <li ng-class="isActive('pool')"><a href="#pool" ng-click="selectedTab='pool'">&nbsp;集群管理&nbsp;</a></li>
+          <li ng-class="isActive('location')"><a href="#location" ng-click="selectedTab='location'">&nbsp;映射规则&nbsp;</a></li>
         </ul>
         <div id="alertMessageDiv" style="text-align: center;"></div>
         <hr>

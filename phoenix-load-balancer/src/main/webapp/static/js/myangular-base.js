@@ -41,6 +41,14 @@ module.factory('DataService', function($resource) {
 module.controller('VsController', function($scope, DataService, $route,
 		$resource, $http) {
 	$scope.selectedTab = 'profile';
+	//获取hash，设置给selectedTab
+	var hash = window.location.hash;
+	if (hash.length > 1) {// 去掉#号
+		hash = hash.substring(1);
+		if(hash == 'profile' || hash=='pool' || hash=='location'){
+			$scope.selectedTab = hash;
+		}
+	}
 	$scope.isActive = function(tabName) {
 		var clazz = ($scope.selectedTab == tabName) ? 'active' : '';
 		return clazz;
