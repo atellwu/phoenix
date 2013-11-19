@@ -53,37 +53,89 @@ public class VirtualServerAction extends ActionSupport {
         virtualServers = virtualServerService.listVirtualServers();
     }
 
-    public String showVs() {
+    public String show() {
+        if (virtualServers.size() == 0) {
+            return "noneVs";
+        }
+        if (virtualServerName == null) {
+            virtualServerName = virtualServers.get(0).getName();//将重定向
+            return "redirect";
+        } else {
+            return SUCCESS;
+        }
+    }
+
+    public String edit() {
         if (virtualServerName == null) {
             virtualServerName = virtualServers.get(0).getName();
         }
         return SUCCESS;
     }
 
-    @Override
-    public String execute() throws Exception {
+    public String get() throws Exception {
         try {
-            if ("GET".equalsIgnoreCase(ServletActionContext.getRequest().getMethod())) {
-                //获取vs
-                System.out.println("virtualServerName:"+virtualServerName);
-                VirtualServer virtualServer = virtualServerService.findVirtualServer(virtualServerName);
-                dataMap.put("virtualServer", virtualServer);
-                LOG.info("execute");
-            } else {
-                String vsJson = IOUtils.toString(ServletActionContext.getRequest().getInputStream());
-                if (StringUtils.isBlank(vsJson)) {
-                    throw new IllegalArgumentException("vs 参数不能为空！");
-                }
-                VirtualServer virtualServer = JsonBinder.getNonNullBinder().fromJson(vsJson, VirtualServer.class);
+            //获取vs
+            VirtualServer virtualServer = virtualServerService.findVirtualServer(virtualServerName);
+            dataMap.put("virtualServer", virtualServer);
+            LOG.info("execute");
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (BizException e) {
+            dataMap.put("errorCode", e.getMessageId());
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Bussiness Error." + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Param Error." + e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
+        }
+        return SUCCESS;
+    }
 
-                String virtualServerName = virtualServer.getName();
-                VirtualServer virtualServer0 = virtualServerService.findVirtualServer(virtualServerName);
-                if (virtualServer0 != null) {
-                    virtualServerService.modifyVirtualServer(virtualServerName, virtualServer);
-                } else {
-                    virtualServerService.addVirtualServer(virtualServerName, virtualServer);
-                }
+    public String save() throws Exception {
+        try {
+            String vsJson = IOUtils.toString(ServletActionContext.getRequest().getInputStream());
+            if (StringUtils.isBlank(vsJson)) {
+                throw new IllegalArgumentException("vs 参数不能为空！");
             }
+            VirtualServer virtualServer = JsonBinder.getNonNullBinder().fromJson(vsJson, VirtualServer.class);
+
+            String virtualServerName = virtualServer.getName();
+            VirtualServer virtualServer0 = virtualServerService.findVirtualServer(virtualServerName);
+            if (virtualServer0 != null) {
+                virtualServerService.modifyVirtualServer(virtualServerName, virtualServer);
+            } else {
+                virtualServerService.addVirtualServer(virtualServerName, virtualServer);
+                virtualServers = virtualServerService.listVirtualServers();//重新更新list
+            }
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (BizException e) {
+            dataMap.put("errorCode", e.getMessageId());
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Bussiness Error." + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Param Error." + e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
+        }
+        return SUCCESS;
+    }
+
+    public String remove() throws Exception {
+        try {
+            VirtualServer virtualServer0 = virtualServerService.findVirtualServer(virtualServerName);
+            if (virtualServer0 == null) {
+                throw new IllegalArgumentException("不存在该站点：" + virtualServerName);
+            }
+            virtualServerService.deleteVirtualServer(virtualServerName);
+            virtualServers = virtualServerService.listVirtualServers();//重新更新list
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());

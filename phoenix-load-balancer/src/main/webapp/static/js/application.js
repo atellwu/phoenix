@@ -11,6 +11,27 @@
 			$('#addPoolModal').modal('show');
 			$('#addPoolName').focus();
 		},
+		"openAddVirtualServerModal" : function() {
+			$('#addVirtualServerAlertDiv').html('');
+			$('#addVirtualServerName').val('');
+			$('#addVirtualServerModal').modal('show');
+			$('#addVirtualServerName').focus();
+		},
+		"openRemoveVirtualServerModal" : function() {
+			$('#removeVirtualServerAlertDiv').html('');
+			$('#removeVirtualServerName').val('');
+			$('#removeVirtualServerModal').modal('show');
+			$('#removeVirtualServerName').focus();
+		},
+		"addVirtualServer" : function() {
+			var addVirtualServerName = $('#addVirtualServerName').val();
+			if (addVirtualServerName == null
+					|| addVirtualServerName.trim() == '') {
+				app.alertError('站点名称不能为空！','addVirtualServerAlertDiv');
+				return;
+			}
+			w.location = w.contextpath + addVirtualServerName + '/edit';
+		},
 		"backPool" : function() {
 			$('div[pool]').hide();
 			$('div[pool=' + name + ']').show();
@@ -26,17 +47,26 @@
 			if (!divId) {
 				divId = "alertMessageDiv";
 			}
-			console.log(divId);
 			$("#" + divId).html($("#alert_error").html());
 			$("#" + divId + " > div > span > span").text(msg);
 		},
-		"alertSuccess" : function(msg) {
-			$("#alertMessageDiv").html($("#alert_success").html());
-			$("#alertMessageDiv > div > span > span").text(msg);
+		"alertSuccess" : function(msg,divId) {
+//			$("#alertMessageDiv").html($("#alert_success").html());
+//			$("#alertMessageDiv > div > span > span").text(msg);
+			if (!divId) {
+				divId = "alertMessageDiv";
+			}
+			$("#" + divId).html($("#alert_success").html());
+			$("#" + divId + " > div > span > span").text(msg);
 		},
-		"alertWarn" : function(msg) {
-			$("#alertMessageDiv").html($("#alert_warn").html());
-			$("#alertMessageDiv > div > span > span").text(msg);
+		"alertWarn" : function(msg,divId) {
+//			$("#alertMessageDiv").html($("#alert_warn").html());
+//			$("#alertMessageDiv > div > span > span").text(msg);
+			if (!divId) {
+				divId = "alertMessageDiv";
+			}
+			$("#" + divId).html($("#alert_warn").html());
+			$("#" + divId + " > div > span > span").text(msg);
 		},
 		"appError" : function(title, errorMsg) {
 			app.alertErrorModal(title, errorMsg);

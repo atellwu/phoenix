@@ -40,19 +40,43 @@
             </interceptor-stack>
         </interceptors>
 
-        <action name="" class="virtualServerAction" method="showVs">
-            <result name="success" type="velocity">
-                /container.htm
+        <action name="" class="virtualServerAction" method="show">
+            <result name="redirect" type="redirect">
+                <param name="location">${virtualServerName}</param>
+            </result>
+            <result name="noneVs" type="velocity">
+                /none_vs.htm
             </result>
         </action>
-        <action name="vs/{virtualServerName}" class="virtualServerAction">
+        <action name="{virtualServerName}/save" class="virtualServerAction"
+            method="save">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
+        <action name="{virtualServerName}/get" class="virtualServerAction"
+            method="get">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="{virtualServerName}/remove" class="virtualServerAction"
+            method="remove">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="{virtualServerName}/edit" class="virtualServerAction"
+            method="edit">
+            <result name="success" type="velocity">
+                /container.htm
+            </result>
+        </action>
         <action name="{virtualServerName}" class="virtualServerAction"
-            method="showVs">
+            method="show">
             <result name="success" type="velocity">
                 /container.htm
             </result>
