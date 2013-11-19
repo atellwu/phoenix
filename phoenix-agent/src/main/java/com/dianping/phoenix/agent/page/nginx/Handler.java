@@ -73,7 +73,19 @@ public class Handler implements PageHandler<Context> {
         Response res = new Response();
 
         switch (payload.getAction()) {
+            case STATUS:
+                if (txMgr.transactionExists(txId)) {
+                    Transaction tx = txMgr.loadTransaction(txId);
+                    res.setStatus(tx.getStatus().toString().toLowerCase());
+                } else {
+                    ctx.addError(new ErrorObject("transaction.exists"));
+                }
+                break;
 
+            case CANCEL:
+                agent.cancel(txId);
+                res.setStatus("ok");
+                break;
             case DEPLOY:
                 task = new ConfigUpgradeTask(payload.getVirtualServerName(), payload.getConfigFileName(),
                         payload.getVersion(), payload.getGirUrl(), payload.isReload(), payload.getDynamicRefreshUrl(),

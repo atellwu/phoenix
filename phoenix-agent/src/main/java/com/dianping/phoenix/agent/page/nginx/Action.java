@@ -2,10 +2,10 @@ package com.dianping.phoenix.agent.page.nginx;
 
 public enum Action implements org.unidal.web.mvc.Action {
     VIEW("view"),
-
     DEPLOY("deploy"),
-    
-    GETLOG("log");
+    GETLOG("log"),
+    CANCEL("cancel"),
+    STATUS("status");
 
     private String m_name;
 

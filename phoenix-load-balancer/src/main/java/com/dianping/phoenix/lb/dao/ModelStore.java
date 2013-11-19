@@ -44,4 +44,6 @@ public interface ModelStore {
 
     public List<String> listTagIds(String name) throws BizException;
 
+    public String findPrevTagId(String virtualServerName, String currentTagId) throws BizException;
+
 }

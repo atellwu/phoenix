@@ -181,7 +181,7 @@ public class LocalFileModelStoreTest {
 
         assertEquals(new ArrayList<Strategy>(configure.getStrategies().values()), store.listStrategies());
 
-        assertRawFileNotChanged( "configure_base.xml");
+        assertRawFileNotChanged("configure_base.xml");
         assertRawFileNotChanged("configure_www.xml");
         assertRawFileNotChanged("configure_tuangou.xml");
     }
@@ -812,8 +812,9 @@ public class LocalFileModelStoreTest {
         Collections.sort(wwwTagIds);
         Collections.sort(tuangouTagIds);
 
-        Assert.assertArrayEquals(new String[] { "1", "2" }, wwwTagIds.toArray(new String[0]));
-        Assert.assertArrayEquals(new String[] { "1", "2", "3" }, tuangouTagIds.toArray(new String[0]));
+        Assert.assertArrayEquals(new String[] { "www-1", "www-2" }, wwwTagIds.toArray(new String[0]));
+        Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3" },
+                tuangouTagIds.toArray(new String[0]));
 
         store.tag("www", 1);
         store.tag("tuangou", 1);
@@ -823,8 +824,9 @@ public class LocalFileModelStoreTest {
         Collections.sort(wwwTagIds);
         Collections.sort(tuangouTagIds);
 
-        Assert.assertArrayEquals(new String[] { "1", "2", "3" }, wwwTagIds.toArray(new String[0]));
-        Assert.assertArrayEquals(new String[] { "1", "2", "3", "4" }, tuangouTagIds.toArray(new String[0]));
+        Assert.assertArrayEquals(new String[] { "www-1", "www-2", "www-3" }, wwwTagIds.toArray(new String[0]));
+        Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3", "tuangou-4" },
+                tuangouTagIds.toArray(new String[0]));
 
         assertRawFileNotChanged("configure_www.xml");
         assertRawFileNotChanged("configure_tuangou.xml");
@@ -847,7 +849,7 @@ public class LocalFileModelStoreTest {
         assertRawFileNotChanged("configure_tuangou.xml");
         assertRawFileNotChanged("configure_base.xml");
     }
-    
+
     @Test
     public void testListTagIdsNoTags() throws Exception {
 
@@ -857,20 +859,41 @@ public class LocalFileModelStoreTest {
         assertRawFileNotChanged("configure_tuangou.xml");
         assertRawFileNotChanged("configure_base.xml");
     }
-    
+
     @Test
     public void testGetTag() throws Exception {
         String tagId = store.tag("www", 1);
-        
+
         VirtualServer tagVs = store.getTag("www", tagId);
-        
+
         Assert.assertEquals(store.findVirtualServer("www").toString(), tagVs.toString());
 
         assertRawFileNotChanged("configure_www.xml");
         assertRawFileNotChanged("configure_tuangou.xml");
         assertRawFileNotChanged("configure_base.xml");
     }
-    
+
+    @Test
+    public void testFindPrevTagId() throws Exception {
+        String tag1 = store.tag("www", 1);
+        String tag2 = store.tag("www", 1);
+
+        store = new LocalFileModelStoreImpl();
+        store.setBaseDir(tmpDir.getAbsolutePath());
+        store.init();
+
+        Assert.assertEquals(tag1, store.findPrevTagId("www", tag2));
+        Assert.assertNull(store.findPrevTagId("www", tag1));
+
+        String tag3 = store.tag("www", 1);
+        Assert.assertEquals(tag2, store.findPrevTagId("www", tag3));
+        Assert.assertEquals(tag1, store.findPrevTagId("www", tag2));
+        Assert.assertNull(store.findPrevTagId("www", tag1));
+
+        assertRawFileNotChanged("configure_www.xml");
+        assertRawFileNotChanged("configure_tuangou.xml");
+        assertRawFileNotChanged("configure_base.xml");
+    }
 
     private void assertRawFileNotChanged(String fileName) throws IOException {
         Assert.assertEquals(FileUtils.readFileToString(new File(baseDir, fileName)),

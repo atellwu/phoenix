@@ -41,6 +41,7 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
     private static final String                  CONFIG_FILE_PREFIX      = "configure_";
     private static final String                  XML_SUFFIX              = ".xml";
     private static final String                  TAGID_SEPARATOR         = "_";
+    private static final String                  TAGID_SPLITTER          = "-";
     private ConcurrentMap<String, AtomicInteger> tagMetas                = new ConcurrentHashMap<String, AtomicInteger>();
 
     public void setBaseDir(String baseDir) {
@@ -161,18 +162,36 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
     protected String saveTag(String key, String vsName, Configure configure) throws IOException {
         tagMetas.putIfAbsent(vsName, new AtomicInteger(0));
         int tagId = tagMetas.get(vsName).incrementAndGet();
-        File tagFile = getTagFile(key, String.valueOf(tagId), vsName);
+        File tagFile = getTagFile(key, tagId, vsName);
         FileUtils.forceMkdir(tagFile.getParentFile());
         doSave(tagFile, configure);
-        return String.valueOf(tagId);
+        return convertToStrTagId(vsName, tagId);
+    }
+
+    private String convertToStrTagId(String vsName, int tagId) {
+        return vsName + TAGID_SPLITTER + tagId;
+    }
+
+    private Integer convertFromStrTagId(String vsName, String tagId) {
+        if (tagId.startsWith(vsName + TAGID_SPLITTER)) {
+            String[] tagIdSplits = tagId.split(TAGID_SPLITTER);
+            if (tagIdSplits != null && tagIdSplits.length == 2 && StringUtils.isNumeric(tagIdSplits[1])) {
+                return Integer.valueOf(tagIdSplits[1]);
+            }
+        }
+        return null;
     }
 
     @Override
     protected Configure loadTag(String key, String vsName, String tagId) throws IOException, SAXException {
-        return DefaultSaxParser.parse(FileUtils.readFileToString(getTagFile(key, tagId, vsName)));
+        Integer tagIdInt = convertFromStrTagId(vsName, tagId);
+        if (tagIdInt != null) {
+            return DefaultSaxParser.parse(FileUtils.readFileToString(getTagFile(key, tagIdInt, vsName)));
+        }
+        return null;
     }
 
-    private File getTagFile(String key, String tagId, String vsName) {
+    private File getTagFile(String key, int tagId, String vsName) {
         return new File(getTagFileBase(vsName), key + TAGID_SEPARATOR + tagId);
     }
 
@@ -191,7 +210,7 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
                 if (tagIdStart != -1) {
                     String tagIdStr = fileName.substring(tagIdStart + 1);
                     if (StringUtils.isNumeric(tagIdStr)) {
-                        tagIds.add(tagIdStr);
+                        tagIds.add(convertToStrTagId(vsName, Integer.parseInt(tagIdStr)));
                     }
                 }
             }
@@ -200,4 +219,31 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
         return null;
     }
 
+    @Override
+    protected String doFindPrevTagId(String virtualServerName, String currentTagId, List<String> tagIds) {
+        Integer currentTagIdInt = convertFromStrTagId(virtualServerName, currentTagId);
+
+        if (currentTagIdInt != null) {
+
+            Integer prevTagId = null;
+
+            for (String lastTagId : tagIds) {
+                Integer lastTagIdInt = convertFromStrTagId(virtualServerName, lastTagId);
+                if (lastTagIdInt != null) {
+                    if (lastTagIdInt < currentTagIdInt) {
+                        if (prevTagId == null) {
+                            prevTagId = lastTagIdInt;
+                        } else {
+                            if (lastTagIdInt > prevTagId) {
+                                prevTagId = lastTagIdInt;
+                            }
+                        }
+                    }
+                }
+            }
+            return prevTagId == null ? null : convertToStrTagId(virtualServerName, prevTagId);
+        }
+
+        return null;
+    }
 }

@@ -35,4 +35,6 @@ public interface VirtualServerDao {
 
     VirtualServer findTagById(String virtualServerName, String tagId) throws BizException;
 
+    String findPrevTagId(String virtualServerName, String tagId) throws BizException;
+
 }

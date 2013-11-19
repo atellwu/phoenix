@@ -389,6 +389,36 @@ public abstract class AbstractModelStore implements ModelStore {
         return null;
     }
 
+    @Override
+    public String findPrevTagId(String virtualServerName, String currentTagId) throws BizException {
+        ConfigMeta configFileEntry = virtualServerConfigFileMapping.get(virtualServerName);
+        if (configFileEntry != null) {
+            configFileEntry.lock.readLock().lock();
+
+            try {
+                if (configFileEntry.configure.findVirtualServer(virtualServerName) == null
+                        || configure.findVirtualServer(virtualServerName) == null) {
+                    ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, virtualServerName);
+                }
+
+                List<String> tagIds = listTagIds(virtualServerName);
+                if (tagIds != null && !tagIds.isEmpty()) {
+                   return doFindPrevTagId(virtualServerName, currentTagId, tagIds);
+                }
+
+            } finally {
+                configFileEntry.lock.readLock().unlock();
+            }
+        } else {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, virtualServerName);
+        }
+
+        return null;
+
+    }
+
+    protected abstract String doFindPrevTagId(String virtualServerName, String currentTagId, List<String> tagIds);
+
     protected abstract List<String> doListTagIds(String vsName) throws IOException;
 
     protected abstract Configure loadTag(String key, String vsName, String tagId) throws IOException, SAXException;

@@ -28,9 +28,9 @@ public interface VirtualServerService {
 
     String generateNginxConfig(VirtualServer virtualServer) throws BizException;
 
-    String push(String virtualServerName, int virtualServerVersion) throws BizException;
-
-    List<String> listPushIds(String virtualServerName) throws BizException;
+    String tag(String virtualServerName, int virtualServerVersion) throws BizException;
 
     VirtualServer findTagById(String virtualServerName, String tagId) throws BizException;
+
+    String findPrevTagId(String virtualServerName, String tagId) throws BizException;
 }
