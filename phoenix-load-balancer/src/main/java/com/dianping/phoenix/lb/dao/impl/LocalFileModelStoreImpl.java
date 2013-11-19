@@ -8,8 +8,11 @@ package com.dianping.phoenix.lb.dao.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -119,7 +122,15 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
                 for (File subFile : virtualServers) {
                     String vsName = subFile.getName();
 
-                    File[] tags = new File(baseDirFile, vsName).listFiles();
+                    File[] tagFolders = new File(baseDirFile, vsName).listFiles();
+                    List<File> tags = new ArrayList<File>();
+
+                    for (File tagFolder : tagFolders) {
+                        File[] files = tagFolder.listFiles();
+                        if (files != null && files.length > 0) {
+                            tags.addAll(Arrays.asList(files));
+                        }
+                    }
 
                     for (File tag : tags) {
                         String fileName = tag.getName();
@@ -162,7 +173,8 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
     protected String saveTag(String key, String vsName, Configure configure) throws IOException {
         tagMetas.putIfAbsent(vsName, new AtomicInteger(0));
         int tagId = tagMetas.get(vsName).incrementAndGet();
-        File tagFile = getTagFile(key, tagId, vsName);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        File tagFile = new File(new File(getTagFileBase(vsName), sdf.format(new Date())), getTagFileName(key, tagId));
         FileUtils.forceMkdir(tagFile.getParentFile());
         doSave(tagFile, configure);
         return convertToStrTagId(vsName, tagId);
@@ -182,17 +194,33 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
         return null;
     }
 
+    private String getTagFileName(String key, int tagId) {
+        return key + TAGID_SEPARATOR + tagId;
+    }
+
     @Override
     protected Configure loadTag(String key, String vsName, String tagId) throws IOException, SAXException {
         Integer tagIdInt = convertFromStrTagId(vsName, tagId);
         if (tagIdInt != null) {
-            return DefaultSaxParser.parse(FileUtils.readFileToString(getTagFile(key, tagIdInt, vsName)));
+            File tagBase = getTagFileBase(vsName);
+            String tagFileName = getTagFileName(key, tagIdInt);
+            File tagFile = null;
+            for (File subFolder : tagBase.listFiles()) {
+                if (tagFile == null) {
+                    for (File tmpTagFile : subFolder.listFiles()) {
+                        if (tmpTagFile.getName().equals(tagFileName)) {
+                            tagFile = tmpTagFile;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (tagFile != null) {
+                return DefaultSaxParser.parse(FileUtils.readFileToString(tagFile));
+            }
         }
         return null;
-    }
-
-    private File getTagFile(String key, int tagId, String vsName) {
-        return new File(getTagFileBase(vsName), key + TAGID_SEPARATOR + tagId);
     }
 
     private File getTagFileBase(String vsName) {
@@ -203,7 +231,15 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
     protected List<String> doListTagIds(String vsName) throws IOException {
         File tagFileBase = getTagFileBase(vsName);
         if (tagFileBase.exists() && tagFileBase.isDirectory()) {
-            String[] fileNames = tagFileBase.list();
+            File[] tagFolders = tagFileBase.listFiles();
+            List<String> fileNames = new ArrayList<String>();
+            for (File tagFolder : tagFolders) {
+                String[] tagFiles = tagFolder.list();
+                if (tagFiles != null && tagFiles.length > 0) {
+                    fileNames.addAll(Arrays.asList(tagFiles));
+                }
+            }
+
             List<String> tagIds = new ArrayList<String>();
             for (String fileName : fileNames) {
                 int tagIdStart = fileName.lastIndexOf(TAGID_SEPARATOR);

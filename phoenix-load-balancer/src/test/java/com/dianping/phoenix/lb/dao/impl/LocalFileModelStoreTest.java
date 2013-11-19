@@ -726,10 +726,11 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testTag() throws Exception {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         store.tag("www", 1);
         store.tag("www", 1);
-        File tagFile = new File(tmpDir, "tag/www/configure_www.xml_1");
-        File tagFile2 = new File(tmpDir, "tag/www/configure_www.xml_2");
+        File tagFile = new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/configure_www.xml_1");
+        File tagFile2 = new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/configure_www.xml_2");
         Assert.assertTrue(tagFile.exists());
         Assert.assertTrue(tagFile2.exists());
         Assert.assertEquals(DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_www.xml"))),
@@ -889,6 +890,56 @@ public class LocalFileModelStoreTest {
         Assert.assertEquals(tag2, store.findPrevTagId("www", tag3));
         Assert.assertEquals(tag1, store.findPrevTagId("www", tag2));
         Assert.assertNull(store.findPrevTagId("www", tag1));
+
+        assertRawFileNotChanged("configure_www.xml");
+        assertRawFileNotChanged("configure_tuangou.xml");
+        assertRawFileNotChanged("configure_base.xml");
+    }
+
+    @Test
+    public void testListMultiFolderTags() throws Exception {
+        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
+                "tag/www/20120101/configure_www.xml_1"));
+        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
+                "tag/www/20120102/configure_www.xml_2"));
+
+        store = new LocalFileModelStoreImpl();
+        store.setBaseDir(tmpDir.getAbsolutePath());
+        store.init();
+
+        store.tag("www", 1);
+        store.tag("www", 1);
+        store.tag("tuangou", 1);
+        store.tag("tuangou", 1);
+        store.tag("tuangou", 1);
+
+        List<String> wwwTagIds = store.listTagIds("www");
+        List<String> tuangouTagIds = store.listTagIds("tuangou");
+        Collections.sort(wwwTagIds);
+        Collections.sort(tuangouTagIds);
+
+        Assert.assertArrayEquals(new String[] { "www-1", "www-2", "www-3", "www-4" }, wwwTagIds.toArray(new String[0]));
+        Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3" },
+                tuangouTagIds.toArray(new String[0]));
+
+        assertRawFileNotChanged("configure_www.xml");
+        assertRawFileNotChanged("configure_tuangou.xml");
+        assertRawFileNotChanged("configure_base.xml");
+    }
+    
+    @Test
+    public void testGetMultiFolderTag() throws Exception {
+        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
+                "tag/www/20120101/configure_www.xml_1"));
+        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
+                "tag/www/20120102/configure_www.xml_2"));
+
+        store = new LocalFileModelStoreImpl();
+        store.setBaseDir(tmpDir.getAbsolutePath());
+        store.init();
+
+        Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-1").toString());
+        Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-2").toString());
 
         assertRawFileNotChanged("configure_www.xml");
         assertRawFileNotChanged("configure_tuangou.xml");
