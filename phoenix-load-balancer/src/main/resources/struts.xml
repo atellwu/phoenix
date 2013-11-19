@@ -32,7 +32,6 @@
         </result-types>
         <!-- Result fragment -->
 
-
         <interceptors>
             <interceptor-stack name="myStack">
                 <interceptor-ref name="timer" />
@@ -41,59 +40,47 @@
             </interceptor-stack>
         </interceptors>
 
-        <action name="main/{vsName}" class="mainAction">
+        <action name="" class="virtualServerAction" method="showVs">
             <result name="success" type="velocity">
                 /container.htm
             </result>
         </action>
-
-        <action name="main" class="mainAction">
-            <result name="success" type="velocity">
-                /container.htm
-            </result>
-        </action>
-
-        <action name="vsNamelist" class="virtualServerAction"
-            method="getVirtualServerList">
+        <action name="vs/{virtualServerName}" class="virtualServerAction">
             <result name="success" type="json">
-                <param name="root">virtualServers</param>
+                <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
-                <param name="excludeProperties">
-                    login.password,
-                    studentList.*\.sin
-                </param>
+            </result>
+        </action>
+        <action name="{virtualServerName}" class="virtualServerAction"
+            method="showVs">
+            <result name="success" type="velocity">
+                /container.htm
             </result>
         </action>
 
-        <action name="propertiesDefinedInputs" class="definedInputAction">
+
+        <action name="base/propertiesDefinedInputs" class="definedInputAction">
             <result name="success" type="json">
                 <param name="root">propertiesDefinedInputs</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
 
-        <action name="directiveDefinedInputs" class="definedInputAction">
+        <action name="base/directiveDefinedInputs" class="definedInputAction">
             <result name="success" type="json">
                 <param name="root">directiveDefinedInputs</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
 
-
-        <action name="vs/{vsName}" class="virtualServerAction">
-            <result name="success" type="json">
-                <param name="root">dataMap</param>
-                <param name="encoding">UTF-8</param>
-            </result>
-        </action>
-
-        <action name="strategies" class="virtualServerAction"
+        <action name="base/strategies" class="strategyAction"
             method="strategies">
             <result name="success" type="json">
                 <param name="root">strategies</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
+
 
     </package>
 

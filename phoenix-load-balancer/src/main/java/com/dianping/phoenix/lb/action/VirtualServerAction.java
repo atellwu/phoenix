@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.exception.BizException;
-import com.dianping.phoenix.lb.model.configure.entity.Strategy;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
-import com.dianping.phoenix.lb.service.StrategyService;
 import com.dianping.phoenix.lb.service.VirtualServerService;
 import com.dianping.phoenix.lb.utils.JsonBinder;
 import com.opensymphony.xwork2.ActionSupport;
@@ -36,8 +34,6 @@ public class VirtualServerAction extends ActionSupport {
 
     private static final long    serialVersionUID      = -1084994778030229218L;
 
-    private String               vsName;
-
     //post的参数vs，用于save
     private String               vs;
 
@@ -46,20 +42,21 @@ public class VirtualServerAction extends ActionSupport {
     @Autowired
     private VirtualServerService virtualServerService;
 
-    @Autowired
-    private StrategyService      strategyService;
-
-    private List<Strategy>       strategies;
-
     private List<VirtualServer>  virtualServers;
+
+    private String               virtualServerName;
+
+    private String               contextPath;
 
     @PostConstruct
     public void init() {
-
+        virtualServers = virtualServerService.listVirtualServers();
     }
 
-    public String strategies() {
-        strategies = strategyService.listStrategies();
+    public String showVs() {
+        if (virtualServerName == null) {
+            virtualServerName = virtualServers.get(0).getName();
+        }
         return SUCCESS;
     }
 
@@ -68,7 +65,8 @@ public class VirtualServerAction extends ActionSupport {
         try {
             if ("GET".equalsIgnoreCase(ServletActionContext.getRequest().getMethod())) {
                 //获取vs
-                VirtualServer virtualServer = virtualServerService.findVirtualServer(vsName);
+                System.out.println("virtualServerName:"+virtualServerName);
+                VirtualServer virtualServer = virtualServerService.findVirtualServer(virtualServerName);
                 dataMap.put("virtualServer", virtualServer);
                 LOG.info("execute");
             } else {
@@ -111,14 +109,9 @@ public class VirtualServerAction extends ActionSupport {
     @Override
     public void validate() {
         super.validate();
-    }
-
-    public String getVsName() {
-        return vsName;
-    }
-
-    public void setVsName(String vsName) {
-        this.vsName = vsName;
+        if (contextPath == null) {
+            contextPath = ServletActionContext.getServletContext().getContextPath();
+        }
     }
 
     public Map<String, Object> getDataMap() {
@@ -133,12 +126,20 @@ public class VirtualServerAction extends ActionSupport {
         this.vs = vs;
     }
 
-    public List<Strategy> getStrategies() {
-        return strategies;
-    }
-
     public List<VirtualServer> getVirtualServers() {
         return virtualServers;
+    }
+
+    public String getVirtualServerName() {
+        return virtualServerName;
+    }
+
+    public String getContextPath() {
+        return contextPath;
+    }
+
+    public void setVirtualServerName(String virtualServerName) {
+        this.virtualServerName = virtualServerName;
     }
 
 }

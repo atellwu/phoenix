@@ -1,7 +1,7 @@
-<div class="content" ng-controller="VsController" id="VsController">
+<div class="content"  ng-app="MyApp" ng-controller="VsController" id="VsController">
   <div class="header">
     <div class="stats">#parse("common/stats.htm")</div>
-    <h1 class="page-title">{{vs.name}}&nbsp;&nbsp;&nbsp;&nbsp;<span class="label label-warning" ng-show="newVs"><i class=" icon-exclamation-sign"></i>&nbsp; 新建站点，请填写后保存。 </span></h1>
+    <h1 class="page-title">$virtualServerName&nbsp;&nbsp;&nbsp;&nbsp;<span class="label label-warning" ng-show="newVs"><i class=" icon-exclamation-sign"></i>&nbsp; 新建站点，请填写后保存。 </span></h1>
   </div>
   #parse("common/breadcrumb.htm")
   <div class="container-fluid">

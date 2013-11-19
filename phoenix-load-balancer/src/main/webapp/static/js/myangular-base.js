@@ -1,14 +1,6 @@
 var module = angular.module('MyApp', [ 'ngResource', 'ngRoute' ]);
 
 module.config(function($routeProvider, $locationProvider, $resourceProvider) {
-	$routeProvider.when('#/:vsName/', {
-		controller : '{{ controller }}'
-	});
-	// $routeProvider.when('/Book/:bookId/ch/:chapterId', {
-	// templateUrl : 'chapter.html',
-	// controller : ChapterCntl
-	// });
-
 	// configure html5 to get links working on jsfiddle
 	$locationProvider.html5Mode(true);
 });
@@ -28,49 +20,20 @@ module.directive('ngEnter', function() {
 
 module.factory('DataService', function($resource) {
 	var model = {};
-	var VsNameList = $resource('/vsNamelist');
-	model.vsNameList = VsNameList.query(function() {
-		if (model.vsNameList.length > 0) {
-			// $scope.vsName = $scope.vsNameList[0].name;
-		}
-	});
 
-	var PropertiesDefinedInputs = $resource('/propertiesDefinedInputs');
+	var PropertiesDefinedInputs = $resource('/base/propertiesDefinedInputs');
 	model.propertiesDefinedInputs = PropertiesDefinedInputs.get(function() {
 	});
 
-	var DirectiveDefinedInputs = $resource('/directiveDefinedInputs');
+	var DirectiveDefinedInputs = $resource('/base/directiveDefinedInputs');
 	model.directiveDefinedInputs = DirectiveDefinedInputs.get(function() {
 	});
 
-	var Strategies = $resource('/strategies');
+	var Strategies = $resource('/base/strategies');
 	model.strategies = Strategies.query(function() {
 	});
 
 	return model;
-});
-
-module.controller('VsNameListController', function($scope, DataService, $route,
-		$resource) {
-	$scope.isActive = function(tabName) {
-		var clazz = ($scope.vsName == tabName) ? 'active' : '';
-		return clazz;
-	};
-
-	$scope.setVsName = function(tabName) {
-		$scope.vsName = tabName;
-	};
-
-	$scope.vsNameList = DataService.vsNameList;
-
-	// $scope.selectedVaName = 'profile';
-
-	// $route.when('/book/:title', {
-	// template : '{{ title }}',
-	// controller : function($scope, $routeParams) {
-	// $scope.title = $routeParams.title;
-	// }
-	// });
 });
 
 module.controller('VsController', function($scope, DataService, $route,
@@ -80,11 +43,6 @@ module.controller('VsController', function($scope, DataService, $route,
 		var clazz = ($scope.selectedTab == tabName) ? 'active' : '';
 		return clazz;
 	};
-	// var Vs = $resource('/vs/:name', {
-	// name : '@name'
-	// }, {
-	// caches : 'dds'
-	// });
 
 	$scope.getVs = function(vsName) {
 		$http({
