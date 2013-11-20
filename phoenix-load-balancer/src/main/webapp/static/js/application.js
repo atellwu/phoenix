@@ -27,10 +27,10 @@
 			var addVirtualServerName = $('#addVirtualServerName').val();
 			if (addVirtualServerName == null
 					|| addVirtualServerName.trim() == '') {
-				app.alertError('站点名称不能为空！','addVirtualServerAlertDiv');
+				app.alertError('站点名称不能为空！', 'addVirtualServerAlertDiv');
 				return;
 			}
-			w.location = w.contextpath + addVirtualServerName + '/edit';
+			w.location = w.contextpath + "/" + addVirtualServerName + '/edit';
 		},
 		"backPool" : function() {
 			$('div[pool]').hide();
@@ -50,18 +50,18 @@
 			$("#" + divId).html($("#alert_error").html());
 			$("#" + divId + " > div > span > span").text(msg);
 		},
-		"alertSuccess" : function(msg,divId) {
-//			$("#alertMessageDiv").html($("#alert_success").html());
-//			$("#alertMessageDiv > div > span > span").text(msg);
+		"alertSuccess" : function(msg, divId) {
+			// $("#alertMessageDiv").html($("#alert_success").html());
+			// $("#alertMessageDiv > div > span > span").text(msg);
 			if (!divId) {
 				divId = "alertMessageDiv";
 			}
 			$("#" + divId).html($("#alert_success").html());
 			$("#" + divId + " > div > span > span").text(msg);
 		},
-		"alertWarn" : function(msg,divId) {
-//			$("#alertMessageDiv").html($("#alert_warn").html());
-//			$("#alertMessageDiv > div > span > span").text(msg);
+		"alertWarn" : function(msg, divId) {
+			// $("#alertMessageDiv").html($("#alert_warn").html());
+			// $("#alertMessageDiv > div > span > span").text(msg);
 			if (!divId) {
 				divId = "alertMessageDiv";
 			}
