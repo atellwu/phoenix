@@ -7,6 +7,7 @@
 package com.dianping.phoenix.lb.dao.impl;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,11 +25,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
+import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.dao.ModelStore;
+import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.configure.entity.Configure;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
 import com.dianping.phoenix.lb.model.configure.transform.DefaultMerger;
 import com.dianping.phoenix.lb.model.configure.transform.DefaultSaxParser;
+import com.dianping.phoenix.lb.utils.ExceptionUtils;
 
 /**
  * @author Leo Liang
@@ -122,37 +126,22 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
                 for (File subFile : virtualServers) {
                     String vsName = subFile.getName();
 
-                    File[] tagFolders = new File(baseDirFile, vsName).listFiles();
-                    List<File> tags = new ArrayList<File>();
-
-                    for (File tagFolder : tagFolders) {
-                        File[] files = tagFolder.listFiles();
-                        if (files != null && files.length > 0) {
-                            tags.addAll(Arrays.asList(files));
-                        }
-                    }
+                    List<File> tags = listAllTagFiles(vsName);
 
                     for (File tag : tags) {
                         String fileName = tag.getName();
-                        if (fileName.startsWith(CONFIG_FILE_PREFIX)) {
-                            int tagIdStart = fileName.lastIndexOf(TAGID_SEPARATOR);
-                            int extStart = fileName.lastIndexOf(XML_SUFFIX);
-                            if (tagIdStart != -1 && extStart != -1 && extStart < tagIdStart) {
-                                String tagIdStr = fileName.substring(tagIdStart + 1);
-                                if (StringUtils.isNumeric(tagIdStr)) {
-                                    String xml = FileUtils.readFileToString(tag);
-                                    Configure tmpConfigure = DefaultSaxParser.parse(xml);
-                                    int tagId = Integer.valueOf(tagIdStr);
-                                    for (Map.Entry<String, VirtualServer> entry : tmpConfigure.getVirtualServers()
-                                            .entrySet()) {
-                                        tagMetas.putIfAbsent(entry.getKey(), new AtomicInteger(0));
-                                        if (tagMetas.get(entry.getKey()).intValue() < tagId) {
-                                            tagMetas.get(entry.getKey()).set(tagId);
-                                        }
-                                    }
+                        Integer tagId = extractTagIdInt(vsName, fileName);
+                        if (tagId != null) {
+                            String xml = FileUtils.readFileToString(tag);
+                            Configure tmpConfigure = DefaultSaxParser.parse(xml);
+                            for (Map.Entry<String, VirtualServer> entry : tmpConfigure.getVirtualServers().entrySet()) {
+                                tagMetas.putIfAbsent(entry.getKey(), new AtomicInteger(0));
+                                if (tagMetas.get(entry.getKey()).intValue() < tagId) {
+                                    tagMetas.get(entry.getKey()).set(tagId);
                                 }
                             }
                         }
+
                     }
                 }
 
@@ -182,6 +171,20 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
 
     private String convertToStrTagId(String vsName, int tagId) {
         return vsName + TAGID_SPLITTER + tagId;
+    }
+
+    private Integer extractTagIdInt(String vsName, String fileName) {
+        String vsFileNamePrefix = CONFIG_FILE_PREFIX + vsName + XML_SUFFIX;
+        if (fileName.startsWith(vsFileNamePrefix)) {
+            int tagIdStart = fileName.lastIndexOf(TAGID_SEPARATOR);
+            if (tagIdStart == vsFileNamePrefix.length()) {
+                String tagIdStr = fileName.substring(tagIdStart + 1);
+                if (StringUtils.isNumeric(tagIdStr)) {
+                    return Integer.valueOf(tagIdStr);
+                }
+            }
+        }
+        return null;
     }
 
     private Integer convertFromStrTagId(String vsName, String tagId) {
@@ -227,32 +230,47 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
         return new File(new File(baseDir, TAG_DIR), vsName);
     }
 
-    @Override
-    protected List<String> doListTagIds(String vsName) throws IOException {
+    private List<File> listAllTagFiles(String vsName) {
+        List<File> tagFiles = new ArrayList<File>();
         File tagFileBase = getTagFileBase(vsName);
         if (tagFileBase.exists() && tagFileBase.isDirectory()) {
             File[] tagFolders = tagFileBase.listFiles();
-            List<String> fileNames = new ArrayList<String>();
             for (File tagFolder : tagFolders) {
-                String[] tagFiles = tagFolder.list();
-                if (tagFiles != null && tagFiles.length > 0) {
-                    fileNames.addAll(Arrays.asList(tagFiles));
-                }
-            }
+                if (tagFolder.isDirectory()) {
+                    File[] tmpTagFiles = tagFolder.listFiles(new FileFilter() {
 
-            List<String> tagIds = new ArrayList<String>();
-            for (String fileName : fileNames) {
-                int tagIdStart = fileName.lastIndexOf(TAGID_SEPARATOR);
-                if (tagIdStart != -1) {
-                    String tagIdStr = fileName.substring(tagIdStart + 1);
-                    if (StringUtils.isNumeric(tagIdStr)) {
-                        tagIds.add(convertToStrTagId(vsName, Integer.parseInt(tagIdStr)));
+                        @Override
+                        public boolean accept(File file) {
+                            return file.isFile();
+                        }
+                    });
+                    if (tmpTagFiles != null && tmpTagFiles.length > 0) {
+                        tagFiles.addAll(Arrays.asList(tmpTagFiles));
                     }
                 }
+
             }
-            return tagIds;
         }
-        return null;
+
+        return tagFiles;
+    }
+
+    @Override
+    protected List<String> doListTagIds(String vsName) throws IOException {
+        List<File> tagFiles = listAllTagFiles(vsName);
+
+        List<String> tagIds = new ArrayList<String>();
+        for (File tagFile : tagFiles) {
+            String fileName = tagFile.getName();
+            int tagIdStart = fileName.lastIndexOf(TAGID_SEPARATOR);
+            if (tagIdStart != -1) {
+                String tagIdStr = fileName.substring(tagIdStart + 1);
+                if (StringUtils.isNumeric(tagIdStr)) {
+                    tagIds.add(convertToStrTagId(vsName, Integer.parseInt(tagIdStr)));
+                }
+            }
+        }
+        return tagIds;
     }
 
     @Override
@@ -281,5 +299,40 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
         }
 
         return null;
+    }
+
+    @Override
+    protected String doFindLatestTagId(String virtualServerName, List<String> tagIds) {
+        Integer latestTagIdInt = null;
+        for (String tagId : tagIds) {
+            Integer tagIdInt = convertFromStrTagId(virtualServerName, tagId);
+
+            if (tagIdInt != null) {
+                if (latestTagIdInt == null) {
+                    latestTagIdInt = tagIdInt;
+                } else if (tagIdInt > latestTagIdInt) {
+                    latestTagIdInt = tagIdInt;
+                }
+            }
+        }
+
+        return latestTagIdInt == null ? null : convertToStrTagId(virtualServerName, latestTagIdInt);
+    }
+
+    @Override
+    protected void doRemoveTag(String virtualServerName, String tagId) throws BizException {
+        Integer expectedTagId = convertFromStrTagId(virtualServerName, tagId);
+
+        if (expectedTagId != null) {
+            List<File> tagFiles = listAllTagFiles(virtualServerName);
+            for (File tagFile : tagFiles) {
+                if (expectedTagId == extractTagIdInt(virtualServerName, tagFile.getName())) {
+                    FileUtils.deleteQuietly(tagFile);
+                    return;
+                }
+            }
+        }
+
+        ExceptionUtils.throwBizException(MessageID.TAG_REMOVE_NOT_FOUND, tagId);
     }
 }

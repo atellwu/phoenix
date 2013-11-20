@@ -854,7 +854,7 @@ public class LocalFileModelStoreTest {
     @Test
     public void testListTagIdsNoTags() throws Exception {
 
-        Assert.assertNull(store.listTagIds("www"));
+        Assert.assertTrue(store.listTagIds("www").size() == 0);
 
         assertRawFileNotChanged("configure_www.xml");
         assertRawFileNotChanged("configure_tuangou.xml");
@@ -926,7 +926,7 @@ public class LocalFileModelStoreTest {
         assertRawFileNotChanged("configure_tuangou.xml");
         assertRawFileNotChanged("configure_base.xml");
     }
-    
+
     @Test
     public void testGetMultiFolderTag() throws Exception {
         FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
@@ -941,6 +941,47 @@ public class LocalFileModelStoreTest {
         Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-1").toString());
         Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-2").toString());
 
+        assertRawFileNotChanged("configure_www.xml");
+        assertRawFileNotChanged("configure_tuangou.xml");
+        assertRawFileNotChanged("configure_base.xml");
+    }
+
+    @Test
+    public void testRemoveTagAndFindLatestTag() throws Exception {
+        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
+                "tag/www/20120101/configure_www.xml_1"));
+        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
+                "tag/www/20120101/configure_www.xml_2"));
+        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
+                "tag/www/20120102/configure_www.xml_3"));
+
+        store = new LocalFileModelStoreImpl();
+        store.setBaseDir(tmpDir.getAbsolutePath());
+        store.init();
+
+        store.tag("www", 1);
+
+        store.removeTag("www", "www-2");
+        store.removeTag("www", "www-4");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+        Assert.assertFalse(new File(tmpDir, "tag/www/20120101/configure_www.xml_2").exists());
+        Assert.assertFalse(new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/configure_www.xml_4").exists());
+
+        List<String> tagIds = store.listTagIds("www");
+        Collections.sort(tagIds);
+        Assert.assertArrayEquals(new String[]{"www-1", "www-3"}, tagIds.toArray());
+        Assert.assertEquals( "www-3", store.findLatestTagId("www"));
+        
+        store.removeTag("www", "www-1");
+        store.removeTag("www", "www-3");
+        Assert.assertFalse(new File(tmpDir, "tag/www/20120101/configure_www.xml_1").exists());
+        Assert.assertFalse(new File(tmpDir, "tag/www/20120101/configure_www.xml_3").exists());
+        
+        Assert.assertEquals(0, store.listTagIds("www").size());
+        Assert.assertNull(store.findLatestTagId("www"));
+        
         assertRawFileNotChanged("configure_www.xml");
         assertRawFileNotChanged("configure_tuangou.xml");
         assertRawFileNotChanged("configure_base.xml");

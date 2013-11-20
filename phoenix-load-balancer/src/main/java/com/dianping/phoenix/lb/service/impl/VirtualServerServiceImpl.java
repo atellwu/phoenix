@@ -340,4 +340,41 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
         });
     }
 
+    @Override
+    public void removeTag(final String virtualServerName, final String tagId) throws BizException {
+        if (StringUtils.isBlank(virtualServerName)) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
+        }
+
+        if (StringUtils.isBlank(tagId)) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_TAGID_EMPTY);
+        }
+
+        read(new ReadOperation<Void>() {
+
+            @Override
+            public Void doRead() throws BizException {
+                virtualServerDao.removeTag(virtualServerName, tagId);
+                return null;
+            }
+
+        });
+    }
+
+    @Override
+    public String findLatestTagId(final String virtualServerName) throws BizException {
+        if (StringUtils.isBlank(virtualServerName)) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
+        }
+
+        return read(new ReadOperation<String>() {
+
+            @Override
+            public String doRead() throws BizException {
+                return virtualServerDao.findLatestTagId(virtualServerName);
+            }
+
+        });
+    }
+
 }

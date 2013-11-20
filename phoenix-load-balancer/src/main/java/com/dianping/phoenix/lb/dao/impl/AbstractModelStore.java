@@ -403,7 +403,7 @@ public abstract class AbstractModelStore implements ModelStore {
 
                 List<String> tagIds = listTagIds(virtualServerName);
                 if (tagIds != null && !tagIds.isEmpty()) {
-                   return doFindPrevTagId(virtualServerName, currentTagId, tagIds);
+                    return doFindPrevTagId(virtualServerName, currentTagId, tagIds);
                 }
 
             } finally {
@@ -416,6 +416,63 @@ public abstract class AbstractModelStore implements ModelStore {
         return null;
 
     }
+
+    @Override
+    public void removeTag(String virtualServerName, String tagId) throws BizException {
+        ConfigMeta configFileEntry = virtualServerConfigFileMapping.get(virtualServerName);
+        if (configFileEntry != null) {
+            configFileEntry.lock.readLock().lock();
+
+            try {
+                if (configFileEntry.configure.findVirtualServer(virtualServerName) == null
+                        || configure.findVirtualServer(virtualServerName) == null) {
+                    ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, virtualServerName);
+                }
+
+                List<String> tagIds = listTagIds(virtualServerName);
+                if (tagIds != null && tagIds.contains(tagId)) {
+                    doRemoveTag(virtualServerName, tagId);
+                }
+
+            } finally {
+                configFileEntry.lock.readLock().unlock();
+            }
+        } else {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, virtualServerName);
+        }
+
+    }
+
+    @Override
+    public String findLatestTagId(String virtualServerName) throws BizException {
+        ConfigMeta configFileEntry = virtualServerConfigFileMapping.get(virtualServerName);
+        if (configFileEntry != null) {
+            configFileEntry.lock.readLock().lock();
+
+            try {
+                if (configFileEntry.configure.findVirtualServer(virtualServerName) == null
+                        || configure.findVirtualServer(virtualServerName) == null) {
+                    ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, virtualServerName);
+                }
+
+                List<String> tagIds = listTagIds(virtualServerName);
+                if (tagIds != null && !tagIds.isEmpty()) {
+                    return doFindLatestTagId(virtualServerName, tagIds);
+                }
+
+            } finally {
+                configFileEntry.lock.readLock().unlock();
+            }
+        } else {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, virtualServerName);
+        }
+
+        return null;
+    }
+
+    protected abstract String doFindLatestTagId(String virtualServerName, List<String> tagIds);
+
+    protected abstract void doRemoveTag(String virtualServerName, String tagId) throws BizException;
 
     protected abstract String doFindPrevTagId(String virtualServerName, String currentTagId, List<String> tagIds);
 

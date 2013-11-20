@@ -37,4 +37,8 @@ public interface VirtualServerDao {
 
     String findPrevTagId(String virtualServerName, String tagId) throws BizException;
 
+    void removeTag(String virtualServerName, String tagId) throws BizException;
+
+    String findLatestTagId(String virtualServerName) throws BizException;
+
 }
