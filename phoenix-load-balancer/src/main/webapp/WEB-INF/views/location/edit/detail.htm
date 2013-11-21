@@ -68,7 +68,9 @@
               <div class="controls">
                 <input ng-trim="true" ng-show="input.inputType == 'TEXT'" ng-model="directive.dynamicAttributes[name]" type="text">
                 <select ng-show="input.inputType == 'SELECT'" ng-model="directive.dynamicAttributes[name]"
-                  ng-options="value0 for value0 in getValueList(input)"></select>
+                  ng-options="value0 for value0 in getValueList(input)">
+                  <option value="">-- 选择 --</option>
+                  </select>
                   &nbsp;
                 <a style="margin-left: 10px;"
                   href="javascript:void(0);" ng-click="removeDynamicAttribute(directive,name)"><i
@@ -98,7 +100,9 @@
         <label class="control-label" for="">选择指令类型：</label>
         <div class="controls">
           <select id="addDirectiveType" ng-model="directiveToBeAdd.type"
-            ng-options="key as key for (key,directiveDefinedInput) in directiveDefinedInputs"></select>
+            ng-options="key as key for (key,directiveDefinedInput) in directiveDefinedInputs">
+            <option value="">-- 选择类型 --</option>
+            </select>
         </div>
       </div>
     </form>

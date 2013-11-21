@@ -30,29 +30,32 @@
     <div class="control-group">
       <label class="control-label">可用性控制</label>
       <div class="controls">
-        <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="OFFLINE">
-          OFFLINE
-        </label> <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="AVAILABLE">
+      <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="AVAILABLE">
           AVAILABLE
         </label>
+        <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="OFFLINE">
+          OFFLINE
+        </label> 
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="">域名</label>
       <div class="controls">
-        <input ng-trim="true" type="text" ng-model="vs.domain" placeholder="domain">
+        <input ng-trim="true" type="text" ng-model="vs.domain" placeholder="输入站点的域名">
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="inputEmail">端口</label>
       <div class="controls">
-        <input ng-trim="true" type="text" ng-model="vs.port" placeholder="domain">
+        <input ng-trim="true" type="text" ng-model="vs.port" placeholder="输入站点的端口号">
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="">默认Pool名</label>
       <div class="controls">
-        <select ng-model="vs.defaultPoolName" ng-options="pool.name as pool.name for pool in vs.pools"></select>
+        <select ng-model="vs.defaultPoolName" ng-options="pool.name as pool.name for pool in vs.pools">
+          <option value="">-- 选择集群 --</option>
+        </select>
       </div>
     </div>
     <div class="control-group">
@@ -68,7 +71,7 @@
     <div class="control-group" ng-repeat="(key, value) in vs.dynamicAttributes" ng-init="valueList = getValueList(key)">
       <label class="control-label">{{ key }}</label>
       <div ng-show="getInputType(key) == 'SELECT'" class="controls">
-        <select ng-model="vs.dynamicAttributes[key]" ng-options="value0 for value0 in valueList"></select> &nbsp;&nbsp;<a
+        <select ng-init="vs.dynamicAttributes[key] = getInitSelectValue(vs.dynamicAttributes[key],valueList)" ng-model="vs.dynamicAttributes[key]" ng-options="value0 for value0 in valueList"></select> &nbsp;&nbsp;<a
           href="javascript:;" ng-click="removeDynamicAttribute(key)""><i class="icon-remove"></i></a>
       </div>
       <div ng-show="getInputType(key) == 'TEXT'" class="controls">

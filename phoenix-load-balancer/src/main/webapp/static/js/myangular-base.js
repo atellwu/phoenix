@@ -68,6 +68,9 @@ module.controller('VsController', function($scope, DataService, $resource,
 					$scope.vs.instances = [];
 					$scope.vs.instances.push(new Object());
 					$scope.vs.pools = [];
+					$scope.vs.state = 'ENABLED';
+					$scope.vs.availability = 'AVAILABLE';
+					$scope.vs.locations = [];
 					$scope.newVs = true;
 				} else {
 					$scope.vs = data.virtualServer;
@@ -130,6 +133,19 @@ module.controller('VsController', function($scope, DataService, $resource,
 			app.appError("响应错误", data);
 		});
 	};
+	//用於select
+	$scope.getInitSelectValue = function(curValue, valueList, propertyName) {
+		var re = curValue;
+		if (propertyName) {
+			if((curValue == null || curValue == '' ) && valueList && valueList.length > 0) 
+				re = valueList[0][propertyName];
+		} else {
+			if((curValue == null || curValue == '' )&& valueList && valueList.length > 0){
+				re =  valueList[0];
+			}
+		}
+		return re;
+	}
 	// 离开页面时，对比一下vs是否发生了修改
 	var onunload = function() {
 		if (vsChanged) {
