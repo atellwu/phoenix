@@ -4,7 +4,7 @@
  * File Created at 2013-10-17
  * 
  */
-package com.dianping.phoenix.lb.service.impl;
+package com.dianping.phoenix.lb.model.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,14 +22,13 @@ import com.dianping.phoenix.lb.model.Availability;
 import com.dianping.phoenix.lb.model.State;
 import com.dianping.phoenix.lb.model.configure.entity.Configure;
 import com.dianping.phoenix.lb.model.configure.entity.Directive;
-import com.dianping.phoenix.lb.model.configure.entity.Instance;
 import com.dianping.phoenix.lb.model.configure.entity.Location;
 import com.dianping.phoenix.lb.model.configure.entity.Member;
 import com.dianping.phoenix.lb.model.configure.entity.Pool;
 import com.dianping.phoenix.lb.model.configure.entity.Strategy;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
-import com.dianping.phoenix.lb.service.ConcurrentControlServiceTemplate;
-import com.dianping.phoenix.lb.service.VirtualServerService;
+import com.dianping.phoenix.lb.model.service.ConcurrentControlServiceTemplate;
+import com.dianping.phoenix.lb.model.service.VirtualServerService;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
 import com.dianping.phoenix.lb.velocity.TemplateManager;
 import com.dianping.phoenix.lb.velocity.VelocityEngineManager;
@@ -285,7 +284,7 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
     }
 
     @Override
-    public String push(final String virtualServerName, final int virtualServerVersion) throws BizException {
+    public String tag(final String virtualServerName, final int virtualServerVersion) throws BizException {
         if (StringUtils.isBlank(virtualServerName)) {
             ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
         }
@@ -294,49 +293,11 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
 
             @Override
             public String doRead() throws BizException {
-                String tagId = virtualServerDao.tag(virtualServerName, virtualServerVersion);
-                VirtualServer tagVs = virtualServerDao.getTag(virtualServerName, tagId);
-                List<Instance> instances = virtualServerDao.find(virtualServerName).getInstances();
-                String nginxConfig = generateNginxConfig(tagVs);
-                pushConfig(nginxConfig, instances);
-                return tagId;
+                return virtualServerDao.tag(virtualServerName, virtualServerVersion);
             }
 
         });
 
-    }
-
-    private void pushConfig(String nginxConfig, List<Instance> instances) {
-        for (Instance instance : instances) {
-            // TODO
-            // 1. commit git
-            // 2. push git
-            // 3. notify pull git
-            // 4. call nginx reload
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.dianping.phoenix.lb.service.VirtualServerService#listPushIds(java
-     * .lang.String)
-     */
-    @Override
-    public List<String> listPushIds(final String virtualServerName) throws BizException {
-        if (StringUtils.isBlank(virtualServerName)) {
-            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
-        }
-
-        return read(new ReadOperation<List<String>>() {
-
-            @Override
-            public List<String> doRead() throws BizException {
-                return virtualServerDao.listTags(virtualServerName);
-            }
-
-        });
     }
 
     @Override
@@ -359,4 +320,87 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
         });
     }
 
+    @Override
+    public String findPrevTagId(final String virtualServerName, final String tagId) throws BizException {
+        if (StringUtils.isBlank(virtualServerName)) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
+        }
+
+        if (StringUtils.isBlank(tagId)) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_TAGID_EMPTY);
+        }
+
+        return read(new ReadOperation<String>() {
+
+            @Override
+            public String doRead() throws BizException {
+                return virtualServerDao.findPrevTagId(virtualServerName, tagId);
+            }
+
+        });
+    }
+
+    @Override
+    public void removeTag(final String virtualServerName, final String tagId) throws BizException {
+        if (StringUtils.isBlank(virtualServerName)) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
+        }
+
+        if (StringUtils.isBlank(tagId)) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_TAGID_EMPTY);
+        }
+
+        read(new ReadOperation<Void>() {
+
+            @Override
+            public Void doRead() throws BizException {
+                virtualServerDao.removeTag(virtualServerName, tagId);
+                return null;
+            }
+
+        });
+    }
+
+    @Override
+    public String findLatestTagId(final String virtualServerName) throws BizException {
+        if (StringUtils.isBlank(virtualServerName)) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
+        }
+
+        return read(new ReadOperation<String>() {
+
+            @Override
+            public String doRead() throws BizException {
+                return virtualServerDao.findLatestTagId(virtualServerName);
+            }
+
+        });
+    }
+
+    @Override
+    public List<String> listTag(final String virtualServerName, final int maxNum) throws BizException {
+        if (StringUtils.isBlank(virtualServerName)) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
+        }
+
+        return read(new ReadOperation<List<String>>() {
+
+            @Override
+            public List<String> doRead() throws BizException {
+                List<String> tags = virtualServerDao.listTags(virtualServerName);
+                if (tags != null && tags.size() < maxNum) {
+                    return tags;
+                } else {
+                    List<String> result = new ArrayList<String>(maxNum);
+                    if (tags != null) {
+                        for (int pos = 0; pos < tags.size() && pos < maxNum; pos++) {
+                            result.add(tags.get(pos));
+                        }
+                    }
+                    return result;
+                }
+            }
+
+        });
+    }
 }

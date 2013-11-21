@@ -4,7 +4,7 @@
  * File Created at 2013-10-17
  * 
  */
-package com.dianping.phoenix.lb.service;
+package com.dianping.phoenix.lb.model.service;
 
 import java.util.List;
 
@@ -28,9 +28,15 @@ public interface VirtualServerService {
 
     String generateNginxConfig(VirtualServer virtualServer) throws BizException;
 
-    String push(String virtualServerName, int virtualServerVersion) throws BizException;
-
-    List<String> listPushIds(String virtualServerName) throws BizException;
+    String tag(String virtualServerName, int virtualServerVersion) throws BizException;
 
     VirtualServer findTagById(String virtualServerName, String tagId) throws BizException;
+
+    String findPrevTagId(String virtualServerName, String tagId) throws BizException;
+
+    void removeTag(String virtualServerName, String tagId) throws BizException;
+
+    String findLatestTagId(String virtualServerName) throws BizException;
+
+    List<String> listTag(String virtualServerName, int maxNum) throws BizException;
 }
