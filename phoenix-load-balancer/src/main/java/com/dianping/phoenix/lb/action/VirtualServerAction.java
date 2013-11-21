@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
-import com.dianping.phoenix.lb.service.VirtualServerService;
+import com.dianping.phoenix.lb.model.service.VirtualServerService;
 import com.dianping.phoenix.lb.utils.JsonBinder;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -73,6 +73,12 @@ public class VirtualServerAction extends ActionSupport {
         return SUCCESS;
     }
 
+    public String deploy() {
+        editOrShow = "edit";
+        return SUCCESS;
+    }
+
+    
     public String get() throws Exception {
         try {
             //获取vs

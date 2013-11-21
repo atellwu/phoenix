@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.model.configure.entity.Strategy;
-import com.dianping.phoenix.lb.service.StrategyService;
+import com.dianping.phoenix.lb.model.service.StrategyService;
 import com.opensymphony.xwork2.ActionSupport;
 
 /**

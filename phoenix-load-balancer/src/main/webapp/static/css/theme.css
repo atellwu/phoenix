@@ -1263,14 +1263,18 @@ span.chooseTipsLine {
 }
 
 .row-fluid #offers .span2 {
-    width: 16%;
+	width: 16%;
 }
 
 .thumbnail {
-    border-radius: 0 0 0 0;
+	border-radius: 0 0 0 0;
 }
 
-.pager a, .pager span {
-    border-radius: 0 0 0 0;
+.pager a,.pager span {
+	border-radius: 0 0 0 0;
 }
 
+.deployBody {
+	background: #fff;
+	background-image: ;
+}

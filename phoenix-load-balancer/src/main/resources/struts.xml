@@ -75,6 +75,13 @@
                 /container.htm
             </result>
         </action>
+        <action name="{virtualServerName}/deploy" class="virtualServerAction"
+            method="deploy">
+            <result name="success" type="velocity">
+                /deploy.htm
+            </result>
+        </action>
+
         <action name="{virtualServerName}" class="virtualServerAction"
             method="show">
             <result name="success" type="velocity">
@@ -104,7 +111,6 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-
 
     </package>
 
