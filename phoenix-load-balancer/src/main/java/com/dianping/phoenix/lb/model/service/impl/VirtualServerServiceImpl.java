@@ -41,7 +41,7 @@ import com.dianping.phoenix.lb.visitor.NginxConfigVisitor;
  */
 @Service
 public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate implements VirtualServerService {
-    
+
     private VirtualServerDao virtualServerDao;
     private StrategyDao      strategyDao;
 
@@ -49,7 +49,7 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
      * @param virtualServerDao
      * @param templateDao
      */
-    @Autowired(required=true)
+    @Autowired(required = true)
     public VirtualServerServiceImpl(VirtualServerDao virtualServerDao, StrategyDao strategyDao) {
         super();
         this.virtualServerDao = virtualServerDao;
@@ -213,6 +213,14 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
             }
         }
 
+        if (StringUtils.isBlank(virtualServer.getName())) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
+        }
+
+        if (virtualServer.getPort() == null) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
+        }
+
         if (!deafultPoolExist) {
             ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_DEFAULTPOOL_NOT_EXISTS,
                     virtualServer.getDefaultPoolName());
@@ -234,6 +242,15 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
                 ExceptionUtils.throwBizException(MessageID.POOL_NO_MEMBER, pool.getName());
             }
 
+            for (Member member : pool.getMembers()) {
+                if (StringUtils.isBlank(member.getName())) {
+                    ExceptionUtils.throwBizException(MessageID.POOL_MEMBER_NO_NAME);
+                }
+                if (StringUtils.isBlank(member.getIp())) {
+                    ExceptionUtils.throwBizException(MessageID.POOL_MEMBER_NO_IP, member.getName());
+                }
+            }
+
             int availMemberCount = 0;
             for (Member member : pool.getMembers()) {
                 if (member.getAvailability() == Availability.AVAILABLE && member.getState() == State.ENABLED) {
@@ -250,6 +267,18 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
         for (Location location : virtualServer.getLocations()) {
 
             boolean proxyPassExists = false;
+
+            if (StringUtils.isBlank(location.getPattern())) {
+                ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_LOCATION_NO_PATTERN);
+            }
+
+            if (StringUtils.isBlank(location.getMatchType())) {
+                ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_LOCATION_NO_MATCHTYPE);
+            }
+
+            if (location.getDirectives().size() == 0) {
+                ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_LOCATION_NO_DIRECTIVE, location.getPattern());
+            }
 
             for (Directive directive : location.getDirectives()) {
                 if (!TemplateManager.INSTANCE.availableFiles("directive").contains(directive.getType())) {
