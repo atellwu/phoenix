@@ -146,6 +146,12 @@ module.controller('VsController', function($scope, DataService, $resource,
 		}
 		return re;
 	}
+	$scope.edit = function(){
+		window.location = window.contextpath + '/' +$scope.vs.name + '/edit' + window.location.hash;
+	}
+	$scope.cancleEdit = function(){
+		window.location = window.contextpath + '/' +$scope.vs.name + window.location.hash;
+	}
 	// 离开页面时，对比一下vs是否发生了修改
 	var onunload = function() {
 		if (vsChanged) {
