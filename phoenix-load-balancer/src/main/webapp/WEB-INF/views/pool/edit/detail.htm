@@ -22,7 +22,7 @@
       <label class="control-label" for="inputEmail">最小活动节点占比</label>
       <div class="controls">
         <div class="input-append">
-          <input class="" ng-model="poolEditing.minAvailableMemberPercentage" type="text" placeholder="输入1-100的数值"> <span
+          <input ng-trim="true" class="" ng-model="poolEditing.minAvailableMemberPercentage" type="text" placeholder="输入1-100的数值"> <span
             class="add-on">%</span>
         </div>
       </div>
@@ -48,12 +48,12 @@
       </thead>
       <tbody>
         <tr ng-repeat="member in poolEditing.members">
-          <td><input class="input-small" ng-model="member.name" type="text"></td>
-          <td><input class="input-small" ng-model="member.ip" type="text"></td>
-          <td><input class="input-mini" ng-model="member.port" type="text"></td>
-          <td><input class="input-mini" ng-model="member.weight" type="text"></td>
-          <td><input class="input-mini" ng-model="member.maxFails" type="text"></td>
-          <td><input class="input-mini" ng-model="member.failTimeout" type="text"></td>
+          <td><input ng-trim="true" class="input-small" ng-model="member.name" type="text"></td>
+          <td><input ng-trim="true" class="input-small" ng-model="member.ip" type="text"></td>
+          <td><input ng-trim="true" class="input-mini" ng-model="member.port" type="text"></td>
+          <td><input ng-trim="true" class="input-mini" ng-model="member.weight" type="text"></td>
+          <td><input ng-trim="true" class="input-mini" ng-model="member.maxFails" type="text"></td>
+          <td><input ng-trim="true" class="input-mini" ng-model="member.failTimeout" type="text"></td>
           <td><label class="radio inline"> <input ng-model="member.state" type="radio"
               value="ENABLED"> ENABLED
           </label> <label class="radio inline"> <input ng-model="member.state" type="radio" value="DISABLED">
