@@ -21,10 +21,13 @@ public enum MessageID {
     VIRTUALSERVER_NOT_EXISTS("vs_not_exists"), //
     VIRTUALSERVER_DEL_FAIL("vs_del_fail"), //
     VIRTUALSERVER_NAME_EMPTY("vs_name_empty"), //
+    VIRTUALSERVER_PORT_EMPTY("vs_port_empty"), //
     VIRTUALSERVER_TAGID_EMPTY("vs_pushid_empty"), //
     VIRTUALSERVER_DEFAULTPOOL_NOT_EXISTS("vs_defaultpool_not_exists"), //
     VIRTUALSERVER_DIRECTIVE_TYPE_NOT_SUPPORT("vs_directive_type_not_support"), //
-    VIRTUALSERVER_LOCATION_NO_DOMAIN("vs_location_no_domain"), //
+    VIRTUALSERVER_LOCATION_NO_DIRECTIVE("vs_location_no_directive"), //
+    VIRTUALSERVER_LOCATION_NO_PATTERN("vs_location_no_pattern"), //
+    VIRTUALSERVER_LOCATION_NO_MATCHTYPE("vs_location_no_matchtype"), //
     VIRTUALSERVER_STRATEGY_NOT_SUPPORT("vs_strategy_not_support"), //
     VIRTUALSERVER_TAG_FAIL("vs_tag_fail"), //
     VIRTUALSERVER_TAG_LOAD_FAIL("vs_tag_load_fail"), //
@@ -33,6 +36,8 @@ public enum MessageID {
 
     POOL_LOWER_THAN_MINAVAIL_PCT("pool_lower_than_minavail_pct"), //
     POOL_NO_MEMBER("pool_no_member"), //
+    POOL_MEMBER_NO_NAME("pool_member_no_name"), //
+    POOL_MEMBER_NO_IP("pool_member_no_ip"), //
 
     PROXY_PASS_MORE_THAN_ONE("proxy_pass_more_than_one"), //
 
