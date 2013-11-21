@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.List;
@@ -810,8 +809,6 @@ public class LocalFileModelStoreTest {
 
         List<String> wwwTagIds = store.listTagIds("www");
         List<String> tuangouTagIds = store.listTagIds("tuangou");
-        Collections.sort(wwwTagIds);
-        Collections.sort(tuangouTagIds);
 
         Assert.assertArrayEquals(new String[] { "www-1", "www-2" }, wwwTagIds.toArray(new String[0]));
         Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3" },
@@ -822,8 +819,6 @@ public class LocalFileModelStoreTest {
 
         wwwTagIds = store.listTagIds("www");
         tuangouTagIds = store.listTagIds("tuangou");
-        Collections.sort(wwwTagIds);
-        Collections.sort(tuangouTagIds);
 
         Assert.assertArrayEquals(new String[] { "www-1", "www-2", "www-3" }, wwwTagIds.toArray(new String[0]));
         Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3", "tuangou-4" },
@@ -915,8 +910,6 @@ public class LocalFileModelStoreTest {
 
         List<String> wwwTagIds = store.listTagIds("www");
         List<String> tuangouTagIds = store.listTagIds("tuangou");
-        Collections.sort(wwwTagIds);
-        Collections.sort(tuangouTagIds);
 
         Assert.assertArrayEquals(new String[] { "www-1", "www-2", "www-3", "www-4" }, wwwTagIds.toArray(new String[0]));
         Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3" },
@@ -970,7 +963,6 @@ public class LocalFileModelStoreTest {
         Assert.assertFalse(new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/configure_www.xml_4").exists());
 
         List<String> tagIds = store.listTagIds("www");
-        Collections.sort(tagIds);
         Assert.assertArrayEquals(new String[]{"www-1", "www-3"}, tagIds.toArray());
         Assert.assertEquals( "www-3", store.findLatestTagId("www"));
         

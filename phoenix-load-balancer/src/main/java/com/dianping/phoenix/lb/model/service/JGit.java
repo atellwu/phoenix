@@ -1,4 +1,4 @@
-package com.dianping.phoenix.lb.service;
+package com.dianping.phoenix.lb.model.service;
 
 import java.io.File;
 import java.io.FileWriter;

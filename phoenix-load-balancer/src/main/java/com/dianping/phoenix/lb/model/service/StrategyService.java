@@ -4,7 +4,7 @@
  * File Created at 2013-10-17
  * 
  */
-package com.dianping.phoenix.lb.service;
+package com.dianping.phoenix.lb.model.service;
 
 import java.util.List;
 

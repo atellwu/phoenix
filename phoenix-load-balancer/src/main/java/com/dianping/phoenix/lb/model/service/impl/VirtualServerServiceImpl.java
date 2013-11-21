@@ -4,7 +4,7 @@
  * File Created at 2013-10-17
  * 
  */
-package com.dianping.phoenix.lb.service.impl;
+package com.dianping.phoenix.lb.model.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +27,8 @@ import com.dianping.phoenix.lb.model.configure.entity.Member;
 import com.dianping.phoenix.lb.model.configure.entity.Pool;
 import com.dianping.phoenix.lb.model.configure.entity.Strategy;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
-import com.dianping.phoenix.lb.service.ConcurrentControlServiceTemplate;
-import com.dianping.phoenix.lb.service.VirtualServerService;
+import com.dianping.phoenix.lb.model.service.ConcurrentControlServiceTemplate;
+import com.dianping.phoenix.lb.model.service.VirtualServerService;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
 import com.dianping.phoenix.lb.velocity.TemplateManager;
 import com.dianping.phoenix.lb.velocity.VelocityEngineManager;
@@ -377,4 +377,30 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
         });
     }
 
+    @Override
+    public List<String> listTag(final String virtualServerName, final int maxNum) throws BizException {
+        if (StringUtils.isBlank(virtualServerName)) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
+        }
+
+        return read(new ReadOperation<List<String>>() {
+
+            @Override
+            public List<String> doRead() throws BizException {
+                List<String> tags = virtualServerDao.listTags(virtualServerName);
+                if (tags != null && tags.size() < maxNum) {
+                    return tags;
+                } else {
+                    List<String> result = new ArrayList<String>(maxNum);
+                    if (tags != null) {
+                        for (int pos = 0; pos < tags.size() && pos < maxNum; pos++) {
+                            result.add(tags.get(pos));
+                        }
+                    }
+                    return result;
+                }
+            }
+
+        });
+    }
 }
