@@ -218,7 +218,7 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
         }
 
         if (virtualServer.getPort() == null) {
-            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_PORT_EMPTY);
         }
 
         if (!deafultPoolExist) {
