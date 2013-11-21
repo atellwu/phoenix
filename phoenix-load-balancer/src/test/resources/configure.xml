@@ -27,7 +27,7 @@
                 <directive type="return" response-code="403" />
             </location>
             <location match-type="prefix" pattern="/shanghai">
-                <directive type="accesslog" path="logs/access.log" format="main" />
+                <directive type="access_log" path="logs/access.log" format="main" />
                 <directive type="rewrite" matches="^(/shanghai/.*)/media/(.*)\..*$" target-pattern="$1/mp3/$2.mp3" flag="break" />
                 <directive type="proxy_pass" pool-name="Web.Tuangou" />
             </location>
