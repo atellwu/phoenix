@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+
+    <!-- struts2中改变struts.xml默认路径, 这些本来struts会自动加载的文件，需要手动加载include。参考：http://my.oschina.net/jawayjiang/blog/88077 -->
+    <include file="struts-default.xml" />
+    <include file="struts-plugin.xml" />
+
+    <constant name="struts.velocity.toolboxlocation" value="WEB-INF/velocity/toolbox.xml" />
+    <constant name="struts.velocity.configfile" value="WEB-INF/velocity/velocity.properties" />
+
+    <constant name="struts.action.extension" value="" />
+    <constant name="struts.custom.properties" value="classpath:/struts.properties" />
+    <constant name="struts.objectFactory"
+        value="org.apache.struts2.spring.StrutsSpringObjectFactory" />
+    <constant name="struts.patternMatcher" value="namedVariable" />
+    <constant name="struts.action.excludePattern" value="favicon.ico,.*/static/.*" />
+
+    <constant name="struts.enable.SlashesInActionNames" value="true" />
+    <constant name="struts.mapper.alwaysSelectFullNamespace"
+        value="false" />
+    <constant name="struts.patternMatcher" value="regex" />
+
+    <package name="softbalance" namespace="/" extends="json-default">
+
+        <result-types>
+            <result-type name="velocity"
+                class="com.dianping.phoenix.lb.action.VelocityLayoutResult" />
+        </result-types>
+        <!-- Result fragment -->
+
+        <interceptors>
+            <interceptor-stack name="myStack">
+                <interceptor-ref name="timer" />
+                <interceptor-ref name="logger" />
+                <interceptor-ref name="defaultStack" />
+            </interceptor-stack>
+        </interceptors>
+
+        <action name="" class="virtualServerAction" method="index">
+            <result name="redirect" type="redirect">
+                <param name="location">${virtualServerName}</param>
+            </result>
+            <result name="noneVs" type="velocity">
+                /none_vs.htm
+            </result>
+        </action>
+        <action name="{virtualServerName}/save" class="virtualServerAction"
+            method="save">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="{virtualServerName}/get" class="virtualServerAction"
+            method="get">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="{virtualServerName}/remove" class="virtualServerAction"
+            method="remove">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="{virtualServerName}/edit" class="virtualServerAction"
+            method="edit">
+            <result name="success" type="velocity">
+                /container.htm
+            </result>
+        </action>
+        <action name="{virtualServerName}/deploy" class="virtualServerAction"
+            method="deploy">
+            <result name="success" type="velocity">
+                /deploy.htm
+            </result>
+        </action>
+
+        <action name="{virtualServerName}" class="virtualServerAction"
+            method="show">
+            <result name="success" type="velocity">
+                /container.htm
+            </result>
+        </action>
+
+
+        <action name="base/propertiesDefinedInputs" class="definedInputAction">
+            <result name="success" type="json">
+                <param name="root">propertiesDefinedInputs</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+
+        <action name="base/directiveDefinedInputs" class="definedInputAction">
+            <result name="success" type="json">
+                <param name="root">directiveDefinedInputs</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+
+        <action name="base/strategies" class="strategyAction"
+            method="strategies">
+            <result name="success" type="json">
+                <param name="root">strategies</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+
+    </package>
+
+</struts>

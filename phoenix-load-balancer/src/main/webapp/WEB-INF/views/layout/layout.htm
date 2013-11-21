@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>#parse("common/header.htm")
+</head>
+<!--[if lt IE 7 ]> <body class="ie ie6"> <![endif]-->
+<!--[if IE 7 ]> <body class="ie ie7 "> <![endif]-->
+<!--[if IE 8 ]> <body class="ie ie8 "> <![endif]-->
+<!--[if IE 9 ]> <body class="ie ie9 "> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<body class="">
+  <!--<![endif]-->
+
+  #parse("common/navbar.htm") #parse("common/sidebar.htm") $screen_content
+<!-- 添加站点 -->
+<div aria-hidden="true" role="dialog" class="modal hide" id="addVirtualServerModal" style="display: none;">
+  <div class="modal-header">
+    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+    <h3>添加新站点</h3>
+  </div>
+  <div class="modal-body">
+    <h6 style="text-align: center;">此处填写新站点名称</h6>
+    <div id="addVirtualServerAlertDiv"></div>
+    <form class="form-horizontal" onsubmit="return false;">
+      <div class="control-group">
+        <label class="control-label">站点名</label>
+        <div class="controls">
+          <div class="input-prepend">
+            <span class="add-on"></span><input id="addVirtualServerName" onkeyup="if(event.keyCode==13)app.addVirtualServer()" type="text" class="input-small"
+              placeholder="">
+          </div>
+          <span class="muted">（必填）</span>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" onclick="app.addVirtualServer()" class="btn btn-primary">确定</button>
+    <button type="button" data-dismiss="modal" class="btn">取消</button>
+  </div>
+</div>
+  <!-- 成功的消息条 -->
+  <div style="display: none" id="alert_success">
+    <div class="alert alert-success">
+      <button type="button" class="close" data-dismiss="alert"><i class="icon-remove icon-white"></i></button>
+      <span style="text-align: center;"><i class="icon-ok-sign"></i>&nbsp; <span></span></span>
+    </div>
+  </div>
+  <!-- 错误消息条 -->
+  <div style="display: none" id="alert_error">
+    <div class="alert alert-error">
+      <button type="button" class="close" data-dismiss="alert"><i class="icon-remove icon-white"></i></button>
+      <span style="text-align: center;"><i class="icon-info-sign"></i>&nbsp; <span></span></span>
+    </div>
+  </div>
+  <!-- 警告的消息条 -->
+  <div style="display: none" id="alert_warn">
+    <div class="alert alert-warn">
+      <button type="button" class="close" data-dismiss="alert"><i class="icon-remove icon-white"></i></button>
+      <span style="text-align: center;"><i class="icon-exclamation-sign"></i>&nbsp; <span></span></span>
+    </div>
+  </div>
+  <!-- 错误消息弹出框 -->
+  <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" class="modal hide" id="errorMsg"
+    style="display: none;">
+    <div class="modal-header">
+      <button aria-hidden="true" data-dismiss="modal" class="close" type="button"><i class="icon-remove"></i></button>
+      <h3></h3>
+    </div>
+    <div class="modal-body">
+      <p style="text-align: center"></p>
+    </div>
+    <div class="modal-footer">
+      <button data-dismiss="modal" class="btn btn-info">关闭</button>
+    </div>
+  </div>
+  <script src="${contextPath}/static/js/jquery-1.7.2.min.js" type="text/javascript"></script>
+  <script src="${contextPath}/static/js/angular.min.js" type="text/javascript" ng:autobind></script>
+  <script src="${contextPath}/static/js/angular-resource.min.js" type="text/javascript"></script>
+  ##<script src="${contextPath}/static/js/angular-route.min.js"></script>
+  ##<script src="${contextPath}/static/js/sammy-0.7.4.min.js"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/jquery.dateFormat-1.0.min.js"></script>
+  <script src="${contextPath}/static/js/bs.min.js"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/s2.min.js"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/application.js?t=20130623"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/myangular-base.js?t=20130623"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/myangular-profile.js?t=20130623"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/myangular-pool.js?t=20130623"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/myangular-location.js?t=20130623"></script>
+
+  <!-- HTML5 shim, for IE6-8 support of HTML elements -->
+  <!--[if lt IE 9]>
+    <script src="${contextPath}/static/js/html5.js"></script>
+   <![endif]-->
+  <script type="text/javascript">
+                $("[rel=tooltip]").tooltip();
+                $(document).ready(function() {
+                	##parse("${tabName}/initJs.htm")
+                	angular.element($('#VsController')).scope().getVs('${virtualServerName}');
+                });
+               </script>
+
+
+
+</body>
+</html>

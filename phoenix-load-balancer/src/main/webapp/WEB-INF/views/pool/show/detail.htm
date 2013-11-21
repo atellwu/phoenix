@@ -1,0 +1,91 @@
+<div ng-show="poolEditing">
+  <a style="float: right; margin-right: 30px;" href="javascript:;" ng-click="switchPoolList();"> <i
+    class="icon-reply"></i> 返回集群列表
+  </a>
+  <h5 style="margin-top: 30px">集群基本信息</h5>
+  <form class="form-horizontal" style="margin-top: 30px;">
+    <div class="control-group">
+      <label class="control-label">集群名</label>
+      <div class="controls">
+        <label class="checkbox"> <span>{{ poolEditing.name }}</span>
+        </label>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="inputPassword">负载均衡策略</label>
+      <div class="controls">
+        <select disabled class="span2" ng-model="poolEditing.loadbalanceStrategyName"
+          ng-options="item.name as item.name for item in strategies"></select>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="inputEmail">最小活动节点占比</label>
+      <div class="controls">
+        <div class="input-append">
+          <input disabled class="" ng-model="poolEditing.minAvailableMemberPercentage" type="text" placeholder="输入1-100的数值"> <span
+            class="add-on">%</span>
+        </div>
+      </div>
+    </div>
+    <br>
+    <h5 style="margin-top: 0px">集群节点管理</h5>
+    <table class="table table-bordered" style="width: 100%">
+      <thead>
+        <tr>
+          <th style="min-width: 120px">节点名称</th>
+          <th>IP</th>
+          <th>端口</th>
+          <th>权重</th>
+          <th>最大失败次数</th>
+          <th>失败超时时间</th>
+          <th>状态</th>
+          <th style="width: 130px;">状态控制</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="member in poolEditing.members">
+          <td><input disabled class="input-small" ng-model="member.name" type="text"></td>
+          <td><input disabled class="input-small" ng-model="member.ip" type="text"></td>
+          <td><input disabled class="input-mini" ng-model="member.port" type="text"></td>
+          <td><input disabled class="input-mini" ng-model="member.weight" type="text"></td>
+          <td><input disabled class="input-mini" ng-model="member.maxFails" type="text"></td>
+          <td><input disabled class="input-mini" ng-model="member.failTimeout" type="text"></td>
+          <td><label class="radio inline"> <input disabled ng-model="member.state" type="radio"
+              value="ENABLED"> ENABLED
+          </label> <label class="radio inline"> <input disabled ng-model="member.state" type="radio" value="DISABLED">
+              DISABLED
+          </label>
+          <label class="radio inline"> <input disabled ng-model="member.state" type="radio" value="FORCED_OFFLINE">
+              FORCED_OFFLINE
+          </label>
+          </td>
+          <td><label class="radio inline"> <input disabled ng-model="member.availability" type="radio"
+              value="OFFLINE"> OFFLINE
+          </label> <label class="radio inline"> <input disabled ng-model="member.availability" type="radio" value="AVAILABLE">
+              AVAILABLE
+          </label></td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</div>
+
+<!-- 确认删除member的对话框 -->
+<div aria-hidden="true" data-backdrop="true" role="dialog" tabindex="-1" class="modal hide" id="affirmRemoveMemberModal"
+  style="display: none;">
+  <div class="modal-header">
+    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+    <h3>确认操作</h3>
+  </div>
+  <div class="modal-body">
+    <p style="text-align: center;">
+      <i class="icon-warning-sign"></i> 您是否确定要删除该节点
+      <span>{{memberToBeRemove.name}}</span>
+      ？
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button ng-click="removeMember();" class="btn btn-primary">确定</button>
+    <button data-dismiss="modal" class="btn">取消</button>
+  </div>
+</div>
