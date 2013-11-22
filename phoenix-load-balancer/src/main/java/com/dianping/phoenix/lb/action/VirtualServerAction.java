@@ -28,6 +28,8 @@ public class VirtualServerAction extends ActionSupport {
 
     private static final int     ERRORCODE_SUCCESS     = 0;
 
+    private static final int     ERRORCODE_PARAM_ERROR = -2;
+
     private static final int     ERRORCODE_INNER_ERROR = -1;
 
     private static final Logger  LOG                   = LoggerFactory.getLogger(VirtualServerAction.class);
@@ -78,7 +80,6 @@ public class VirtualServerAction extends ActionSupport {
         return SUCCESS;
     }
 
-    
     public String get() throws Exception {
         try {
             //获取vs
@@ -89,11 +90,11 @@ public class VirtualServerAction extends ActionSupport {
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Bussiness Error." + e.getMessage());
+            LOG.error("Bussiness Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error." + e.getMessage());
+            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
@@ -122,11 +123,11 @@ public class VirtualServerAction extends ActionSupport {
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Bussiness Error." + e.getMessage());
+            LOG.error("Bussiness Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error." + e.getMessage());
+            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
@@ -147,11 +148,11 @@ public class VirtualServerAction extends ActionSupport {
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Bussiness Error." + e.getMessage());
+            LOG.error("Bussiness Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error." + e.getMessage());
+            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
@@ -162,6 +163,34 @@ public class VirtualServerAction extends ActionSupport {
 
     public String getVirtualServerList() {
         virtualServers = virtualServerService.listVirtualServers();
+        return SUCCESS;
+    }
+
+    public String preview() throws Exception {
+        try {
+            String vsJson = IOUtils.toString(ServletActionContext.getRequest().getInputStream());
+            if (StringUtils.isBlank(vsJson)) {
+                throw new IllegalArgumentException("vs 参数不能为空！");
+            }
+            VirtualServer virtualServer = JsonBinder.getNonNullBinder().fromJson(vsJson, VirtualServer.class);
+
+            String nginxConfig = virtualServerService.generateNginxConfig(virtualServer);
+
+            dataMap.put("nginxConfig", nginxConfig);
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (BizException e) {
+            dataMap.put("errorCode", e.getMessageId());
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Bussiness Error: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Param Error: " + e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
+        }
         return SUCCESS;
     }
 

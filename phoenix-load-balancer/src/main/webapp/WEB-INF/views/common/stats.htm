@@ -1,5 +1,14 @@
+<p class="stat" ng-show="editOrShow=='show'">
+  <a ng-href="${contextPath}/{{vs.name}}/deploy" target="_blank"><span style="color: #6c7a95" class="number"><i
+      class="icon-external-link"></i> 发布</span></a>
+</p>
+<p class="stat" ng-show="editOrShow=='show'">
+  <a ng-href="${contextPath}/{{vs.name}}/deploy" target="_blank"><span style="color: #6c7a95" class="number"><i
+      class="icon-tag"></i> 创建Tag</span></a>
+</p>
 <p class="stat">
-  <a ng-href="${contextPath}/{{vs.name}}/deploy" target="_blank"><span style="color: #6c7a95" class="number">发布</span></a>
+  <a href="javascript:;" ng-click="preview()" title="预览当前生成的 nginx config 文件"><span style="color: #6c7a95" class="number"><i
+      class="icon-eye-open"></i> 预览</span></a>
 </p>
 <!-- 删除站点 -->
 <div aria-hidden="true" role="dialog" class="modal hide" id="removeVirtualServerModal" style="display: none;">
@@ -12,7 +21,7 @@
     <div id="removeVirtualServerAlertDiv"></div>
     <form class="form-horizontal" onsubmit="return false;">
       <div class="control-group">
-        <label class="control-label" style="width:230px;">为确保无误，请输入该站点名：</label>
+        <label class="control-label" style="width: 230px;">为确保无误，请输入该站点名：</label>
         <div class="controls">
           <div class="input-prepend">
             <span class="add-on"></span><input id="removeVirtualServerName" type="text" class="input-small"
@@ -28,5 +37,21 @@
     <button type="button" ng-show="removeVirtualServerName==vs.name" ng-click="removeVirtualServer()"
       class="btn btn-primary">确定</button>
     <button type="button" data-dismiss="modal" class="btn">取消</button>
+  </div>
+</div>
+<!-- 预览 -->
+<div aria-hidden="false" role="dialog" data-backdrop="true" class="modal hide" id="previewVirtualServerModal"
+  style="width: 900px; margin: 0 0 0 0;">
+  <div class="modal-header">
+    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+    <h3>预览 (只读)</h3>
+  </div>
+  <div class="modal-body">
+    <div id="previewVirtualServerAlertDiv"></div>
+    <div id="nginxConfigEditor"
+      style="width:840px;height:80%;margin-top:-10px;border: 1px solid #A9E2F3;"></div>
+  </div>
+  <div class="modal-footer">
+    <button style="margin-right:15px" type="button" data-dismiss="modal" class="btn">关闭</button>
   </div>
 </div>

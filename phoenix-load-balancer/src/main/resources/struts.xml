@@ -81,6 +81,13 @@
                 /deploy.htm
             </result>
         </action>
+        <action name="{virtualServerName}/preview" class="virtualServerAction"
+            method="preview">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
 
         <action name="{virtualServerName}" class="virtualServerAction"
             method="show">

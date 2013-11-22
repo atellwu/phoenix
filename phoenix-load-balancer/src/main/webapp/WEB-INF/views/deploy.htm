@@ -1,77 +1,75 @@
 #set($layout = "deployLayout.htm")
-<div class="row" style="padding: 50px;">
+<div class="row" style="padding: 20px 100px 0 100px;">
   <span style="color: #585858; font-size: 14px">代码演示</span>
   <hr style="margin-top: 0px; margin-bottom: 5px">
   <div class="container-fluid">
     <div class="row-fluid">
-      <div class="span7">
+      <div class="span6">
+        <button id="runButton" style="float: right; margin-bottom: 10px; margin-right: 0px;" type="button"
+          onclick="rundemo_app.runDemo()" class="btn btn-success">发布</button>
+        <button id="shutdownButton" type="button" onclick="rundemo_app.shutdown()" class="btn btn-danger"
+          style="display: none;">Shutdown</button>
         <div class="control-group">
           <label class="control-label">当前状态</label>
           <div class="controls">
-            <label class="checkbox"> <span class="label label-important ng-binding">待询问jinhua</span>
+            <label class="checkbox"> <span class="label label-important">{{ getVsState() }}</span>
             </label>
           </div>
         </div>
         <div class="control-group">
           <label class="control-label">状态控制</label>
           <div class="controls">
-            <label class="radio inline"> <input disabled="" ng-model="vs.state" type="radio" value="ENABLED"
-              class="ng-pristine ng-valid" name="006"> ENABLED
-            </label> <label class="radio inline"> <input disabled="" ng-model="vs.state" type="radio" value="DISABLED"
-              class="ng-pristine ng-valid" name="007"> DISABLED
-            </label> <label class="radio inline"> <input disabled="" ng-model="vs.state" type="radio"
-              value="FORCED_OFFLINE" class="ng-pristine ng-valid" name="008"> FORCED_OFFLINE
+            <label class="radio inline"> <input ng-model="vs.state" type="radio" value="ENABLED">
+              ENABLED
+            </label> <label class="radio inline"> <input ng-model="vs.state" type="radio" value="DISABLED">
+              DISABLED
+            </label> <label class="radio inline"> <input ng-model="vs.state" type="radio" value="FORCED_OFFLINE">
+              FORCED_OFFLINE
             </label>
           </div>
         </div>
         <div class="control-group">
           <label class="control-label">可用性控制</label>
           <div class="controls">
-            <label class="radio inline"> <input disabled="" ng-model="vs.availability" type="radio"
-              value="OFFLINE" class="ng-pristine ng-valid" name="009"> OFFLINE
-            </label> <label class="radio inline"> <input disabled="" ng-model="vs.availability" type="radio"
-              value="AVAILABLE" class="ng-pristine ng-valid" name="00A"> AVAILABLE
+            <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="AVAILABLE">
+              AVAILABLE
+            </label> <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="OFFLINE">
+              OFFLINE
             </label>
           </div>
         </div>
         <div class="control-group">
           <label class="control-label" for="">域名</label>
           <div class="controls">
-            <input disabled="" type="text" ng-model="vs.domain" placeholder="domain" class="ng-pristine ng-valid">
+            <input ng-trim="true" type="text" ng-model="vs.domain" placeholder="输入站点的域名">
           </div>
         </div>
         <div class="control-group">
           <label class="control-label" for="inputEmail">端口</label>
           <div class="controls">
-            <input disabled="" type="text" ng-model="vs.port" placeholder="domain" class="ng-pristine ng-valid">
+            <input ng-trim="true" type="text" ng-model="vs.port" placeholder="输入站点的端口号">
           </div>
         </div>
         <div class="control-group">
           <label class="control-label" for="">默认Pool名</label>
           <div class="controls">
-            <select disabled="" ng-model="vs.defaultPoolName" ng-options="pool.name as pool.name for pool in vs.pools"
-              class="ng-pristine ng-valid"><option value="0" selected="selected">Web.Index</option></select>
+            <select ng-model="vs.defaultPoolName" ng-options="pool.name as pool.name for pool in vs.pools">
+              <option value="">-- 选择集群 --</option>
+            </select>
           </div>
         </div>
         <div class="control-group">
-          <label class="control-label" for="">目标nginx机器ip</label>
-          <!-- ngRepeat: instance in vs.instances -->
-          <div class="controls ng-scope" style="margin-bottom: 10px" ng-repeat="instance in vs.instances">
-            <input class="input-small ng-pristine ng-valid" disabled="" ng-model="instance.ip" type="text">
+          <a style="float: right; margin-right: 0px" ng-click="addInstance();" href="javascript:;"><i
+            class="icon-plus"></i> 添加</a> <label class="control-label" for="">目标nginx机器ip</label>
+          <div class="controls" style="margin-bottom: 10px" ng-repeat="instance in vs.instances">
+            <input ng-trim="true" class="input-small" ng-model="instance.ip" type="text">&nbsp;&nbsp; <a
+              href="javascript:;" ng-click="removeInstance($index);"><i class="icon-remove"></i></a>
           </div>
-          <!-- end ngRepeat: instance in vs.instances -->
-          <div class="controls ng-scope" style="margin-bottom: 10px" ng-repeat="instance in vs.instances">
-            <input class="input-small ng-pristine ng-valid" disabled="" ng-model="instance.ip" type="text">
-          </div>
-          <!-- end ngRepeat: instance in vs.instances -->
         </div>
       </div>
-      <div class="span5">
-        <button id="runButton" type="button" onclick="rundemo_app.runDemo()" class="btn btn-success">Run</button>
-        <button id="shutdownButton" type="button" onclick="rundemo_app.shutdown()" class="btn btn-danger"
-          style="display: none;">Shutdown</button>
+      <div class="span6">
         <pre
-          style="cursor: text; margin-top: 20px; background-color: #3A1042; color: #FFFFFF; font-size: 12px; width: 100%; height: 320px; overflow-x: auto;"
+          style="cursor: text; margin-top: 20px; background-color: #3A1042; color: #FFFFFF; font-size: 12px; width: 100%; height: 420px; overflow-x: auto;"
           id="console"></pre>
         <span style="float: right; font-size: 9px;">.Console.</span> <input id="consoleInput" type="text"
           class="input-xlarge" onkeypress="rundemo_app.input(event);" placeholder="console input">
