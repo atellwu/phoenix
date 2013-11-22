@@ -14,6 +14,8 @@ import java.util.Arrays;
  */
 public class Constants {
     public static String   DEPLOY_SUMMARY            = "summary";
+    public static String   ENV_DEV                   = "dev";
+    public static String   ENV_PRODUCT               = "product";
 
     public static String   LOCATION_MATCHTYPE_PREFIX = "prefix";
     public static String   LOCATION_MATCHTYPE_REGEX  = "regex";

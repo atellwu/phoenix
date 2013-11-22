@@ -6,4 +6,7 @@
    <model package="com.dianping.phoenix.lb.model.deploy" name="deploy">
       <sample-model>src/test/resources/deploy/deploy.xml</sample-model>
    </model>
+   <model package="com.dianping.phoenix.lb.config" name="runtime-config">
+      <sample-model>src/test/resources/runtime-config.xml</sample-model>
+   </model>
 </wizard>

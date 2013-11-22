@@ -152,6 +152,7 @@
 							<manifest><![CDATA[
 							${basedir}/src/main/resources/META-INF/dal/model/configure-manifest.xml,
 							${basedir}/src/main/resources/META-INF/dal/model/deploy-manifest.xml,
+							${basedir}/src/main/resources/META-INF/dal/model/runtime-config-manifest.xml,
 							]]></manifest>
 						</configuration>
 					</execution>
