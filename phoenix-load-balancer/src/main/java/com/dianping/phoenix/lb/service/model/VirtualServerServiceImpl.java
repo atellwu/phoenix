@@ -4,7 +4,7 @@
  * File Created at 2013-10-17
  * 
  */
-package com.dianping.phoenix.lb.model.service.impl;
+package com.dianping.phoenix.lb.service.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,8 +28,6 @@ import com.dianping.phoenix.lb.model.configure.entity.Member;
 import com.dianping.phoenix.lb.model.configure.entity.Pool;
 import com.dianping.phoenix.lb.model.configure.entity.Strategy;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
-import com.dianping.phoenix.lb.model.service.ConcurrentControlServiceTemplate;
-import com.dianping.phoenix.lb.model.service.VirtualServerService;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
 import com.dianping.phoenix.lb.velocity.TemplateManager;
 import com.dianping.phoenix.lb.velocity.VelocityEngineManager;

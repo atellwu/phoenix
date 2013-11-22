@@ -42,6 +42,11 @@ public enum MessageID {
     PROXY_PASS_MORE_THAN_ONE("proxy_pass_more_than_one"), //
 
     TAG_REMOVE_NOT_FOUND("tag_remove_not_found"), //
+    
+    DEPLOY_FIND_ACTIVE_DEPLOY_FAIL("deploy_find_active_deploy_fail"),//
+    DEPLOY_ALREADY_RUNNING("deploy_already_running"),
+    DEPLOY_EXCEPTION("deploy_exception");
+    
 
     ;
 

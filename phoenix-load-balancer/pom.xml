@@ -149,7 +149,10 @@
 							<goal>dal-model</goal>
 						</goals>
 						<configuration>
-							<manifest><![CDATA[${basedir}/src/main/resources/META-INF/dal/model/configure-manifest.xml,]]></manifest>
+							<manifest><![CDATA[
+							${basedir}/src/main/resources/META-INF/dal/model/configure-manifest.xml,
+							${basedir}/src/main/resources/META-INF/dal/model/deploy-manifest.xml,
+							]]></manifest>
 						</configuration>
 					</execution>
 					<execution>

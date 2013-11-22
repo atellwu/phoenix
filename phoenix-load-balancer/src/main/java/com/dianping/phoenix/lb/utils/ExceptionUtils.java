@@ -26,7 +26,7 @@ public class ExceptionUtils {
     }
 
     public static void logAndRethrowBizException(Throwable e) throws BizException {
-        log.error(e.getMessage(),e);
+        log.error(e.getMessage(), e);
         throw new BizException(e);
     }
 

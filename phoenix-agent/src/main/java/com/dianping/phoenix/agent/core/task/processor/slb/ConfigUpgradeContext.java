@@ -5,7 +5,6 @@ import org.unidal.lookup.annotation.Inject;
 import com.dianping.cat.Cat;
 import com.dianping.phoenix.agent.core.shell.ScriptExecutor;
 import com.dianping.phoenix.agent.core.task.Task;
-import com.dianping.phoenix.agent.core.task.processor.kernel.DeployTask;
 import com.dianping.phoenix.agent.core.task.workflow.Context;
 
 public class ConfigUpgradeContext extends Context {
