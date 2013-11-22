@@ -135,7 +135,7 @@ function git_commit {
 	cd $git_dir
 	
 	cat <<-END > .version
-			version:$version
+			$version
 	END
 	
 	local change_files=`git status --short | wc -l`

@@ -1,5 +1,6 @@
 package com.dianping.phoenix.agent.page.nginx;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -7,6 +8,8 @@ import java.io.Writer;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.unidal.lookup.annotation.Inject;
 import org.unidal.web.mvc.ErrorObject;
@@ -26,6 +29,7 @@ import com.dianping.phoenix.agent.core.tx.TransactionManager;
 import com.dianping.phoenix.agent.response.entity.Response;
 import com.dianping.phoenix.agent.util.CharacterReplaceFilterWriter;
 import com.dianping.phoenix.agent.util.ThreadUtil;
+import com.dianping.phoenix.configure.ConfigManager;
 
 public class Handler implements PageHandler<Context> {
     private final static Logger logger = Logger.getLogger(Handler.class);
@@ -35,6 +39,8 @@ public class Handler implements PageHandler<Context> {
     private Agent               agent;
     @Inject
     private TransactionManager  txMgr;
+    @Inject
+    private ConfigManager       config;
 
     @Override
     @PayloadMeta(Payload.class)
@@ -73,6 +79,16 @@ public class Handler implements PageHandler<Context> {
         Response res = new Response();
 
         switch (payload.getAction()) {
+            case VERSION:
+                String version = getVersion(payload.getVirtualServerName());
+                if (StringUtils.isNotBlank(version)) {
+                    res.setMessage(version);
+                    res.setStatus("ok");
+                } else {
+                    res.setMessage("Unknown version");
+                    res.setStatus("fail");
+                }
+                break;
             case STATUS:
                 if (txMgr.transactionExists(txId)) {
                     Transaction tx = txMgr.loadTransaction(txId);
@@ -118,6 +134,18 @@ public class Handler implements PageHandler<Context> {
         model.setResponse(res);
         model.setAction(payload.getAction());
         m_jspViewer.view(ctx, model);
+    }
+
+    private String getVersion(String virtualServerName) {
+        File versionFile = new File(new File(config.getTengineConfigDocBasePattern(), virtualServerName), ".version");
+        if (versionFile.exists()) {
+            try {
+                return StringUtils.trimToNull(FileUtils.readFileToString(versionFile));
+            } catch (Exception e) {
+                // ignore it
+            }
+        }
+        return null;
     }
 
     private void submitTask(Task task, TransactionId txId, Response res, Context ctx) throws Exception {

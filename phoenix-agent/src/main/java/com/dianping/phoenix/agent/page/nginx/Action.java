@@ -1,11 +1,13 @@
 package com.dianping.phoenix.agent.page.nginx;
 
 public enum Action implements org.unidal.web.mvc.Action {
-    VIEW("view"),
-    DEPLOY("deploy"),
-    GETLOG("log"),
-    CANCEL("cancel"),
-    STATUS("status");
+    VIEW("view"),//
+    DEPLOY("deploy"),//
+    GETLOG("log"),//
+    CANCEL("cancel"),//
+    STATUS("status"),//
+    VERSION("version"),//
+    ;
 
     private String m_name;
 
