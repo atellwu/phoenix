@@ -21,6 +21,7 @@ import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.dao.ModelStore;
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.configure.entity.Configure;
+import com.dianping.phoenix.lb.model.configure.entity.Pool;
 import com.dianping.phoenix.lb.model.configure.entity.Strategy;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
@@ -468,6 +469,83 @@ public abstract class AbstractModelStore implements ModelStore {
         }
 
         return null;
+    }
+
+    @Override
+    public List<Pool> listPools() {
+        baseConfigMeta.lock.readLock().lock();
+        try {
+            return new ArrayList<Pool>(configure.getPools().values());
+        } finally {
+            baseConfigMeta.lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public Pool findPool(String name) {
+        baseConfigMeta.lock.readLock().lock();
+        try {
+            return configure.findPool(name);
+        } finally {
+            baseConfigMeta.lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public void updateOrCreatePool(String name, Pool pool) throws BizException {
+        Pool originalPool = null;
+        baseConfigMeta.lock.writeLock().lock();
+        try {
+            Date now = new Date();
+
+            originalPool = baseConfigMeta.configure.findPool(name);
+            pool.setLastModifiedDate(now);
+
+            if (baseConfigMeta.configure.findPool(name) == null) {
+                pool.setCreationDate(now);
+            } else {
+                pool.setCreationDate(originalPool.getCreationDate());
+            }
+            baseConfigMeta.configure.addPool(pool);
+            configure.addPool(pool);
+            save(baseConfigMeta.key, baseConfigMeta.configure);
+
+        } catch (IOException e) {
+            if (originalPool == null) {
+                baseConfigMeta.configure.removePool(name);
+                configure.removePool(name);
+            } else {
+                baseConfigMeta.configure.addPool(originalPool);
+                configure.addPool(originalPool);
+            }
+            ExceptionUtils.logAndRethrowBizException(e, MessageID.POOL_SAVE_FAIL, name);
+        } finally {
+            baseConfigMeta.lock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void removePool(String name) throws BizException {
+        Pool originalPool = null;
+        baseConfigMeta.lock.writeLock().lock();
+        try {
+            originalPool = baseConfigMeta.configure.findPool(name);
+
+            if (originalPool == null) {
+                return;
+            }
+
+            baseConfigMeta.configure.removePool(name);
+            configure.removePool(name);
+            save(baseConfigMeta.key, baseConfigMeta.configure);
+
+        } catch (IOException e) {
+            baseConfigMeta.configure.addPool(originalPool);
+            configure.addPool(originalPool);
+            ExceptionUtils.logAndRethrowBizException(e, MessageID.POOL_SAVE_FAIL, name);
+        } finally {
+            baseConfigMeta.lock.writeLock().unlock();
+        }
     }
 
     protected abstract String doFindLatestTagId(String virtualServerName, List<String> tagIds);

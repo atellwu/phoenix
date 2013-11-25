@@ -95,11 +95,27 @@ public class LocalFileModelStoreTest {
     }
 
     @Test
+    public void testListPools() throws Exception {
+        Configure configure = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "configure_base.xml")));
+
+        assertEquals(new ArrayList<Pool>(configure.getPools().values()), store.listPools());
+    }
+
+    @Test
     public void testFindStrategy() throws Exception {
         Configure configure = DefaultSaxParser.parse(FileUtils
                 .readFileToString(new File(baseDir, "configure_base.xml")));
         Strategy expected = configure.findStrategy("uri-hash");
         Assert.assertTrue(EqualsBuilder.reflectionEquals(expected, store.findStrategy("uri-hash"), true));
+    }
+
+    @Test
+    public void testFindPool() throws Exception {
+        Configure configure = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "configure_base.xml")));
+        Pool expected = configure.findPool("Web.Tuangou");
+        Assert.assertTrue(EqualsBuilder.reflectionEquals(expected, store.findPool("Web.Tuangou"), true));
     }
 
     @Test
@@ -133,6 +149,33 @@ public class LocalFileModelStoreTest {
     }
 
     @Test
+    public void testAddPool() throws Exception {
+        Pool pool = new Pool("TestPool");
+        pool.setMinAvailableMemberPercentage(40);
+        pool.setLoadbalanceStrategyName("uri-hash");
+        Member member1 = new Member("test01");
+        member1.setIp("10.1.1.1");
+        pool.addMember(member1);
+        Member member2 = new Member("test02");
+        member2.setIp("10.1.1.2");
+        pool.addMember(member2);
+        store.updateOrCreatePool("TestPool", pool);
+
+        Configure configure = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "configure_base.xml")));
+
+        configure.addPool(pool);
+
+        assertEquals(new ArrayList<Pool>(configure.getPools().values()), store.listPools());
+        Assert.assertNotNull(pool.getCreationDate());
+        Assert.assertEquals(pool.getLastModifiedDate(), pool.getCreationDate());
+
+        assertEquals(configure, "configure_base.xml");
+        assertRawFileNotChanged("configure_www.xml");
+        assertRawFileNotChanged("configure_tuangou.xml");
+    }
+
+    @Test
     public void testUpdateStrategy() throws Exception {
         Strategy modifiedStrategy = new Strategy("uri-hash");
         modifiedStrategy.setType("hash");
@@ -151,6 +194,40 @@ public class LocalFileModelStoreTest {
         assertEquals(new ArrayList<Strategy>(configure.getStrategies().values()), store.listStrategies());
         Assert.assertEquals(now, modifiedStrategy.getLastModifiedDate());
         Assert.assertEquals(expectedStrategy.getCreationDate(), modifiedStrategy.getCreationDate());
+
+        assertEquals(configure, "configure_base.xml");
+        assertRawFileNotChanged("configure_www.xml");
+        assertRawFileNotChanged("configure_tuangou.xml");
+    }
+
+    @Test
+    public void testUpdatePool() throws Exception {
+        Pool modifiedPool = new Pool("Web.Tuangou");
+        modifiedPool.setMinAvailableMemberPercentage(10);
+        modifiedPool.setLoadbalanceStrategyName("roundrobin");
+        Member member = new Member("t1");
+        member.setIp("12.12.12.12");
+        modifiedPool.addMember(member);
+
+        Date now = new Date();
+        store.updateOrCreatePool("Web.Tuangou", modifiedPool);
+
+        Configure configure = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "configure_base.xml")));
+
+        Pool expectedPool = configure.findPool("Web.Tuangou");
+        expectedPool.setMinAvailableMemberPercentage(10);
+        expectedPool.setLoadbalanceStrategyName("roundrobin");
+        Member member2 = new Member("t1");
+        member2.setIp("12.12.12.12");
+        expectedPool.removeMember("tuangou-web01");
+        expectedPool.removeMember("tuangou-web02");
+        expectedPool.addMember(member2);
+        expectedPool.setLastModifiedDate(now);
+
+        assertEquals(new ArrayList<Pool>(configure.getPools().values()), store.listPools());
+        Assert.assertEquals(now, modifiedPool.getLastModifiedDate());
+        Assert.assertEquals(expectedPool.getCreationDate(), modifiedPool.getCreationDate());
 
         assertEquals(configure, "configure_base.xml");
         assertRawFileNotChanged("configure_www.xml");
@@ -227,6 +304,21 @@ public class LocalFileModelStoreTest {
         assertRawFileNotChanged("configure_www.xml");
         assertRawFileNotChanged("configure_tuangou.xml");
     }
+    
+    @Test
+    public void testRemovePool() throws Exception {
+        store.removePool("Web.Tuangou");
+
+        Configure configure = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "configure_base.xml")));
+        configure.removePool("Web.Tuangou");
+
+        assertEquals(new ArrayList<Pool>(configure.getPools().values()), store.listPools());
+
+        assertEquals(configure, "configure_base.xml");
+        assertRawFileNotChanged("configure_www.xml");
+        assertRawFileNotChanged("configure_tuangou.xml");
+    }
 
     @Test
     public void testRemoveStrategyRollback() throws Exception {
@@ -273,13 +365,6 @@ public class LocalFileModelStoreTest {
         newDirective.setDynamicAttribute("expires", "30d");
         newLocation.addDirective(newDirective);
         newVirtualServer.addLocation(newLocation);
-        Pool newPool = new Pool("static-pool");
-        newPool.setLoadbalanceStrategyName("ip-hash");
-        newPool.setMinAvailableMemberPercentage(20);
-        Member newMember = new Member("static01");
-        newMember.setIp("100.100.100.1");
-        newPool.addMember(newMember);
-        newVirtualServer.addPool(newPool);
 
         VirtualServer originalVirtualServer = store.findVirtualServer("www");
         int originalVersion = originalVirtualServer.getVersion();
@@ -331,13 +416,6 @@ public class LocalFileModelStoreTest {
         newDirective.setDynamicAttribute("expires", "30d");
         newLocation.addDirective(newDirective);
         newVirtualServer.addLocation(newLocation);
-        Pool newPool = new Pool("static-pool");
-        newPool.setLoadbalanceStrategyName("ip-hash");
-        newPool.setMinAvailableMemberPercentage(20);
-        Member newMember = new Member("static01");
-        newMember.setIp("100.100.100.1");
-        newPool.addMember(newMember);
-        newVirtualServer.addPool(newPool);
 
         VirtualServer originalVirtualServer = store.findVirtualServer("www");
         int originalVersion = originalVirtualServer.getVersion();
@@ -365,13 +443,6 @@ public class LocalFileModelStoreTest {
         newDirective1.setDynamicAttribute("expires", "300d");
         newLocation1.addDirective(newDirective1);
         newVirtualServer1.addLocation(newLocation1);
-        Pool newPool1 = new Pool("static-pool1");
-        newPool1.setLoadbalanceStrategyName("ip-hash1");
-        newPool1.setMinAvailableMemberPercentage(20);
-        Member newMember1 = new Member("static01");
-        newMember1.setIp("100.100.100.11");
-        newPool1.addMember(newMember1);
-        newVirtualServer1.addPool(newPool1);
         try {
             store.updateVirtualServer("www", newVirtualServer1);
             Assert.fail();
@@ -427,13 +498,6 @@ public class LocalFileModelStoreTest {
         newDirective.setDynamicAttribute("expires", "30d");
         newLocation.addDirective(newDirective);
         newVirtualServer.addLocation(newLocation);
-        Pool newPool = new Pool("static-pool");
-        newPool.setLoadbalanceStrategyName("ip-hash");
-        newPool.setMinAvailableMemberPercentage(20);
-        Member newMember = new Member("static01");
-        newMember.setIp("100.100.100.1");
-        newPool.addMember(newMember);
-        newVirtualServer.addPool(newPool);
 
         try {
             store.updateVirtualServer("test", newVirtualServer);
@@ -479,13 +543,6 @@ public class LocalFileModelStoreTest {
         newDirective.setDynamicAttribute("expires", "30d");
         newLocation.addDirective(newDirective);
         newVirtualServer.addLocation(newLocation);
-        Pool newPool = new Pool("static-pool");
-        newPool.setLoadbalanceStrategyName("ip-hash");
-        newPool.setMinAvailableMemberPercentage(20);
-        Member newMember = new Member("static01");
-        newMember.setIp("100.100.100.1");
-        newPool.addMember(newMember);
-        newVirtualServer.addPool(newPool);
 
         try {
             store.updateVirtualServer("www", newVirtualServer);
@@ -527,13 +584,6 @@ public class LocalFileModelStoreTest {
         newDirective.setDynamicAttribute("expires", "30d");
         newLocation.addDirective(newDirective);
         newVirtualServer.addLocation(newLocation);
-        Pool newPool = new Pool("static-pool");
-        newPool.setLoadbalanceStrategyName("ip-hash");
-        newPool.setMinAvailableMemberPercentage(20);
-        Member newMember = new Member("static01");
-        newMember.setIp("100.100.100.1");
-        newPool.addMember(newMember);
-        newVirtualServer.addPool(newPool);
 
         Date now = new Date();
         store.addVirtualServer("testVs", newVirtualServer);
@@ -592,13 +642,6 @@ public class LocalFileModelStoreTest {
         newDirective.setDynamicAttribute("expires", "30d");
         newLocation.addDirective(newDirective);
         newVirtualServer.addLocation(newLocation);
-        Pool newPool = new Pool("static-pool");
-        newPool.setLoadbalanceStrategyName("ip-hash");
-        newPool.setMinAvailableMemberPercentage(20);
-        Member newMember = new Member("static01");
-        newMember.setIp("100.100.100.1");
-        newPool.addMember(newMember);
-        newVirtualServer.addPool(newPool);
 
         try {
             store.addVirtualServer("www", newVirtualServer);
@@ -645,13 +688,6 @@ public class LocalFileModelStoreTest {
         newDirective.setDynamicAttribute("expires", "30d");
         newLocation.addDirective(newDirective);
         newVirtualServer.addLocation(newLocation);
-        Pool newPool = new Pool("static-pool");
-        newPool.setLoadbalanceStrategyName("ip-hash");
-        newPool.setMinAvailableMemberPercentage(20);
-        Member newMember = new Member("static01");
-        newMember.setIp("100.100.100.1");
-        newPool.addMember(newMember);
-        newVirtualServer.addPool(newPool);
 
         try {
             store.addVirtualServer("test", newVirtualServer);
@@ -963,17 +999,17 @@ public class LocalFileModelStoreTest {
         Assert.assertFalse(new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/configure_www.xml_4").exists());
 
         List<String> tagIds = store.listTagIds("www");
-        Assert.assertArrayEquals(new String[]{"www-1", "www-3"}, tagIds.toArray());
-        Assert.assertEquals( "www-3", store.findLatestTagId("www"));
-        
+        Assert.assertArrayEquals(new String[] { "www-1", "www-3" }, tagIds.toArray());
+        Assert.assertEquals("www-3", store.findLatestTagId("www"));
+
         store.removeTag("www", "www-1");
         store.removeTag("www", "www-3");
         Assert.assertFalse(new File(tmpDir, "tag/www/20120101/configure_www.xml_1").exists());
         Assert.assertFalse(new File(tmpDir, "tag/www/20120101/configure_www.xml_3").exists());
-        
+
         Assert.assertEquals(0, store.listTagIds("www").size());
         Assert.assertNull(store.findLatestTagId("www"));
-        
+
         assertRawFileNotChanged("configure_www.xml");
         assertRawFileNotChanged("configure_tuangou.xml");
         assertRawFileNotChanged("configure_base.xml");

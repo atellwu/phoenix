@@ -9,6 +9,7 @@ package com.dianping.phoenix.lb.dao;
 import java.util.List;
 
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.configure.entity.Pool;
 import com.dianping.phoenix.lb.model.configure.entity.Strategy;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
 
@@ -24,13 +25,21 @@ public interface ModelStore {
 
     public List<Strategy> listStrategies();
 
+    public List<Pool> listPools();
+
     public Strategy findStrategy(String name);
 
     public VirtualServer findVirtualServer(String name);
 
+    public Pool findPool(String name);
+
     public void updateOrCreateStrategy(String name, Strategy strategy) throws BizException;
 
     public void removeStrategy(String name) throws BizException;
+
+    public void updateOrCreatePool(String name, Pool pool) throws BizException;
+
+    public void removePool(String name) throws BizException;
 
     public void updateVirtualServer(String name, VirtualServer virtualServer) throws BizException;
 

@@ -17,15 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.phoenix.lb.constant.MessageID;
+import com.dianping.phoenix.lb.dao.PoolDao;
 import com.dianping.phoenix.lb.dao.StrategyDao;
 import com.dianping.phoenix.lb.dao.VirtualServerDao;
 import com.dianping.phoenix.lb.exception.BizException;
-import com.dianping.phoenix.lb.model.Availability;
-import com.dianping.phoenix.lb.model.State;
 import com.dianping.phoenix.lb.model.configure.entity.Configure;
 import com.dianping.phoenix.lb.model.configure.entity.Directive;
 import com.dianping.phoenix.lb.model.configure.entity.Location;
-import com.dianping.phoenix.lb.model.configure.entity.Member;
 import com.dianping.phoenix.lb.model.configure.entity.Pool;
 import com.dianping.phoenix.lb.model.configure.entity.Strategy;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
@@ -44,17 +42,19 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
 
     private VirtualServerDao virtualServerDao;
     private StrategyDao      strategyDao;
+    private PoolDao          poolDao;
 
     /**
      * @param virtualServerDao
      * @param templateDao
      */
     @Autowired(required = true)
-    public VirtualServerServiceImpl(VirtualServerDao virtualServerDao, StrategyDao strategyDao)
+    public VirtualServerServiceImpl(VirtualServerDao virtualServerDao, StrategyDao strategyDao, PoolDao poolDao)
             throws ComponentLookupException {
         super();
         this.virtualServerDao = virtualServerDao;
         this.strategyDao = strategyDao;
+        this.poolDao = poolDao;
     }
 
     /**
@@ -206,13 +206,6 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
     }
 
     private void validate(VirtualServer virtualServer) throws BizException {
-        boolean deafultPoolExist = false;
-        for (Pool pool : virtualServer.getPools()) {
-            if (pool.getName().equals(virtualServer.getDefaultPoolName())) {
-                deafultPoolExist = true;
-                break;
-            }
-        }
 
         if (StringUtils.isBlank(virtualServer.getName())) {
             ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
@@ -222,47 +215,13 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
             ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_PORT_EMPTY);
         }
 
-        if (!deafultPoolExist) {
+        if (StringUtils.isBlank(virtualServer.getDefaultPoolName())) {
+            ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NO_DEFAULT_POOL_NAME);
+        }
+
+        if (poolDao.find(virtualServer.getDefaultPoolName()) == null) {
             ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_DEFAULTPOOL_NOT_EXISTS,
                     virtualServer.getDefaultPoolName());
-        }
-
-        List<Strategy> strategies = strategyDao.list();
-        List<String> strategyNames = new ArrayList<String>();
-        for (Strategy strategy : strategies) {
-            strategyNames.add(strategy.getName());
-        }
-
-        for (Pool pool : virtualServer.getPools()) {
-            if (!strategyNames.contains(pool.getLoadbalanceStrategyName())) {
-                ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_STRATEGY_NOT_SUPPORT,
-                        pool.getLoadbalanceStrategyName(), pool.getName());
-            }
-
-            if (pool.getMembers().size() == 0) {
-                ExceptionUtils.throwBizException(MessageID.POOL_NO_MEMBER, pool.getName());
-            }
-
-            for (Member member : pool.getMembers()) {
-                if (StringUtils.isBlank(member.getName())) {
-                    ExceptionUtils.throwBizException(MessageID.POOL_MEMBER_NO_NAME);
-                }
-                if (StringUtils.isBlank(member.getIp())) {
-                    ExceptionUtils.throwBizException(MessageID.POOL_MEMBER_NO_IP, member.getName());
-                }
-            }
-
-            int availMemberCount = 0;
-            for (Member member : pool.getMembers()) {
-                if (member.getAvailability() == Availability.AVAILABLE && member.getState() == State.ENABLED) {
-                    availMemberCount++;
-                }
-            }
-
-            if (availMemberCount * 100.0d / pool.getMembers().size() < pool.getMinAvailableMemberPercentage()) {
-                ExceptionUtils.throwBizException(MessageID.POOL_LOWER_THAN_MINAVAIL_PCT,
-                        pool.getMinAvailableMemberPercentage(), pool.getName());
-            }
         }
 
         for (Location location : virtualServer.getLocations()) {
@@ -299,12 +258,22 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
     }
 
     @Override
-    public String generateNginxConfig(VirtualServer virtualServer) throws BizException {
+    public String generateNginxConfig(VirtualServer virtualServer, List<Pool> pools) throws BizException {
 
         try {
             Configure tmpConfigure = new Configure();
             for (Strategy strategy : strategyDao.list()) {
                 tmpConfigure.addStrategy(strategy);
+            }
+
+            if (pools == null) {
+                for (Pool pool : poolDao.list()) {
+                    tmpConfigure.addPool(pool);
+                }
+            } else {
+                for (Pool pool : pools) {
+                    tmpConfigure.addPool(pool);
+                }
             }
 
             tmpConfigure.addVirtualServer(virtualServer);
@@ -441,4 +410,5 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
 
         });
     }
+
 }

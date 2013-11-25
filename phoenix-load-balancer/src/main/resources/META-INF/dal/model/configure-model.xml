@@ -4,6 +4,7 @@
 	<entity name="configure" root="true">
 		<entity-ref name="strategy" type="map" names="strategies" xml-indent="true" method-find-or-create="true" />
 		<entity-ref name="virtualServer" type="map" names="virtualServers" method-find-or-create="true" />
+		<entity-ref name="pool" type="map" names="pools" xml-indent="true" method-find-or-create="true" />
 	</entity>
 	<entity name="strategy" dynamic-attributes="true">
 		<attribute name="name" value-type="String" key="true" />
@@ -25,7 +26,6 @@
 		<attribute name="creation-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
 		<attribute name="last-modified-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
 		<attribute name="version" value-type="int" primitive="true" default-value="1" />
-		<entity-ref name="pool" type="list" names="pools" xml-indent="true" />
 		<entity-ref name="instance" type="list" names="instances" xml-indent="true" />
 		<entity-ref name="location" type="list" names="locations" xml-indent="true" />
 	</entity>
@@ -34,6 +34,8 @@
 		<attribute name="loadbalance-strategy-name" value-type="String" />
 		<attribute name="min-available-member-percentage" value-type="int" primitive="true" />
 		<entity-ref name="member" type="list" names="members" />
+		<attribute name="creation-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
+		<attribute name="last-modified-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
 	</entity>
 	<entity name="member">
 		<attribute name="name" value-type="String" key="true" />

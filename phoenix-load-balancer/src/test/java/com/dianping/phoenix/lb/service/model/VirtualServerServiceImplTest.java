@@ -13,13 +13,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.dianping.phoenix.lb.dao.PoolDao;
 import com.dianping.phoenix.lb.dao.StrategyDao;
 import com.dianping.phoenix.lb.dao.VirtualServerDao;
 import com.dianping.phoenix.lb.dao.impl.LocalFileModelStoreImpl;
+import com.dianping.phoenix.lb.dao.impl.PoolDaoImpl;
 import com.dianping.phoenix.lb.dao.impl.StrategyDaoImpl;
 import com.dianping.phoenix.lb.dao.impl.VirtualServerDaoImpl;
-import com.dianping.phoenix.lb.service.model.VirtualServerService;
-import com.dianping.phoenix.lb.service.model.VirtualServerServiceImpl;
 
 /**
  * @author Leo Liang
@@ -32,6 +32,7 @@ public class VirtualServerServiceImplTest {
     private VirtualServerService    virtualServerService;
     private VirtualServerDao        virtualServerDao;
     private StrategyDao             strategyDao;
+    private PoolDao                 poolDao;
 
     @Before
     public void before() throws Exception {
@@ -48,7 +49,9 @@ public class VirtualServerServiceImplTest {
         virtualServerDao = new VirtualServerDaoImpl(store);
 
         strategyDao = new StrategyDaoImpl(store);
-        virtualServerService = new VirtualServerServiceImpl(virtualServerDao, strategyDao);
+        poolDao = new PoolDaoImpl(store);
+
+        virtualServerService = new VirtualServerServiceImpl(virtualServerDao, strategyDao, poolDao);
     }
 
     @After
@@ -61,6 +64,6 @@ public class VirtualServerServiceImplTest {
 
     @Test
     public void testNginxConf() throws Exception {
-        System.out.println(virtualServerService.generateNginxConfig(virtualServerDao.find("www")));
+        System.out.println(virtualServerService.generateNginxConfig(virtualServerDao.find("www"), null));
     }
 }
