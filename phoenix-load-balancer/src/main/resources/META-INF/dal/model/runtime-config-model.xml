@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model model-package="com.dianping.phoenix.lb.config" enable-base-visitor="true" enable-merger="true" enable-sax-parser="true">
+	<entity name="runtime-config" root="true">
+		<element name="tengine-config-git-url-dev" value-type="String"
+			default-value="ssh://git@code.dianpingoa.com/arch/phoenix-slb-tengine-config-dev.git" />
+		<element name="tengine-config-git-url-product" value-type="String"
+			default-value="ssh://git@code.dianpingoa.com/arch/phoenix-slb-tengine-config-product.git" />
+		<element name="model-git-url-dev" value-type="String" default-value="ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-dev.git" />
+		<element name="model-git-url-product" value-type="String" default-value="ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-product.git" />
+		<element name="model-store-base-dir" value-type="String" default-value="/data/appdatas/phoenix/slb/model" />
+		<element name="deploy-log-url-pattern" value-type="String" default-value="http://%s:3473/phoenix/agent/nginx?op=log&amp;deployId=%s" />
+		<element name="deploy-url-reload-pattern" value-type="String"
+			default-value="http://%s:3473/phoenix/agent/nginx?op=deploy&amp;deployId=%s&amp;vs=%s&amp;config=%s&amp;version=%s&amp;gitUrl=%s&amp;reload=true" />
+		<element name="deploy-status-url-pattern" value-type="String" default-value="http://%s:3473/phoenix/agent/nginx?op=status&amp;deployId=%s" />
+		<element name="agent-tengine-config-version-url-pattern" value-type="String" default-value="http://%s:3473/phoenix/agent/nginx?op=version&amp;vs=%s" />
+		<element name="deploy-getlog-retrycount" value-type="int" primitive="true" default-value="10" />
+		<element name="deploy-connect-timeout" value-type="int" primitive="true" default-value="10000" />
+		<element name="deploy-retry-interval" value-type="int" primitive="true" default-value="30000" />
+		<element name="env" value-type="String" default-value="dev" />
+	</entity>
+</model>
+

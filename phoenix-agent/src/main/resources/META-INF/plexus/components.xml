@@ -313,6 +313,9 @@
 				<requirement>
 					<role>com.dianping.phoenix.agent.core.tx.TransactionManager</role>
 				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.configure.ConfigManager</role>
+				</requirement>
 			</requirements>
 		</component>
 		<component>
@@ -321,6 +324,15 @@
 			<requirements>
 				<requirement>
 					<role>org.unidal.web.mvc.view.model.ModelHandler</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.configure.ConfigManager</role>
+			<implementation>com.dianping.phoenix.configure.ConfigManager</implementation>
+			<requirements>
+				<requirement>
+					<role>java.lang.String</role>
 				</requirement>
 			</requirements>
 		</component>

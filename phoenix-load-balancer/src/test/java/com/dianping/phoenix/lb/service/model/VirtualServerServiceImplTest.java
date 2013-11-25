@@ -4,7 +4,7 @@
  * File Created at Nov 1, 2013
  * 
  */
-package com.dianping.phoenix.lb.model.service.impl;
+package com.dianping.phoenix.lb.service.model;
 
 import java.io.File;
 
@@ -18,8 +18,8 @@ import com.dianping.phoenix.lb.dao.VirtualServerDao;
 import com.dianping.phoenix.lb.dao.impl.LocalFileModelStoreImpl;
 import com.dianping.phoenix.lb.dao.impl.StrategyDaoImpl;
 import com.dianping.phoenix.lb.dao.impl.VirtualServerDaoImpl;
-import com.dianping.phoenix.lb.model.service.VirtualServerService;
-import com.dianping.phoenix.lb.model.service.impl.VirtualServerServiceImpl;
+import com.dianping.phoenix.lb.service.model.VirtualServerService;
+import com.dianping.phoenix.lb.service.model.VirtualServerServiceImpl;
 
 /**
  * @author Leo Liang
