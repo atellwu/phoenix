@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.phoenix.lb.dao.ModelStore;
 import com.dianping.phoenix.lb.dao.PoolDao;
 import com.dianping.phoenix.lb.exception.BizException;
-import com.dianping.phoenix.lb.model.configure.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.Pool;
 
 /**
  * @author Leo Liang

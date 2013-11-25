@@ -21,12 +21,12 @@ import com.dianping.phoenix.lb.dao.PoolDao;
 import com.dianping.phoenix.lb.dao.StrategyDao;
 import com.dianping.phoenix.lb.dao.VirtualServerDao;
 import com.dianping.phoenix.lb.exception.BizException;
-import com.dianping.phoenix.lb.model.configure.entity.Configure;
-import com.dianping.phoenix.lb.model.configure.entity.Directive;
-import com.dianping.phoenix.lb.model.configure.entity.Location;
-import com.dianping.phoenix.lb.model.configure.entity.Pool;
-import com.dianping.phoenix.lb.model.configure.entity.Strategy;
-import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
+import com.dianping.phoenix.lb.model.entity.Directive;
+import com.dianping.phoenix.lb.model.entity.Location;
+import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.SlbModelTree;
+import com.dianping.phoenix.lb.model.entity.Strategy;
+import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.service.ConcurrentControlServiceTemplate;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
 import com.dianping.phoenix.lb.velocity.TemplateManager;
@@ -261,25 +261,25 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
     public String generateNginxConfig(VirtualServer virtualServer, List<Pool> pools) throws BizException {
 
         try {
-            Configure tmpConfigure = new Configure();
+            SlbModelTree tmpSlbModelTree = new SlbModelTree();
             for (Strategy strategy : strategyDao.list()) {
-                tmpConfigure.addStrategy(strategy);
+                tmpSlbModelTree.addStrategy(strategy);
             }
 
             if (pools == null) {
                 for (Pool pool : poolDao.list()) {
-                    tmpConfigure.addPool(pool);
+                    tmpSlbModelTree.addPool(pool);
                 }
             } else {
                 for (Pool pool : pools) {
-                    tmpConfigure.addPool(pool);
+                    tmpSlbModelTree.addPool(pool);
                 }
             }
 
-            tmpConfigure.addVirtualServer(virtualServer);
+            tmpSlbModelTree.addVirtualServer(virtualServer);
 
             NginxConfigVisitor visitor = new NginxConfigVisitor();
-            tmpConfigure.accept(visitor);
+            tmpSlbModelTree.accept(visitor);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("config", visitor.getVisitorResult());
             return VelocityEngineManager.INSTANCE.merge(TemplateManager.INSTANCE.getTemplate("server", "default"),

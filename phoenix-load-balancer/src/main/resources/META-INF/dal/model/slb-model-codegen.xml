@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-  <entity name="configure" root="true">
+  <entity name="slb-model-tree" root="true">
     <entity-ref name="strategy" type="list" names="strategies" xml-indent="true" />
     <entity-ref name="pool" type="list" names="pools" xml-indent="true" />
     <entity-ref name="virtualServer" type="list" names="virtualServers" />

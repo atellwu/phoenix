@@ -20,10 +20,10 @@ import org.xml.sax.SAXException;
 import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.dao.ModelStore;
 import com.dianping.phoenix.lb.exception.BizException;
-import com.dianping.phoenix.lb.model.configure.entity.Configure;
-import com.dianping.phoenix.lb.model.configure.entity.Pool;
-import com.dianping.phoenix.lb.model.configure.entity.Strategy;
-import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
+import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.SlbModelTree;
+import com.dianping.phoenix.lb.model.entity.Strategy;
+import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
 
 /**
@@ -32,18 +32,18 @@ import com.dianping.phoenix.lb.utils.ExceptionUtils;
  */
 public abstract class AbstractModelStore implements ModelStore {
 
-    protected Configure                         configure                      = new Configure();
+    protected SlbModelTree                      slbModelTree                   = new SlbModelTree();
     protected ConfigMeta                        baseConfigMeta;
     protected ConcurrentMap<String, ConfigMeta> virtualServerConfigFileMapping = new ConcurrentHashMap<String, ConfigMeta>();
 
     protected static class ConfigMeta {
         protected String                 key;
         protected ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-        protected Configure              configure;
+        protected SlbModelTree           slbModelTree;
 
-        public ConfigMeta(String key, Configure configure) {
+        public ConfigMeta(String key, SlbModelTree slbModelTree) {
             this.key = key;
-            this.configure = configure;
+            this.slbModelTree = slbModelTree;
         }
 
     }
@@ -60,13 +60,13 @@ public abstract class AbstractModelStore implements ModelStore {
     public List<VirtualServer> listVirtualServers() {
         // ignore concurrent issue, since it will introduce unnecessary
         // complexity
-        return new ArrayList<VirtualServer>(configure.getVirtualServers().values());
+        return new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values());
     }
 
     public List<Strategy> listStrategies() {
         baseConfigMeta.lock.readLock().lock();
         try {
-            return new ArrayList<Strategy>(configure.getStrategies().values());
+            return new ArrayList<Strategy>(slbModelTree.getStrategies().values());
         } finally {
             baseConfigMeta.lock.readLock().unlock();
         }
@@ -75,7 +75,7 @@ public abstract class AbstractModelStore implements ModelStore {
     public Strategy findStrategy(String name) {
         baseConfigMeta.lock.readLock().lock();
         try {
-            return configure.findStrategy(name);
+            return slbModelTree.findStrategy(name);
         } finally {
             baseConfigMeta.lock.readLock().unlock();
         }
@@ -84,7 +84,7 @@ public abstract class AbstractModelStore implements ModelStore {
     public VirtualServer findVirtualServer(String name) {
         // ignore concurrent issue, since it will introduce unnecessary
         // complexity
-        return configure.findVirtualServer(name);
+        return slbModelTree.findVirtualServer(name);
     }
 
     /*
@@ -92,7 +92,7 @@ public abstract class AbstractModelStore implements ModelStore {
      * 
      * @see
      * com.dianping.phoenix.lb.dao.impl.ModelStore#updateOrCreateStrategy(java
-     * .lang.String, com.dianping.phoenix.lb.model.configure.entity.Strategy)
+     * .lang.String, com.dianping.phoenix.lb.model.slbModelTree.entity.Strategy)
      */
     @Override
     public void updateOrCreateStrategy(String name, Strategy strategy) throws BizException {
@@ -101,25 +101,25 @@ public abstract class AbstractModelStore implements ModelStore {
         try {
             Date now = new Date();
 
-            originalStrategy = baseConfigMeta.configure.findStrategy(name);
+            originalStrategy = baseConfigMeta.slbModelTree.findStrategy(name);
             strategy.setLastModifiedDate(now);
 
-            if (baseConfigMeta.configure.findStrategy(name) == null) {
+            if (baseConfigMeta.slbModelTree.findStrategy(name) == null) {
                 strategy.setCreationDate(now);
             } else {
                 strategy.setCreationDate(originalStrategy.getCreationDate());
             }
-            baseConfigMeta.configure.addStrategy(strategy);
-            configure.addStrategy(strategy);
-            save(baseConfigMeta.key, baseConfigMeta.configure);
+            baseConfigMeta.slbModelTree.addStrategy(strategy);
+            slbModelTree.addStrategy(strategy);
+            save(baseConfigMeta.key, baseConfigMeta.slbModelTree);
 
         } catch (IOException e) {
             if (originalStrategy == null) {
-                baseConfigMeta.configure.removeStrategy(name);
-                configure.removeStrategy(name);
+                baseConfigMeta.slbModelTree.removeStrategy(name);
+                slbModelTree.removeStrategy(name);
             } else {
-                baseConfigMeta.configure.addStrategy(originalStrategy);
-                configure.addStrategy(originalStrategy);
+                baseConfigMeta.slbModelTree.addStrategy(originalStrategy);
+                slbModelTree.addStrategy(originalStrategy);
             }
             ExceptionUtils.logAndRethrowBizException(e, MessageID.STRATEGY_SAVE_FAIL, name);
         } finally {
@@ -139,19 +139,19 @@ public abstract class AbstractModelStore implements ModelStore {
         Strategy originalStrategy = null;
         baseConfigMeta.lock.writeLock().lock();
         try {
-            originalStrategy = baseConfigMeta.configure.findStrategy(name);
+            originalStrategy = baseConfigMeta.slbModelTree.findStrategy(name);
 
             if (originalStrategy == null) {
                 return;
             }
 
-            baseConfigMeta.configure.removeStrategy(name);
-            configure.removeStrategy(name);
-            save(baseConfigMeta.key, baseConfigMeta.configure);
+            baseConfigMeta.slbModelTree.removeStrategy(name);
+            slbModelTree.removeStrategy(name);
+            save(baseConfigMeta.key, baseConfigMeta.slbModelTree);
 
         } catch (IOException e) {
-            baseConfigMeta.configure.addStrategy(originalStrategy);
-            configure.addStrategy(originalStrategy);
+            baseConfigMeta.slbModelTree.addStrategy(originalStrategy);
+            slbModelTree.addStrategy(originalStrategy);
             ExceptionUtils.logAndRethrowBizException(e, MessageID.STRATEGY_SAVE_FAIL, name);
         } finally {
             baseConfigMeta.lock.writeLock().unlock();
@@ -164,7 +164,7 @@ public abstract class AbstractModelStore implements ModelStore {
      * @see
      * com.dianping.phoenix.lb.dao.impl.ModelStore#updateVirtualServer(java.
      * lang.String,
-     * com.dianping.phoenix.lb.model.configure.entity.VirtualServer)
+     * com.dianping.phoenix.lb.model.slbModelTree.entity.VirtualServer)
      */
     @Override
     public void updateVirtualServer(String name, VirtualServer virtualServer) throws BizException {
@@ -174,12 +174,12 @@ public abstract class AbstractModelStore implements ModelStore {
             configFileEntry.lock.writeLock().lock();
 
             try {
-                if (configFileEntry.configure.findVirtualServer(name) == null
-                        || configure.findVirtualServer(name) == null) {
+                if (configFileEntry.slbModelTree.findVirtualServer(name) == null
+                        || slbModelTree.findVirtualServer(name) == null) {
                     return;
                 }
 
-                originalVirtualServer = configFileEntry.configure.findVirtualServer(name);
+                originalVirtualServer = configFileEntry.slbModelTree.findVirtualServer(name);
 
                 if (originalVirtualServer.getVersion() != virtualServer.getVersion()) {
                     ExceptionUtils.logAndRethrowBizException(new ConcurrentModificationException(),
@@ -190,12 +190,12 @@ public abstract class AbstractModelStore implements ModelStore {
                     virtualServer.setCreationDate(originalVirtualServer.getCreationDate());
                 }
 
-                configFileEntry.configure.addVirtualServer(virtualServer);
-                configure.addVirtualServer(virtualServer);
-                save(configFileEntry.key, configFileEntry.configure);
+                configFileEntry.slbModelTree.addVirtualServer(virtualServer);
+                slbModelTree.addVirtualServer(virtualServer);
+                save(configFileEntry.key, configFileEntry.slbModelTree);
             } catch (IOException e) {
-                configFileEntry.configure.addVirtualServer(originalVirtualServer);
-                configure.addVirtualServer(originalVirtualServer);
+                configFileEntry.slbModelTree.addVirtualServer(originalVirtualServer);
+                slbModelTree.addVirtualServer(originalVirtualServer);
                 ExceptionUtils.logAndRethrowBizException(e, MessageID.VIRTUALSERVER_SAVE_FAIL, name);
             } finally {
                 configFileEntry.lock.writeLock().unlock();
@@ -219,32 +219,32 @@ public abstract class AbstractModelStore implements ModelStore {
         if (configFileEntry != null) {
             configFileEntry.lock.writeLock().lock();
             try {
-                if (configFileEntry.configure.findVirtualServer(name) == null
-                        || configure.findVirtualServer(name) == null) {
+                if (configFileEntry.slbModelTree.findVirtualServer(name) == null
+                        || slbModelTree.findVirtualServer(name) == null) {
                     return;
                 }
 
-                originalVirtualServer = configFileEntry.configure.findVirtualServer(name);
+                originalVirtualServer = configFileEntry.slbModelTree.findVirtualServer(name);
 
                 if (originalVirtualServer == null) {
                     return;
                 }
 
-                configFileEntry.configure.removeVirtualServer(name);
-                configure.removeVirtualServer(name);
+                configFileEntry.slbModelTree.removeVirtualServer(name);
+                slbModelTree.removeVirtualServer(name);
 
-                if (configFileEntry.configure.getVirtualServers().size() == 0) {
+                if (configFileEntry.slbModelTree.getVirtualServers().size() == 0) {
                     if (!delete(configFileEntry.key)) {
                         throw new IOException();
                     } else {
                         virtualServerConfigFileMapping.remove(name);
                     }
                 } else {
-                    save(configFileEntry.key, configFileEntry.configure);
+                    save(configFileEntry.key, configFileEntry.slbModelTree);
                 }
             } catch (IOException e) {
-                configFileEntry.configure.addVirtualServer(originalVirtualServer);
-                configure.addVirtualServer(originalVirtualServer);
+                configFileEntry.slbModelTree.addVirtualServer(originalVirtualServer);
+                slbModelTree.addVirtualServer(originalVirtualServer);
                 ExceptionUtils.logAndRethrowBizException(e, MessageID.VIRTUALSERVER_SAVE_FAIL, name);
             } finally {
                 configFileEntry.lock.writeLock().unlock();
@@ -259,7 +259,7 @@ public abstract class AbstractModelStore implements ModelStore {
      * 
      * @see
      * com.dianping.phoenix.lb.dao.impl.ModelStore#addVirtualServer(java.lang
-     * .String, com.dianping.phoenix.lb.model.configure.entity.VirtualServer)
+     * .String, com.dianping.phoenix.lb.model.slbModelTree.entity.VirtualServer)
      */
     @Override
     public void addVirtualServer(String name, VirtualServer virtualServer) throws BizException {
@@ -273,11 +273,11 @@ public abstract class AbstractModelStore implements ModelStore {
         virtualServer.setCreationDate(now);
         virtualServer.setLastModifiedDate(now);
 
-        Configure newConfigure = new Configure();
-        newConfigure.addVirtualServer(virtualServer);
+        SlbModelTree newSlbModelTree = new SlbModelTree();
+        newSlbModelTree.addVirtualServer(virtualServer);
 
         ConfigMeta originalMeta = virtualServerConfigFileMapping.putIfAbsent(name, new ConfigMeta(convertToKey(name),
-                newConfigure));
+                newSlbModelTree));
 
         if (originalMeta != null) {
             return;
@@ -285,15 +285,15 @@ public abstract class AbstractModelStore implements ModelStore {
             ConfigMeta configMeta = virtualServerConfigFileMapping.get(name);
             configMeta.lock.writeLock().lock();
             try {
-                if (configure.findVirtualServer(name) != null) {
+                if (slbModelTree.findVirtualServer(name) != null) {
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_ALREADY_EXISTS, name);
                 } else {
-                    configure.addVirtualServer(virtualServer);
-                    save(configMeta.key, newConfigure);
+                    slbModelTree.addVirtualServer(virtualServer);
+                    save(configMeta.key, newSlbModelTree);
                 }
 
             } catch (IOException e) {
-                configure.removeVirtualServer(name);
+                slbModelTree.removeVirtualServer(name);
                 virtualServerConfigFileMapping.remove(name);
                 ExceptionUtils.logAndRethrowBizException(new IOException(), MessageID.VIRTUALSERVER_SAVE_FAIL, name);
             } finally {
@@ -309,19 +309,19 @@ public abstract class AbstractModelStore implements ModelStore {
             configFileEntry.lock.writeLock().lock();
 
             try {
-                if (configFileEntry.configure.findVirtualServer(name) == null
-                        || configure.findVirtualServer(name) == null) {
+                if (configFileEntry.slbModelTree.findVirtualServer(name) == null
+                        || slbModelTree.findVirtualServer(name) == null) {
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, name);
                 }
 
-                int currentVersion = configFileEntry.configure.findVirtualServer(name).getVersion();
+                int currentVersion = configFileEntry.slbModelTree.findVirtualServer(name).getVersion();
 
                 if (currentVersion != version) {
                     ExceptionUtils.logAndRethrowBizException(new ConcurrentModificationException(),
                             MessageID.VIRTUALSERVER_CONCURRENT_MOD, name);
                 }
 
-                return saveTag(configFileEntry.key, name, configFileEntry.configure);
+                return saveTag(configFileEntry.key, name, configFileEntry.slbModelTree);
             } catch (IOException e) {
                 ExceptionUtils.logAndRethrowBizException(e, MessageID.VIRTUALSERVER_TAG_FAIL, name);
             } finally {
@@ -341,14 +341,14 @@ public abstract class AbstractModelStore implements ModelStore {
             configFileEntry.lock.readLock().lock();
 
             try {
-                if (configFileEntry.configure.findVirtualServer(name) == null
-                        || configure.findVirtualServer(name) == null) {
+                if (configFileEntry.slbModelTree.findVirtualServer(name) == null
+                        || slbModelTree.findVirtualServer(name) == null) {
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, name);
                 }
 
-                Configure tagConfigure = loadTag(configFileEntry.key, name, tagId);
-                if (tagConfigure != null && tagConfigure.findVirtualServer(name) != null) {
-                    return tagConfigure.findVirtualServer(name);
+                SlbModelTree tagSlbModelTree = loadTag(configFileEntry.key, name, tagId);
+                if (tagSlbModelTree != null && tagSlbModelTree.findVirtualServer(name) != null) {
+                    return tagSlbModelTree.findVirtualServer(name);
                 } else {
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_TAG_NOT_FOUND, tagId, name);
                 }
@@ -371,8 +371,8 @@ public abstract class AbstractModelStore implements ModelStore {
             configFileEntry.lock.readLock().lock();
 
             try {
-                if (configFileEntry.configure.findVirtualServer(name) == null
-                        || configure.findVirtualServer(name) == null) {
+                if (configFileEntry.slbModelTree.findVirtualServer(name) == null
+                        || slbModelTree.findVirtualServer(name) == null) {
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, name);
                 }
 
@@ -397,8 +397,8 @@ public abstract class AbstractModelStore implements ModelStore {
             configFileEntry.lock.readLock().lock();
 
             try {
-                if (configFileEntry.configure.findVirtualServer(virtualServerName) == null
-                        || configure.findVirtualServer(virtualServerName) == null) {
+                if (configFileEntry.slbModelTree.findVirtualServer(virtualServerName) == null
+                        || slbModelTree.findVirtualServer(virtualServerName) == null) {
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, virtualServerName);
                 }
 
@@ -425,8 +425,8 @@ public abstract class AbstractModelStore implements ModelStore {
             configFileEntry.lock.readLock().lock();
 
             try {
-                if (configFileEntry.configure.findVirtualServer(virtualServerName) == null
-                        || configure.findVirtualServer(virtualServerName) == null) {
+                if (configFileEntry.slbModelTree.findVirtualServer(virtualServerName) == null
+                        || slbModelTree.findVirtualServer(virtualServerName) == null) {
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, virtualServerName);
                 }
 
@@ -451,8 +451,8 @@ public abstract class AbstractModelStore implements ModelStore {
             configFileEntry.lock.readLock().lock();
 
             try {
-                if (configFileEntry.configure.findVirtualServer(virtualServerName) == null
-                        || configure.findVirtualServer(virtualServerName) == null) {
+                if (configFileEntry.slbModelTree.findVirtualServer(virtualServerName) == null
+                        || slbModelTree.findVirtualServer(virtualServerName) == null) {
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NOT_EXISTS, virtualServerName);
                 }
 
@@ -475,7 +475,7 @@ public abstract class AbstractModelStore implements ModelStore {
     public List<Pool> listPools() {
         baseConfigMeta.lock.readLock().lock();
         try {
-            return new ArrayList<Pool>(configure.getPools().values());
+            return new ArrayList<Pool>(slbModelTree.getPools().values());
         } finally {
             baseConfigMeta.lock.readLock().unlock();
         }
@@ -485,7 +485,7 @@ public abstract class AbstractModelStore implements ModelStore {
     public Pool findPool(String name) {
         baseConfigMeta.lock.readLock().lock();
         try {
-            return configure.findPool(name);
+            return slbModelTree.findPool(name);
         } finally {
             baseConfigMeta.lock.readLock().unlock();
         }
@@ -498,25 +498,25 @@ public abstract class AbstractModelStore implements ModelStore {
         try {
             Date now = new Date();
 
-            originalPool = baseConfigMeta.configure.findPool(name);
+            originalPool = baseConfigMeta.slbModelTree.findPool(name);
             pool.setLastModifiedDate(now);
 
-            if (baseConfigMeta.configure.findPool(name) == null) {
+            if (baseConfigMeta.slbModelTree.findPool(name) == null) {
                 pool.setCreationDate(now);
             } else {
                 pool.setCreationDate(originalPool.getCreationDate());
             }
-            baseConfigMeta.configure.addPool(pool);
-            configure.addPool(pool);
-            save(baseConfigMeta.key, baseConfigMeta.configure);
+            baseConfigMeta.slbModelTree.addPool(pool);
+            slbModelTree.addPool(pool);
+            save(baseConfigMeta.key, baseConfigMeta.slbModelTree);
 
         } catch (IOException e) {
             if (originalPool == null) {
-                baseConfigMeta.configure.removePool(name);
-                configure.removePool(name);
+                baseConfigMeta.slbModelTree.removePool(name);
+                slbModelTree.removePool(name);
             } else {
-                baseConfigMeta.configure.addPool(originalPool);
-                configure.addPool(originalPool);
+                baseConfigMeta.slbModelTree.addPool(originalPool);
+                slbModelTree.addPool(originalPool);
             }
             ExceptionUtils.logAndRethrowBizException(e, MessageID.POOL_SAVE_FAIL, name);
         } finally {
@@ -529,19 +529,19 @@ public abstract class AbstractModelStore implements ModelStore {
         Pool originalPool = null;
         baseConfigMeta.lock.writeLock().lock();
         try {
-            originalPool = baseConfigMeta.configure.findPool(name);
+            originalPool = baseConfigMeta.slbModelTree.findPool(name);
 
             if (originalPool == null) {
                 return;
             }
 
-            baseConfigMeta.configure.removePool(name);
-            configure.removePool(name);
-            save(baseConfigMeta.key, baseConfigMeta.configure);
+            baseConfigMeta.slbModelTree.removePool(name);
+            slbModelTree.removePool(name);
+            save(baseConfigMeta.key, baseConfigMeta.slbModelTree);
 
         } catch (IOException e) {
-            baseConfigMeta.configure.addPool(originalPool);
-            configure.addPool(originalPool);
+            baseConfigMeta.slbModelTree.addPool(originalPool);
+            slbModelTree.addPool(originalPool);
             ExceptionUtils.logAndRethrowBizException(e, MessageID.POOL_SAVE_FAIL, name);
         } finally {
             baseConfigMeta.lock.writeLock().unlock();
@@ -556,11 +556,11 @@ public abstract class AbstractModelStore implements ModelStore {
 
     protected abstract List<String> doListTagIds(String vsName) throws IOException;
 
-    protected abstract Configure loadTag(String key, String vsName, String tagId) throws IOException, SAXException;
+    protected abstract SlbModelTree loadTag(String key, String vsName, String tagId) throws IOException, SAXException;
 
-    protected abstract String saveTag(String key, String vsName, Configure configure) throws IOException;
+    protected abstract String saveTag(String key, String vsName, SlbModelTree slbModelTree) throws IOException;
 
-    protected abstract void save(String key, Configure configure) throws IOException;
+    protected abstract void save(String key, SlbModelTree slbModelTree) throws IOException;
 
     protected abstract boolean delete(String key);
 

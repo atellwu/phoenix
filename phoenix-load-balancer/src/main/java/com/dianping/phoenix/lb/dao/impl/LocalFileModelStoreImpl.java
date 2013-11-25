@@ -29,10 +29,10 @@ import org.xml.sax.SAXException;
 import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.dao.ModelStore;
 import com.dianping.phoenix.lb.exception.BizException;
-import com.dianping.phoenix.lb.model.configure.entity.Configure;
-import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
-import com.dianping.phoenix.lb.model.configure.transform.DefaultMerger;
-import com.dianping.phoenix.lb.model.configure.transform.DefaultSaxParser;
+import com.dianping.phoenix.lb.model.entity.SlbModelTree;
+import com.dianping.phoenix.lb.model.entity.VirtualServer;
+import com.dianping.phoenix.lb.model.transform.DefaultMerger;
+import com.dianping.phoenix.lb.model.transform.DefaultSaxParser;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
 
 /**
@@ -46,7 +46,7 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
     private String                               baseDir;
     private static final String                  BASE_CONFIG_FILE_SUFFIX = "_base";
     private static final String                  TAG_DIR                 = "tag";
-    private static final String                  CONFIG_FILE_PREFIX      = "configure_";
+    private static final String                  CONFIG_FILE_PREFIX      = "slb_";
     private static final String                  XML_SUFFIX              = ".xml";
     private static final String                  TAGID_SEPARATOR         = "_";
     private static final String                  TAGID_SPLITTER          = "-";
@@ -73,18 +73,18 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
                     String fileName = subFile.getName();
                     if (fileName.startsWith(CONFIG_FILE_PREFIX)) {
                         String xml = FileUtils.readFileToString(subFile);
-                        Configure tmpConfigure = DefaultSaxParser.parse(xml);
+                        SlbModelTree tmpSlbModelTree = DefaultSaxParser.parse(xml);
 
                         if (fileName.endsWith(BASE_CONFIG_FILE_SUFFIX + XML_SUFFIX)) {
-                            baseConfigMeta = new ConfigMeta(fileName, tmpConfigure);
+                            baseConfigMeta = new ConfigMeta(fileName, tmpSlbModelTree);
                         } else {
-                            for (Map.Entry<String, VirtualServer> entry : tmpConfigure.getVirtualServers().entrySet()) {
+                            for (Map.Entry<String, VirtualServer> entry : tmpSlbModelTree.getVirtualServers().entrySet()) {
                                 virtualServerConfigFileMapping.put(entry.getKey(), new ConfigMeta(fileName,
-                                        tmpConfigure));
+                                        tmpSlbModelTree));
                             }
                         }
 
-                        new DefaultMerger().merge(configure, tmpConfigure);
+                        new DefaultMerger().merge(slbModelTree, tmpSlbModelTree);
                     }
                 }
 
@@ -101,12 +101,12 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
         }
     }
 
-    protected void save(String key, Configure configure) throws IOException {
-        doSave(new File(baseDir, key), configure);
+    protected void save(String key, SlbModelTree slbModelTree) throws IOException {
+        doSave(new File(baseDir, key), slbModelTree);
     }
 
-    private void doSave(File file, Configure configure) throws IOException {
-        FileUtils.writeStringToFile(file, configure.toString());
+    private void doSave(File file, SlbModelTree slbModelTree) throws IOException {
+        FileUtils.writeStringToFile(file, slbModelTree.toString());
     }
 
     protected boolean delete(String key) {
@@ -134,8 +134,8 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
                         Integer tagId = extractTagIdInt(vsName, fileName);
                         if (tagId != null) {
                             String xml = FileUtils.readFileToString(tag);
-                            Configure tmpConfigure = DefaultSaxParser.parse(xml);
-                            for (Map.Entry<String, VirtualServer> entry : tmpConfigure.getVirtualServers().entrySet()) {
+                            SlbModelTree tmpSlbModelTree = DefaultSaxParser.parse(xml);
+                            for (Map.Entry<String, VirtualServer> entry : tmpSlbModelTree.getVirtualServers().entrySet()) {
                                 tagMetas.putIfAbsent(entry.getKey(), new AtomicInteger(0));
                                 if (tagMetas.get(entry.getKey()).intValue() < tagId) {
                                     tagMetas.get(entry.getKey()).set(tagId);
@@ -160,13 +160,13 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
     }
 
     @Override
-    protected String saveTag(String key, String vsName, Configure configure) throws IOException {
+    protected String saveTag(String key, String vsName, SlbModelTree slbModelTree) throws IOException {
         tagMetas.putIfAbsent(vsName, new AtomicInteger(0));
         int tagId = tagMetas.get(vsName).incrementAndGet();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         File tagFile = new File(new File(getTagFileBase(vsName), sdf.format(new Date())), getTagFileName(key, tagId));
         FileUtils.forceMkdir(tagFile.getParentFile());
-        doSave(tagFile, configure);
+        doSave(tagFile, slbModelTree);
         return convertToStrTagId(vsName, tagId);
     }
 
@@ -203,7 +203,7 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
     }
 
     @Override
-    protected Configure loadTag(String key, String vsName, String tagId) throws IOException, SAXException {
+    protected SlbModelTree loadTag(String key, String vsName, String tagId) throws IOException, SAXException {
         Integer tagIdInt = convertFromStrTagId(vsName, tagId);
         if (tagIdInt != null) {
             File tagBase = getTagFileBase(vsName);

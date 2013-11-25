@@ -26,16 +26,16 @@ import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.Availability;
 import com.dianping.phoenix.lb.model.State;
-import com.dianping.phoenix.lb.model.configure.entity.Configure;
-import com.dianping.phoenix.lb.model.configure.entity.Directive;
-import com.dianping.phoenix.lb.model.configure.entity.Instance;
-import com.dianping.phoenix.lb.model.configure.entity.Location;
-import com.dianping.phoenix.lb.model.configure.entity.Member;
-import com.dianping.phoenix.lb.model.configure.entity.Pool;
-import com.dianping.phoenix.lb.model.configure.entity.Strategy;
-import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
-import com.dianping.phoenix.lb.model.configure.transform.DefaultMerger;
-import com.dianping.phoenix.lb.model.configure.transform.DefaultSaxParser;
+import com.dianping.phoenix.lb.model.entity.Directive;
+import com.dianping.phoenix.lb.model.entity.Instance;
+import com.dianping.phoenix.lb.model.entity.Location;
+import com.dianping.phoenix.lb.model.entity.Member;
+import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.SlbModelTree;
+import com.dianping.phoenix.lb.model.entity.Strategy;
+import com.dianping.phoenix.lb.model.entity.VirtualServer;
+import com.dianping.phoenix.lb.model.transform.DefaultMerger;
+import com.dianping.phoenix.lb.model.transform.DefaultSaxParser;
 
 /**
  * @author Leo Liang
@@ -69,17 +69,17 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testListVirtualServers() throws Exception {
-        Configure wwwConfigure = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir,
-                "configure_www.xml")));
+        SlbModelTree wwwSlbModelTree = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir,
+                "slb_www.xml")));
 
-        Configure tuangouConfigure = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir,
-                "configure_tuangou.xml")));
+        SlbModelTree tuangouSlbModelTree = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir,
+                "slb_tuangou.xml")));
 
-        List<VirtualServer> expected = new ArrayList<VirtualServer>(tuangouConfigure.getVirtualServers().values()
+        List<VirtualServer> expected = new ArrayList<VirtualServer>(tuangouSlbModelTree.getVirtualServers().values()
                 .size()
-                + wwwConfigure.getVirtualServers().values().size());
-        expected.addAll(tuangouConfigure.getVirtualServers().values());
-        expected.addAll(wwwConfigure.getVirtualServers().values());
+                + wwwSlbModelTree.getVirtualServers().values().size());
+        expected.addAll(tuangouSlbModelTree.getVirtualServers().values());
+        expected.addAll(wwwSlbModelTree.getVirtualServers().values());
 
         List<VirtualServer> actual = store.listVirtualServers();
 
@@ -88,41 +88,41 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testListStrategies() throws Exception {
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
 
-        assertEquals(new ArrayList<Strategy>(configure.getStrategies().values()), store.listStrategies());
+        assertEquals(new ArrayList<Strategy>(slbModelTree.getStrategies().values()), store.listStrategies());
     }
 
     @Test
     public void testListPools() throws Exception {
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
 
-        assertEquals(new ArrayList<Pool>(configure.getPools().values()), store.listPools());
+        assertEquals(new ArrayList<Pool>(slbModelTree.getPools().values()), store.listPools());
     }
 
     @Test
     public void testFindStrategy() throws Exception {
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
-        Strategy expected = configure.findStrategy("uri-hash");
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        Strategy expected = slbModelTree.findStrategy("uri-hash");
         Assert.assertTrue(EqualsBuilder.reflectionEquals(expected, store.findStrategy("uri-hash"), true));
     }
 
     @Test
     public void testFindPool() throws Exception {
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
-        Pool expected = configure.findPool("Web.Tuangou");
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        Pool expected = slbModelTree.findPool("Web.Tuangou");
         Assert.assertTrue(EqualsBuilder.reflectionEquals(expected, store.findPool("Web.Tuangou"), true));
     }
 
     @Test
     public void testFindVirtualServer() throws Exception {
-        Configure configure = DefaultSaxParser
-                .parse(FileUtils.readFileToString(new File(baseDir, "configure_www.xml")));
-        VirtualServer expected = configure.findVirtualServer("www");
+        SlbModelTree slbModelTree = DefaultSaxParser
+                .parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml")));
+        VirtualServer expected = slbModelTree.findVirtualServer("www");
         Assert.assertTrue(EqualsBuilder.reflectionEquals(expected, store.findVirtualServer("www"), true));
     }
 
@@ -134,18 +134,18 @@ public class LocalFileModelStoreTest {
         newStrategy.setDynamicAttribute("method", "crc32");
         store.updateOrCreateStrategy("dper-hash", newStrategy);
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
 
-        configure.addStrategy(newStrategy);
+        slbModelTree.addStrategy(newStrategy);
 
-        assertEquals(new ArrayList<Strategy>(configure.getStrategies().values()), store.listStrategies());
+        assertEquals(new ArrayList<Strategy>(slbModelTree.getStrategies().values()), store.listStrategies());
         Assert.assertNotNull(newStrategy.getCreationDate());
         Assert.assertEquals(newStrategy.getLastModifiedDate(), newStrategy.getCreationDate());
 
-        assertEquals(configure, "configure_base.xml");
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
     }
 
     @Test
@@ -161,18 +161,18 @@ public class LocalFileModelStoreTest {
         pool.addMember(member2);
         store.updateOrCreatePool("TestPool", pool);
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
 
-        configure.addPool(pool);
+        slbModelTree.addPool(pool);
 
-        assertEquals(new ArrayList<Pool>(configure.getPools().values()), store.listPools());
+        assertEquals(new ArrayList<Pool>(slbModelTree.getPools().values()), store.listPools());
         Assert.assertNotNull(pool.getCreationDate());
         Assert.assertEquals(pool.getLastModifiedDate(), pool.getCreationDate());
 
-        assertEquals(configure, "configure_base.xml");
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
     }
 
     @Test
@@ -184,20 +184,20 @@ public class LocalFileModelStoreTest {
         Date now = new Date();
         store.updateOrCreateStrategy("uri-hash", modifiedStrategy);
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
 
-        Strategy expectedStrategy = configure.findStrategy("uri-hash");
+        Strategy expectedStrategy = slbModelTree.findStrategy("uri-hash");
         expectedStrategy.setDynamicAttribute("method", "md5");
         expectedStrategy.setLastModifiedDate(now);
 
-        assertEquals(new ArrayList<Strategy>(configure.getStrategies().values()), store.listStrategies());
+        assertEquals(new ArrayList<Strategy>(slbModelTree.getStrategies().values()), store.listStrategies());
         Assert.assertEquals(now, modifiedStrategy.getLastModifiedDate());
         Assert.assertEquals(expectedStrategy.getCreationDate(), modifiedStrategy.getCreationDate());
 
-        assertEquals(configure, "configure_base.xml");
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
     }
 
     @Test
@@ -212,10 +212,10 @@ public class LocalFileModelStoreTest {
         Date now = new Date();
         store.updateOrCreatePool("Web.Tuangou", modifiedPool);
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
 
-        Pool expectedPool = configure.findPool("Web.Tuangou");
+        Pool expectedPool = slbModelTree.findPool("Web.Tuangou");
         expectedPool.setMinAvailableMemberPercentage(10);
         expectedPool.setLoadbalanceStrategyName("roundrobin");
         Member member2 = new Member("t1");
@@ -225,18 +225,18 @@ public class LocalFileModelStoreTest {
         expectedPool.addMember(member2);
         expectedPool.setLastModifiedDate(now);
 
-        assertEquals(new ArrayList<Pool>(configure.getPools().values()), store.listPools());
+        assertEquals(new ArrayList<Pool>(slbModelTree.getPools().values()), store.listPools());
         Assert.assertEquals(now, modifiedPool.getLastModifiedDate());
         Assert.assertEquals(expectedPool.getCreationDate(), modifiedPool.getCreationDate());
 
-        assertEquals(configure, "configure_base.xml");
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
     }
 
     @Test
     public void testAddStrategyRollback() throws Exception {
-        new File(tmpDir, "configure_base.xml").setWritable(false);
+        new File(tmpDir, "slb_base.xml").setWritable(false);
 
         Strategy newStrategy = new Strategy("dper-hash");
         newStrategy.setType("hash");
@@ -252,19 +252,19 @@ public class LocalFileModelStoreTest {
             Assert.fail();
         }
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
 
-        assertEquals(new ArrayList<Strategy>(configure.getStrategies().values()), store.listStrategies());
+        assertEquals(new ArrayList<Strategy>(slbModelTree.getStrategies().values()), store.listStrategies());
 
-        assertRawFileNotChanged("configure_base.xml");
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
     }
 
     @Test
     public void testUpdateStrategyRollback() throws Exception {
-        new File(tmpDir, "configure_base.xml").setWritable(false);
+        new File(tmpDir, "slb_base.xml").setWritable(false);
 
         Strategy modifiedStrategy = new Strategy("uri-hash");
         modifiedStrategy.setType("hash");
@@ -279,50 +279,50 @@ public class LocalFileModelStoreTest {
             Assert.fail();
         }
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
 
-        assertEquals(new ArrayList<Strategy>(configure.getStrategies().values()), store.listStrategies());
+        assertEquals(new ArrayList<Strategy>(slbModelTree.getStrategies().values()), store.listStrategies());
 
-        assertEquals(configure, "configure_base.xml");
-        assertRawFileNotChanged("configure_base.xml");
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
     }
 
     @Test
     public void testRemoveStrategy() throws Exception {
         store.removeStrategy("uri-hash");
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
-        configure.removeStrategy("uri-hash");
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        slbModelTree.removeStrategy("uri-hash");
 
-        assertEquals(new ArrayList<Strategy>(configure.getStrategies().values()), store.listStrategies());
+        assertEquals(new ArrayList<Strategy>(slbModelTree.getStrategies().values()), store.listStrategies());
 
-        assertEquals(configure, "configure_base.xml");
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
     }
     
     @Test
     public void testRemovePool() throws Exception {
         store.removePool("Web.Tuangou");
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
-        configure.removePool("Web.Tuangou");
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        slbModelTree.removePool("Web.Tuangou");
 
-        assertEquals(new ArrayList<Pool>(configure.getPools().values()), store.listPools());
+        assertEquals(new ArrayList<Pool>(slbModelTree.getPools().values()), store.listPools());
 
-        assertEquals(configure, "configure_base.xml");
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
     }
 
     @Test
     public void testRemoveStrategyRollback() throws Exception {
-        new File(tmpDir, "configure_base.xml").setWritable(false);
+        new File(tmpDir, "slb_base.xml").setWritable(false);
 
         try {
             store.removeStrategy("uri-hash");
@@ -333,22 +333,22 @@ public class LocalFileModelStoreTest {
             Assert.fail();
         }
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
 
-        assertEquals(new ArrayList<Strategy>(configure.getStrategies().values()), store.listStrategies());
+        assertEquals(new ArrayList<Strategy>(slbModelTree.getStrategies().values()), store.listStrategies());
 
-        assertEquals(configure, "configure_base.xml");
-        assertRawFileNotChanged("configure_base.xml");
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
     }
 
     @Test
     public void testUpdateVirtualServer() throws Exception {
 
         VirtualServer newVirtualServer = DefaultSaxParser.parse(
-                FileUtils.readFileToString(new File(baseDir, "configure_www.xml"))).findVirtualServer("www");
+                FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))).findVirtualServer("www");
         Instance newInstance = new Instance();
         newInstance.setIp("10.1.2.5");
         newVirtualServer.addInstance(newInstance);
@@ -372,12 +372,12 @@ public class LocalFileModelStoreTest {
 
         Date now = new Date();
         store.updateVirtualServer("www", newVirtualServer);
-        Configure configure = DefaultSaxParser
-                .parse(FileUtils.readFileToString(new File(baseDir, "configure_www.xml")));
-        new DefaultMerger().merge(configure,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_tuangou.xml"))));
+        SlbModelTree slbModelTree = DefaultSaxParser
+                .parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml")));
+        new DefaultMerger().merge(slbModelTree,
+                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
 
-        configure.addVirtualServer(newVirtualServer);
+        slbModelTree.addVirtualServer(newVirtualServer);
 
         Assert.assertEquals(originalVersion + 1, store.findVirtualServer("www").getVersion());
         Assert.assertEquals(originalCreationDate, store.findVirtualServer("www").getCreationDate());
@@ -385,21 +385,21 @@ public class LocalFileModelStoreTest {
         Assert.assertTrue(EqualsBuilder.reflectionEquals(newVirtualServer, store.findVirtualServer("www"), "m_version",
                 "m_creationDate", "m_lastModifiedDate"));
         // assert the whole model
-        assertEquals(new ArrayList<VirtualServer>(configure.getVirtualServers().values()), store.listVirtualServers());
-        Configure wwwConfigure = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir,
-                "configure_www.xml")));
-        wwwConfigure.addVirtualServer(newVirtualServer);
-        // assert www configure has updated
-        assertEquals(wwwConfigure, "configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
+        SlbModelTree wwwSlbModelTree = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir,
+                "slb_www.xml")));
+        wwwSlbModelTree.addVirtualServer(newVirtualServer);
+        // assert www slbModelTree has updated
+        assertEquals(wwwSlbModelTree, "slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
     public void testUpdateVirtualServerConcurrentModification() throws Exception {
 
         VirtualServer newVirtualServer = DefaultSaxParser.parse(
-                FileUtils.readFileToString(new File(baseDir, "configure_www.xml"))).findVirtualServer("www");
+                FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))).findVirtualServer("www");
         Instance newInstance = new Instance();
         newInstance.setIp("10.1.2.5");
         newVirtualServer.addInstance(newInstance);
@@ -426,7 +426,7 @@ public class LocalFileModelStoreTest {
 
         // modify concurrent
         VirtualServer newVirtualServer1 = DefaultSaxParser.parse(
-                FileUtils.readFileToString(new File(baseDir, "configure_www.xml"))).findVirtualServer("www");
+                FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))).findVirtualServer("www");
         Instance newInstance1 = new Instance();
         newInstance1.setIp("10.1.2.5");
         newVirtualServer1.addInstance(newInstance1);
@@ -453,12 +453,12 @@ public class LocalFileModelStoreTest {
         }
         // modify concurrent end
 
-        Configure configure = DefaultSaxParser
-                .parse(FileUtils.readFileToString(new File(baseDir, "configure_www.xml")));
-        new DefaultMerger().merge(configure,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_tuangou.xml"))));
+        SlbModelTree slbModelTree = DefaultSaxParser
+                .parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml")));
+        new DefaultMerger().merge(slbModelTree,
+                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
 
-        configure.addVirtualServer(newVirtualServer);
+        slbModelTree.addVirtualServer(newVirtualServer);
 
         Assert.assertEquals(originalVersion + 1, store.findVirtualServer("www").getVersion());
         Assert.assertEquals(originalCreationDate, store.findVirtualServer("www").getCreationDate());
@@ -466,14 +466,14 @@ public class LocalFileModelStoreTest {
         Assert.assertTrue(EqualsBuilder.reflectionEquals(newVirtualServer, store.findVirtualServer("www"), "m_version",
                 "m_creationDate", "m_lastModifiedDate"));
         // assert the whole model
-        assertEquals(new ArrayList<VirtualServer>(configure.getVirtualServers().values()), store.listVirtualServers());
-        Configure wwwConfigure = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir,
-                "configure_www.xml")));
-        wwwConfigure.addVirtualServer(newVirtualServer);
-        // assert www configure has updated
-        assertEquals(wwwConfigure, "configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
+        SlbModelTree wwwSlbModelTree = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir,
+                "slb_www.xml")));
+        wwwSlbModelTree.addVirtualServer(newVirtualServer);
+        // assert www slbModelTree has updated
+        assertEquals(wwwSlbModelTree, "slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
 
     }
 
@@ -481,7 +481,7 @@ public class LocalFileModelStoreTest {
     public void testUpdateVirtualServerNotExists() throws Exception {
 
         VirtualServer newVirtualServer = DefaultSaxParser.parse(
-                FileUtils.readFileToString(new File(baseDir, "configure_www.xml"))).findVirtualServer("www");
+                FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))).findVirtualServer("www");
         Instance newInstance = new Instance();
         newInstance.setIp("10.1.2.5");
         newVirtualServer.addInstance(newInstance);
@@ -508,25 +508,25 @@ public class LocalFileModelStoreTest {
             Assert.fail();
         }
 
-        Configure configure = DefaultSaxParser
-                .parse(FileUtils.readFileToString(new File(baseDir, "configure_www.xml")));
-        new DefaultMerger().merge(configure,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_tuangou.xml"))));
+        SlbModelTree slbModelTree = DefaultSaxParser
+                .parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml")));
+        new DefaultMerger().merge(slbModelTree,
+                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
 
         // assert the whole model
-        assertEquals(new ArrayList<VirtualServer>(configure.getVirtualServers().values()), store.listVirtualServers());
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
 
     }
 
     @Test
     public void testUpdateVirtualServerRollback() throws Exception {
-        new File(tmpDir, "configure_www.xml").setWritable(false);
+        new File(tmpDir, "slb_www.xml").setWritable(false);
 
         VirtualServer newVirtualServer = DefaultSaxParser.parse(
-                FileUtils.readFileToString(new File(baseDir, "configure_www.xml"))).findVirtualServer("www");
+                FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))).findVirtualServer("www");
         Instance newInstance = new Instance();
         newInstance.setIp("10.1.2.5");
         newVirtualServer.addInstance(newInstance);
@@ -553,16 +553,16 @@ public class LocalFileModelStoreTest {
             Assert.fail();
 
         }
-        Configure configure = DefaultSaxParser
-                .parse(FileUtils.readFileToString(new File(baseDir, "configure_www.xml")));
-        new DefaultMerger().merge(configure,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_tuangou.xml"))));
+        SlbModelTree slbModelTree = DefaultSaxParser
+                .parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml")));
+        new DefaultMerger().merge(slbModelTree,
+                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
 
         // assert the whole model
-        assertEquals(new ArrayList<VirtualServer>(configure.getVirtualServers().values()), store.listVirtualServers());
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
@@ -592,21 +592,21 @@ public class LocalFileModelStoreTest {
         Assert.assertEquals(now, newVirtualServer.getCreationDate());
         Assert.assertEquals(now, newVirtualServer.getLastModifiedDate());
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
-        new DefaultMerger().merge(configure,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_www.xml"))));
-        new DefaultMerger().merge(configure,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_tuangou.xml"))));
-        configure.addVirtualServer(newVirtualServer);
-        assertEquals(new ArrayList<VirtualServer>(configure.getVirtualServers().values()), store.listVirtualServers());
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        new DefaultMerger().merge(slbModelTree,
+                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))));
+        new DefaultMerger().merge(slbModelTree,
+                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
+        slbModelTree.addVirtualServer(newVirtualServer);
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
         // assert new file created
-        Assert.assertTrue(new File(tmpDir, "configure_testVs.xml").exists());
+        Assert.assertTrue(new File(tmpDir, "slb_testVs.xml").exists());
         Assert.assertEquals(1,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(tmpDir, "configure_testVs.xml")))
+                DefaultSaxParser.parse(FileUtils.readFileToString(new File(tmpDir, "slb_testVs.xml")))
                         .getVirtualServers().size());
         VirtualServer virtualServerFromFile = DefaultSaxParser
-                .parse(FileUtils.readFileToString(new File(tmpDir, "configure_testVs.xml"))).getVirtualServers()
+                .parse(FileUtils.readFileToString(new File(tmpDir, "slb_testVs.xml"))).getVirtualServers()
                 .get("testVs");
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -617,9 +617,9 @@ public class LocalFileModelStoreTest {
         Assert.assertEquals(sdf.format(newVirtualServer.getLastModifiedDate()),
                 sdf.format(virtualServerFromFile.getLastModifiedDate()));
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
 
     }
 
@@ -652,18 +652,18 @@ public class LocalFileModelStoreTest {
             Assert.fail();
         }
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
-        new DefaultMerger().merge(configure,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_www.xml"))));
-        new DefaultMerger().merge(configure,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_tuangou.xml"))));
-        assertEquals(new ArrayList<VirtualServer>(configure.getVirtualServers().values()), store.listVirtualServers());
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        new DefaultMerger().merge(slbModelTree,
+                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))));
+        new DefaultMerger().merge(slbModelTree,
+                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
         // assert new file not created
-        Assert.assertFalse(new File(tmpDir, "configure_testVs.xml").exists());
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        Assert.assertFalse(new File(tmpDir, "slb_testVs.xml").exists());
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
 
     }
 
@@ -698,18 +698,18 @@ public class LocalFileModelStoreTest {
             Assert.fail();
         }
 
-        Configure configure = DefaultSaxParser.parse(FileUtils
-                .readFileToString(new File(baseDir, "configure_base.xml")));
-        new DefaultMerger().merge(configure,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_www.xml"))));
-        new DefaultMerger().merge(configure,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_tuangou.xml"))));
-        assertEquals(new ArrayList<VirtualServer>(configure.getVirtualServers().values()), store.listVirtualServers());
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        new DefaultMerger().merge(slbModelTree,
+                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))));
+        new DefaultMerger().merge(slbModelTree,
+                DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
         // assert new file not created
-        Assert.assertFalse(new File(tmpDir, "configure_testVs.xml").exists());
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        Assert.assertFalse(new File(tmpDir, "slb_testVs.xml").exists());
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
 
     }
 
@@ -718,17 +718,17 @@ public class LocalFileModelStoreTest {
         store.removeVirtualServer("www");
 
         Assert.assertNull(store.findVirtualServer("www"));
-        // assert www configure deleted
-        Assert.assertFalse(new File(tmpDir, "configure_www.xml").exists());
+        // assert www slbModelTree deleted
+        Assert.assertFalse(new File(tmpDir, "slb_www.xml").exists());
 
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
     public void testRemoveVirtualServerRollback() throws Exception {
         tmpDir.setWritable(false);
-        new File(tmpDir, "configure_www.xml").setWritable(false);
+        new File(tmpDir, "slb_www.xml").setWritable(false);
         try {
             store.removeVirtualServer("www");
             Assert.fail();
@@ -739,9 +739,9 @@ public class LocalFileModelStoreTest {
         }
 
         Assert.assertNotNull(store.findVirtualServer("www"));
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
@@ -754,9 +754,9 @@ public class LocalFileModelStoreTest {
             Assert.fail();
         }
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
@@ -764,18 +764,18 @@ public class LocalFileModelStoreTest {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         store.tag("www", 1);
         store.tag("www", 1);
-        File tagFile = new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/configure_www.xml_1");
-        File tagFile2 = new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/configure_www.xml_2");
+        File tagFile = new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/slb_www.xml_1");
+        File tagFile2 = new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/slb_www.xml_2");
         Assert.assertTrue(tagFile.exists());
         Assert.assertTrue(tagFile2.exists());
-        Assert.assertEquals(DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_www.xml"))),
+        Assert.assertEquals(DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))),
                 DefaultSaxParser.parse(FileUtils.readFileToString(tagFile)));
-        Assert.assertEquals(DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "configure_www.xml"))),
+        Assert.assertEquals(DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))),
                 DefaultSaxParser.parse(FileUtils.readFileToString(tagFile2)));
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
@@ -789,9 +789,9 @@ public class LocalFileModelStoreTest {
             Assert.fail();
         }
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
@@ -806,9 +806,9 @@ public class LocalFileModelStoreTest {
             Assert.fail();
         }
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
@@ -826,9 +826,9 @@ public class LocalFileModelStoreTest {
             Assert.fail();
         }
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
@@ -860,9 +860,9 @@ public class LocalFileModelStoreTest {
         Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3", "tuangou-4" },
                 tuangouTagIds.toArray(new String[0]));
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
@@ -877,9 +877,9 @@ public class LocalFileModelStoreTest {
             Assert.fail();
         }
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
@@ -887,9 +887,9 @@ public class LocalFileModelStoreTest {
 
         Assert.assertTrue(store.listTagIds("www").size() == 0);
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
@@ -900,9 +900,9 @@ public class LocalFileModelStoreTest {
 
         Assert.assertEquals(store.findVirtualServer("www").toString(), tagVs.toString());
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
@@ -922,17 +922,17 @@ public class LocalFileModelStoreTest {
         Assert.assertEquals(tag1, store.findPrevTagId("www", tag2));
         Assert.assertNull(store.findPrevTagId("www", tag1));
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
     public void testListMultiFolderTags() throws Exception {
-        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
-                "tag/www/20120101/configure_www.xml_1"));
-        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
-                "tag/www/20120102/configure_www.xml_2"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
+                "tag/www/20120101/slb_www.xml_1"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
+                "tag/www/20120102/slb_www.xml_2"));
 
         store = new LocalFileModelStoreImpl();
         store.setBaseDir(tmpDir.getAbsolutePath());
@@ -951,17 +951,17 @@ public class LocalFileModelStoreTest {
         Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3" },
                 tuangouTagIds.toArray(new String[0]));
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
     public void testGetMultiFolderTag() throws Exception {
-        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
-                "tag/www/20120101/configure_www.xml_1"));
-        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
-                "tag/www/20120102/configure_www.xml_2"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
+                "tag/www/20120101/slb_www.xml_1"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
+                "tag/www/20120102/slb_www.xml_2"));
 
         store = new LocalFileModelStoreImpl();
         store.setBaseDir(tmpDir.getAbsolutePath());
@@ -970,19 +970,19 @@ public class LocalFileModelStoreTest {
         Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-1").toString());
         Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-2").toString());
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     @Test
     public void testRemoveTagAndFindLatestTag() throws Exception {
-        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
-                "tag/www/20120101/configure_www.xml_1"));
-        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
-                "tag/www/20120101/configure_www.xml_2"));
-        FileUtils.copyFile(new File(tmpDir, "configure_www.xml"), new File(tmpDir,
-                "tag/www/20120102/configure_www.xml_3"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
+                "tag/www/20120101/slb_www.xml_1"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
+                "tag/www/20120101/slb_www.xml_2"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
+                "tag/www/20120102/slb_www.xml_3"));
 
         store = new LocalFileModelStoreImpl();
         store.setBaseDir(tmpDir.getAbsolutePath());
@@ -995,8 +995,8 @@ public class LocalFileModelStoreTest {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
-        Assert.assertFalse(new File(tmpDir, "tag/www/20120101/configure_www.xml_2").exists());
-        Assert.assertFalse(new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/configure_www.xml_4").exists());
+        Assert.assertFalse(new File(tmpDir, "tag/www/20120101/slb_www.xml_2").exists());
+        Assert.assertFalse(new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/slb_www.xml_4").exists());
 
         List<String> tagIds = store.listTagIds("www");
         Assert.assertArrayEquals(new String[] { "www-1", "www-3" }, tagIds.toArray());
@@ -1004,15 +1004,15 @@ public class LocalFileModelStoreTest {
 
         store.removeTag("www", "www-1");
         store.removeTag("www", "www-3");
-        Assert.assertFalse(new File(tmpDir, "tag/www/20120101/configure_www.xml_1").exists());
-        Assert.assertFalse(new File(tmpDir, "tag/www/20120101/configure_www.xml_3").exists());
+        Assert.assertFalse(new File(tmpDir, "tag/www/20120101/slb_www.xml_1").exists());
+        Assert.assertFalse(new File(tmpDir, "tag/www/20120101/slb_www.xml_3").exists());
 
         Assert.assertEquals(0, store.listTagIds("www").size());
         Assert.assertNull(store.findLatestTagId("www"));
 
-        assertRawFileNotChanged("configure_www.xml");
-        assertRawFileNotChanged("configure_tuangou.xml");
-        assertRawFileNotChanged("configure_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+        assertRawFileNotChanged("slb_base.xml");
     }
 
     private void assertRawFileNotChanged(String fileName) throws IOException {
@@ -1020,8 +1020,8 @@ public class LocalFileModelStoreTest {
                 FileUtils.readFileToString(new File(tmpDir, fileName)));
     }
 
-    private void assertEquals(Configure configure, String fileName) throws SAXException, IOException {
-        Assert.assertEquals(configure.toString(),
+    private void assertEquals(SlbModelTree slbModelTree, String fileName) throws SAXException, IOException {
+        Assert.assertEquals(slbModelTree.toString(),
                 DefaultSaxParser.parse(FileUtils.readFileToString(new File(tmpDir, fileName))).toString());
     }
 
