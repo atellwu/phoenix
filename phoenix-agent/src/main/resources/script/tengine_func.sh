@@ -133,6 +133,11 @@ function git_commit {
 	local git_dir=$1
 	local comment=$2
 	cd $git_dir
+	
+	cat <<-END > .version
+			$version
+	END
+	
 	local change_files=`git status --short | wc -l`
 	if [ $change_files -gt 0 ];then
 		log "committing $change_files files"

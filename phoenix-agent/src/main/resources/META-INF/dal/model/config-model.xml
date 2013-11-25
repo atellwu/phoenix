@@ -15,8 +15,8 @@
 		<element name="dryrun-port" value-type="int" default-value="3475" primitive="true" />
 		<element name="kernel-doc-base-pattern" value-type="String" default-value="/data/webapps/phoenix/phoenix-kernel/%s" />
 		<element name="agent-doc-base-pattern" value-type="String" default-value="/data/webapps/phoenix/phoenix-agent/" />
-		<element name="tengine-config-git-doc-base-pattern" value-type="String" default-value="/data/appdatas/phoenix/tengine-conf" />
-		<element name="tengine-config-doc-base-pattern" value-type="String" default-value="/usr/local/nginx/conf/phoenix-load-balance" />
+		<element name="tengine-config-git-doc-base-pattern" value-type="String" default-value="/data/appdatas/phoenix/slb/tengine-conf" />
+		<element name="tengine-config-doc-base-pattern" value-type="String" default-value="/usr/local/nginx/conf/phoenix-slb" />
 		<element name="temp-script-dir" value-type="String" default-value="/tmp/" />
 		<element name="domain-doc-base-keyword-pattern" value-type="String" default-value="/%1$s/current/%1$s.war" />
 		<element name="test-service-poll-interval" value-type="int" default-value="2000" primitive="true" />

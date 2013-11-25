@@ -24,9 +24,12 @@ public enum PlexusComponentContainer {
         this.container = ContainerLoader.getDefaultContainer();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T lookup(Class<Object> type) throws ComponentLookupException {
-        return (T) this.container.lookup(type);
+    public <T> T lookup(Class<T> type) throws ComponentLookupException {
+        return this.container.lookup(type);
+    }
+
+    public <T> T lookup(Class<T> type, String roleHint) throws ComponentLookupException {
+        return this.container.lookup(type, roleHint);
     }
 
 }

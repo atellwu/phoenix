@@ -1,0 +1,15 @@
+<runtime-config>
+    <tengine-config-git-url-dev>ssh://git@code.dianpingoa.com/arch/phoenix-slb-tengine-config-dev.git</tengine-config-git-url-dev>
+    <tengine-config-git-url-product>ssh://git@code.dianpingoa.com/arch/phoenix-slb-tengine-config-product.git</tengine-config-git-url-product>
+    <model-git-url-dev>ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-dev.git</model-git-url-dev>
+    <model-git-url-product>ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-product.git</model-git-url-product>
+    <model-store-base-dir>/data/appdatas/phoenix/slb/model</model-store-base-dir>
+    <deploy-log-url-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=log&deployId=%s]]></deploy-log-url-pattern>
+    <deploy-url-reload-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=deploy&deployId=%s&vs=%s&config=%s&version=%s&gitUrl=%s&reload=true]]></deploy-url-reload-pattern>
+    <deploy-status-url-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=status&deployId=%s]]></deploy-status-url-pattern>
+    <agent-tengine-config-version-url-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=version&vs=%s]]></agent-tengine-config-version-url-pattern>
+    <deploy-getlog-retrycount>10</deploy-getlog-retrycount>
+    <deploy-connect-timeout>1000</deploy-connect-timeout>
+    <deploy-retry-interval>30000</deploy-retry-interval>
+    <env>dev</env>
+</runtime-config>

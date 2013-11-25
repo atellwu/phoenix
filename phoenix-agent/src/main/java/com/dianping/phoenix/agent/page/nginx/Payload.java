@@ -182,6 +182,19 @@ public class Payload implements ActionPayload<AgentPage, Action> {
                 }
 
                 break;
+            case STATUS:
+            case CANCEL:
+            case GETLOG:
+                checkCommonArguments(ctx);
+                if (m_offset < 0) {
+                    ctx.addError(new ErrorObject("offset.invalid"));
+                }
+                break;
+            case VERSION:
+                if(StringUtils.isBlank(m_virtualServerName)){
+                    ctx.addError(new ErrorObject("vsName.missing"));
+                }
+                break;
 
         }
     }

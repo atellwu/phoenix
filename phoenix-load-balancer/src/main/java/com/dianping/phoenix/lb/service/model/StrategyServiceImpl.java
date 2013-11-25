@@ -4,7 +4,7 @@
  * File Created at 2013-10-17
  * 
  */
-package com.dianping.phoenix.lb.model.service.impl;
+package com.dianping.phoenix.lb.service.model;
 
 import java.util.List;
 
@@ -16,8 +16,6 @@ import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.dao.StrategyDao;
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.configure.entity.Strategy;
-import com.dianping.phoenix.lb.model.service.ConcurrentControlServiceTemplate;
-import com.dianping.phoenix.lb.model.service.StrategyService;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
 
 /**
