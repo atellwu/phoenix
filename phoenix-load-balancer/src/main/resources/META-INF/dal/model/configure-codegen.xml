@@ -2,6 +2,7 @@
 <model>
   <entity name="configure" root="true">
     <entity-ref name="strategy" type="list" names="strategies" xml-indent="true" />
+    <entity-ref name="pool" type="list" names="pools" xml-indent="true" />
     <entity-ref name="virtualServer" type="list" names="virtualServers" />
   </entity>
   <entity name="strategy">
@@ -11,6 +12,24 @@
     <attribute name="method" value-type="String" />
     <attribute name="creation-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
     <attribute name="last-modified-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
+  </entity>
+  <entity name="pool">
+    <attribute name="name" value-type="String" />
+    <attribute name="loadbalance-strategy-name" value-type="String" />
+    <attribute name="min-available-member-percentage" value-type="int" />
+    <attribute name="creation-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
+    <attribute name="last-modified-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
+    <entity-ref name="member" type="list" names="members" />
+  </entity>
+  <entity name="member">
+    <attribute name="name" value-type="String" />
+    <attribute name="ip" value-type="String" />
+    <attribute name="port" value-type="int" />
+    <attribute name="weight" value-type="int" />
+    <attribute name="max-fails" value-type="int" />
+    <attribute name="fail-timeout" value-type="String" />
+    <attribute name="state" value-type="String" />
+    <attribute name="availability" value-type="String" />
   </entity>
   <entity name="virtualServer">
     <attribute name="name" value-type="String" />
@@ -23,25 +42,8 @@
     <attribute name="last-modified-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
     <attribute name="version" value-type="int" />
     <attribute name="access_log" value-type="String" />
-    <entity-ref name="pool" type="list" names="pools" xml-indent="true" />
     <entity-ref name="instance" type="list" names="instances" xml-indent="true" />
     <entity-ref name="location" type="list" names="locations" xml-indent="true" />
-  </entity>
-  <entity name="pool">
-    <attribute name="name" value-type="String" />
-    <attribute name="loadbalance-strategy-name" value-type="String" />
-    <attribute name="min-available-member-percentage" value-type="int" />
-    <entity-ref name="member" type="list" names="members" />
-  </entity>
-  <entity name="member">
-    <attribute name="name" value-type="String" />
-    <attribute name="ip" value-type="String" />
-    <attribute name="port" value-type="int" />
-    <attribute name="weight" value-type="int" />
-    <attribute name="max-fails" value-type="int" />
-    <attribute name="fail-timeout" value-type="String" />
-    <attribute name="state" value-type="String" />
-    <attribute name="availability" value-type="String" />
   </entity>
   <entity name="instance">
     <attribute name="ip" value-type="String" />

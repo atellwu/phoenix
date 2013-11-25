@@ -9,6 +9,7 @@ package com.dianping.phoenix.lb.service.model;
 import java.util.List;
 
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.configure.entity.Pool;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
 
 /**
@@ -26,7 +27,7 @@ public interface VirtualServerService {
 
     void modifyVirtualServer(String virtualServerName, VirtualServer virtualServer) throws BizException;
 
-    String generateNginxConfig(VirtualServer virtualServer) throws BizException;
+    String generateNginxConfig(VirtualServer virtualServer, List<Pool> pools) throws BizException;
 
     String tag(String virtualServerName, int virtualServerVersion) throws BizException;
 

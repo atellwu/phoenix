@@ -4,7 +4,7 @@
  * File Created at Oct 30, 2013
  * 
  */
-package com.dianping.phoenix.lb.nginx;
+package com.dianping.phoenix.lb.model.nginx;
 
 import com.dianping.phoenix.lb.model.configure.entity.Member;
 

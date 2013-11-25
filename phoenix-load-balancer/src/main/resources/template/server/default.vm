@@ -13,9 +13,11 @@ server {
 }
  
 #foreach($upstream in $config.upstreams)
+#if($upstream.used)
 upstream $upstream.name {
     $nginx.lbStrategy($upstream.lbStrategy)
 #foreach($server in $upstream.servers)
 $nginx.upstreamServer($server)#end
 }
+#end
 #end

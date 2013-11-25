@@ -4,18 +4,20 @@
  * File Created at Oct 30, 2013
  * 
  */
-package com.dianping.phoenix.lb.nginx;
+package com.dianping.phoenix.lb.model.nginx;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Leo Liang
  * 
  */
 public class NginxConfig {
-    private NginxServer         server;
-    private List<NginxUpstream> upstreams = new ArrayList<NginxUpstream>();
+    private NginxServer                server;
+    private Map<String, NginxUpstream> upstreams = new HashMap<String, NginxUpstream>();
 
     /**
      * @return the servers
@@ -36,11 +38,15 @@ public class NginxConfig {
      * @return the upstreams
      */
     public List<NginxUpstream> getUpstreams() {
-        return upstreams;
+        return new ArrayList<NginxUpstream>(upstreams.values());
     }
 
     public void addUpstream(NginxUpstream upstream) {
-        this.upstreams.add(upstream);
+        this.upstreams.put(upstream.getName(), upstream);
+    }
+
+    public NginxUpstream getUpstream(String name) {
+        return upstreams.get(name);
     }
 
 }
