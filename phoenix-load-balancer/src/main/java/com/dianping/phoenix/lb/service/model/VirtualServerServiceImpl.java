@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ import com.dianping.phoenix.lb.model.configure.entity.Member;
 import com.dianping.phoenix.lb.model.configure.entity.Pool;
 import com.dianping.phoenix.lb.model.configure.entity.Strategy;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
+import com.dianping.phoenix.lb.service.ConcurrentControlServiceTemplate;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
 import com.dianping.phoenix.lb.velocity.TemplateManager;
 import com.dianping.phoenix.lb.velocity.VelocityEngineManager;
@@ -48,7 +50,8 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
      * @param templateDao
      */
     @Autowired(required = true)
-    public VirtualServerServiceImpl(VirtualServerDao virtualServerDao, StrategyDao strategyDao) {
+    public VirtualServerServiceImpl(VirtualServerDao virtualServerDao, StrategyDao strategyDao)
+            throws ComponentLookupException {
         super();
         this.virtualServerDao = virtualServerDao;
         this.strategyDao = strategyDao;
@@ -298,18 +301,24 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
     @Override
     public String generateNginxConfig(VirtualServer virtualServer) throws BizException {
 
-        Configure tmpConfigure = new Configure();
-        for (Strategy strategy : strategyDao.list()) {
-            tmpConfigure.addStrategy(strategy);
+        try {
+            Configure tmpConfigure = new Configure();
+            for (Strategy strategy : strategyDao.list()) {
+                tmpConfigure.addStrategy(strategy);
+            }
+
+            tmpConfigure.addVirtualServer(virtualServer);
+
+            NginxConfigVisitor visitor = new NginxConfigVisitor();
+            tmpConfigure.accept(visitor);
+            Map<String, Object> context = new HashMap<String, Object>();
+            context.put("config", visitor.getVisitorResult());
+            return VelocityEngineManager.INSTANCE.merge(TemplateManager.INSTANCE.getTemplate("server", "default"),
+                    context);
+        } catch (Exception e) {
+            ExceptionUtils.logAndRethrowBizException(e);
         }
-
-        tmpConfigure.addVirtualServer(virtualServer);
-
-        NginxConfigVisitor visitor = new NginxConfigVisitor();
-        tmpConfigure.accept(visitor);
-        Map<String, Object> context = new HashMap<String, Object>();
-        context.put("config", visitor.getVisitorResult());
-        return VelocityEngineManager.INSTANCE.merge(TemplateManager.INSTANCE.getTemplate("server", "default"), context);
+        return "";
     }
 
     @Override

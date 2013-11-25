@@ -10,18 +10,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.dianping.phoenix.lb.constant.Constants;
+import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.model.configure.entity.Directive;
 import com.dianping.phoenix.lb.model.configure.entity.Location;
 import com.dianping.phoenix.lb.model.configure.entity.Member;
 import com.dianping.phoenix.lb.model.configure.entity.Pool;
 import com.dianping.phoenix.lb.model.configure.entity.Strategy;
 import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
-import com.dianping.phoenix.lb.nginx.NginxConfig;
-import com.dianping.phoenix.lb.nginx.NginxLocation;
-import com.dianping.phoenix.lb.nginx.NginxLocation.MatchType;
-import com.dianping.phoenix.lb.nginx.NginxServer;
-import com.dianping.phoenix.lb.nginx.NginxUpstream;
-import com.dianping.phoenix.lb.nginx.NginxUpstreamServer;
+import com.dianping.phoenix.lb.model.nginx.NginxConfig;
+import com.dianping.phoenix.lb.model.nginx.NginxLocation;
+import com.dianping.phoenix.lb.model.nginx.NginxLocation.MatchType;
+import com.dianping.phoenix.lb.model.nginx.NginxServer;
+import com.dianping.phoenix.lb.model.nginx.NginxUpstream;
+import com.dianping.phoenix.lb.model.nginx.NginxUpstreamServer;
+import com.dianping.phoenix.lb.utils.MessageUtils;
 
 /**
  * @author Leo Liang
@@ -82,6 +84,14 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
         nginxLocation.setPattern(location.getPattern());
         for (Directive directive : location.getDirectives()) {
             nginxLocation.addDirective(directive);
+            if ("proxy_pass".equals(directive.getType())) {
+                NginxUpstream upstream = result.getUpstream(directive.getDynamicAttribute("pool-name"));
+                if (upstream == null) {
+                    throw new RuntimeException(MessageUtils.getMessage(MessageID.PROXY_PASS_NO_POOL,
+                            location.getPattern()));
+                }
+                upstream.setUsed(true);
+            }
         }
 
         result.getServer().addLocations(nginxLocation);

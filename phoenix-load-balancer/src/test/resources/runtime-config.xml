@@ -4,6 +4,7 @@
     <model-git-url-dev>ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-dev.git</model-git-url-dev>
     <model-git-url-product>ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-product.git</model-git-url-product>
     <model-store-base-dir>/data/appdatas/phoenix/slb/model</model-store-base-dir>
+    <tengine-config-base-dir>/data/appdatas/phoenix/slb/tengine</tengine-config-base-dir>
     <deploy-log-url-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=log&deployId=%s]]></deploy-log-url-pattern>
     <deploy-url-reload-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=deploy&deployId=%s&vs=%s&config=%s&version=%s&gitUrl=%s&reload=true]]></deploy-url-reload-pattern>
     <deploy-status-url-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=status&deployId=%s]]></deploy-status-url-pattern>

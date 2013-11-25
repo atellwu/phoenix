@@ -17,8 +17,8 @@ import com.dianping.phoenix.lb.model.Availability;
 import com.dianping.phoenix.lb.model.State;
 import com.dianping.phoenix.lb.model.configure.entity.Directive;
 import com.dianping.phoenix.lb.model.configure.entity.Strategy;
-import com.dianping.phoenix.lb.nginx.NginxLocation.MatchType;
-import com.dianping.phoenix.lb.nginx.NginxUpstreamServer;
+import com.dianping.phoenix.lb.model.nginx.NginxLocation.MatchType;
+import com.dianping.phoenix.lb.model.nginx.NginxUpstreamServer;
 
 /**
  * @author Leo Liang

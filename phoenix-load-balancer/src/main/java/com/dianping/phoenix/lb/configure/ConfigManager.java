@@ -1,7 +1,10 @@
 package com.dianping.phoenix.lb.configure;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Iterator;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.unidal.helper.Files;
@@ -94,6 +97,7 @@ public class ConfigManager implements Initializable {
         } catch (Exception e) {
             throw new InitializationException(String.format("Unable to load configuration file(%s)!", m_configFile), e);
         }
+        makeShellScriptExecutable();
     }
 
     public boolean isShowLogTimestamp() {
@@ -115,4 +119,24 @@ public class ConfigManager implements Initializable {
         return String.format(m_config.getAgentTengineConfigVersionUrlPattern(), host, vsName);
     }
 
+    public File getLbScript() {
+        check();
+        return getScriptFile("lb.sh");
+    }
+
+    private File getScriptFile(String scriptFileName) {
+        URL scriptUrl = this.getClass().getClassLoader().getResource("script/" + scriptFileName);
+        if (scriptUrl == null) {
+            throw new RuntimeException(scriptFileName + " not found");
+        }
+        return new File(scriptUrl.getPath());
+    }
+
+    private void makeShellScriptExecutable() {
+        File scriptDir = getLbScript().getParentFile();
+        Iterator<File> scriptIter = FileUtils.iterateFiles(scriptDir, new String[] { "sh" }, true);
+        while (scriptIter != null && scriptIter.hasNext()) {
+            scriptIter.next().setExecutable(true, false);
+        }
+    }
 }

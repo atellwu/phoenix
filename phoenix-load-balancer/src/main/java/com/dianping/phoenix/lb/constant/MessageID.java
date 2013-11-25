@@ -40,13 +40,13 @@ public enum MessageID {
     POOL_MEMBER_NO_IP("pool_member_no_ip"), //
 
     PROXY_PASS_MORE_THAN_ONE("proxy_pass_more_than_one"), //
+    PROXY_PASS_NO_POOL("proxy_pass_no_pool"), //
 
     TAG_REMOVE_NOT_FOUND("tag_remove_not_found"), //
-    
-    DEPLOY_FIND_ACTIVE_DEPLOY_FAIL("deploy_find_active_deploy_fail"),//
-    DEPLOY_ALREADY_RUNNING("deploy_already_running"),
-    DEPLOY_EXCEPTION("deploy_exception");
-    
+
+    DEPLOY_FIND_ACTIVE_DEPLOY_FAIL("deploy_find_active_deploy_fail"), //
+    DEPLOY_ALREADY_RUNNING("deploy_already_running"), //
+    DEPLOY_EXCEPTION("deploy_exception"),
 
     ;
 
