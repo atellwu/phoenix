@@ -1,4 +1,4 @@
-<configure>
+<slb-model-tree>
 	<strategies>
 		<strategy name="uri-hash" type="hash" target="$request_uri" method="crc32" creation-date="2013-10-15 16:40:00"
 			last-modified-date="2013-10-15 16:40:00" />
@@ -38,4 +38,4 @@
 		</locations>
 	</virtualServer>
 	<virtualServer />
-</configure>
+</slb-model-tree>

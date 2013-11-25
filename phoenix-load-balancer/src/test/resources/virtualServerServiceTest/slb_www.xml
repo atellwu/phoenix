@@ -1,4 +1,4 @@
-<configure>
+<slb-model-tree>
 	<virtualServer name="www" state="ENABLED" availability="AVAILABLE" default-pool-name="Web.Index" domain="www.dianping.com"
 		port="80" creation-date="2013-10-15 16:40:00" last-modified-date="2013-10-15 16:40:00" version="1" access_log="logs/domain2.access.log  main"
 		test="test a">
@@ -26,4 +26,4 @@
 			</location>
 		</locations>
 	</virtualServer>
-</configure>
+</slb-model-tree>

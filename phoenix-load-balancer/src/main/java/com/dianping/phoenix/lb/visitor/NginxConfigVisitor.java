@@ -11,12 +11,12 @@ import java.util.Map;
 
 import com.dianping.phoenix.lb.constant.Constants;
 import com.dianping.phoenix.lb.constant.MessageID;
-import com.dianping.phoenix.lb.model.configure.entity.Directive;
-import com.dianping.phoenix.lb.model.configure.entity.Location;
-import com.dianping.phoenix.lb.model.configure.entity.Member;
-import com.dianping.phoenix.lb.model.configure.entity.Pool;
-import com.dianping.phoenix.lb.model.configure.entity.Strategy;
-import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
+import com.dianping.phoenix.lb.model.entity.Directive;
+import com.dianping.phoenix.lb.model.entity.Location;
+import com.dianping.phoenix.lb.model.entity.Member;
+import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.Strategy;
+import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.model.nginx.NginxConfig;
 import com.dianping.phoenix.lb.model.nginx.NginxLocation;
 import com.dianping.phoenix.lb.model.nginx.NginxLocation.MatchType;

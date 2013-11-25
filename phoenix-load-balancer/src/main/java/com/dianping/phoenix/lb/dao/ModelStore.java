@@ -9,9 +9,9 @@ package com.dianping.phoenix.lb.dao;
 import java.util.List;
 
 import com.dianping.phoenix.lb.exception.BizException;
-import com.dianping.phoenix.lb.model.configure.entity.Pool;
-import com.dianping.phoenix.lb.model.configure.entity.Strategy;
-import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
+import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.Strategy;
+import com.dianping.phoenix.lb.model.entity.VirtualServer;
 
 /**
  * @author Leo Liang

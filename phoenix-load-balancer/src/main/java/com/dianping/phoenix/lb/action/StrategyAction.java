@@ -7,7 +7,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.phoenix.lb.model.configure.entity.Strategy;
+import com.dianping.phoenix.lb.model.entity.Strategy;
 import com.dianping.phoenix.lb.service.model.StrategyService;
 import com.opensymphony.xwork2.ActionSupport;
 

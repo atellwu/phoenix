@@ -19,9 +19,9 @@ import com.dianping.phoenix.lb.dao.StrategyDao;
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.Availability;
 import com.dianping.phoenix.lb.model.State;
-import com.dianping.phoenix.lb.model.configure.entity.Member;
-import com.dianping.phoenix.lb.model.configure.entity.Pool;
-import com.dianping.phoenix.lb.model.configure.entity.Strategy;
+import com.dianping.phoenix.lb.model.entity.Member;
+import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.Strategy;
 import com.dianping.phoenix.lb.service.ConcurrentControlServiceTemplate;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
 

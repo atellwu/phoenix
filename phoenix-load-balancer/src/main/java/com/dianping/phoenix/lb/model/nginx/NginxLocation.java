@@ -9,7 +9,7 @@ package com.dianping.phoenix.lb.model.nginx;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dianping.phoenix.lb.model.configure.entity.Directive;
+import com.dianping.phoenix.lb.model.entity.Directive;
 
 /**
  * @author Leo Liang
