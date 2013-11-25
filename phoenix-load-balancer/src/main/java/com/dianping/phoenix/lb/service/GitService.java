@@ -21,4 +21,5 @@ public interface GitService {
     public void removeTag(GitContext context) throws Exception;
 
     void setup(GitContext context) throws Exception;
+    
 }

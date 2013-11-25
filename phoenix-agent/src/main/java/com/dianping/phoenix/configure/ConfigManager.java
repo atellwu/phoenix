@@ -231,8 +231,7 @@ public class ConfigManager implements Initializable {
             loaderClass = TOMCAT_LOADER_CLASS;
             serverXmlList.add(new File(containerInstallPath + "/conf/server.xml"));
             serverXmlList.add(new File(containerInstallPath + "/conf/Catalina/localhost/"));
-        }
-        if (containerType == ContainerType.JBOSS) {
+        } else if (containerType == ContainerType.JBOSS) {
             loaderClass = JBOSS_LOADER_CLASS;
             serverXmlList.add(new File(String.format("%s/server/%s/deploy/jboss-web.deployer/server.xml",
                     containerInstallPath, m_config.getAgent().getJbossServerName())));
