@@ -93,3 +93,11 @@ function clone {
 	cd - >/dev/null
 }
 
+function rollback {
+	log "rolling back $target_dir"
+	rm -rf $target_dir/*
+	
+	cd $target_dir/
+	git reset --hard
+	cd - >/dev/null
+}

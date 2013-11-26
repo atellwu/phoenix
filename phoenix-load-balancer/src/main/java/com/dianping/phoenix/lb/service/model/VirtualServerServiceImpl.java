@@ -331,14 +331,21 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
                     }
 
                     String tagId = virtualServerDao.tag(virtualServerName, virtualServerVersion, pools);
+                    File serverConfFile = new File(
+                            new File(configManager.getTengineConfigBaseDir(), virtualServerName),
+                            configManager.getTengineConfigFileName());
 
-                    FileUtils.writeStringToFile(new File(new File(configManager.getTengineConfigBaseDir(),
-                            virtualServerName), configManager.getTengineConfigFileName()), nginxConfigContent);
+                    try {
+                        FileUtils.writeStringToFile(serverConfFile, nginxConfigContent);
 
-                    gitService.tagAndPush(configManager.getTengineConfigGitUrl(),
-                            configManager.getTengineConfigBaseDir(), tagId,
-                            String.format("update vs(%s) to tag(%s)", virtualServerName, tagId));
-
+                        gitService.tagAndPush(configManager.getTengineConfigGitUrl(),
+                                configManager.getTengineConfigBaseDir(), tagId,
+                                String.format("update vs(%s) to tag(%s)", virtualServerName, tagId));
+                    } catch (Exception e) {
+                        virtualServerDao.removeTag(virtualServerName, tagId);
+                        gitService.rollback(configManager.getTengineConfigBaseDir());
+                        ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_TAG_FAIL, virtualServerName);
+                    }
                     return tagId;
                 } catch (Exception e) {
                     ExceptionUtils.rethrowBizException(e);

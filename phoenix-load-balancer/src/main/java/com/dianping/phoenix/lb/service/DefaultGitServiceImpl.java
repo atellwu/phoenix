@@ -107,6 +107,11 @@ public class DefaultGitServiceImpl implements GitService {
 
     }
 
+    @Override
+    public void rollback(String targetDir) throws BizException {
+        exec(getShellCmd("rollback", null, targetDir, null, null));
+    }
+
     public static void main(String[] args) throws ComponentLookupException, BizException, IOException {
         DefaultGitServiceImpl service = new DefaultGitServiceImpl();
         service.init();
@@ -115,8 +120,9 @@ public class DefaultGitServiceImpl implements GitService {
         service.clone(gitUrl, targetDir, null);
         FileUtils.writeStringToFile(new File(targetDir, System.currentTimeMillis() + ".t"),
                 Long.toString(System.currentTimeMillis()));
-        service.commitAllChanges(targetDir, "test-lll");
-        service.tagAndPush(gitUrl, targetDir, "test-lll", "ccccd");
+        // service.commitAllChanges(targetDir, "test-lll");
+        // service.tagAndPush(gitUrl, targetDir, "test-lll", "ccccd");
+        service.rollback(targetDir);
     }
 
 }
