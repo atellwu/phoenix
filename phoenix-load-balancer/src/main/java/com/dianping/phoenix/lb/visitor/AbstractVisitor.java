@@ -6,7 +6,7 @@
  */
 package com.dianping.phoenix.lb.visitor;
 
-import com.dianping.phoenix.lb.model.configure.transform.BaseVisitor;
+import com.dianping.phoenix.lb.model.transform.BaseVisitor;
 
 /**
  * @author Leo Liang

@@ -1,25 +1,13 @@
 package com.dianping.phoenix.lb.service;
 
-import java.io.File;
-import java.util.Collection;
-
-import org.eclipse.jgit.lib.Ref;
-
 public interface GitService {
-    void clear(File dir) throws Exception;
+    boolean clone(String gitUrl, String targetDir);
 
-    public String commit(GitContext context) throws Exception;
+    boolean checkoutTag(String targetDir, String tag);
 
-    public File getWorkingDir();
-
-    public Collection<Ref> lsRemote() throws Exception;
-
-    void pull(GitContext context) throws Exception;
-
-    void push(GitContext context) throws Exception;
-
-    public void removeTag(GitContext context) throws Exception;
-
-    void setup(GitContext context) throws Exception;
+    boolean commit(String targetDir, String comment);
     
+    boolean tag(String targetDir, String tag);
+    
+    boolean push(String targetDir);
 }

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.phoenix.lb.dao.ModelStore;
 import com.dianping.phoenix.lb.dao.VirtualServerDao;
 import com.dianping.phoenix.lb.exception.BizException;
-import com.dianping.phoenix.lb.model.configure.entity.VirtualServer;
+import com.dianping.phoenix.lb.model.entity.VirtualServer;
 
 /**
  * @author Leo Liang

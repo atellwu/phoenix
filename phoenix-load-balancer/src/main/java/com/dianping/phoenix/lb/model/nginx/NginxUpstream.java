@@ -4,12 +4,12 @@
  * File Created at Oct 30, 2013
  * 
  */
-package com.dianping.phoenix.lb.nginx;
+package com.dianping.phoenix.lb.model.nginx;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dianping.phoenix.lb.model.configure.entity.Strategy;
+import com.dianping.phoenix.lb.model.entity.Strategy;
 
 /**
  * @author Leo Liang
@@ -19,6 +19,15 @@ public class NginxUpstream {
     private String                    name;
     private List<NginxUpstreamServer> servers = new ArrayList<NginxUpstreamServer>();
     private Strategy                  lbStrategy;
+    private boolean                   used;
+
+    public boolean isUsed() {
+        return used;
+    }
+
+    public void setUsed(boolean used) {
+        this.used = used;
+    }
 
     /**
      * @return the name
