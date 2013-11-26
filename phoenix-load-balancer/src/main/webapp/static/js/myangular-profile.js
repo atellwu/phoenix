@@ -55,4 +55,6 @@ module.controller('ProfileController', function($scope, DataService, $resource,
 		instance.ip = '';
 		$scope.vs.instances.push(instance);
 	}
+	//默认pool选择
+	$scope.pools = DataService.pools;
 });

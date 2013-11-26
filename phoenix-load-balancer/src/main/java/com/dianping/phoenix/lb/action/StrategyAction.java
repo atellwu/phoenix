@@ -24,17 +24,27 @@ public class StrategyAction extends ActionSupport {
 
     private List<Strategy>    strategies;
 
+    private String            poolName;
+
     @PostConstruct
     public void init() {
         strategies = strategyService.listStrategies();
     }
 
-    public String strategies() {
+    public String listStrategies() {
         return SUCCESS;
     }
 
     public List<Strategy> getStrategies() {
         return strategies;
+    }
+
+    public String getPoolName() {
+        return poolName;
+    }
+
+    public void setPoolName(String poolName) {
+        this.poolName = poolName;
     }
 
 }

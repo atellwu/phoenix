@@ -1,20 +1,16 @@
-<div ng-show="poolEditing">
-  <a style="float: right; margin-right: 30px;" href="javascript:;" ng-click="switchPoolList();"> <i
-    class="icon-reply"></i> 返回集群列表
-  </a>
-  <h5 style="margin-top: 30px">集群基本信息</h5>
+<div ng-show="pool">
   <form class="form-horizontal" style="margin-top: 30px;">
     <div class="control-group">
       <label class="control-label">集群名</label>
       <div class="controls">
-        <label class="checkbox"> <span>{{ poolEditing.name }}</span>
+        <label class="checkbox"> <span>{{ pool.name }}</span>
         </label>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="inputPassword">负载均衡策略</label>
       <div class="controls">
-        <select disabled class="span2" ng-model="poolEditing.loadbalanceStrategyName"
+        <select disabled class="span2" ng-model="pool.loadbalanceStrategyName"
           ng-options="item.name as item.name for item in strategies"></select>
       </div>
     </div>
@@ -22,7 +18,7 @@
       <label class="control-label" for="inputEmail">最小活动节点占比</label>
       <div class="controls">
         <div class="input-append">
-          <input disabled class="" ng-model="poolEditing.minAvailableMemberPercentage" type="text"
+          <input disabled class="" ng-model="pool.minAvailableMemberPercentage" type="text"
             placeholder="输入1-100的数值"> <span class="add-on">%</span>
         </div>
       </div>
@@ -43,7 +39,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="member in poolEditing.members">
+        <tr ng-repeat="member in pool.members">
           <td><input disabled class="input-small" ng-model="member.name" type="text"></td>
           <td><input disabled class="input-small" ng-model="member.ip" type="text"></td>
           <td><input disabled class="input-mini" ng-model="member.port" type="text"></td>

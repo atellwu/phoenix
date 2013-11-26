@@ -18,7 +18,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 	$scope.getVs = function(vsName) {
 		$http({
 			method : 'GET',
-			url : window.contextpath + '/' + vsName + '/get'
+			url : window.contextpath + '/vs/' + vsName + '/get'
 		}).success(function(data, status, headers, config) {
 			if (data.errorCode == 0) {
 				if (data.virtualServer == null) {// 新建vs
@@ -54,14 +54,14 @@ module.controller('VsController', function($scope, DataService, $resource,
 		$http({
 			method : 'POST',
 			data : $scope.vs,
-			url : window.contextpath + '/' + $scope.vs.name + '/save'
+			url : window.contextpath + '/vs/' + $scope.vs.name + '/save'
 		}).success(
 				function(data, status, headers, config) {
 					if (data.errorCode == 0) {
 						app.alertSuccess("保存成功！ 即将刷新页面...");
 						vsChanged = false;// 保存成功，修改标识重置
 						setTimeout(function() {
-							window.location = window.contextpath + "/"
+							window.location = window.contextpath + "/vs/"
 									+ $scope.vs.name + window.location.hash;
 						}, 700);
 					} else {
@@ -76,7 +76,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 		$http({
 			method : 'POST',
 			data : $scope.vs,
-			url : window.contextpath + '/' + $scope.vs.name + '/remove'
+			url : window.contextpath + '/vs/' + $scope.vs.name + '/remove'
 		}).success(
 				function(data, status, headers, config) {
 					if (data.errorCode == 0) {
@@ -109,11 +109,11 @@ module.controller('VsController', function($scope, DataService, $resource,
 		return re;
 	}
 	$scope.edit = function() {
-		window.location = window.contextpath + '/' + $scope.vs.name + '/edit'
+		window.location = window.contextpath + '/vs/' + $scope.vs.name + '/edit'
 				+ window.location.hash;
 	}
 	$scope.cancleEdit = function() {
-		window.location = window.contextpath + '/' + $scope.vs.name
+		window.location = window.contextpath + '/vs/' + $scope.vs.name
 				+ window.location.hash;
 	}
 	$scope.preview = function() {
@@ -138,7 +138,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 		$http({
 			method : 'POST',
 			data : $scope.vs,
-			url : window.contextpath + '/' + $scope.vs.name + '/preview'
+			url : window.contextpath + '/vs/' + $scope.vs.name + '/preview'
 		}).success(function(data, status, headers, config) {
 			if (data.errorCode == 0) {
 				window.nginxConfigEditor.setValue(data.nginxConfig);

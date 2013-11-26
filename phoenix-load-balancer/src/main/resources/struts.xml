@@ -42,57 +42,89 @@
 
         <action name="" class="virtualServerAction" method="index">
             <result name="redirect" type="redirect">
-                <param name="location">${virtualServerName}</param>
+                <param name="location">vs/${virtualServerName}</param>
             </result>
-            <result name="noneVs" type="velocity">
+            <result name="none" type="velocity">
                 /none_vs.htm
             </result>
         </action>
-        <action name="{virtualServerName}/save" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/save" class="virtualServerAction"
             method="save">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="{virtualServerName}/get" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/get" class="virtualServerAction"
             method="get">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="{virtualServerName}/remove" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/remove" class="virtualServerAction"
             method="remove">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="{virtualServerName}/edit" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/edit" class="virtualServerAction"
             method="edit">
             <result name="success" type="velocity">
-                /container.htm
+                /virtualserver.htm
             </result>
         </action>
-        <action name="{virtualServerName}/deploy" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/deploy" class="virtualServerAction"
             method="deploy">
             <result name="success" type="velocity">
                 /deploy.htm
             </result>
         </action>
-        <action name="{virtualServerName}/preview" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/preview" class="virtualServerAction"
             method="preview">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-
-        <action name="{virtualServerName}" class="virtualServerAction"
+        <action name="vs/{virtualServerName}" class="virtualServerAction"
             method="show">
             <result name="success" type="velocity">
-                /container.htm
+                /virtualserver.htm
+            </result>
+        </action>
+
+        <action name="pool/{poolName}/save" class="poolAction"
+            method="save">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="pool/{poolName}/get" class="poolAction"
+            method="get">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="pool/{poolName}/remove" class="poolAction"
+            method="remove">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="pool/{poolName}/edit" class="poolAction"
+            method="edit">
+            <result name="success" type="velocity">
+                /pool.htm
+            </result>
+        </action>
+        <action name="pool/{poolName}" class="poolAction" method="show">
+            <result name="success" type="velocity">
+                /pool.htm
             </result>
         </action>
 
@@ -111,13 +143,21 @@
             </result>
         </action>
 
-        <action name="base/strategies" class="strategyAction"
-            method="strategies">
+        <action name="base/listStrategies" class="strategyAction"
+            method="listStrategies">
             <result name="success" type="json">
                 <param name="root">strategies</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
+
+        <action name="base/listPools" class="poolAction" method="listPools">
+            <result name="success" type="json">
+                <param name="root">pools</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+
 
     </package>
 

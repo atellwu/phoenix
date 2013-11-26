@@ -6,22 +6,28 @@
 			$('#addParamModal').modal('show');
 			$('#addParamKey').focus();
 		},
-		"openAddPoolModal" : function() {
-			$('#addPoolName').val('');
-			$('#addPoolModal').modal('show');
-			$('#addPoolName').focus();
-		},
 		"openAddVirtualServerModal" : function() {
 			$('#addVirtualServerAlertDiv').html('');
 			$('#addVirtualServerName').val('');
 			$('#addVirtualServerModal').modal('show');
 			$('#addVirtualServerName').focus();
 		},
+		"openAddPoolModal" : function() {
+			$('#addPoolName').val('');
+			$('#addPoolModal').modal('show');
+			$('#addPoolName').focus();
+		},
 		"openRemoveVirtualServerModal" : function() {
 			$('#removeVirtualServerAlertDiv').html('');
 			$('#removeVirtualServerName').val('');
 			$('#removeVirtualServerModal').modal('show');
 			$('#removeVirtualServerName').focus();
+		},
+		"openRemovePoolModal" : function() {
+			$('#removePoolAlertDiv').html('');
+			$('#removePoolName').val('');
+			$('#removePoolModal').modal('show');
+			$('#removePoolName').focus();
 		},
 		"addVirtualServer" : function() {
 			var addVirtualServerName = $('#addVirtualServerName').val();
@@ -30,7 +36,16 @@
 				app.alertError('站点名称不能为空！', 'addVirtualServerAlertDiv');
 				return;
 			}
-			w.location = w.contextpath + "/" + addVirtualServerName + '/edit';
+			w.location = w.contextpath + "/vs/" + addVirtualServerName + '/edit';
+		},
+		"addPool" : function() {
+			var addPoolName = $('#addPoolName').val();
+			if (addPoolName == null
+					|| addPoolName.trim() == '') {
+				app.alertError('集群名称不能为空！', 'addPoolAlertDiv');
+				return;
+			}
+			w.location = w.contextpath + "/pool/" + addPoolName + '/edit';
 		},
 		"backPool" : function() {
 			$('div[pool]').hide();

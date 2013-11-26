@@ -1,10 +1,6 @@
 package com.dianping.phoenix.lb.action;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -20,28 +16,16 @@ import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.service.model.PoolService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.dianping.phoenix.lb.utils.JsonBinder;
-import com.opensymphony.xwork2.ActionSupport;
 
 /**
  * @author wukezhu
  */
 @Component("virtualServerAction")
-public class VirtualServerAction extends ActionSupport {
+public class VirtualServerAction extends MenuAction {
 
-    private static final int     ERRORCODE_SUCCESS     = 0;
+    private static final Logger  LOG              = LoggerFactory.getLogger(VirtualServerAction.class);
 
-    private static final int     ERRORCODE_PARAM_ERROR = -2;
-
-    private static final int     ERRORCODE_INNER_ERROR = -1;
-
-    private static final Logger  LOG                   = LoggerFactory.getLogger(VirtualServerAction.class);
-
-    private static final long    serialVersionUID      = -1084994778030229218L;
-
-    //post的参数vs，用于save
-    private String               vs;
-
-    private Map<String, Object>  dataMap               = new HashMap<String, Object>();
+    private static final long    serialVersionUID = -1084994778030229218L;
 
     @Autowired
     private VirtualServerService virtualServerService;
@@ -49,18 +33,7 @@ public class VirtualServerAction extends ActionSupport {
     @Autowired
     private PoolService          poolService;
 
-    private List<VirtualServer>  virtualServers;
-
     private String               virtualServerName;
-
-    private String               contextPath;
-
-    private String               editOrShow            = "show";
-
-    @PostConstruct
-    public void init() {
-        virtualServers = virtualServerService.listVirtualServers();
-    }
 
     public String index() {
         if (virtualServers.size() == 0) {
@@ -68,21 +41,6 @@ public class VirtualServerAction extends ActionSupport {
         }
         virtualServerName = virtualServers.get(0).getName();//重定向
         return "redirect";
-    }
-
-    public String show() {
-        editOrShow = "show";
-        return SUCCESS;
-    }
-
-    public String edit() {
-        editOrShow = "edit";
-        return SUCCESS;
-    }
-
-    public String deploy() {
-        editOrShow = "edit";
-        return SUCCESS;
     }
 
     public String get() throws Exception {
@@ -166,11 +124,6 @@ public class VirtualServerAction extends ActionSupport {
         return SUCCESS;
     }
 
-    public String getVirtualServerList() {
-        virtualServers = virtualServerService.listVirtualServers();
-        return SUCCESS;
-    }
-
     public String preview() throws Exception {
         try {
             String vsJson = IOUtils.toString(ServletActionContext.getRequest().getInputStream());
@@ -201,44 +154,17 @@ public class VirtualServerAction extends ActionSupport {
         return SUCCESS;
     }
 
-    @Override
-    public void validate() {
-        super.validate();
-        if (contextPath == null) {
-            contextPath = ServletActionContext.getServletContext().getContextPath();
-        }
-    }
-
-    public Map<String, Object> getDataMap() {
-        return dataMap;
-    }
-
-    public String getVs() {
-        return vs;
-    }
-
-    public void setVs(String vs) {
-        this.vs = vs;
-    }
-
-    public List<VirtualServer> getVirtualServers() {
-        return virtualServers;
+    public String deploy() {
+        editOrShow = "edit";
+        return SUCCESS;
     }
 
     public String getVirtualServerName() {
         return virtualServerName;
     }
 
-    public String getContextPath() {
-        return contextPath;
-    }
-
     public void setVirtualServerName(String virtualServerName) {
         this.virtualServerName = virtualServerName;
-    }
-
-    public String getEditOrShow() {
-        return editOrShow;
     }
 
 }

@@ -1,14 +1,17 @@
 <div class="sidebar-nav">
-  <a href="javascript:app.openAddVirtualServerModal();" class="nav-header"><i class="icon-plus"></i> 新增站点</a> <a
-    href="#dashboard-menu" class="nav-header" data-toggle="collapse"><i class="icon-list-ul"></i>站点列表</a>
+  <a href="#dashboard-menu" class="nav-header" data-toggle="collapse"><i class="icon-list-ul"></i>站点列表</a>
   <ul id="dashboard-menu" class="nav nav-list collapse in">
     #foreach($virtualServer in $virtualServers)
     <li class="#if($virtualServer.name == $virtualServerName)active #end"><a
-      href="${contextPath}/$virtualServer.name"><i class="icon-globe"></i> $virtualServer.name </a></li> #end
+      href="${contextPath}/vs/$virtualServer.name"><i class="icon-globe"></i> $virtualServer.name </a></li> #end
+    <li class=""><a href="javascript:app.openAddVirtualServerModal();" class=""><i class="icon-plus"></i> 新增站点</a></li>
   </ul>
-  <a href="#dashboard-menu" class="nav-header" data-toggle="collapse"><i class="icon-list-ul"></i>通用管理</a>
-  <ul id="dashboard-menu" class="nav nav-list collapse in">
-    <li class="#if($pools)active #end"><a href="${contextPath}/pools"><i class="icon-globe"></i> 集群管理 </a></li>
+  <a href="#pool-menu" class="nav-header" data-toggle="collapse"><i class="icon-list-ul"></i>通用管理</a>
+  <ul id="pool-menu" class="nav nav-list collapse in">
+    #foreach($pool in $pools)
+    <li class="#if($pool.name == $poolName)active #end"><a href="${contextPath}/pool/$pool.name"><i
+        class="icon-globe"></i> $pool.name </a></li> #end
+    <li class=""><a href="javascript:app.openAddPoolModal();" class=""><i class="icon-plus"></i> 新增集群</a></li>
   </ul>
 </div>
 

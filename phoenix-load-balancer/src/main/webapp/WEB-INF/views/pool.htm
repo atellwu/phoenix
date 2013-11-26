@@ -1,0 +1,27 @@
+#set($layout = "poolLayout.htm")
+<div class="content" ng-init="editOrShow='${editOrShow}'" ng-app="MyApp" ng-controller="PoolController"
+  id="PoolController">
+  <div class="header">
+    <div class="stats">#parse("common/poolStats.htm")</div>
+    <h1 class="page-title">
+      {{pool.name}}&nbsp;&nbsp;&nbsp;&nbsp;<span class="label label-warning" ng-show="newPool"><i
+        class=" icon-exclamation-sign"></i>&nbsp; 新建站点，请填写后保存。 </span>
+    </h1>
+  </div>
+  #parse("common/breadcrumb.htm")
+  <div class="container-fluid">
+    <div class="row-fluid" style="min-height: 500px;">
+      <div id="alertMessageDiv" style="text-align: center;"></div>
+      <a ng-show="editOrShow=='edit' && !newVs" ng-click="cancleEdit()" href="javascript:;"
+        style="float: right; margin-left: 20px; margin-top: 25px" class="btn">取消</a> <a
+        ng-show="editOrShow=='edit' && newVs" ng-href="${contextPath}/"
+        style="float: right; margin-left: 20px; margin-top: 25px" class="btn">取消</a>
+      <button ng-show="editOrShow=='edit'" ng-click="save()" style="float: right; margin-top: 25px"
+        class="btn btn-primary">保存</button>
+      <a ng-hide="editOrShow=='edit'" ng-click="edit()" href="javascript:;"
+        style="float: right; margin-right: 20px; margin-top: 25px" class=""> <i class="icon-edit"></i>&nbsp;编辑
+      </a> <br /> #parse("/pool/${editOrShow}/detail.htm")
+    </div>
+    #parse("common/simplefooter.htm")
+  </div>
+</div>
