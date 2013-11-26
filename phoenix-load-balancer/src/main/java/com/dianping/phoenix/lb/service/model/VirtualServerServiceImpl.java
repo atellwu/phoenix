@@ -312,10 +312,10 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
             ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
         }
 
-        return read(new ReadOperation<String>() {
+        return write(new WriteOperation<String>() {
 
             @Override
-            public String doRead() throws BizException {
+            public String doWrite() throws BizException {
                 try {
                     VirtualServer virtualServer = virtualServerDao.find(virtualServerName);
 
@@ -334,12 +334,12 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
 
                     FileUtils.writeStringToFile(new File(new File(configManager.getTengineConfigBaseDir(),
                             virtualServerName), configManager.getTengineConfigFileName()), nginxConfigContent);
-                    
+
                     gitService.tagAndPush(configManager.getTengineConfigGitUrl(),
                             configManager.getTengineConfigBaseDir(), tagId,
                             String.format("update vs(%s) to tag(%s)", virtualServerName, tagId));
 
-                    return virtualServerDao.tag(virtualServerName, virtualServerVersion, pools);
+                    return tagId;
                 } catch (Exception e) {
                     ExceptionUtils.rethrowBizException(e);
                 }
