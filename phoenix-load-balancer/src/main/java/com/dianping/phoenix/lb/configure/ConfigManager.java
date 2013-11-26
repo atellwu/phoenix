@@ -38,6 +38,21 @@ public class ConfigManager implements Initializable {
         return m_config.getModelGitUrlDev();
     }
 
+    public String getNginxCheckConfigFileName() {
+        check();
+        return m_config.getNginxCheckConfigFileName();
+    }
+
+    public String getNginxCheckConfigFolder() {
+        check();
+        return m_config.getNginxCheckConfigFolder();
+    }
+
+    public String getNginxCheckMainConfigFileName() {
+        check();
+        return m_config.getNginxCheckMainConfigFileName();
+    }
+
     public int getDeployConnectTimeout() {
         check();
 
@@ -83,6 +98,17 @@ public class ConfigManager implements Initializable {
                 gitUrl);
     }
 
+    public String getDeployWithDynamicRefreshUrl(String host, int deployId, String vsName, String configFileName,
+            String version, String refreshUrl, String refreshMethod) {
+        check();
+        String gitUrl = m_config.getTengineConfigGitUrlDev();
+        if (Constants.ENV_PRODUCT.equals(m_config.getEnv())) {
+            gitUrl = m_config.getTengineConfigGitUrlProduct();
+        }
+        return String.format(m_config.getDeployUrlDynamicRefreshPattern(), host, deployId, vsName, configFileName, version,
+                gitUrl, refreshUrl, refreshMethod);
+    }
+
     @Override
     public void initialize() throws InitializationException {
         try {
@@ -122,6 +148,11 @@ public class ConfigManager implements Initializable {
     public File getLbScript() {
         check();
         return getScriptFile("lb.sh");
+    }
+
+    public File getNginxScript() {
+        check();
+        return getScriptFile("nginx.sh");
     }
 
     private File getScriptFile(String scriptFileName) {
