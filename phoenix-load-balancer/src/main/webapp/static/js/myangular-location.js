@@ -53,8 +53,8 @@ module
 						}
 						if (input.name == 'pool-name') {// 对pool-name特殊处理
 							var list = [];
-							for ( var i = 0; i < $scope.vs.pools.length; i++) {
-								list.push($scope.vs.pools[i].name);
+							for ( var i = 0; i < $scope.pools.length; i++) {
+								list.push($scope.pools[i].name);
 							}
 							return list;
 						}
@@ -104,5 +104,7 @@ module
 					$scope.removeDynamicAttribute = function(directive, name) {
 						delete directive.dynamicAttributes[name];
 					}
+					//pool-name选择
+					$scope.pools = DataService.pools;
 
 				});

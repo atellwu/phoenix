@@ -158,6 +158,14 @@
             </result>
         </action>
 
+        <action name="deploy/show" class="deployAction"
+            method="show">
+            <result name="success" type="velocity">
+                /deploy.htm
+            </result>
+        </action>
+
+
 
     </package>
 
