@@ -53,6 +53,8 @@ module.controller('PoolController',
 			// member增删
 			$scope.addMember = function() {
 				var member = new Object();
+				member.state = 'ENABLED';
+				member.availability = 'AVAILABLE';
 				var members = $scope.poolEditing.members;
 				if (!members) {
 					members = [];

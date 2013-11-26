@@ -1,79 +1,79 @@
 package com.dianping.phoenix.lb.deploy;
 
+import java.util.List;
+
 public class DeployPlan {
-    private String  m_warType;
 
-    private String  m_version;
+    /** 待发布的VirtualServer的tag */
+    private String       tag;
 
-    private String  m_policy;
+    /** 待发布的机器 */
+    private List<String> hosts;
 
-    private boolean m_abortOnError = true;
+    /** 发布策略 */
+    private DeployPolicy deployPolicy;
 
-    private boolean m_skipTest     = true;
+    /** 错误处理：一台机器发生错误时，中断还是继续 */
+    private boolean      abortOnError = true;
 
-    private boolean m_autoContinue;
+    /** 发布控制：手动还是自动（如果是自动，需要设置时间间隔） */
+    private boolean      autoContinue;
 
-    private int     m_deployInterval;
+    /** 发布的时间间隔 */
+    private int          deployInterval;
 
-    public String getPolicy() {
-        return m_policy;
+    public String getTag() {
+        return tag;
     }
 
-    public String getVersion() {
-        return m_version;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
-    public String getWarType() {
-        return m_warType;
+    public List<String> getHosts() {
+        return hosts;
+    }
+
+    public void setHosts(List<String> hosts) {
+        this.hosts = hosts;
+    }
+
+    public DeployPolicy getDeployPolicy() {
+        return deployPolicy;
+    }
+
+    public void setDeployPolicy(DeployPolicy deployPolicy) {
+        this.deployPolicy = deployPolicy;
     }
 
     public boolean isAbortOnError() {
-        return m_abortOnError;
-    }
-
-    public boolean isSkipTest() {
-        return m_skipTest;
-    }
-
-    public boolean isAutoContinue() {
-        return m_autoContinue;
+        return abortOnError;
     }
 
     public void setAbortOnError(boolean abortOnError) {
-        m_abortOnError = abortOnError;
+        this.abortOnError = abortOnError;
     }
 
-    public void setPolicy(String policy) {
-        m_policy = policy;
-    }
-
-    public void setSkipTest(boolean testService) {
-        m_skipTest = testService;
+    public boolean isAutoContinue() {
+        return autoContinue;
     }
 
     public void setAutoContinue(boolean autoContinue) {
-        m_autoContinue = autoContinue;
-    }
-
-    public void setVersion(String version) {
-        m_version = version;
-    }
-
-    public void setWarType(String warType) {
-        m_warType = warType;
-    }
-
-    public void setDeployInterval(int deployInterval) {
-        m_deployInterval = deployInterval;
+        this.autoContinue = autoContinue;
     }
 
     public int getDeployInterval() {
-        return m_deployInterval;
+        return deployInterval;
+    }
+
+    public void setDeployInterval(int deployInterval) {
+        this.deployInterval = deployInterval;
     }
 
     @Override
     public String toString() {
-        return String.format("%s[version=%s, policy=%s, abortOnError=%s]", DeployPlan.class.getSimpleName(), m_version,
-                m_policy, m_abortOnError);
+        return "DeployPlan [tag=" + tag + ", hosts=" + hosts + ", deployPolicy=" + deployPolicy + ", abortOnError=" + abortOnError + ", autoContinue=" + autoContinue + ", deployInterval="
+                + deployInterval + "]";
     }
+
 }

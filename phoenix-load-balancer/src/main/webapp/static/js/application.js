@@ -163,3 +163,14 @@
 	};
 	w.app = app;
 }(window || this));
+
+$(document).ready(function() {
+	// pom
+	var nginxConfigEditor = ace.edit("nginxConfigEditor");
+	nginxConfigEditor.setFontSize(14);
+	nginxConfigEditor.setTheme("ace/theme/eclipse");
+	nginxConfigEditor.getSession().setMode("ace/mode/java");
+	nginxConfigEditor.setReadOnly(true);
+	window.nginxConfigEditor = nginxConfigEditor;
+
+});
