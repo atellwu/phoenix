@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.Strategy;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 
@@ -47,9 +48,9 @@ public interface ModelStore {
 
     public void addVirtualServer(String name, VirtualServer virtualServer) throws BizException;
 
-    public String tag(String name, int version) throws BizException;
+    public String tag(String name, int version, List<Pool> pools) throws BizException;
 
-    public VirtualServer getTag(String name, String tagId) throws BizException;
+    public SlbModelTree getTag(String name, String tagId) throws BizException;
 
     public List<String> listTagIds(String name) throws BizException;
 

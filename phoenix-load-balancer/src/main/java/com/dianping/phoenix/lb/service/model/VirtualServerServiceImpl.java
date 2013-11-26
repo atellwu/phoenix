@@ -291,7 +291,8 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
     }
 
     @Override
-    public String tag(final String virtualServerName, final int virtualServerVersion) throws BizException {
+    public String tag(final String virtualServerName, final int virtualServerVersion, final List<Pool> pools)
+            throws BizException {
         if (StringUtils.isBlank(virtualServerName)) {
             ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
         }
@@ -300,7 +301,7 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
 
             @Override
             public String doRead() throws BizException {
-                return virtualServerDao.tag(virtualServerName, virtualServerVersion);
+                return virtualServerDao.tag(virtualServerName, virtualServerVersion, pools);
             }
 
         });
@@ -308,7 +309,7 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
     }
 
     @Override
-    public VirtualServer findTagById(final String virtualServerName, final String tagId) throws BizException {
+    public SlbModelTree findTagById(final String virtualServerName, final String tagId) throws BizException {
         if (StringUtils.isBlank(virtualServerName)) {
             ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
         }
@@ -317,10 +318,10 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
             ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_TAGID_EMPTY);
         }
 
-        return read(new ReadOperation<VirtualServer>() {
+        return read(new ReadOperation<SlbModelTree>() {
 
             @Override
-            public VirtualServer doRead() throws BizException {
+            public SlbModelTree doRead() throws BizException {
                 return virtualServerDao.findTagById(virtualServerName, tagId);
             }
 
