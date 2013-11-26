@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
+import com.dianping.phoenix.lb.service.model.PoolService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.dianping.phoenix.lb.utils.JsonBinder;
 import com.opensymphony.xwork2.ActionSupport;
@@ -43,6 +45,9 @@ public class VirtualServerAction extends ActionSupport {
 
     @Autowired
     private VirtualServerService virtualServerService;
+
+    @Autowired
+    private PoolService          poolService;
 
     private List<VirtualServer>  virtualServers;
 
@@ -174,7 +179,9 @@ public class VirtualServerAction extends ActionSupport {
             }
             VirtualServer virtualServer = JsonBinder.getNonNullBinder().fromJson(vsJson, VirtualServer.class);
 
-            String nginxConfig = virtualServerService.generateNginxConfig(virtualServer);
+            List<Pool> poolList = poolService.listPools();
+
+            String nginxConfig = virtualServerService.generateNginxConfig(virtualServer, poolList);
 
             dataMap.put("nginxConfig", nginxConfig);
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
