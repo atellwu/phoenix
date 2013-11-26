@@ -14,6 +14,7 @@ module
 					$scope.openAddLocationModal = function() {
 						$scope.locationToBeAdd = new Object();
 						$scope.locationToBeAdd.caseSensitive = true;
+						$scope.locationToBeAdd.matchType = 'prefix';
 						$('#addLocationModal').modal('show');
 						$('#addLocationName').focus();
 					};
@@ -52,11 +53,9 @@ module
 						}
 						if (input.name == 'pool-name') {// 对pool-name特殊处理
 							var list = [];
-							console.log("$scope.vs.pools:" + $scope.vs.pools);
 							for ( var i = 0; i < $scope.vs.pools.length; i++) {
 								list.push($scope.vs.pools[i].name);
 							}
-							console.log("list:" + list);
 							return list;
 						}
 						return input.valueList;

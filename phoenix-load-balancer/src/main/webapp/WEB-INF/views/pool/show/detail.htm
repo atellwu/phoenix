@@ -22,8 +22,8 @@
       <label class="control-label" for="inputEmail">最小活动节点占比</label>
       <div class="controls">
         <div class="input-append">
-          <input disabled class="" ng-model="poolEditing.minAvailableMemberPercentage" type="text" placeholder="输入1-100的数值"> <span
-            class="add-on">%</span>
+          <input disabled class="" ng-model="poolEditing.minAvailableMemberPercentage" type="text"
+            placeholder="输入1-100的数值"> <span class="add-on">%</span>
         </div>
       </div>
     </div>
@@ -54,15 +54,13 @@
               value="ENABLED"> ENABLED
           </label> <label class="radio inline"> <input disabled ng-model="member.state" type="radio" value="DISABLED">
               DISABLED
-          </label>
-          <label class="radio inline"> <input disabled ng-model="member.state" type="radio" value="FORCED_OFFLINE">
-              FORCED_OFFLINE
-          </label>
-          </td>
+          </label> <label class="radio inline"> <input disabled ng-model="member.state" type="radio"
+              value="FORCED_OFFLINE"> FORCED_OFFLINE
+          </label></td>
           <td><label class="radio inline"> <input disabled ng-model="member.availability" type="radio"
+              value="AVAILABLE"> AVAILABLE
+          </label><label class="radio inline"> <input disabled ng-model="member.availability" type="radio"
               value="OFFLINE"> OFFLINE
-          </label> <label class="radio inline"> <input disabled ng-model="member.availability" type="radio" value="AVAILABLE">
-              AVAILABLE
           </label></td>
         </tr>
       </tbody>
@@ -79,9 +77,7 @@
   </div>
   <div class="modal-body">
     <p style="text-align: center;">
-      <i class="icon-warning-sign"></i> 您是否确定要删除该节点
-      <span>{{memberToBeRemove.name}}</span>
-      ？
+      <i class="icon-warning-sign"></i> 您是否确定要删除该节点 <span>{{memberToBeRemove.name}}</span> ？
     </p>
   </div>
   <div class="modal-footer">

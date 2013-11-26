@@ -9,13 +9,13 @@
   #parse("common/breadcrumb.htm")
   <div class="container-fluid">
     <div class="row-fluid" style="min-height: 500px;">
-      <a ng-show="editOrShow=='edit' && !newVs" ng-href="${contextPath}/{{vs.name}}"
+      <a ng-show="editOrShow=='edit' && !newVs" ng-click="cancleEdit()" href="javascript:;"
         style="float: right; margin-left: 20px; margin-top: 25px" class="btn">取消</a> <a
         ng-show="editOrShow=='edit' && newVs" ng-href="${contextPath}/"
         style="float: right; margin-left: 20px; margin-top: 25px" class="btn">取消</a>
       <button ng-show="editOrShow=='edit'" ng-click="save()" style="float: right; margin-top: 25px"
         class="btn btn-primary">保存</button>
-      <a ng-hide="editOrShow=='edit'" ng-href="${contextPath}/{{vs.name}}/edit"
+      <a ng-hide="editOrShow=='edit'" ng-click="edit()" href="javascript:;"
         style="float: right; margin-right: 20px; margin-top: 25px" class=""> <i class="icon-edit"></i>&nbsp;编辑
       </a>
       <div style="margin: 0 auto; margin-top: 20px;" class="tabbable">

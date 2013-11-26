@@ -47,7 +47,7 @@
         <label class="control-label">集群名</label>
         <div class="controls">
           <div class="input-prepend">
-            <span class="add-on"></span><input ng-model="poolToBeAdd.name" id="addPoolName" ng-enter="addPool()" type="text" class="input-small"
+            <span class="add-on"></span><input ng-trim="true" ng-model="poolToBeAdd.name" id="addPoolName" ng-enter="addPool()" type="text" class="input-small"
               placeholder="">
           </div>
           <span class="muted">（必填）</span>

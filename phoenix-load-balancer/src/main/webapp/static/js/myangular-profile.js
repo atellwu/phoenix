@@ -1,7 +1,7 @@
-module.controller('ProfileController', function($scope, DataService,
-		$resource, $http) {
-	//计算状态
-	$scope.getVsState = function(){
+module.controller('ProfileController', function($scope, DataService, $resource,
+		$http) {
+	// 计算状态
+	$scope.getVsState = function() {
 		return '待询问jinhua';
 	}
 	// 动态参数的管理
