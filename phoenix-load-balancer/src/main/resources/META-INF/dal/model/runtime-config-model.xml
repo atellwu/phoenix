@@ -23,6 +23,7 @@
 		<element name="nginx-check-config-folder" value-type="String" default-value="/usr/local/nginx/conf/phoenix-slb/test/" />
 		<element name="nginx-check-config-file-name" value-type="String" default-value="server.conf" />
 		<element name="nginx-check-main-config-file-name" value-type="String" default-value="conf/test.conf" />
+		<element name="tengine-config-file-name" value-type="String" default-value="server.conf" />
 		<element name="env" value-type="String" default-value="dev" />
 	</entity>
 </model>

@@ -29,6 +29,10 @@ public class ExceptionUtils {
         log.error(e.getMessage(), e);
         throw new BizException(e);
     }
+    
+    public static void rethrowBizException(Throwable e) throws BizException {
+        throw new BizException(e);
+    }
 
     public static void throwBizException(MessageID messageId, Object... args) throws BizException {
         throw new BizException(messageId, args);

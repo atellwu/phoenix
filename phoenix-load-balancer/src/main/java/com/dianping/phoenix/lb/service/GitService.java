@@ -1,13 +1,17 @@
 package com.dianping.phoenix.lb.service;
 
+import com.dianping.phoenix.lb.exception.BizException;
+
 public interface GitService {
-    boolean clone(String gitUrl, String targetDir);
 
-    boolean checkoutTag(String targetDir, String tag);
+    void clone(String gitUrl, String targetDir, String tag) throws BizException;
 
-    boolean commit(String targetDir, String comment);
-    
-    boolean tag(String targetDir, String tag);
-    
-    boolean push(String targetDir);
+    void commitAllChanges(String targetDir, String comment) throws BizException;
+
+    void tagAndPush(String gitUrl, String targetDir, String tag, String comment) throws BizException;
+
+    void push(String gitUrl, String targetDir) throws BizException;
+
+    void rollback(String targetDir) throws BizException;
+
 }

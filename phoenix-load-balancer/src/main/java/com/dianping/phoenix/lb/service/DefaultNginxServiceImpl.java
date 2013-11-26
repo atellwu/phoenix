@@ -8,8 +8,6 @@ package com.dianping.phoenix.lb.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -29,17 +27,15 @@ public class DefaultNginxServiceImpl implements NginxService {
 
     private static Logger log  = Logger.getLogger(DefaultNginxServiceImpl.class);
     private ConfigManager configManager;
-    private Lock          lock = new ReentrantLock();
 
     public void init() throws ComponentLookupException {
         configManager = PlexusComponentContainer.INSTANCE.lookup(ConfigManager.class);
     }
 
     @Override
-    public NginxCheckResult checkConfig(String configContent) throws BizException {
+    public synchronized NginxCheckResult checkConfig(String configContent) throws BizException {
         File serverConf = new File(configManager.getNginxCheckConfigFolder(),
                 configManager.getNginxCheckConfigFileName());
-        lock.lock();
         try {
             if (serverConf.exists()) {
                 FileUtils.deleteQuietly(serverConf);
@@ -61,7 +57,6 @@ public class DefaultNginxServiceImpl implements NginxService {
             ExceptionUtils.logAndRethrowBizException(e);
         } finally {
             FileUtils.deleteQuietly(serverConf);
-            lock.unlock();
         }
         return null;
     }

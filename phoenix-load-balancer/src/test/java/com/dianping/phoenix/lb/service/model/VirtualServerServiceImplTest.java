@@ -20,6 +20,8 @@ import com.dianping.phoenix.lb.dao.impl.LocalFileModelStoreImpl;
 import com.dianping.phoenix.lb.dao.impl.PoolDaoImpl;
 import com.dianping.phoenix.lb.dao.impl.StrategyDaoImpl;
 import com.dianping.phoenix.lb.dao.impl.VirtualServerDaoImpl;
+import com.dianping.phoenix.lb.service.DefaultGitServiceImpl;
+import com.dianping.phoenix.lb.service.DefaultNginxServiceImpl;
 
 /**
  * @author Leo Liang
@@ -33,6 +35,8 @@ public class VirtualServerServiceImplTest {
     private VirtualServerDao        virtualServerDao;
     private StrategyDao             strategyDao;
     private PoolDao                 poolDao;
+    private DefaultNginxServiceImpl nginxService;
+    private DefaultGitServiceImpl   gitService;
 
     @Before
     public void before() throws Exception {
@@ -50,8 +54,13 @@ public class VirtualServerServiceImplTest {
 
         strategyDao = new StrategyDaoImpl(store);
         poolDao = new PoolDaoImpl(store);
+        gitService = new DefaultGitServiceImpl();
+        gitService.init();
+        nginxService = new DefaultNginxServiceImpl();
+        nginxService.init();
 
-        virtualServerService = new VirtualServerServiceImpl(virtualServerDao, strategyDao, poolDao);
+        virtualServerService = new VirtualServerServiceImpl(virtualServerDao, strategyDao, poolDao, nginxService,
+                gitService);
     }
 
     @After

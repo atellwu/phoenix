@@ -7,6 +7,7 @@
     <element name="model-git-url-product" value-type="String" />
     <element name="model-store-base-dir" value-type="String" />
     <element name="tengine-config-base-dir" value-type="String" />
+    <element name="tengine-config-file-name" value-type="String" />
     <element name="deploy-log-url-pattern" value-type="String" />
     <element name="deploy-url-reload-pattern" value-type="String" />
     <element name="deploy-url-dynamic-refresh-pattern" value-type="String" />

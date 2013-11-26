@@ -43,6 +43,11 @@ public class ConfigManager implements Initializable {
         return m_config.getNginxCheckConfigFileName();
     }
 
+    public String getTengineConfigBaseDir() {
+        check();
+        return m_config.getTengineConfigBaseDir();
+    }
+
     public String getNginxCheckConfigFolder() {
         check();
         return m_config.getNginxCheckConfigFolder();
@@ -90,10 +95,7 @@ public class ConfigManager implements Initializable {
 
     public String getDeployWithReloadUrl(String host, int deployId, String vsName, String configFileName, String version) {
         check();
-        String gitUrl = m_config.getTengineConfigGitUrlDev();
-        if (Constants.ENV_PRODUCT.equals(m_config.getEnv())) {
-            gitUrl = m_config.getTengineConfigGitUrlProduct();
-        }
+        String gitUrl = getTengineConfigGitUrl();
         return String.format(m_config.getDeployUrlReloadPattern(), host, deployId, vsName, configFileName, version,
                 gitUrl);
     }
@@ -101,12 +103,22 @@ public class ConfigManager implements Initializable {
     public String getDeployWithDynamicRefreshUrl(String host, int deployId, String vsName, String configFileName,
             String version, String refreshUrl, String refreshMethod) {
         check();
-        String gitUrl = m_config.getTengineConfigGitUrlDev();
+        String gitUrl = getTengineConfigGitUrl();
+        return String.format(m_config.getDeployUrlDynamicRefreshPattern(), host, deployId, vsName, configFileName,
+                version, gitUrl, refreshUrl, refreshMethod);
+    }
+
+    public String getTengineConfigGitUrl() {
+        check();
         if (Constants.ENV_PRODUCT.equals(m_config.getEnv())) {
-            gitUrl = m_config.getTengineConfigGitUrlProduct();
+            return m_config.getTengineConfigGitUrlProduct();
         }
-        return String.format(m_config.getDeployUrlDynamicRefreshPattern(), host, deployId, vsName, configFileName, version,
-                gitUrl, refreshUrl, refreshMethod);
+        return m_config.getTengineConfigGitUrlDev();
+    }
+
+    public String getTengineConfigFileName() {
+        check();
+        return m_config.getTengineConfigFileName();
     }
 
     @Override
@@ -145,9 +157,9 @@ public class ConfigManager implements Initializable {
         return String.format(m_config.getAgentTengineConfigVersionUrlPattern(), host, vsName);
     }
 
-    public File getLbScript() {
+    public File getGitScript() {
         check();
-        return getScriptFile("lb.sh");
+        return getScriptFile("git.sh");
     }
 
     public File getNginxScript() {
@@ -164,7 +176,7 @@ public class ConfigManager implements Initializable {
     }
 
     private void makeShellScriptExecutable() {
-        File scriptDir = getLbScript().getParentFile();
+        File scriptDir = getGitScript().getParentFile();
         Iterator<File> scriptIter = FileUtils.iterateFiles(scriptDir, new String[] { "sh" }, true);
         while (scriptIter != null && scriptIter.hasNext()) {
             scriptIter.next().setExecutable(true, false);
