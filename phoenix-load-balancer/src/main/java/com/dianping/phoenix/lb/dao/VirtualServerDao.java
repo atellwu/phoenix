@@ -9,6 +9,8 @@ package com.dianping.phoenix.lb.dao;
 import java.util.List;
 
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 
 /**
@@ -27,13 +29,11 @@ public interface VirtualServerDao {
 
     void delete(String virtualServerName) throws BizException;
 
-    String tag(String virtualServerName, int virtualServerVersion) throws BizException;
-
-    VirtualServer getTag(String virtualServerName, String tagId) throws BizException;
+    String tag(String virtualServerName, int virtualServerVersion, List<Pool> pools) throws BizException;
 
     List<String> listTags(String virtualServerName) throws BizException;
 
-    VirtualServer findTagById(String virtualServerName, String tagId) throws BizException;
+    SlbModelTree findTagById(String virtualServerName, String tagId) throws BizException;
 
     String findPrevTagId(String virtualServerName, String tagId) throws BizException;
 

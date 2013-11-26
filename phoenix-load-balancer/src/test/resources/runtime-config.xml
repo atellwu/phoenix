@@ -7,8 +7,12 @@
     <tengine-config-base-dir>/data/appdatas/phoenix/slb/tengine</tengine-config-base-dir>
     <deploy-log-url-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=log&deployId=%s]]></deploy-log-url-pattern>
     <deploy-url-reload-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=deploy&deployId=%s&vs=%s&config=%s&version=%s&gitUrl=%s&reload=true]]></deploy-url-reload-pattern>
+    <deploy-url-dynamic-refresh-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=deploy&deployId=%s&vs=%s&config=%s&version=%s&gitUrl=%s&reload=false&refreshUrl=%s&refreshMethod=%s]]></deploy-url-dynamic-refresh-pattern>
     <deploy-status-url-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=status&deployId=%s]]></deploy-status-url-pattern>
     <agent-tengine-config-version-url-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=version&vs=%s]]></agent-tengine-config-version-url-pattern>
+    <nginx-check-config-folder>/usr/local/nginx/conf/</nginx-check-config-folder>
+    <nginx-check-config-file-name>server.conf</nginx-check-config-file-name>
+    <nginx-check-main-config-file-name>test.conf</nginx-check-main-config-file-name>
     <deploy-getlog-retrycount>10</deploy-getlog-retrycount>
     <deploy-connect-timeout>1000</deploy-connect-timeout>
     <deploy-retry-interval>30000</deploy-retry-interval>

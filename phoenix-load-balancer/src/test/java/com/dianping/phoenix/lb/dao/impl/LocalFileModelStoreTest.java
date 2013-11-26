@@ -304,7 +304,7 @@ public class LocalFileModelStoreTest {
         assertRawFileNotChanged("slb_www.xml");
         assertRawFileNotChanged("slb_tuangou.xml");
     }
-    
+
     @Test
     public void testRemovePool() throws Exception {
         store.removePool("Web.Tuangou");
@@ -385,7 +385,8 @@ public class LocalFileModelStoreTest {
         Assert.assertTrue(EqualsBuilder.reflectionEquals(newVirtualServer, store.findVirtualServer("www"), "m_version",
                 "m_creationDate", "m_lastModifiedDate"));
         // assert the whole model
-        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()),
+                store.listVirtualServers());
         SlbModelTree wwwSlbModelTree = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir,
                 "slb_www.xml")));
         wwwSlbModelTree.addVirtualServer(newVirtualServer);
@@ -466,7 +467,8 @@ public class LocalFileModelStoreTest {
         Assert.assertTrue(EqualsBuilder.reflectionEquals(newVirtualServer, store.findVirtualServer("www"), "m_version",
                 "m_creationDate", "m_lastModifiedDate"));
         // assert the whole model
-        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()),
+                store.listVirtualServers());
         SlbModelTree wwwSlbModelTree = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir,
                 "slb_www.xml")));
         wwwSlbModelTree.addVirtualServer(newVirtualServer);
@@ -514,7 +516,8 @@ public class LocalFileModelStoreTest {
                 DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
 
         // assert the whole model
-        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()),
+                store.listVirtualServers());
         assertRawFileNotChanged("slb_www.xml");
         assertRawFileNotChanged("slb_tuangou.xml");
         assertRawFileNotChanged("slb_base.xml");
@@ -559,7 +562,8 @@ public class LocalFileModelStoreTest {
                 DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
 
         // assert the whole model
-        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()),
+                store.listVirtualServers());
         assertRawFileNotChanged("slb_www.xml");
         assertRawFileNotChanged("slb_tuangou.xml");
         assertRawFileNotChanged("slb_base.xml");
@@ -599,12 +603,12 @@ public class LocalFileModelStoreTest {
         new DefaultMerger().merge(slbModelTree,
                 DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
         slbModelTree.addVirtualServer(newVirtualServer);
-        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()),
+                store.listVirtualServers());
         // assert new file created
         Assert.assertTrue(new File(tmpDir, "slb_testVs.xml").exists());
-        Assert.assertEquals(1,
-                DefaultSaxParser.parse(FileUtils.readFileToString(new File(tmpDir, "slb_testVs.xml")))
-                        .getVirtualServers().size());
+        Assert.assertEquals(1, DefaultSaxParser.parse(FileUtils.readFileToString(new File(tmpDir, "slb_testVs.xml")))
+                .getVirtualServers().size());
         VirtualServer virtualServerFromFile = DefaultSaxParser
                 .parse(FileUtils.readFileToString(new File(tmpDir, "slb_testVs.xml"))).getVirtualServers()
                 .get("testVs");
@@ -658,7 +662,8 @@ public class LocalFileModelStoreTest {
                 DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))));
         new DefaultMerger().merge(slbModelTree,
                 DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
-        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()),
+                store.listVirtualServers());
         // assert new file not created
         Assert.assertFalse(new File(tmpDir, "slb_testVs.xml").exists());
         assertRawFileNotChanged("slb_www.xml");
@@ -704,7 +709,8 @@ public class LocalFileModelStoreTest {
                 DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))));
         new DefaultMerger().merge(slbModelTree,
                 DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_tuangou.xml"))));
-        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()), store.listVirtualServers());
+        assertEquals(new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values()),
+                store.listVirtualServers());
         // assert new file not created
         Assert.assertFalse(new File(tmpDir, "slb_testVs.xml").exists());
         assertRawFileNotChanged("slb_www.xml");
@@ -762,16 +768,18 @@ public class LocalFileModelStoreTest {
     @Test
     public void testTag() throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        store.tag("www", 1);
-        store.tag("www", 1);
+        store.tag("www", 1, store.listPools());
+        store.tag("www", 1, store.listPools());
         File tagFile = new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/slb_www.xml_1");
         File tagFile2 = new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/slb_www.xml_2");
         Assert.assertTrue(tagFile.exists());
         Assert.assertTrue(tagFile2.exists());
-        Assert.assertEquals(DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))),
-                DefaultSaxParser.parse(FileUtils.readFileToString(tagFile)));
-        Assert.assertEquals(DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))),
-                DefaultSaxParser.parse(FileUtils.readFileToString(tagFile2)));
+        SlbModelTree expected = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml")));
+        for (Pool pool : store.listPools()) {
+            expected.addPool(pool);
+        }
+        Assert.assertEquals(expected, DefaultSaxParser.parse(FileUtils.readFileToString(tagFile)));
+        Assert.assertEquals(expected, DefaultSaxParser.parse(FileUtils.readFileToString(tagFile2)));
 
         assertRawFileNotChanged("slb_www.xml");
         assertRawFileNotChanged("slb_tuangou.xml");
@@ -781,7 +789,7 @@ public class LocalFileModelStoreTest {
     @Test
     public void testTagVSNotExists() throws Exception {
         try {
-            store.tag("www2", 1);
+            store.tag("www2", 1, store.listPools());
             Assert.fail();
         } catch (BizException e) {
             Assert.assertEquals(e.getMessageId(), MessageID.VIRTUALSERVER_NOT_EXISTS);
@@ -797,7 +805,7 @@ public class LocalFileModelStoreTest {
     @Test
     public void testTagConcurrentMod() throws Exception {
         try {
-            store.tag("www", 2);
+            store.tag("www", 2, store.listPools());
             Assert.fail();
         } catch (BizException e) {
             Assert.assertEquals(e.getMessageId(), MessageID.VIRTUALSERVER_CONCURRENT_MOD);
@@ -817,7 +825,7 @@ public class LocalFileModelStoreTest {
         FileUtils.forceMkdir(tagDir);
         tagDir.setWritable(false);
         try {
-            store.tag("www", 1);
+            store.tag("www", 1, store.listPools());
             Assert.fail();
         } catch (BizException e) {
             Assert.assertEquals(e.getMessageId(), MessageID.VIRTUALSERVER_TAG_FAIL);
@@ -833,11 +841,11 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testListTagIds() throws Exception {
-        store.tag("www", 1);
-        store.tag("www", 1);
-        store.tag("tuangou", 1);
-        store.tag("tuangou", 1);
-        store.tag("tuangou", 1);
+        store.tag("www", 1, store.listPools());
+        store.tag("www", 1, store.listPools());
+        store.tag("tuangou", 1, store.listPools());
+        store.tag("tuangou", 1, store.listPools());
+        store.tag("tuangou", 1, store.listPools());
 
         store = new LocalFileModelStoreImpl();
         store.setBaseDir(tmpDir.getAbsolutePath());
@@ -850,8 +858,8 @@ public class LocalFileModelStoreTest {
         Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3" },
                 tuangouTagIds.toArray(new String[0]));
 
-        store.tag("www", 1);
-        store.tag("tuangou", 1);
+        store.tag("www", 1, store.listPools());
+        store.tag("tuangou", 1, store.listPools());
 
         wwwTagIds = store.listTagIds("www");
         tuangouTagIds = store.listTagIds("tuangou");
@@ -894,11 +902,16 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testGetTag() throws Exception {
-        String tagId = store.tag("www", 1);
+        String tagId = store.tag("www", 1, store.listPools());
 
-        VirtualServer tagVs = store.getTag("www", tagId);
+        SlbModelTree tagSlbModelTree = store.getTag("www", tagId);
 
-        Assert.assertEquals(store.findVirtualServer("www").toString(), tagVs.toString());
+        Assert.assertEquals(store.findVirtualServer("www").toString(), tagSlbModelTree.findVirtualServer("www")
+                .toString());
+
+        for (Pool expPool : store.listPools()) {
+            Assert.assertTrue(EqualsBuilder.reflectionEquals(expPool, tagSlbModelTree.findPool(expPool.getName()), true));
+        }
 
         assertRawFileNotChanged("slb_www.xml");
         assertRawFileNotChanged("slb_tuangou.xml");
@@ -907,8 +920,8 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testFindPrevTagId() throws Exception {
-        String tag1 = store.tag("www", 1);
-        String tag2 = store.tag("www", 1);
+        String tag1 = store.tag("www", 1, store.listPools());
+        String tag2 = store.tag("www", 1, store.listPools());
 
         store = new LocalFileModelStoreImpl();
         store.setBaseDir(tmpDir.getAbsolutePath());
@@ -917,7 +930,7 @@ public class LocalFileModelStoreTest {
         Assert.assertEquals(tag1, store.findPrevTagId("www", tag2));
         Assert.assertNull(store.findPrevTagId("www", tag1));
 
-        String tag3 = store.tag("www", 1);
+        String tag3 = store.tag("www", 1, store.listPools());
         Assert.assertEquals(tag2, store.findPrevTagId("www", tag3));
         Assert.assertEquals(tag1, store.findPrevTagId("www", tag2));
         Assert.assertNull(store.findPrevTagId("www", tag1));
@@ -929,20 +942,18 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testListMultiFolderTags() throws Exception {
-        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
-                "tag/www/20120101/slb_www.xml_1"));
-        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
-                "tag/www/20120102/slb_www.xml_2"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir, "tag/www/20120101/slb_www.xml_1"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir, "tag/www/20120102/slb_www.xml_2"));
 
         store = new LocalFileModelStoreImpl();
         store.setBaseDir(tmpDir.getAbsolutePath());
         store.init();
 
-        store.tag("www", 1);
-        store.tag("www", 1);
-        store.tag("tuangou", 1);
-        store.tag("tuangou", 1);
-        store.tag("tuangou", 1);
+        store.tag("www", 1, store.listPools());
+        store.tag("www", 1, store.listPools());
+        store.tag("tuangou", 1, store.listPools());
+        store.tag("tuangou", 1, store.listPools());
+        store.tag("tuangou", 1, store.listPools());
 
         List<String> wwwTagIds = store.listTagIds("www");
         List<String> tuangouTagIds = store.listTagIds("tuangou");
@@ -958,17 +969,25 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testGetMultiFolderTag() throws Exception {
-        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
-                "tag/www/20120101/slb_www.xml_1"));
-        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
-                "tag/www/20120102/slb_www.xml_2"));
+        SlbModelTree tagSlbModelTree = DefaultSaxParser.parse(FileUtils.readFileToString(new File(tmpDir, "slb_www.xml")));
+        for(Pool pool:DefaultSaxParser.parse(FileUtils.readFileToString(new File(tmpDir, "slb_base.xml"))).getPools().values()){
+            tagSlbModelTree.addPool(pool);
+        }
+        FileUtils.writeStringToFile(new File(tmpDir, "tag/www/20120101/slb_www.xml_1"), tagSlbModelTree.toString());
+        FileUtils.writeStringToFile(new File(tmpDir, "tag/www/20120101/slb_www.xml_2"), tagSlbModelTree.toString());
 
         store = new LocalFileModelStoreImpl();
         store.setBaseDir(tmpDir.getAbsolutePath());
         store.init();
 
-        Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-1").toString());
-        Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-2").toString());
+        Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-1").findVirtualServer("www").toString());
+        for(Pool pool: store.listPools()){
+            Assert.assertTrue(EqualsBuilder.reflectionEquals(pool, store.getTag("www", "www-1").findPool(pool.getName()), true));
+        }
+        Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-2").findVirtualServer("www").toString());
+        for(Pool pool: store.listPools()){
+            Assert.assertTrue(EqualsBuilder.reflectionEquals(pool, store.getTag("www", "www-2").findPool(pool.getName()), true));
+        }
 
         assertRawFileNotChanged("slb_www.xml");
         assertRawFileNotChanged("slb_tuangou.xml");
@@ -977,18 +996,15 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testRemoveTagAndFindLatestTag() throws Exception {
-        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
-                "tag/www/20120101/slb_www.xml_1"));
-        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
-                "tag/www/20120101/slb_www.xml_2"));
-        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir,
-                "tag/www/20120102/slb_www.xml_3"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir, "tag/www/20120101/slb_www.xml_1"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir, "tag/www/20120101/slb_www.xml_2"));
+        FileUtils.copyFile(new File(tmpDir, "slb_www.xml"), new File(tmpDir, "tag/www/20120102/slb_www.xml_3"));
 
         store = new LocalFileModelStoreImpl();
         store.setBaseDir(tmpDir.getAbsolutePath());
         store.init();
 
-        store.tag("www", 1);
+        store.tag("www", 1, store.listPools());
 
         store.removeTag("www", "www-2");
         store.removeTag("www", "www-4");

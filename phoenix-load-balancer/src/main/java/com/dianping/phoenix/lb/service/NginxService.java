@@ -6,6 +6,8 @@
  */
 package com.dianping.phoenix.lb.service;
 
+import com.dianping.phoenix.lb.exception.BizException;
+
 /**
  * @author Leo Liang
  * 
@@ -29,4 +31,6 @@ public interface NginxService {
         }
 
     }
+    
+    NginxCheckResult checkConfig(String configContent) throws BizException;
 }
