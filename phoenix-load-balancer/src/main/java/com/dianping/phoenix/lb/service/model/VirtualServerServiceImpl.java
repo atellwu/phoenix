@@ -6,16 +6,21 @@
  */
 package com.dianping.phoenix.lb.service.model;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.phoenix.lb.PlexusComponentContainer;
+import com.dianping.phoenix.lb.configure.ConfigManager;
 import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.dao.PoolDao;
 import com.dianping.phoenix.lb.dao.StrategyDao;
@@ -28,6 +33,9 @@ import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.Strategy;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.service.ConcurrentControlServiceTemplate;
+import com.dianping.phoenix.lb.service.GitService;
+import com.dianping.phoenix.lb.service.NginxService;
+import com.dianping.phoenix.lb.service.NginxService.NginxCheckResult;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
 import com.dianping.phoenix.lb.velocity.TemplateManager;
 import com.dianping.phoenix.lb.velocity.VelocityEngineManager;
@@ -43,18 +51,25 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
     private VirtualServerDao virtualServerDao;
     private StrategyDao      strategyDao;
     private PoolDao          poolDao;
+    private NginxService     nginxService;
+    private GitService       gitService;
+    private ConfigManager    configManager;
 
-    /**
-     * @param virtualServerDao
-     * @param templateDao
-     */
     @Autowired(required = true)
-    public VirtualServerServiceImpl(VirtualServerDao virtualServerDao, StrategyDao strategyDao, PoolDao poolDao)
-            throws ComponentLookupException {
+    public VirtualServerServiceImpl(VirtualServerDao virtualServerDao, StrategyDao strategyDao, PoolDao poolDao,
+            NginxService nginxService, GitService gitService) throws ComponentLookupException {
         super();
         this.virtualServerDao = virtualServerDao;
         this.strategyDao = strategyDao;
         this.poolDao = poolDao;
+        this.gitService = gitService;
+        this.nginxService = nginxService;
+    }
+
+    public void init() throws ComponentLookupException, BizException {
+        configManager = PlexusComponentContainer.INSTANCE.lookup(ConfigManager.class);
+
+        gitService.clone(configManager.getTengineConfigGitUrl(), configManager.getTengineConfigBaseDir(), null);
     }
 
     /**
@@ -301,7 +316,34 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
 
             @Override
             public String doRead() throws BizException {
-                return virtualServerDao.tag(virtualServerName, virtualServerVersion, pools);
+                try {
+                    VirtualServer virtualServer = virtualServerDao.find(virtualServerName);
+
+                    if (virtualServer.getVersion() != virtualServerVersion) {
+                        ExceptionUtils.logAndRethrowBizException(new ConcurrentModificationException(),
+                                MessageID.VIRTUALSERVER_CONCURRENT_MOD, virtualServerName);
+                    }
+
+                    String nginxConfigContent = generateNginxConfig(virtualServer, pools);
+                    NginxCheckResult nginxCheckResult = nginxService.checkConfig(nginxConfigContent);
+                    if (!nginxCheckResult.isSucess()) {
+                        ExceptionUtils.throwBizException(MessageID.NGINX_CHECK_EXCEPTION, nginxCheckResult.getMsg());
+                    }
+
+                    String tagId = virtualServerDao.tag(virtualServerName, virtualServerVersion, pools);
+
+                    FileUtils.writeStringToFile(new File(new File(configManager.getTengineConfigBaseDir(),
+                            virtualServerName), configManager.getTengineConfigFileName()), nginxConfigContent);
+                    
+                    gitService.tagAndPush(configManager.getTengineConfigGitUrl(),
+                            configManager.getTengineConfigBaseDir(), tagId,
+                            String.format("update vs(%s) to tag(%s)", virtualServerName, tagId));
+
+                    return virtualServerDao.tag(virtualServerName, virtualServerVersion, pools);
+                } catch (Exception e) {
+                    ExceptionUtils.rethrowBizException(e);
+                }
+                return null;
             }
 
         });
