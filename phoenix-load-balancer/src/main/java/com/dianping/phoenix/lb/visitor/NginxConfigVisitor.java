@@ -51,8 +51,9 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
         defaultLocation.setMatchType(MatchType.COMMON);
         defaultLocation.setPattern("/");
         Directive directive = new Directive();
-        directive.setType("proxy_pass");
-        directive.setDynamicAttribute("pool-name", toUpstreamName(virtualServer.getDefaultPoolName()));
+        directive.setType(Constants.DIRECTIVE_PROXY_PASS);
+        directive.setDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME,
+                toUpstreamName(virtualServer.getDefaultPoolName()));
         defaultLocation.addDirective(directive);
         server.addLocations(defaultLocation);
         result.setServer(server);
@@ -84,8 +85,9 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
         nginxLocation.setPattern(location.getPattern());
         for (Directive directive : location.getDirectives()) {
             nginxLocation.addDirective(directive);
-            if ("proxy_pass".equals(directive.getType())) {
-                NginxUpstream upstream = result.getUpstream(directive.getDynamicAttribute("pool-name"));
+            if (Constants.DIRECTIVE_PROXY_PASS.equals(directive.getType())) {
+                NginxUpstream upstream = result.getUpstream(directive
+                        .getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME));
                 if (upstream == null) {
                     throw new RuntimeException(MessageUtils.getMessage(MessageID.PROXY_PASS_NO_POOL,
                             location.getPattern()));
