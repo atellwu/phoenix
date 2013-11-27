@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 
 /**
@@ -29,9 +30,9 @@ public interface VirtualServerService {
 
     String generateNginxConfig(VirtualServer virtualServer, List<Pool> pools) throws BizException;
 
-    String tag(String virtualServerName, int virtualServerVersion) throws BizException;
+    String tag(String virtualServerName, int virtualServerVersion, List<Pool> pools) throws BizException;
 
-    VirtualServer findTagById(String virtualServerName, String tagId) throws BizException;
+    SlbModelTree findTagById(String virtualServerName, String tagId) throws BizException;
 
     String findPrevTagId(String virtualServerName, String tagId) throws BizException;
 
@@ -40,4 +41,6 @@ public interface VirtualServerService {
     String findLatestTagId(String virtualServerName) throws BizException;
 
     List<String> listTag(String virtualServerName, int maxNum) throws BizException;
+
+    List<String> findVirtualServerByPool(String poolName) throws BizException;
 }

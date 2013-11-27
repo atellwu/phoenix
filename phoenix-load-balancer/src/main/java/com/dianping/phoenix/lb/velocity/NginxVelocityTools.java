@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.dianping.phoenix.lb.constant.Constants;
 import com.dianping.phoenix.lb.model.Availability;
 import com.dianping.phoenix.lb.model.State;
 import com.dianping.phoenix.lb.model.entity.Directive;
@@ -73,8 +74,8 @@ public class NginxVelocityTools {
         if (StringUtils.isNotBlank(template)) {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("directive", directive);
-            if ("proxy_pass".equals(directive.getType())) {
-                context.put("dp_domain", directive.getDynamicAttribute("pool-name"));
+            if (Constants.DIRECTIVE_PROXY_PASS.equals(directive.getType())) {
+                context.put("dp_domain", directive.getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME));
             }
             return VelocityEngineManager.INSTANCE.merge(template, context);
         } else {

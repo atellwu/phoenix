@@ -50,7 +50,11 @@ public enum MessageID {
 
     DEPLOY_FIND_ACTIVE_DEPLOY_FAIL("deploy_find_active_deploy_fail"), //
     DEPLOY_ALREADY_RUNNING("deploy_already_running"), //
-    DEPLOY_EXCEPTION("deploy_exception"),
+    DEPLOY_EXCEPTION("deploy_exception"),//
+    
+    GIT_EXCEPTION("git_exception"),//
+    
+    NGINX_CHECK_EXCEPTION("nginx_check_exception"),//
 
     ;
 

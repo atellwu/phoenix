@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import com.dianping.phoenix.lb.dao.ModelStore;
 import com.dianping.phoenix.lb.dao.VirtualServerDao;
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 
 /**
@@ -57,13 +59,8 @@ public class VirtualServerDaoImpl extends AbstractDao implements VirtualServerDa
     }
 
     @Override
-    public String tag(String virtualServerName, int virtualServerVersion) throws BizException {
-        return store.tag(virtualServerName, virtualServerVersion);
-    }
-
-    @Override
-    public VirtualServer getTag(String virtualServerName, String tagId) throws BizException {
-        return store.getTag(virtualServerName, tagId);
+    public String tag(String virtualServerName, int virtualServerVersion, List<Pool> pools) throws BizException {
+        return store.tag(virtualServerName, virtualServerVersion, pools);
     }
 
     @Override
@@ -72,7 +69,7 @@ public class VirtualServerDaoImpl extends AbstractDao implements VirtualServerDa
     }
 
     @Override
-    public VirtualServer findTagById(String virtualServerName, String tagId) throws BizException {
+    public SlbModelTree findTagById(String virtualServerName, String tagId) throws BizException {
         return store.getTag(virtualServerName, tagId);
     }
 
@@ -83,7 +80,7 @@ public class VirtualServerDaoImpl extends AbstractDao implements VirtualServerDa
 
     @Override
     public void removeTag(String virtualServerName, String tagId) throws BizException {
-         store.removeTag(virtualServerName, tagId);
+        store.removeTag(virtualServerName, tagId);
     }
 
     @Override

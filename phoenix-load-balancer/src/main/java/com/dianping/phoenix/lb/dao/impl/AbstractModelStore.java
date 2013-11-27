@@ -303,7 +303,7 @@ public abstract class AbstractModelStore implements ModelStore {
     }
 
     @Override
-    public String tag(String name, int version) throws BizException {
+    public String tag(String name, int version, List<Pool> pools) throws BizException {
         ConfigMeta configFileEntry = virtualServerConfigFileMapping.get(name);
         if (configFileEntry != null) {
             configFileEntry.lock.writeLock().lock();
@@ -321,7 +321,13 @@ public abstract class AbstractModelStore implements ModelStore {
                             MessageID.VIRTUALSERVER_CONCURRENT_MOD, name);
                 }
 
-                return saveTag(configFileEntry.key, name, configFileEntry.slbModelTree);
+                SlbModelTree tagSlbModelTree = new SlbModelTree();
+                for (Pool pool : pools) {
+                    tagSlbModelTree.addPool(pool);
+                }
+                tagSlbModelTree.addVirtualServer(configFileEntry.slbModelTree.findVirtualServer(name));
+
+                return saveTag(configFileEntry.key, name, tagSlbModelTree);
             } catch (IOException e) {
                 ExceptionUtils.logAndRethrowBizException(e, MessageID.VIRTUALSERVER_TAG_FAIL, name);
             } finally {
@@ -335,7 +341,7 @@ public abstract class AbstractModelStore implements ModelStore {
     }
 
     @Override
-    public VirtualServer getTag(String name, String tagId) throws BizException {
+    public SlbModelTree getTag(String name, String tagId) throws BizException {
         ConfigMeta configFileEntry = virtualServerConfigFileMapping.get(name);
         if (configFileEntry != null) {
             configFileEntry.lock.readLock().lock();
@@ -348,7 +354,7 @@ public abstract class AbstractModelStore implements ModelStore {
 
                 SlbModelTree tagSlbModelTree = loadTag(configFileEntry.key, name, tagId);
                 if (tagSlbModelTree != null && tagSlbModelTree.findVirtualServer(name) != null) {
-                    return tagSlbModelTree.findVirtualServer(name);
+                    return tagSlbModelTree;
                 } else {
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_TAG_NOT_FOUND, tagId, name);
                 }
