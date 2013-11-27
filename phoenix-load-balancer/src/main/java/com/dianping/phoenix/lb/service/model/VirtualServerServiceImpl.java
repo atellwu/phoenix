@@ -388,7 +388,7 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
                     try {
                         FileUtils.writeStringToFile(serverConfFile, nginxConfigContent);
 
-                        gitService.tagAndPush(configManager.getTengineConfigGitUrl(),
+                        gitService.commitAllChangesAndTagAndPush(configManager.getTengineConfigGitUrl(),
                                 configManager.getTengineConfigBaseDir(), tagId,
                                 String.format("update vs(%s) to tag(%s)", virtualServerName, tagId));
                     } catch (Exception e) {
