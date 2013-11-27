@@ -39,5 +39,8 @@ module.factory('DataService', function($resource) {
 	model.pools = Pools.query(function() {
 	});
 
+	// list tag的resource
+//	model.Tags = $resource(window.contextpath + '/vs/:vsName0/tag/list');
+
 	return model;
 });

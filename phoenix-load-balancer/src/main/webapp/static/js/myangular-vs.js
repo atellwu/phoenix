@@ -1,10 +1,6 @@
 module.controller('VsController', function($scope, DataService, $resource,
 		$http) {
 	$scope.selectedTab = 'profile';
-	// list tag的resource
-	var Tags = $resource(window.contextpath + '/vs/:vsName/tag/list', {
-		vsName : '@vsName'
-	});
 	// 获取hash，设置给selectedTab
 	var hash = window.location.hash;
 	if (hash.length > 1) {// 去掉#号
@@ -19,6 +15,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 	};
 	var vsChanged = false;
 	$scope.vs = null;
+	$scope.tags = [];
 	$scope.getVs = function(vsName) {
 		$http({
 			method : 'GET',
@@ -53,9 +50,20 @@ module.controller('VsController', function($scope, DataService, $resource,
 			app.appError("响应错误", data);
 		});
 		// 获取tag list
-		$scope.tags = Tags.get({
-			vsName : vsName
-		}, function() {
+		// 老是tags含有angularjs的属性
+		// var Tags = $resource(window.contextpath + '/vs/:vsName0/tag/list');
+		// $scope.tags = Tags.query({
+		// vsName0 : vsName
+		// },function(){
+		// console.log($scope.tags);
+		// });
+		$http({
+			method : 'GET',
+			url : window.contextpath + '/vs/' + vsName + '/tag/list'
+		}).success(function(data, status, headers, config) {
+			$scope.tags = data;
+		}).error(function(data, status, headers, config) {
+			app.appError("响应错误", data);
 		});
 	};
 	// 保存
@@ -125,24 +133,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 				+ window.location.hash;
 	}
 	$scope.preview = function() {
-		// 显示modal
-		var width = $(window).width();
-		var height = $(window).height();
-		var left = (width - 900) / 2;
-		var modal = $('#previewVirtualServerModal');
-		modal.css('height', height - 20);
-		modal.css('width', 900);
-		modal.css('top', 10);
-		if (left > 0) {
-			modal.css('left', left);
-			$('#previewVirtualServerModal>.modal-footer').css('left', left);
-		}
-		var modalBody = $('#previewVirtualServerModal>.modal-body');
-		modalBody.css('height', height - 170);
-		modalBody.css('max-height', height - 145);
-		window.nginxConfigEditor.setValue("");
-		$('#nginxConfigEditor').show();
-		$('#previewVirtualServerModal').modal('show');
+		showPreviewModal();
 		$http({
 			method : 'POST',
 			data : $scope.vs,
@@ -163,7 +154,10 @@ module.controller('VsController', function($scope, DataService, $resource,
 	}
 
 	// addTag
+	$scope.addingTag = false;
+	$scope.newTag = null;
 	$scope.addTag = function() {
+		$scope.addingTag  = true;
 		var param = new Object();
 		// param.virtualServerName = $scope.vs.name;
 		param.version = $scope.vs.version;
@@ -175,40 +169,60 @@ module.controller('VsController', function($scope, DataService, $resource,
 			},
 			url : window.contextpath + '/vs/' + $scope.vs.name + '/tag/add'
 		}).success(function(data, status, headers, config) {
+			$scope.addingTag  = false;
 			if (data.errorCode == 0) {
-				app.alertSuccess("保存成功！ 即将刷新页面...");
-				// vsChanged = false;// 保存成功，修改标识重置
-				// setTimeout(function() {
-				// window.location = window.contextpath + "/vs/"
-				// + $scope.vs.name + window.location.hash;
-				// }, 700);
+				app.alertSuccess("创建发布版本成功！点击“已创建的发布版本”可查看。");
+				$('#tagsUl').addClass('open');
+				$scope.tags.unshift(data.tagId);
+				$scope.newTag = data.tagId;
 			} else {
 				app.alertError("保存失败: " + data.errorMessage);
 			}
 		}).error(function(data, status, headers, config) {
+			$scope.addingTag  = false;
 			app.appError("响应错误", data);
 		});
 	};
 	$scope.viewTag = function(tagId) {
+		showPreviewModal();
 		$http(
 				{
 					method : 'GET',
 					url : window.contextpath + '/vs/' + $scope.vs.name
-							+ '/tag/' + tagId
-				}).success(function(data, status, headers, config) {
-			if (data.errorCode == 0) {
-				app.alertSuccess("保存成功！ 即将刷新页面...");
-				// vsChanged = false;// 保存成功，修改标识重置
-				// setTimeout(function() {
-				// window.location = window.contextpath + "/vs/"
-				// + $scope.vs.name + window.location.hash;
-				// }, 700);
-			} else {
-				app.alertError("保存失败: " + data.errorMessage);
-			}
-		}).error(function(data, status, headers, config) {
+							+ '/tag/get/' + tagId
+				}).success(
+				function(data, status, headers, config) {
+					if (data.errorCode == 0) {
+						window.nginxConfigEditor.setValue(data.nginxConfig);
+						window.nginxConfigEditor.moveCursorTo(0, 0);
+					} else {
+						$('#nginxConfigEditor').hide();
+						app.alertError("预览失败: " + data.errorMessage,
+								"previewVirtualServerAlertDiv");
+					}
+				}).error(function(data, status, headers, config) {
 			app.appError("响应错误", data);
 		});
+	};
+	var showPreviewModal = function(){
+		// 显示modal
+		var width = $(window).width();
+		var height = $(window).height();
+		var left = (width - 900) / 2;
+		var modal = $('#previewVirtualServerModal');
+		modal.css('height', height - 20);
+		modal.css('width', 900);
+		modal.css('top', 10);
+		if (left > 0) {
+			modal.css('left', left);
+			$('#previewVirtualServerModal>.modal-footer').css('left', left);
+		}
+		var modalBody = $('#previewVirtualServerModal>.modal-body');
+		modalBody.css('height', height - 170);
+		modalBody.css('max-height', height - 145);
+		window.nginxConfigEditor.setValue("");
+		$('#nginxConfigEditor').show();
+		$('#previewVirtualServerModal').modal('show');
 	};
 	// 离开页面时，对比一下vs是否发生了修改
 	var onunload = function() {

@@ -198,7 +198,7 @@ public class VirtualServerAction extends MenuAction {
                 for (Entry<String, VirtualServer> entry : virtualServers0.entrySet()) {
                     VirtualServer virtualServer = entry.getValue();
                     String config = virtualServerService.generateNginxConfig(virtualServer, poolList);
-                    dataMap.put("config", config);
+                    dataMap.put("nginxConfig", config);
                     break;
                 }
             }

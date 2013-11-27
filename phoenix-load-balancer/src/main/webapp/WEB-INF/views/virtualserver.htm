@@ -22,11 +22,11 @@
         <ul ng-model="selectedTab" class="nav nav-pills">
           <li ng-class="isActive('profile')"><a href="#profile" ng-click="selectedTab='profile'">&nbsp;基本配置&nbsp;</a></li>
           <li ng-class="isActive('location')"><a href="#location" ng-click="selectedTab='location'">&nbsp;映射规则&nbsp;</a></li>
-          <li class="dropdown" style="margin-left: 20px; font-size: 12px;"><a href="#" class="dropdown-toggle"
+          <li id="tagsUl" class="dropdown" style="margin-left: 20px; font-size: 12px;"><a href="#" class="dropdown-toggle"
             data-toggle="dropdown">已创建的发布版本 <b class="caret"></b></a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-              <li ng-repeat="tagId in tagIds"><a ng-click="viewTag(tagId)"
-                tabindex="-1" href="javascript:void(0)"><i class="icon-plus"></i> {{ tagId }}</a></li>
+              <li ng-repeat="tag in tags"><a ng-click="viewTag(tag)"
+                tabindex="-1" href="javascript:void(0)">{{ tag }} <i class="icon-ok-sign" ng-show="newTag==tag"> (刚刚新增的版本)</i></a></li>
             </ul></li>
           <li class="dropdown" style="margin-left: 20px; font-size: 12px;"><a href="#" class="dropdown-toggle"
             data-toggle="dropdown">更多操作 <b class="caret"></b></a>

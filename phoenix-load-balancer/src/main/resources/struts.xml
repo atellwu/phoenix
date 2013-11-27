@@ -103,7 +103,7 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="vs/{virtualServerName}/tag/get" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/tag/get/{tagId}" class="virtualServerAction"
             method="getNginxConfigByTagId">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
