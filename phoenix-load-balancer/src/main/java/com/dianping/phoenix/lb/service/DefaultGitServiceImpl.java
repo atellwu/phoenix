@@ -107,13 +107,13 @@ public class DefaultGitServiceImpl implements GitService {
     }
 
     @Override
-    public void clone(String gitUrl, String targetDir, String tag) throws BizException {
+    public synchronized void clone(String gitUrl, String targetDir, String tag) throws BizException {
         exec(getShellCmd("clone", gitUrl, targetDir, tag, null));
 
     }
 
     @Override
-    public void rollback(String targetDir) throws BizException {
+    public synchronized void rollback(String targetDir) throws BizException {
         exec(getShellCmd("rollback", null, targetDir, null, null));
     }
 
@@ -128,6 +128,13 @@ public class DefaultGitServiceImpl implements GitService {
         // service.commitAllChanges(targetDir, "test-lll");
         // service.tagAndPush(gitUrl, targetDir, "test-lll", "ccccd");
         service.rollback(targetDir);
+    }
+
+    @Override
+    public synchronized void commitAllChangesAndTagAndPush(String gitUrl, String targetDir, String tag, String comment)
+            throws BizException {
+        commitAllChanges(targetDir, comment);
+        tagAndPush(gitUrl, targetDir, tag, comment);
     }
 
 }

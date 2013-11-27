@@ -14,4 +14,6 @@ public interface GitService {
 
     void rollback(String targetDir) throws BizException;
 
+    void commitAllChangesAndTagAndPush(String gitUrl, String targetDir, String tag, String comment) throws BizException;
+
 }
