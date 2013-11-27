@@ -9,9 +9,12 @@ package com.dianping.phoenix.lb.service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.springframework.stereotype.Service;
 
 import com.dianping.phoenix.lb.PlexusComponentContainer;
 import com.dianping.phoenix.lb.configure.ConfigManager;
@@ -23,11 +26,13 @@ import com.dianping.phoenix.lb.utils.ExceptionUtils;
  * @author Leo Liang
  * 
  */
+@Service
 public class DefaultNginxServiceImpl implements NginxService {
 
-    private static Logger log  = Logger.getLogger(DefaultNginxServiceImpl.class);
+    private static Logger log = Logger.getLogger(DefaultNginxServiceImpl.class);
     private ConfigManager configManager;
 
+    @PostConstruct
     public void init() throws ComponentLookupException {
         configManager = PlexusComponentContainer.INSTANCE.lookup(ConfigManager.class);
     }
@@ -74,11 +79,10 @@ public class DefaultNginxServiceImpl implements NginxService {
     public static void main(String[] args) throws Exception {
         DefaultNginxServiceImpl service = new DefaultNginxServiceImpl();
         service.init();
-        NginxCheckResult res = service
-                .checkConfig("server {}");
+        NginxCheckResult res = service.checkConfig("server {}");
         if (!res.isSucess()) {
             System.out.println(res.getMsg());
-        }else{
+        } else {
             System.out.println("ok");
         }
     }

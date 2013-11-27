@@ -12,9 +12,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.springframework.stereotype.Service;
 
 import com.dianping.phoenix.lb.PlexusComponentContainer;
 import com.dianping.phoenix.lb.configure.ConfigManager;
@@ -27,10 +30,12 @@ import com.dianping.phoenix.lb.utils.ExceptionUtils;
  * @author Leo Liang
  * 
  */
+@Service
 public class DefaultGitServiceImpl implements GitService {
 
     private ConfigManager configManager;
 
+    @PostConstruct
     public void init() throws ComponentLookupException {
         configManager = PlexusComponentContainer.INSTANCE.lookup(ConfigManager.class);
     }

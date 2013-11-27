@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -67,6 +69,7 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
         this.nginxService = nginxService;
     }
 
+    @PostConstruct
     public void init() throws ComponentLookupException, BizException {
         configManager = PlexusComponentContainer.INSTANCE.lookup(ConfigManager.class);
 
