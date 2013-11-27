@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -272,7 +273,13 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
             }
         }
 
-        Collections.sort(tagIds);
+        Collections.sort(tagIds, new Comparator<String>() {
+
+            @Override
+            public int compare(String o1, String o2) {
+                return -1 * o1.compareTo(o2);
+            }
+        });
         return tagIds;
     }
 

@@ -854,8 +854,8 @@ public class LocalFileModelStoreTest {
         List<String> wwwTagIds = store.listTagIds("www");
         List<String> tuangouTagIds = store.listTagIds("tuangou");
 
-        Assert.assertArrayEquals(new String[] { "www-1", "www-2" }, wwwTagIds.toArray(new String[0]));
-        Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3" },
+        Assert.assertArrayEquals(new String[] { "www-2", "www-1" }, wwwTagIds.toArray(new String[0]));
+        Assert.assertArrayEquals(new String[] { "tuangou-3", "tuangou-2", "tuangou-1" },
                 tuangouTagIds.toArray(new String[0]));
 
         store.tag("www", 1, store.listPools());
@@ -864,8 +864,8 @@ public class LocalFileModelStoreTest {
         wwwTagIds = store.listTagIds("www");
         tuangouTagIds = store.listTagIds("tuangou");
 
-        Assert.assertArrayEquals(new String[] { "www-1", "www-2", "www-3" }, wwwTagIds.toArray(new String[0]));
-        Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3", "tuangou-4" },
+        Assert.assertArrayEquals(new String[] { "www-3", "www-2", "www-1" }, wwwTagIds.toArray(new String[0]));
+        Assert.assertArrayEquals(new String[] { "tuangou-4", "tuangou-3", "tuangou-2", "tuangou-1" },
                 tuangouTagIds.toArray(new String[0]));
 
         assertRawFileNotChanged("slb_www.xml");
@@ -958,8 +958,8 @@ public class LocalFileModelStoreTest {
         List<String> wwwTagIds = store.listTagIds("www");
         List<String> tuangouTagIds = store.listTagIds("tuangou");
 
-        Assert.assertArrayEquals(new String[] { "www-1", "www-2", "www-3", "www-4" }, wwwTagIds.toArray(new String[0]));
-        Assert.assertArrayEquals(new String[] { "tuangou-1", "tuangou-2", "tuangou-3" },
+        Assert.assertArrayEquals(new String[] { "www-4", "www-3", "www-2", "www-1" }, wwwTagIds.toArray(new String[0]));
+        Assert.assertArrayEquals(new String[] { "tuangou-3", "tuangou-2", "tuangou-1" },
                 tuangouTagIds.toArray(new String[0]));
 
         assertRawFileNotChanged("slb_www.xml");
@@ -1015,7 +1015,7 @@ public class LocalFileModelStoreTest {
         Assert.assertFalse(new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/slb_www.xml_4").exists());
 
         List<String> tagIds = store.listTagIds("www");
-        Assert.assertArrayEquals(new String[] { "www-1", "www-3" }, tagIds.toArray());
+        Assert.assertArrayEquals(new String[] { "www-3", "www-1" }, tagIds.toArray());
         Assert.assertEquals("www-3", store.findLatestTagId("www"));
 
         store.removeTag("www", "www-1");
