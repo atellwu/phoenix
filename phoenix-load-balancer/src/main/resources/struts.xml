@@ -13,7 +13,8 @@
     <constant name="struts.velocity.configfile" value="WEB-INF/velocity/velocity.properties" />
 
     <constant name="struts.action.extension" value="" />
-    <constant name="struts.custom.properties" value="classpath:/struts.properties" />
+    <!-- <constant name="struts.custom.properties" value="classpath:/struts.properties" 
+        /> -->
     <constant name="struts.objectFactory"
         value="org.apache.struts2.spring.StrutsSpringObjectFactory" />
     <constant name="struts.patternMatcher" value="namedVariable" />
@@ -88,12 +89,35 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
+        <action name="vs/{virtualServerName}/tag/add" class="virtualServerAction"
+            method="addTag">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/tag/list" class="virtualServerAction"
+            method="listTags">
+            <result name="success" type="json">
+                <param name="root">tags</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/tag/get" class="virtualServerAction"
+            method="getNginxConfigByTagId">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
         <action name="vs/{virtualServerName}" class="virtualServerAction"
             method="show">
             <result name="success" type="velocity">
                 /virtualserver.htm
             </result>
         </action>
+
+
 
         <action name="pool/{poolName}/save" class="poolAction"
             method="save">
@@ -158,8 +182,7 @@
             </result>
         </action>
 
-        <action name="deploy/show" class="deployAction"
-            method="show">
+        <action name="deploy/show" class="deployAction" method="show">
             <result name="success" type="velocity">
                 /deploy.htm
             </result>

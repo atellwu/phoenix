@@ -46,7 +46,7 @@ public class DeployAction extends ActionSupport {
     @Autowired
     private PoolService          poolService;
 
-    private List<String>         virtualServerNames;
+    private String[]             virtualServerNames;
 
     private List<VirtualServer>  virtualServers;
 
@@ -63,7 +63,7 @@ public class DeployAction extends ActionSupport {
      */
     public String show() {
 
-        System.out.println(virtualServerNames);
+        System.out.println(virtualServerNames[0]);
         return SUCCESS;
     }
 
@@ -95,11 +95,11 @@ public class DeployAction extends ActionSupport {
         return contextPath;
     }
 
-    public List<String> getVirtualServerNames() {
+    public String[] getVirtualServerNames() {
         return virtualServerNames;
     }
 
-    public void setVirtualServerNames(List<String> virtualServerNames) {
+    public void setVirtualServerNames(String[] virtualServerNames) {
         this.virtualServerNames = virtualServerNames;
     }
 

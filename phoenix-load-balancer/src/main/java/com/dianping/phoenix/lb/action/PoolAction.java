@@ -5,26 +5,23 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.Pool;
-import com.dianping.phoenix.lb.service.model.PoolService;
 import com.dianping.phoenix.lb.utils.JsonBinder;
 
 /**
  * @author wukezhu
  */
 @Component("poolAction")
+@Scope("prototype")
 public class PoolAction extends MenuAction {
 
     private static final Logger LOG              = LoggerFactory.getLogger(PoolAction.class);
 
     private static final long   serialVersionUID = -1084994778030229218L;
-
-    @Autowired
-    private PoolService         poolService;
 
     private String              poolName;
 
@@ -65,7 +62,6 @@ public class PoolAction extends MenuAction {
                 poolService.modifyPool(poolName, pool);
             } else {
                 poolService.addPool(poolName, pool);
-                pools = poolService.listPools();//重新更新list
             }
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (BizException e) {
@@ -91,7 +87,6 @@ public class PoolAction extends MenuAction {
                 throw new IllegalArgumentException("不存在该站点：" + poolName);
             }
             poolService.deletePool(poolName);
-            pools = poolService.listPools();//重新更新list
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());

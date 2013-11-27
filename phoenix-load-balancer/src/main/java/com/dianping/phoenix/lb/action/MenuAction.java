@@ -46,8 +46,6 @@ public abstract class MenuAction extends ActionSupport {
 
     @PostConstruct
     public void init() {
-        virtualServers = virtualServerService.listVirtualServers();
-        pools = poolService.listPools();
     }
 
     public String listVirtualServers() {
@@ -74,6 +72,8 @@ public abstract class MenuAction extends ActionSupport {
         if (contextPath == null) {
             contextPath = ServletActionContext.getServletContext().getContextPath();
         }
+        virtualServers = virtualServerService.listVirtualServers();
+        pools = poolService.listPools();
     }
 
     public Map<String, Object> getDataMap() {

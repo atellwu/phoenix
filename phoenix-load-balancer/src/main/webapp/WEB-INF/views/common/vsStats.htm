@@ -3,8 +3,8 @@
       class="icon-external-link"></i> 发布</span></a>
 </p>
 <p class="stat" ng-show="editOrShow=='show'">
-  <a ng-href="${contextPath}/{{vs.name}}/deploy" target="_blank"><span style="color: #6c7a95" class="number"><i
-      class="icon-tag"></i> 创建Tag</span></a>
+  <a href="javascript:;" ng-click="addTag();" target="_blank"><span style="color: #6c7a95" class="number"><i
+      class="icon-tag"></i> 创建发布版本</span></a>
 </p>
 <p class="stat">
   <a href="javascript:;" ng-click="preview()" title="预览当前生成的 nginx config 文件"><span style="color: #6c7a95"
