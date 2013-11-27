@@ -13,14 +13,16 @@ import java.util.Arrays;
  * 
  */
 public class Constants {
-    public static String   DEPLOY_SUMMARY            = "summary";
-    public static String   ENV_DEV                   = "dev";
-    public static String   ENV_PRODUCT               = "product";
+    public static String   DEPLOY_SUMMARY                 = "summary";
+    public static String   ENV_DEV                        = "dev";
+    public static String   ENV_PRODUCT                    = "product";
+    public static String   DIRECTIVE_PROXY_PASS           = "proxy_pass";
+    public static String   DIRECTIVE_PROXY_PASS_POOL_NAME = "pool-name";
 
-    public static String   LOCATION_MATCHTYPE_PREFIX = "prefix";
-    public static String   LOCATION_MATCHTYPE_REGEX  = "regex";
-    public static String   LOCATION_MATCHTYPE_COMMON = "common";
-    public static String[] LOCATION_MATCHTYPES       = new String[] { LOCATION_MATCHTYPE_PREFIX,
+    public static String   LOCATION_MATCHTYPE_PREFIX      = "prefix";
+    public static String   LOCATION_MATCHTYPE_REGEX       = "regex";
+    public static String   LOCATION_MATCHTYPE_COMMON      = "common";
+    public static String[] LOCATION_MATCHTYPES            = new String[] { LOCATION_MATCHTYPE_PREFIX,
             LOCATION_MATCHTYPE_REGEX, LOCATION_MATCHTYPE_COMMON };
 
     public static void main(String[] args) {

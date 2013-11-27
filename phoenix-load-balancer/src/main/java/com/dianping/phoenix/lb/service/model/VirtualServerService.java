@@ -41,4 +41,6 @@ public interface VirtualServerService {
     String findLatestTagId(String virtualServerName) throws BizException;
 
     List<String> listTag(String virtualServerName, int maxNum) throws BizException;
+
+    List<String> findVirtualServerByPool(String poolName) throws BizException;
 }

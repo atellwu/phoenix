@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.phoenix.lb.PlexusComponentContainer;
 import com.dianping.phoenix.lb.configure.ConfigManager;
+import com.dianping.phoenix.lb.constant.Constants;
 import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.dao.PoolDao;
 import com.dianping.phoenix.lb.dao.StrategyDao;
@@ -86,6 +87,52 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
      */
     public void setVirtualServerDao(VirtualServerDao virtualServerDao) {
         this.virtualServerDao = virtualServerDao;
+    }
+
+    public List<String> findVirtualServerByPool(final String poolName) throws BizException {
+        try {
+            return read(new ReadOperation<List<String>>() {
+
+                @Override
+                public List<String> doRead() throws Exception {
+                    List<String> vsNames = new ArrayList<String>();
+                    for (VirtualServer vs : virtualServerDao.list()) {
+
+                        boolean found = false;
+
+                        if (StringUtils.equals(vs.getDefaultPoolName(), poolName)) {
+                            vsNames.add(vs.getName());
+                            found = true;
+                        }
+
+                        if (found) {
+                            continue;
+                        }
+
+                        for (Location location : vs.getLocations()) {
+                            if (found) {
+                                break;
+                            }
+                            for (Directive directive : location.getDirectives()) {
+                                if (Constants.DIRECTIVE_PROXY_PASS.equals(directive.getType())
+                                        && StringUtils
+                                                .equals(directive
+                                                        .getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME),
+                                                        poolName)) {
+                                    vsNames.add(vs.getName());
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    return vsNames;
+                }
+
+            });
+        } catch (BizException e) {
+            return null;
+        }
     }
 
     /*
@@ -260,7 +307,7 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_DIRECTIVE_TYPE_NOT_SUPPORT,
                             directive.getType());
                 }
-                if ("proxy_pass".equals(directive.getType())) {
+                if (Constants.DIRECTIVE_PROXY_PASS.equals(directive.getType())) {
                     if (!proxyPassExists) {
                         proxyPassExists = true;
                     } else {
