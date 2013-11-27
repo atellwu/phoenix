@@ -145,6 +145,9 @@
 				<requirement>
 					<role>com.dianping.phoenix.agent.core.tx.LogFormatter</role>
 				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.agent.core.AgentStatusHolder</role>
+				</requirement>
 			</requirements>
 		</component>
 		<component>
@@ -251,6 +254,24 @@
 		<component>
 			<role>com.dianping.phoenix.agent.page.deploy.JspViewer</role>
 			<implementation>com.dianping.phoenix.agent.page.deploy.JspViewer</implementation>
+			<requirements>
+				<requirement>
+					<role>org.unidal.web.mvc.view.model.ModelHandler</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.agent.page.nginx.Handler</role>
+			<implementation>com.dianping.phoenix.agent.page.nginx.Handler</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.agent.page.nginx.JspViewer</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.agent.page.nginx.JspViewer</role>
+			<implementation>com.dianping.phoenix.agent.page.nginx.JspViewer</implementation>
 			<requirements>
 				<requirement>
 					<role>org.unidal.web.mvc.view.model.ModelHandler</role>
