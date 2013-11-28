@@ -157,6 +157,8 @@ module.controller('VsController', function($scope, DataService, $resource,
 	$scope.addingTag = false;
 	$scope.newTag = null;
 	$scope.addTag = function() {
+		app.clearAlertMessage();
+		app.alertProgress();
 		$scope.addingTag  = true;
 		var param = new Object();
 		// param.virtualServerName = $scope.vs.name;
@@ -176,7 +178,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 				$scope.tags.unshift(data.tagId);
 				$scope.newTag = data.tagId;
 			} else {
-				app.alertError("保存失败: " + data.errorMessage);
+				app.alertError("创建失败: " + data.errorMessage);
 			}
 		}).error(function(data, status, headers, config) {
 			$scope.addingTag  = false;

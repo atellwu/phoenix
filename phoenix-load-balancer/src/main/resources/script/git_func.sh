@@ -14,12 +14,14 @@ function add_ssh_private_key {
 	if [ $write -eq 1  ];then
 		log "try to add phoenix-load-balancer private key to .ssh/config"
 		mkdir -p ~/.ssh
-		cp -r git/.ssh/id_rsa ~/.ssh/id_rsa.phoenixlb
-		chmod 600 ~/.ssh/id_rsa.phoenixlb
+		cp -r git/.ssh/id_rsa ~/.ssh/phoenixlb
+		cp -r git/.ssh/id_rsa.pub ~/.ssh/phoenixlb.pub
+		chmod 600 ~/.ssh/phoenixlb
+		chmod 600 ~/.ssh/phoenixlb.pub
 		cat <<-END >> $ssh_config
 			
 			Host $git_host
-			IdentityFile ~/.ssh/id_rsa.phoenixlb
+			IdentityFile ~/.ssh/phoenixlb
 			StrictHostKeyChecking no
 		END
 		chmod 600 $ssh_config

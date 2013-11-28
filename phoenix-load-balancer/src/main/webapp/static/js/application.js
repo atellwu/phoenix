@@ -58,6 +58,18 @@
 		"refresh" : function() {
 			w.location.reload();
 		},
+		"alertProgress" : function(divId) {
+			if (!divId) {
+				divId = "alertMessageDiv";
+			}
+			$("#" + divId).html($("#progress").html());
+		},
+		"clearAlertMessage": function(divId) {
+			if (!divId) {
+				divId = "alertMessageDiv";
+			}
+			$("#" + divId).html('');
+		},
 		"alertError" : function(msg, divId) {
 			if (!divId) {
 				divId = "alertMessageDiv";
