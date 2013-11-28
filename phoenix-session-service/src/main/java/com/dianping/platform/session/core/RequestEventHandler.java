@@ -133,89 +133,87 @@ public class RequestEventHandler {
 	}
 
 	public void start() {
-
-		Threads.forGroup("Phoenix-RequestEventHandler").start(new Task() {
-
-			@Override
-			public String getName() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void run() {
-				while (!stop.get()) {
-					RequestEvent event = null;
-					try {
-						event = rcvQ.take();
-					} catch (InterruptedException e) {
-						// TODO
-						return;
-					}
-					switch (event.getHop()) {
-					case HOP_CLIENT:
-						processClientEvent(event);
-						break;
-
-					case HOP_SERVER:
-						processServerEvent(event);
-						break;
-
-					default:
-						// TODO
-						break;
-					}
-				}
-			}
-
-			@Override
-			public void shutdown() {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
-		Threads.forGroup("Phoenix-RequestEventRetryQueueCleaner").start(new Task() {
-
-			@Override
-			public String getName() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void run() {
-				while (!stop.get()) {
-					for (Map.Entry<String, RequestEvent> entry : retryMap.entrySet()) {
-						RequestEvent event = entry.getValue();
-						
-						if (event.getTimestamp() + config.getEventExpireTime() > System.currentTimeMillis()) {
-							// TODO log expire
-							retryMap.remove(entry.getKey());
-							System.out.println("expire " + event);
-						}
-					}
-					try {
-						Thread.sleep(config.getRetryQueueCleanInterval());
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-
-			@Override
-			public void shutdown() {
-				// TODO Auto-generated method stub
-
-			}
-
-		});
-
+		Threads.forGroup("Phoenix-RequestEventHandler").start(new HandlerTask());
+		Threads.forGroup("Phoenix-RequestEventRetryQueueCleaner").start(new RetryQueueCleanTask());
 	}
 
 	public void stop() {
 		stop.set(true);
+	}
+	
+	private class RetryQueueCleanTask implements Task {
+		@Override
+		public String getName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void run() {
+			while (!stop.get()) {
+				for (Map.Entry<String, RequestEvent> entry : retryMap.entrySet()) {
+					RequestEvent event = entry.getValue();
+					
+					if (event.getTimestamp() + config.getEventExpireTime() > System.currentTimeMillis()) {
+						// TODO log expire
+						retryMap.remove(entry.getKey());
+						System.out.println("expire " + event);
+					}
+				}
+				try {
+					Thread.sleep(config.getRetryQueueCleanInterval());
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+
+		@Override
+		public void shutdown() {
+			// TODO Auto-generated method stub
+
+		}
+	}
+	
+	private class HandlerTask implements Task {
+		@Override
+		public String getName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void run() {
+			while (!stop.get()) {
+				RequestEvent event = null;
+				try {
+					event = rcvQ.take();
+				} catch (InterruptedException e) {
+					// TODO
+					return;
+				}
+				switch (event.getHop()) {
+				case HOP_CLIENT:
+					processClientEvent(event);
+					break;
+
+				case HOP_SERVER:
+					processServerEvent(event);
+					break;
+
+				default:
+					// TODO
+					break;
+				}
+			}
+		}
+
+		@Override
+		public void shutdown() {
+			// TODO Auto-generated method stub
+
+		}
 	}
 
 }
