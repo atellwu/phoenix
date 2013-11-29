@@ -21,7 +21,8 @@ public enum VelocityEngineManager {
 		ve = new VelocityEngine();
         ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "class");
         ve.setProperty("class.resource.loader.class", PhoenixResourceLoader.class.getName());
-        ve.setProperty("class.resource.loader.cache", true);
+        ve.setProperty("class.resource.loader.cache", false);
+        ve.setProperty("webapp.resource.loader.cache", false);
         ve.setProperty("class.resource.loader.modificationCheckInterval", "-1");
         ve.setProperty("input.encoding", "UTF-8");
         ve.setProperty("runtime.log.logsystem.class", "org.apache.velocity.runtime.log.NullLogSystem");

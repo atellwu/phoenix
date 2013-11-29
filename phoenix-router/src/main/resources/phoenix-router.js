@@ -5,7 +5,7 @@ var body = document.body;
 function setCookie(name, value) {
 	var exdate=new Date();
 	exdate.setDate(exdate.getDate() + 7);
-	var escapedValue = escape(value) + "; expires=" + exdate.toUTCString();
+	var escapedValue = escape(value) + "; expires=" + exdate.toUTCString() + "; Path=/";
 	document.cookie = name + "=" + escapedValue;
 }
 
