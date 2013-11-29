@@ -12,4 +12,9 @@ public class ConfigManager {
 		return 1000;
 	}
 
+	public int getRetryQueueSafeLength() {
+		// TODO Auto-generated method stub
+		return 1000;
+	}
+
 }

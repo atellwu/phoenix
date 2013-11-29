@@ -38,12 +38,17 @@ public class RequestEventHandler {
 	}
 
 	public RequestEventHandler(BlockingQueue<RequestEvent> rcvQ, BlockingQueue<RequestEvent> sendQ,
-			RequestEventRecorder recorder) {
+			RequestEventRecorder recorder, ConfigManager config) {
 		this();
 		this.rcvQ = rcvQ;
 		this.sendQ = sendQ;
 		this.rec = recorder;
-		config = new ConfigManager();
+		this.config = config;
+	}
+
+	public RequestEventHandler(BlockingQueue<RequestEvent> rcvQ, BlockingQueue<RequestEvent> sendQ,
+			RequestEventRecorder recorder) {
+		this(rcvQ, sendQ, recorder, new ConfigManager());
 	}
 
 	public RequestEvent findEvent(String uid, String urlDigest) {
@@ -57,6 +62,14 @@ public class RequestEventHandler {
 
 	ConcurrentHashMap<String, ConcurrentHashMap<String, RequestEvent>> getL1Map() {
 		return l1Map;
+	}
+
+	ConcurrentHashMap<String, RequestEvent> getRetryMap() {
+		return retryMap;
+	}
+
+	private boolean isEventExpired(RequestEvent event) {
+		return event.getTimestamp() + config.getEventExpireTime() > System.currentTimeMillis();
 	}
 
 	private void overrideEvent(RequestEvent curEvent, RequestEvent oldEvent) {
@@ -85,7 +98,7 @@ public class RequestEventHandler {
 			}
 		}
 
-		// client event should also be stored in map
+		// client event is also a server event
 		curEvent.setHop(HOP_SERVER);
 		processServerEvent(curEvent);
 
@@ -101,7 +114,8 @@ public class RequestEventHandler {
 		String urlDigest = curEvent.getUrlDigest();
 
 		RequestEvent retryingEvent = retryMap.remove(urlDigest);
-		if (retryingEvent != null && retryingEvent.getTimestamp() > curEvent.getTimestamp()) {
+		if (retryingEvent != null && !isEventExpired(retryingEvent)
+				&& retryingEvent.getTimestamp() > curEvent.getTimestamp()) {
 			referEventFound(retryingEvent, curEvent);
 		}
 
@@ -140,7 +154,7 @@ public class RequestEventHandler {
 	public void stop() {
 		stop.set(true);
 	}
-	
+
 	private class RetryQueueCleanTask implements Task {
 		@Override
 		public String getName() {
@@ -151,13 +165,15 @@ public class RequestEventHandler {
 		@Override
 		public void run() {
 			while (!stop.get()) {
-				for (Map.Entry<String, RequestEvent> entry : retryMap.entrySet()) {
-					RequestEvent event = entry.getValue();
-					
-					if (event.getTimestamp() + config.getEventExpireTime() > System.currentTimeMillis()) {
-						// TODO log expire
-						retryMap.remove(entry.getKey());
-						System.out.println("expire " + event);
+				if (retryMap.size() > config.getRetryQueueSafeLength()) {
+					for (Map.Entry<String, RequestEvent> entry : retryMap.entrySet()) {
+						RequestEvent event = entry.getValue();
+
+						if (System.currentTimeMillis() > event.getTimestamp() + config.getEventExpireTime()) {
+							// TODO log expire
+							retryMap.remove(entry.getKey());
+							System.out.println("expire " + event);
+						}
 					}
 				}
 				try {
@@ -175,7 +191,7 @@ public class RequestEventHandler {
 
 		}
 	}
-	
+
 	private class HandlerTask implements Task {
 		@Override
 		public String getName() {
