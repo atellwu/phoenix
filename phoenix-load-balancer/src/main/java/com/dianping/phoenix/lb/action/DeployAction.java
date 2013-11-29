@@ -6,20 +6,16 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.phoenix.lb.deploy.DeployPlan;
-import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.deploy.DeploySetting;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.service.model.PoolService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
-import com.dianping.phoenix.lb.utils.JsonBinder;
 import com.opensymphony.xwork2.ActionSupport;
 
 /**
@@ -52,7 +48,7 @@ public class DeployAction extends ActionSupport {
 
     private String               contextPath;
 
-    private DeployPlan           deployPlan;
+    private DeploySetting        deployPlan;
 
     @PostConstruct
     public void init() {

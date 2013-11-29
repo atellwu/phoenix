@@ -14,9 +14,8 @@
     <context:component-scan base-package="com.dianping.phoenix.lb">
     </context:component-scan>
 
-    <bean id="modelStore"
-        class="com.dianping.phoenix.lb.dao.impl.LocalFileModelStoreImpl" init-method="init">
-        <property name="baseDir" value="/home/atell/softbalance_data/" />
-    </bean>
+    <import resource="applicationContext-properties.xml" />
+    <import resource="applicationContext-database.xml" />
+    <import resource="applicationContext-service.xml" />
 
 </beans>
