@@ -1,6 +1,19 @@
 <plexus>
 	<components>
 		<component>
+			<role>com.dianping.platform.session.core.ConfigManager</role>
+			<implementation>com.dianping.platform.session.core.ConfigManager</implementation>
+		</component>
+		<component>
+			<role>com.dianping.platform.session.core.RecordFileManager</role>
+			<implementation>com.dianping.platform.session.core.RecordFileManager</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.platform.session.core.ConfigManager</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
 			<role>org.unidal.web.mvc.model.ModuleRegistry</role>
 			<implementation>org.unidal.web.mvc.model.ModuleRegistry</implementation>
 			<configuration>
