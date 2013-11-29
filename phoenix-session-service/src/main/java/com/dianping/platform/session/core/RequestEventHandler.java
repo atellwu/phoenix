@@ -2,18 +2,98 @@ package com.dianping.platform.session.core;
 
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.log4j.Logger;
 import org.unidal.helper.Threads;
 import org.unidal.helper.Threads.Task;
 import org.unidal.lookup.annotation.Inject;
 
 import com.dianping.phoenix.session.RequestEvent;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 public class RequestEventHandler {
+	
+	private static Logger logger = Logger.getLogger(RequestEventHandler.class);
+
+	private class HandlerTask implements Task {
+		@Override
+		public String getName() {
+			return this.getClass().getSimpleName();
+		}
+
+		@Override
+		public void run() {
+			while (!stop.get()) {
+				RequestEvent event = null;
+				try {
+					event = rcvQ.take();
+				} catch (InterruptedException e) {
+					logger.info("Thread Interrupted, will exit");
+					return;
+				}
+				
+				switch (event.getHop()) {
+				case HOP_CLIENT:
+					if(isEventExpired(event)) {
+						logger.info(String.format("Receive expired RequestEvent %s from client, will ignore", event));
+					} else {
+						processClientEvent(event);
+					}
+					break;
+
+				case HOP_SERVER:
+					processServerEvent(event);
+					break;
+
+				default:
+					logger.error(String.format("Unknown hop %d received, will ignore", event.getHop()));
+					break;
+				}
+			}
+		}
+
+		@Override
+		public void shutdown() {
+		}
+	}
+	private class RetryQueueCleanTask implements Task {
+		@Override
+		public String getName() {
+			return this.getClass().getSimpleName();
+		}
+
+		@Override
+		public void run() {
+			while (!stop.get()) {
+				if (retryCache.size() > config.getRetryQueueSafeLength()) {
+					for (Map.Entry<String, RequestEvent> entry : retryCache.entrySet()) {
+						RequestEvent event = entry.getValue();
+
+						if (System.currentTimeMillis() > event.getTimestamp() + config.getEventExpireTime()) {
+							logger.warn(String.format("RequestEvent %s is expired", event));
+							retryCache.remove(entry.getKey());
+						}
+					}
+				}
+				try {
+					Thread.sleep(config.getRetryQueueCleanInterval());
+				} catch (InterruptedException e) {
+					logger.info("Thread Interrupted, will exit");
+					return;
+				}
+			}
+		}
+
+		@Override
+		public void shutdown() {
+		}
+	}
 
 	public final static int HOP_CLIENT = 0;
+
 	public final static int HOP_SERVER = 1;
 
 	@Inject
@@ -24,26 +104,16 @@ public class RequestEventHandler {
 
 	@Inject
 	private RequestEventRecorder rec;
-
 	@Inject
 	private ConfigManager config;
+	
+	private ConcurrentMap<String, RequestEvent> retryCache;
 
-	private ConcurrentHashMap<String, RequestEvent> retryMap;
-	private ConcurrentHashMap<String, ConcurrentHashMap<String, RequestEvent>> l1Map;
+	private ConcurrentMap<String, ConcurrentMap<String, RequestEvent>> l1Cache;
+
 	private AtomicBoolean stop = new AtomicBoolean();
 
 	public RequestEventHandler() {
-		l1Map = new ConcurrentHashMap<String, ConcurrentHashMap<String, RequestEvent>>();
-		retryMap = new ConcurrentHashMap<String, RequestEvent>();
-	}
-
-	public RequestEventHandler(BlockingQueue<RequestEvent> rcvQ, BlockingQueue<RequestEvent> sendQ,
-			RequestEventRecorder recorder, ConfigManager config) {
-		this();
-		this.rcvQ = rcvQ;
-		this.sendQ = sendQ;
-		this.rec = recorder;
-		this.config = config;
 	}
 
 	public RequestEventHandler(BlockingQueue<RequestEvent> rcvQ, BlockingQueue<RequestEvent> sendQ,
@@ -51,25 +121,57 @@ public class RequestEventHandler {
 		this(rcvQ, sendQ, recorder, new ConfigManager());
 	}
 
+	public RequestEventHandler(BlockingQueue<RequestEvent> rcvQ, BlockingQueue<RequestEvent> sendQ,
+			RequestEventRecorder recorder, ConfigManager config) {
+		this.rcvQ = rcvQ;
+		this.sendQ = sendQ;
+		this.rec = recorder;
+		this.config = config;
+
+		retryCache = buildRetryCache();
+		l1Cache = buildL1Cache();
+	}
+
+	private ConcurrentMap<String, ConcurrentMap<String, RequestEvent>> buildL1Cache() {
+		Cache<String, ConcurrentMap<String, RequestEvent>> l1Cache = CacheBuilder.newBuilder() //
+				.maximumSize(config.getMaxL1CacheSize()) //
+				.build();
+		return l1Cache.asMap();
+	}
+
+	private ConcurrentMap<String, RequestEvent> buildL2Cache() {
+		Cache<String, RequestEvent> l2Cache = CacheBuilder.newBuilder() //
+				.maximumSize(config.getMaxL2CacheSize())// 
+				.build();
+		return l2Cache.asMap();
+	}
+	
+	private ConcurrentMap<String, RequestEvent> buildRetryCache() {
+		Cache<String, RequestEvent> retryCache = CacheBuilder.newBuilder() //
+				.maximumSize(config.getMaxRetryCacheSize())// 
+				.build();
+		return retryCache.asMap();
+	}
+
 	public RequestEvent findEvent(String uid, String urlDigest) {
-		ConcurrentHashMap<String, RequestEvent> l2Map = l1Map.get(uid);
-		if (l2Map != null) {
-			return l2Map.get(urlDigest);
+		ConcurrentMap<String, RequestEvent> l2Cache = l1Cache.get(uid);
+		if (l2Cache != null) {
+			return l2Cache.get(urlDigest);
 		} else {
 			return null;
 		}
 	}
 
-	ConcurrentHashMap<String, ConcurrentHashMap<String, RequestEvent>> getL1Map() {
-		return l1Map;
+	ConcurrentMap<String, ConcurrentMap<String, RequestEvent>> getL1Cache() {
+		return l1Cache;
 	}
 
-	ConcurrentHashMap<String, RequestEvent> getRetryMap() {
-		return retryMap;
+	ConcurrentMap<String, RequestEvent> getRetryCache() {
+		return retryCache;
 	}
 
 	private boolean isEventExpired(RequestEvent event) {
-		return event.getTimestamp() + config.getEventExpireTime() > System.currentTimeMillis();
+		return System.currentTimeMillis() > event.getTimestamp() + config.getEventExpireTime();
 	}
 
 	private void overrideEvent(RequestEvent curEvent, RequestEvent oldEvent) {
@@ -84,10 +186,10 @@ public class RequestEventHandler {
 		String userId = curEvent.getUserId();
 		String refererUrlDigest = curEvent.getRefererUrlDigest();
 
-		ConcurrentHashMap<String, RequestEvent> l2Map = l1Map.get(userId);
+		ConcurrentMap<String, RequestEvent> l2Cache = l1Cache.get(userId);
 		if (refererUrlDigest != null) {
-			if (l2Map != null) {
-				RequestEvent referEvent = l2Map.get(refererUrlDigest);
+			if (l2Cache != null) {
+				RequestEvent referEvent = l2Cache.get(refererUrlDigest);
 				if (referEvent != null) {
 					referEventFound(curEvent, referEvent);
 				} else {
@@ -103,35 +205,34 @@ public class RequestEventHandler {
 		processServerEvent(curEvent);
 
 		if (!sendQ.offer(curEvent)) {
-			// TODO
-			throw new RuntimeException("send q is full");
+			logger.error(String.format("Send queue is full, can not send RequestEvent %s to other server", curEvent));
 		}
 	}
 
 	private void processServerEvent(RequestEvent curEvent) {
 		String userId = curEvent.getUserId();
-		ConcurrentHashMap<String, RequestEvent> l2Map = l1Map.get(userId);
+		ConcurrentMap<String, RequestEvent> l2Cache = l1Cache.get(userId);
 		String urlDigest = curEvent.getUrlDigest();
 
-		RequestEvent retryingEvent = retryMap.remove(urlDigest);
+		RequestEvent retryingEvent = retryCache.remove(urlDigest);
 		if (retryingEvent != null && !isEventExpired(retryingEvent)
 				&& retryingEvent.getTimestamp() > curEvent.getTimestamp()) {
 			referEventFound(retryingEvent, curEvent);
 		}
 
-		if (l2Map == null) {
-			l2Map = new ConcurrentHashMap<String, RequestEvent>();
-			l2Map.put(urlDigest, curEvent);
-			l1Map.put(userId, l2Map);
+		if (l2Cache == null) {
+			l2Cache = buildL2Cache();
+			l2Cache.put(urlDigest, curEvent);
+			l1Cache.put(userId, l2Cache);
 		} else {
-			RequestEvent oldEvent = l2Map.get(urlDigest);
+			RequestEvent oldEvent = l2Cache.get(urlDigest);
 			if (oldEvent == null) {
-				l2Map.put(urlDigest, curEvent);
+				l2Cache.put(urlDigest, curEvent);
 			} else {
 				if (curEvent.getTimestamp() > oldEvent.getTimestamp()) {
 					overrideEvent(curEvent, oldEvent);
 				} else {
-					// TODO
+					logger.info(String.format("RequestEvent %s received after %s", curEvent, oldEvent));
 				}
 			}
 		}
@@ -139,97 +240,25 @@ public class RequestEventHandler {
 	}
 
 	private void referEventFound(RequestEvent curEvent, RequestEvent referEvent) {
-		rec.recordEvent(curEvent, referEvent);
+		try {
+			rec.recordEvent(curEvent, referEvent);
+		} catch (Exception e) {
+			logger.error(String.format("Can not record event %s refer to %s", curEvent, referEvent), e);
+		}
 	}
 
 	private void referEventNotFound(RequestEvent curEvent) {
-		retryMap.put(curEvent.getRefererUrlDigest(), curEvent);
+		retryCache.put(curEvent.getRefererUrlDigest(), curEvent);
 	}
 
 	public void start() {
-		Threads.forGroup("Phoenix-RequestEventHandler").start(new HandlerTask());
-		Threads.forGroup("Phoenix-RequestEventRetryQueueCleaner").start(new RetryQueueCleanTask());
+		Threads.forGroup("Phoenix").start(new HandlerTask());
+		Threads.forGroup("Phoenix").start(new RetryQueueCleanTask());
 	}
 
 	public void stop() {
 		stop.set(true);
-	}
-
-	private class RetryQueueCleanTask implements Task {
-		@Override
-		public String getName() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public void run() {
-			while (!stop.get()) {
-				if (retryMap.size() > config.getRetryQueueSafeLength()) {
-					for (Map.Entry<String, RequestEvent> entry : retryMap.entrySet()) {
-						RequestEvent event = entry.getValue();
-
-						if (System.currentTimeMillis() > event.getTimestamp() + config.getEventExpireTime()) {
-							// TODO log expire
-							retryMap.remove(entry.getKey());
-							System.out.println("expire " + event);
-						}
-					}
-				}
-				try {
-					Thread.sleep(config.getRetryQueueCleanInterval());
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-
-		@Override
-		public void shutdown() {
-			// TODO Auto-generated method stub
-
-		}
-	}
-
-	private class HandlerTask implements Task {
-		@Override
-		public String getName() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public void run() {
-			while (!stop.get()) {
-				RequestEvent event = null;
-				try {
-					event = rcvQ.take();
-				} catch (InterruptedException e) {
-					// TODO
-					return;
-				}
-				switch (event.getHop()) {
-				case HOP_CLIENT:
-					processClientEvent(event);
-					break;
-
-				case HOP_SERVER:
-					processServerEvent(event);
-					break;
-
-				default:
-					// TODO
-					break;
-				}
-			}
-		}
-
-		@Override
-		public void shutdown() {
-			// TODO Auto-generated method stub
-
-		}
+		Threads.forGroup("Phoenix").shutdown();
 	}
 
 }

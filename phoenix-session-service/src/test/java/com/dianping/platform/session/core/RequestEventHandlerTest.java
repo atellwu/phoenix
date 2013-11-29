@@ -46,37 +46,37 @@ public class RequestEventHandlerTest {
 		svrEvent1 = new RequestEvent();
 		svrEvent1.setHop(RequestEventHandler.HOP_SERVER);
 		svrEvent1.setRequestId("svrEvent1");
-		svrEvent1.setTimestamp(1L);
+		svrEvent1.setTimestamp(System.currentTimeMillis());
 		svrEvent1.setUrlDigest(svrEventUrlDigest);
 		svrEvent1.setUserId(uid);
 
 		svrEvent2 = new RequestEvent();
 		svrEvent2.setHop(RequestEventHandler.HOP_SERVER);
 		svrEvent2.setRequestId("svrEvent2");
-		svrEvent2.setTimestamp(2L);
+		svrEvent2.setTimestamp(System.currentTimeMillis() + 1);
 		svrEvent2.setUrlDigest(svrEventUrlDigest);
 		svrEvent2.setUserId(uid);
 
 		clientEvent1 = new RequestEvent();
 		clientEvent1.setHop(RequestEventHandler.HOP_CLIENT);
 		clientEvent1.setRequestId("clientEvent1");
-		clientEvent1.setTimestamp(101L);
+		clientEvent1.setTimestamp(System.currentTimeMillis());
 		clientEvent1.setUrlDigest(clientEventUrlDigest);
 		clientEvent1.setUserId(uid);
 
 		clientEventRTSvrEvent1 = new RequestEvent();
 		clientEventRTSvrEvent1.setHop(RequestEventHandler.HOP_CLIENT);
 		clientEventRTSvrEvent1.setRefererUrlDigest(svrEventUrlDigest);
-		clientEventRTSvrEvent1.setRequestId("referToEvent1");
-		clientEventRTSvrEvent1.setTimestamp(201L);
+		clientEventRTSvrEvent1.setRequestId("referToServerEvent1");
+		clientEventRTSvrEvent1.setTimestamp(System.currentTimeMillis() + 2);
 		clientEventRTSvrEvent1.setUrlDigest("any" + +rnd.nextLong());
 		clientEventRTSvrEvent1.setUserId(uid);
 
 		clientEventRTClientEvent1 = new RequestEvent();
 		clientEventRTClientEvent1.setHop(RequestEventHandler.HOP_CLIENT);
 		clientEventRTClientEvent1.setRefererUrlDigest(clientEventUrlDigest);
-		clientEventRTClientEvent1.setRequestId("referToEvent1");
-		clientEventRTClientEvent1.setTimestamp(202L);
+		clientEventRTClientEvent1.setRequestId("referToClientEvent1");
+		clientEventRTClientEvent1.setTimestamp(System.currentTimeMillis() + 3);
 		clientEventRTClientEvent1.setUrlDigest("any" + +rnd.nextLong());
 		clientEventRTClientEvent1.setUserId(uid);
 
@@ -84,7 +84,7 @@ public class RequestEventHandlerTest {
 		clientEventRTNothing.setHop(RequestEventHandler.HOP_CLIENT);
 		clientEventRTNothing.setRefererUrlDigest("not exists");
 		clientEventRTNothing.setRequestId("clientEventRTNothing");
-		clientEventRTNothing.setTimestamp(203L);
+		clientEventRTNothing.setTimestamp(System.currentTimeMillis());
 		clientEventRTNothing.setUrlDigest("any" + +rnd.nextLong());
 		clientEventRTNothing.setUserId(uid);
 
@@ -102,13 +102,14 @@ public class RequestEventHandlerTest {
 		rcvQ.offer(svrEvent1);
 		rcvQ.offer(svrEvent2);
 
-		while (rcvQ.size() > 0) {
+		long start = System.currentTimeMillis();
+		while (rcvQ.size() > 0 && System.currentTimeMillis() - start < 1000) {
 			Thread.sleep(1);
 		}
 		RequestEvent eventNow = handler.findEvent(uid, svrEventUrlDigest);
 
 		assertEquals(svrEvent2, eventNow);
-		assertEquals(1, handler.getL1Map().get(uid).size());
+		assertEquals(1, handler.getL1Cache().get(uid).size());
 
 	}
 
@@ -119,13 +120,14 @@ public class RequestEventHandlerTest {
 		rcvQ.offer(svrEvent2);
 		rcvQ.offer(svrEvent1);
 
-		while (rcvQ.size() > 0) {
+		long start = System.currentTimeMillis();
+		while (rcvQ.size() > 0 && System.currentTimeMillis() - start < 1000) {
 			Thread.sleep(1);
 		}
 		RequestEvent eventNow = handler.findEvent(uid, svrEventUrlDigest);
 
 		assertEquals(svrEvent2, eventNow);
-		assertEquals(1, handler.getL1Map().get(uid).size());
+		assertEquals(1, handler.getL1Cache().get(uid).size());
 
 	}
 
@@ -222,23 +224,25 @@ public class RequestEventHandlerTest {
 
 			@Override
 			public int getEventExpireTime() {
-				return 1;
+				return 50;
 			}
 
 		};
 		handler = new RequestEventHandler(rcvQ, sendQ, new DummyRecorder(), config);
 		handler.start();
 
-		Thread.sleep(config.getRetryQueueCleanInterval() / 4);
+		assertEquals(0, handler.getRetryCache().size());
+		Thread.sleep(config.getRetryQueueCleanInterval() / 8);
 		clientEventRTClientEvent1.setTimestamp(System.currentTimeMillis());
 		rcvQ.offer(clientEventRTClientEvent1);
-		Thread.sleep(config.getRetryQueueCleanInterval() / 4);
-		assertEquals(1, handler.getRetryMap().size());
+		Thread.sleep(config.getRetryQueueCleanInterval() / 8);
+		assertEquals(1, handler.getRetryCache().size());
 		
+		clientEventRTSvrEvent1.setTimestamp(System.currentTimeMillis());
 		rcvQ.offer(clientEventRTSvrEvent1);
 		
 		Thread.sleep(config.getRetryQueueCleanInterval());
-		assertEquals(0, handler.getRetryMap().size());
+		assertEquals(0, handler.getRetryCache().size());
 	}
 
 }
