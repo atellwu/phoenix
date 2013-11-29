@@ -325,73 +325,73 @@ public class DeploymentTaskExample {
             return (Criteria) this;
         }
 
-        public Criteria andStrategyIsNull() {
-            addCriterion("strategy is null");
+        public Criteria andDeployPolicyIsNull() {
+            addCriterion("deploy_policy is null");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyIsNotNull() {
-            addCriterion("strategy is not null");
+        public Criteria andDeployPolicyIsNotNull() {
+            addCriterion("deploy_policy is not null");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyEqualTo(String value) {
-            addCriterion("strategy =", value, "strategy");
+        public Criteria andDeployPolicyEqualTo(DeployPolicy value) {
+            addCriterion("deploy_policy =", value, "deployPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyNotEqualTo(String value) {
-            addCriterion("strategy <>", value, "strategy");
+        public Criteria andDeployPolicyNotEqualTo(DeployPolicy value) {
+            addCriterion("deploy_policy <>", value, "deployPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyGreaterThan(String value) {
-            addCriterion("strategy >", value, "strategy");
+        public Criteria andDeployPolicyGreaterThan(DeployPolicy value) {
+            addCriterion("deploy_policy >", value, "deployPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyGreaterThanOrEqualTo(String value) {
-            addCriterion("strategy >=", value, "strategy");
+        public Criteria andDeployPolicyGreaterThanOrEqualTo(DeployPolicy value) {
+            addCriterion("deploy_policy >=", value, "deployPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyLessThan(String value) {
-            addCriterion("strategy <", value, "strategy");
+        public Criteria andDeployPolicyLessThan(DeployPolicy value) {
+            addCriterion("deploy_policy <", value, "deployPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyLessThanOrEqualTo(String value) {
-            addCriterion("strategy <=", value, "strategy");
+        public Criteria andDeployPolicyLessThanOrEqualTo(DeployPolicy value) {
+            addCriterion("deploy_policy <=", value, "deployPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyLike(String value) {
-            addCriterion("strategy like", value, "strategy");
+        public Criteria andDeployPolicyLike(DeployPolicy value) {
+            addCriterion("deploy_policy like", value, "deployPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyNotLike(String value) {
-            addCriterion("strategy not like", value, "strategy");
+        public Criteria andDeployPolicyNotLike(DeployPolicy value) {
+            addCriterion("deploy_policy not like", value, "deployPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyIn(List<String> values) {
-            addCriterion("strategy in", values, "strategy");
+        public Criteria andDeployPolicyIn(List<DeployPolicy> values) {
+            addCriterion("deploy_policy in", values, "deployPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyNotIn(List<String> values) {
-            addCriterion("strategy not in", values, "strategy");
+        public Criteria andDeployPolicyNotIn(List<DeployPolicy> values) {
+            addCriterion("deploy_policy not in", values, "deployPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyBetween(String value1, String value2) {
-            addCriterion("strategy between", value1, value2, "strategy");
+        public Criteria andDeployPolicyBetween(DeployPolicy value1, DeployPolicy value2) {
+            addCriterion("deploy_policy between", value1, value2, "deployPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andStrategyNotBetween(String value1, String value2) {
-            addCriterion("strategy not between", value1, value2, "strategy");
+        public Criteria andDeployPolicyNotBetween(DeployPolicy value1, DeployPolicy value2) {
+            addCriterion("deploy_policy not between", value1, value2, "deployPolicy");
             return (Criteria) this;
         }
 
@@ -405,52 +405,62 @@ public class DeploymentTaskExample {
             return (Criteria) this;
         }
 
-        public Criteria andErrorPolicyEqualTo(Integer value) {
+        public Criteria andErrorPolicyEqualTo(ErrorPolicy value) {
             addCriterion("error_policy =", value, "errorPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andErrorPolicyNotEqualTo(Integer value) {
+        public Criteria andErrorPolicyNotEqualTo(ErrorPolicy value) {
             addCriterion("error_policy <>", value, "errorPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andErrorPolicyGreaterThan(Integer value) {
+        public Criteria andErrorPolicyGreaterThan(ErrorPolicy value) {
             addCriterion("error_policy >", value, "errorPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andErrorPolicyGreaterThanOrEqualTo(Integer value) {
+        public Criteria andErrorPolicyGreaterThanOrEqualTo(ErrorPolicy value) {
             addCriterion("error_policy >=", value, "errorPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andErrorPolicyLessThan(Integer value) {
+        public Criteria andErrorPolicyLessThan(ErrorPolicy value) {
             addCriterion("error_policy <", value, "errorPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andErrorPolicyLessThanOrEqualTo(Integer value) {
+        public Criteria andErrorPolicyLessThanOrEqualTo(ErrorPolicy value) {
             addCriterion("error_policy <=", value, "errorPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andErrorPolicyIn(List<Integer> values) {
+        public Criteria andErrorPolicyLike(ErrorPolicy value) {
+            addCriterion("error_policy like", value, "errorPolicy");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorPolicyNotLike(ErrorPolicy value) {
+            addCriterion("error_policy not like", value, "errorPolicy");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorPolicyIn(List<ErrorPolicy> values) {
             addCriterion("error_policy in", values, "errorPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andErrorPolicyNotIn(List<Integer> values) {
+        public Criteria andErrorPolicyNotIn(List<ErrorPolicy> values) {
             addCriterion("error_policy not in", values, "errorPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andErrorPolicyBetween(Integer value1, Integer value2) {
+        public Criteria andErrorPolicyBetween(ErrorPolicy value1, ErrorPolicy value2) {
             addCriterion("error_policy between", value1, value2, "errorPolicy");
             return (Criteria) this;
         }
 
-        public Criteria andErrorPolicyNotBetween(Integer value1, Integer value2) {
+        public Criteria andErrorPolicyNotBetween(ErrorPolicy value1, ErrorPolicy value2) {
             addCriterion("error_policy not between", value1, value2, "errorPolicy");
             return (Criteria) this;
         }
@@ -465,52 +475,52 @@ public class DeploymentTaskExample {
             return (Criteria) this;
         }
 
-        public Criteria andAutoContinueEqualTo(Integer value) {
+        public Criteria andAutoContinueEqualTo(Boolean value) {
             addCriterion("auto_continue =", value, "autoContinue");
             return (Criteria) this;
         }
 
-        public Criteria andAutoContinueNotEqualTo(Integer value) {
+        public Criteria andAutoContinueNotEqualTo(Boolean value) {
             addCriterion("auto_continue <>", value, "autoContinue");
             return (Criteria) this;
         }
 
-        public Criteria andAutoContinueGreaterThan(Integer value) {
+        public Criteria andAutoContinueGreaterThan(Boolean value) {
             addCriterion("auto_continue >", value, "autoContinue");
             return (Criteria) this;
         }
 
-        public Criteria andAutoContinueGreaterThanOrEqualTo(Integer value) {
+        public Criteria andAutoContinueGreaterThanOrEqualTo(Boolean value) {
             addCriterion("auto_continue >=", value, "autoContinue");
             return (Criteria) this;
         }
 
-        public Criteria andAutoContinueLessThan(Integer value) {
+        public Criteria andAutoContinueLessThan(Boolean value) {
             addCriterion("auto_continue <", value, "autoContinue");
             return (Criteria) this;
         }
 
-        public Criteria andAutoContinueLessThanOrEqualTo(Integer value) {
+        public Criteria andAutoContinueLessThanOrEqualTo(Boolean value) {
             addCriterion("auto_continue <=", value, "autoContinue");
             return (Criteria) this;
         }
 
-        public Criteria andAutoContinueIn(List<Integer> values) {
+        public Criteria andAutoContinueIn(List<Boolean> values) {
             addCriterion("auto_continue in", values, "autoContinue");
             return (Criteria) this;
         }
 
-        public Criteria andAutoContinueNotIn(List<Integer> values) {
+        public Criteria andAutoContinueNotIn(List<Boolean> values) {
             addCriterion("auto_continue not in", values, "autoContinue");
             return (Criteria) this;
         }
 
-        public Criteria andAutoContinueBetween(Integer value1, Integer value2) {
+        public Criteria andAutoContinueBetween(Boolean value1, Boolean value2) {
             addCriterion("auto_continue between", value1, value2, "autoContinue");
             return (Criteria) this;
         }
 
-        public Criteria andAutoContinueNotBetween(Integer value1, Integer value2) {
+        public Criteria andAutoContinueNotBetween(Boolean value1, Boolean value2) {
             addCriterion("auto_continue not between", value1, value2, "autoContinue");
             return (Criteria) this;
         }
@@ -585,52 +595,52 @@ public class DeploymentTaskExample {
             return (Criteria) this;
         }
 
-        public Criteria andStatusEqualTo(Integer value) {
+        public Criteria andStatusEqualTo(DeployStatus value) {
             addCriterion("status =", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotEqualTo(Integer value) {
+        public Criteria andStatusNotEqualTo(DeployStatus value) {
             addCriterion("status <>", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThan(Integer value) {
+        public Criteria andStatusGreaterThan(DeployStatus value) {
             addCriterion("status >", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThanOrEqualTo(Integer value) {
+        public Criteria andStatusGreaterThanOrEqualTo(DeployStatus value) {
             addCriterion("status >=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThan(Integer value) {
+        public Criteria andStatusLessThan(DeployStatus value) {
             addCriterion("status <", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThanOrEqualTo(Integer value) {
+        public Criteria andStatusLessThanOrEqualTo(DeployStatus value) {
             addCriterion("status <=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusIn(List<Integer> values) {
+        public Criteria andStatusIn(List<DeployStatus> values) {
             addCriterion("status in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotIn(List<Integer> values) {
+        public Criteria andStatusNotIn(List<DeployStatus> values) {
             addCriterion("status not in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusBetween(Integer value1, Integer value2) {
+        public Criteria andStatusBetween(DeployStatus value1, DeployStatus value2) {
             addCriterion("status between", value1, value2, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotBetween(Integer value1, Integer value2) {
+        public Criteria andStatusNotBetween(DeployStatus value1, DeployStatus value2) {
             addCriterion("status not between", value1, value2, "status");
             return (Criteria) this;
         }

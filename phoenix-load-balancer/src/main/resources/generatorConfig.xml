@@ -4,8 +4,7 @@
   "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
-    <classPathEntry
-        location="/data/appdatas/mysql-connector-java-5.1.18.jar" />
+    <classPathEntry location="/data/appdatas/mysql-connector-java-5.1.18.jar" />
 
     <context id="slb" targetRuntime="MyBatis3">
         <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"></plugin>
@@ -36,6 +35,15 @@
         </javaClientGenerator>
 
         <table tableName="deployment_task">
+            <columnOverride column="deploy_policy"
+                javaType="com.dianping.phoenix.lb.deploy.model.DeployPolicy"
+                jdbcType="VARCHAR" />
+            <columnOverride column="error_policy"
+                javaType="com.dianping.phoenix.lb.deploy.model.ErrorPolicy"
+                jdbcType="VARCHAR" />
+            <columnOverride column="status"
+                javaType="com.dianping.phoenix.lb.deploy.model.DeployStatus"
+                jdbcType="VARCHAR" />
         </table>
         <table tableName="deployment_detail">
         </table>

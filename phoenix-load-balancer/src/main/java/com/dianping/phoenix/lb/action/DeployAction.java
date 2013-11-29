@@ -10,9 +10,12 @@ import org.apache.struts2.ServletActionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.deploy.DeploySetting;
+import com.dianping.phoenix.lb.deploy.model.DeploymentTask;
+import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.service.model.PoolService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
@@ -22,6 +25,7 @@ import com.opensymphony.xwork2.ActionSupport;
  * @author wukezhu
  */
 @Component("deployAction")
+@Scope("prototype")
 public class DeployAction extends ActionSupport {
 
     private static final long    serialVersionUID      = -7250754630706893980L;
@@ -42,6 +46,9 @@ public class DeployAction extends ActionSupport {
     @Autowired
     private PoolService          poolService;
 
+    @Autowired
+    private DeployTaskService    deployTaskService;
+
     private String[]             virtualServerNames;
 
     private List<VirtualServer>  virtualServers;
@@ -50,6 +57,12 @@ public class DeployAction extends ActionSupport {
 
     private DeploySetting        deployPlan;
 
+    private int                  pageNum               = 1;
+
+    private int                  MAX_PAGE_NUM          = 50;
+
+    private List<DeploymentTask> list;
+
     @PostConstruct
     public void init() {
     }
@@ -57,9 +70,19 @@ public class DeployAction extends ActionSupport {
     /**
      * 进入发布的页面，需要的参数是vsName列表
      */
-    public String show() {
+    public String list() {
+        if (pageNum > MAX_PAGE_NUM) {
+            pageNum = 1;
+        }
+        list = deployTaskService.list(pageNum);
 
-        System.out.println(virtualServerNames[0]);
+        return SUCCESS;
+    }
+
+    /**
+     * 进入发布的页面，需要的参数是vsName列表
+     */
+    public String task() {
         return SUCCESS;
     }
 
@@ -97,6 +120,22 @@ public class DeployAction extends ActionSupport {
 
     public void setVirtualServerNames(String[] virtualServerNames) {
         this.virtualServerNames = virtualServerNames;
+    }
+
+    public int getPageNum() {
+        return pageNum;
+    }
+
+    public void setPageNum(int pageNum) {
+        this.pageNum = pageNum;
+    }
+
+    public List<DeploymentTask> getList() {
+        return list;
+    }
+
+    public void setList(List<DeploymentTask> list) {
+        this.list = list;
     }
 
 }

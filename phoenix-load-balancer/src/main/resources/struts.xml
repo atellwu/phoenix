@@ -182,9 +182,9 @@
             </result>
         </action>
 
-        <action name="deploy/show" class="deployAction" method="show">
+        <action name="deploy/list" class="deployAction" method="list">
             <result name="success" type="velocity">
-                /deploy.htm
+                /deploy/list.htm
             </result>
         </action>
 

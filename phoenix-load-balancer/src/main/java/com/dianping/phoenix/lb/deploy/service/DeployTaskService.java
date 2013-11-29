@@ -1,11 +1,16 @@
 package com.dianping.phoenix.lb.deploy.service;
 
+import java.util.List;
+
+import com.dianping.phoenix.lb.deploy.model.DeploymentTask;
+
 public interface DeployTaskService {
 
     /**
      * 获取任务列表
+     * @return 
      */
-    void list(int pageNum);
+    List<DeploymentTask> list(int pageNum);
 
     /**
      * 获取某个任务
