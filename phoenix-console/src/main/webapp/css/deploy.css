@@ -41,3 +41,7 @@
 	color: #00dd11;
 	background-color: #000;
 }
+
+.selected {
+	background-color: #eee;
+}

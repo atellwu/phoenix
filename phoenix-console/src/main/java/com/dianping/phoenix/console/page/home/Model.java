@@ -1,5 +1,6 @@
 package com.dianping.phoenix.console.page.home;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -33,6 +34,10 @@ public class Model extends ViewModel<ConsolePage, Action, Context> {
 	private List<List<String>> m_domainInfos;
 
 	private String m_domainInfoJson;
+
+	private Product m_product;
+
+	private List<Domain> m_domains;
 
 	public Model(Context ctx) {
 		super(ctx);
@@ -69,6 +74,40 @@ public class Model extends ViewModel<ConsolePage, Action, Context> {
 
 	public List<Product> getProducts() {
 		return m_products;
+	}
+
+	public Product getProduct() {
+		return m_product;
+	}
+
+	public void setProduct(String productStr) {
+		for (Product product : getProducts()) {
+			if (product.getName().equals(productStr)) {
+				m_product = product;
+				break;
+			}
+		}
+	}
+
+	public List<Domain> getDomains() {
+		return m_domains;
+	}
+
+	public void setDomains(List<String> domainsStr) {
+		List<Domain> domains = new ArrayList<Domain>();
+		for (String domainStr : domainsStr) {
+			Domain domain = m_product.getDomains().get(domainStr);
+			if (domain != null) {
+				domains.add(domain);
+			}
+		}
+		Collections.sort(domains, new Comparator<Domain>() {
+			@Override
+			public int compare(Domain o1, Domain o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+		m_domains = domains;
 	}
 
 	public void setProducts(List<Product> products) {

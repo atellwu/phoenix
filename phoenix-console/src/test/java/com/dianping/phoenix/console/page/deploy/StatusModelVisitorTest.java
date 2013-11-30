@@ -16,18 +16,20 @@ public class StatusModelVisitorTest {
 	@Test
 	public void testVisit() throws SAXException, IOException {
 		DeployModel origin = DefaultSaxParser.parse(getClass().getResourceAsStream("status.xml"));
-		Map<String, Integer> map = new HashMap<String, Integer>();
+		Map<Integer, Map<String, Integer>> map = new HashMap<Integer, Map<String, Integer>>();
 		StatusModelVisitor visitor = new StatusModelVisitor(map);
 
-		map.put("192.168.66.132", 1);
-		map.put("192.168.66.133", 3);
+		map.put(1, new HashMap<String, Integer>());
+		map.put(2, new HashMap<String, Integer>());
+		map.get(1).put("192.168.66.132", 1);
+		map.get(2).put("192.168.66.133", 3);
 
 		origin.accept(visitor);
 
 		DeployModel model = visitor.getModel();
 
 		// System.out.println(model);
-		Assert.assertEquals(4, model.getHosts().size());
+		Assert.assertEquals(5, model.getHosts().size());
 
 		HostModel summary = model.findHost("summary");
 

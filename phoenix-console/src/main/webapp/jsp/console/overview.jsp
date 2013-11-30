@@ -32,7 +32,7 @@
 								<c:when test="${flagc}">
 									<div id="_${product.name}" class="accordion-body collapse in">
 										<div class="accordion-inner">
-											<ul class="nav nav-pills nav-stacked">
+											<ul class="nav nav-pills nav-stacked" style="height: 300px; overflow: auto;">
 												<c:set var="flagl" scope="page" value="true" />
 												<c:forEach var="domain" items="${product.domains}">
 													<c:choose>
@@ -53,7 +53,7 @@
 								<c:otherwise>
 									<div id="_${product.name}" class="accordion-body collapse">
 										<div class="accordion-inner">
-											<ul class="nav nav-pills nav-stacked">
+											<ul class="nav nav-pills nav-stacked" style="height: 300px; overflow: auto;">
 												<c:set var="flagl" scope="page" value="true" />
 												<c:forEach var="domain" items="${product.domains}">
 													<c:choose>

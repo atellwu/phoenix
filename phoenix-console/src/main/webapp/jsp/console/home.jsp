@@ -73,9 +73,14 @@
 					</c:otherwise>
 				</c:choose>
 				<div>
+				<form method="post">
+					<input type="hidden" name="op" value="cross-domain">
+					<input type="hidden" name="type" value="${payload.plan.warType.name}">
+					<input type="hidden" name="product" value="${product.name}">
 					<table class="table table-bordered table-striped table-condensed">
 						<thead>
 							<tr>
+								<th><input class="all-check" type="checkbox" value="${product.name}"/></th>
 								<th>Project</th>
 								<th><span class="badge badge-success">${product.productActiveCount}</span></th>
 								<th><span class="badge badge-important">${product.productInactiveCount}</span></th>
@@ -87,6 +92,7 @@
 						<tbody>
 							<c:forEach var="domain" items="${product.domains}">
 								<tr>
+									<td><input type="checkbox" name="domain" value="${domain.value.name}" meta="${product.name}"></td>
 									<td><a class="toProject" href="?op=project&type=${payload.plan.warType.name}&project=${domain.value.name}">${domain.value.name}</a></td>
 									<td><span class="badge badge-success">${domain.value.activeCount}</span></td>
 									<td><span class="badge badge-important">${domain.value.inactiveCount}</span></td>
@@ -118,6 +124,8 @@
 							</c:forEach>
 						</tbody>
 					</table>
+					<input type="submit" class="btn btn-primary disabled" disabled="disabled" value="Cross Projects" meta="${product.name}">
+				</form>
 				</div>
 		</div>
 		</c:forEach>
