@@ -26,16 +26,17 @@
           </tr>
         </thead>
         <tbody id="adList">
+          #foreach($task in $list)
           <tr>
-            <td></td>
-            <td>
-            </td>
-            <td></td>
-            <td></td>
+            <td>$task.name</td>
+            <td>$task.deployPolicy.desc</td>
+            <td>$task.errorPolicy.desc</td>
+            <td>#if($task.autoContinue)自动 #else 手动#end</td>
             <td style=''></td>
             <td><a href="http://$!{ad.domain}$!{ad.url}#i$!{aliIdHex}" target="_blank"><span
                 class="label label-success">&nbsp; 查看任务 </span></a></td>
           </tr>
+          #end
         </tbody>
       </table>
 
