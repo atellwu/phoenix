@@ -109,6 +109,7 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 		while (rcvQ.size() > 0 && System.currentTimeMillis() - start < 1000) {
 			Thread.sleep(1);
 		}
+		Thread.sleep(100);
 		RequestEvent eventNow = handler.findEvent(uid, svrEventUrlDigest);
 
 		assertEquals(svrEvent2, eventNow);
@@ -127,6 +128,7 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 		while (rcvQ.size() > 0 && System.currentTimeMillis() - start < 1000) {
 			Thread.sleep(1);
 		}
+		Thread.sleep(100);
 		RequestEvent eventNow = handler.findEvent(uid, svrEventUrlDigest);
 
 		assertEquals(svrEvent2, eventNow);

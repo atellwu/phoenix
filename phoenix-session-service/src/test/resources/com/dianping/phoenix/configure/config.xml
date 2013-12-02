@@ -11,4 +11,6 @@
 	<record-file-write-queue-scan-interval>1000</record-file-write-queue-scan-interval>
 	<record-file-write-stream-close-scan-interval>60000</record-file-write-stream-close-scan-interval>
 	<record-file-write-stream-multiply>3</record-file-write-stream-multiply>
+	<handler-task-threads>2</handler-task-threads>
+	<handler-task-queue-capacity>1000</handler-task-queue-capacity>
 </config>
