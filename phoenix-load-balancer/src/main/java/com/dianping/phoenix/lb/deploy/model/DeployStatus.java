@@ -2,64 +2,56 @@ package com.dianping.phoenix.lb.deploy.model;
 
 public enum DeployStatus {
 
-    CREATED(0, "created"), // complete with all failed
+    CREATED("新建的任务"),
 
-    FAILED(5, "failed"), // complete with all failed
+    DEPLOYING("正在执行"),
 
-    SUCCESS(3, "successful"), // completed with all successful
+    CANCELLING("已被取消"),
 
-    DEPLOYING(2, "deploying"),
+    PAUSING("暂停中"),
 
-    WARNING(4, "warning"), // completed with partial failures
+    UNKNOWN("未知状态"), WARNING("执行完成(有警告信息)"), // completed with partial failures
 
-    CANCELLING(10, "cancelling"),
+    FAILED("执行失败"), // complete with all failed
 
-    PAUSING(11, "pausing"),
+    SUCCESS("执行成功"); // completed with all successful
 
-    UNKNOWN(999, "unknown");
+    private String desc;
 
-    private int    m_id;
-
-    private String m_name;
-
-    private DeployStatus(int id, String name) {
-        m_id = id;
-        m_name = name;
+    private DeployStatus(String desc) {
+        this.desc = desc;
     }
 
-    public static DeployStatus getById(int id, DeployStatus defaultStatus) {
-        for (DeployStatus status : DeployStatus.values()) {
-            if (status.getId() == id) {
-                return status;
-            }
-        }
+    //    public static DeployStatus getById(int id, DeployStatus defaultStatus) {
+    //        for (DeployStatus status : DeployStatus.values()) {
+    //            if (status.getId() == id) {
+    //                return status;
+    //            }
+    //        }
+    //
+    //        return defaultStatus;
+    //    }
 
-        return defaultStatus;
-    }
-
-    public static DeployStatus getByName(String name, DeployStatus defaultStatus) {
-        for (DeployStatus status : DeployStatus.values()) {
-            if (status.getName().equals(name)) {
-                return status;
-            }
-        }
-
-        return defaultStatus;
-    }
+    //    public static DeployStatus getByName(String name, DeployStatus defaultStatus) {
+    //        for (DeployStatus status : DeployStatus.values()) {
+    //            if (status.getName().equals(name)) {
+    //                return status;
+    //            }
+    //        }
+    //
+    //        return defaultStatus;
+    //    }
 
     public static boolean isFinalStatus(DeployStatus status) {
         return status == SUCCESS || status == WARNING;
     }
 
-    public int getId() {
-        return m_id;
+    public String getDesc() {
+        return desc;
     }
 
-    public String getName() {
-        return m_name;
-    }
+    //    public int getId() {
+    //        return m_id;
+    //    }
 
-    public String getTitle() {
-        return m_name.toUpperCase();
-    }
 }

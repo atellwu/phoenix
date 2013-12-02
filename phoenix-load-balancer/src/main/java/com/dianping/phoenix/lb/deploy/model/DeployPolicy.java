@@ -11,12 +11,12 @@ public enum DeployPolicy {
 
     private int    m_batchSize;
 
-    private String m_description;
+    private String desc;
 
     private DeployPolicy(String id, int batchSize, String description) {
         m_id = id;
         m_batchSize = batchSize;
-        m_description = description;
+        desc = description;
     }
 
     public int getBatchSize() {
@@ -27,7 +27,7 @@ public enum DeployPolicy {
         return m_id;
     }
 
-    public String getDescription() {
-        return m_description;
+    public String getDesc() {
+        return desc;
     }
 }
