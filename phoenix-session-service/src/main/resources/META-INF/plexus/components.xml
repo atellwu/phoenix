@@ -14,11 +14,23 @@
 			</requirements>
 		</component>
 		<component>
+			<role>com.dianping.phoenix.session.core.RequestEventRecorder</role>
+			<implementation>com.dianping.phoenix.session.core.FileRecorder</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.session.core.RecordFileManager</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
 			<role>com.dianping.phoenix.session.core.RequestEventHandler</role>
 			<implementation>com.dianping.phoenix.session.core.RequestEventHandler</implementation>
 			<requirements>
 				<requirement>
 					<role>com.dianping.phoenix.configure.ConfigManager</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.session.core.RequestEventRecorder</role>
 				</requirement>
 			</requirements>
 		</component>
