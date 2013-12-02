@@ -25,8 +25,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
 
+import com.dianping.phoenix.lb.PlexusComponentContainer;
+import com.dianping.phoenix.lb.configure.ConfigManager;
 import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.dao.ModelStore;
 import com.dianping.phoenix.lb.exception.BizException;
@@ -34,6 +37,7 @@ import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.model.transform.DefaultMerger;
 import com.dianping.phoenix.lb.model.transform.DefaultSaxParser;
+import com.dianping.phoenix.lb.service.GitService;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
 
 /**
@@ -52,14 +56,39 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
     private static final String                  TAGID_SEPARATOR         = "_";
     private static final String                  TAGID_SPLITTER          = "-";
     private ConcurrentMap<String, AtomicInteger> tagMetas                = new ConcurrentHashMap<String, AtomicInteger>();
+    @Autowired
+    private GitService                           gitService;
+    private ConfigManager                        configManager;
+
+    private enum FileOP {
+        SAVE("Save"), DEL("Delete");
+        String name;
+
+        private FileOP(String name) {
+            this.name = name;
+        }
+    }
 
     public void setBaseDir(String baseDir) {
         this.baseDir = baseDir;
     }
 
+    public void setGitService(GitService gitService) {
+        this.gitService = gitService;
+    }
+
     @Override
     protected void initCustomizedMetas() {
         initTagMetas();
+        if (gitService != null) {
+            try {
+                configManager = PlexusComponentContainer.INSTANCE.lookup(ConfigManager.class);
+                gitService.clone(configManager.getModelStoreBaseDir(), baseDir, null);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+        }
     }
 
     @Override
@@ -79,7 +108,8 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
                         if (fileName.endsWith(BASE_CONFIG_FILE_SUFFIX + XML_SUFFIX)) {
                             baseConfigMeta = new ConfigMeta(fileName, tmpSlbModelTree);
                         } else {
-                            for (Map.Entry<String, VirtualServer> entry : tmpSlbModelTree.getVirtualServers().entrySet()) {
+                            for (Map.Entry<String, VirtualServer> entry : tmpSlbModelTree.getVirtualServers()
+                                    .entrySet()) {
                                 virtualServerConfigFileMapping.put(entry.getKey(), new ConfigMeta(fileName,
                                         tmpSlbModelTree));
                             }
@@ -102,16 +132,28 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
         }
     }
 
-    protected void save(String key, SlbModelTree slbModelTree) throws IOException {
+    protected void save(String key, SlbModelTree slbModelTree) throws IOException, BizException {
         doSave(new File(baseDir, key), slbModelTree);
     }
 
-    private void doSave(File file, SlbModelTree slbModelTree) throws IOException {
+    private void doSave(File file, SlbModelTree slbModelTree) throws IOException, BizException {
         FileUtils.writeStringToFile(file, slbModelTree.toString());
+        saveToGit(file, FileOP.SAVE);
     }
 
-    protected boolean delete(String key) {
-        return new File(baseDir, key).delete();
+    private void saveToGit(File file, FileOP op) throws BizException {
+        if (gitService != null) {
+            gitService.commitAllChanges(baseDir,
+                    String.format("%s file %s", op.name, StringUtils.removeStart(file.getAbsolutePath(), baseDir)));
+            gitService.push(configManager.getModelGitUrl(), baseDir);
+        }
+    }
+
+    protected boolean delete(String key) throws BizException {
+        File file = new File(baseDir, key);
+        boolean success = file.delete();
+        saveToGit(file, FileOP.DEL);
+        return success;
     }
 
     protected String convertToKey(String virtualServerName) {
@@ -136,7 +178,8 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
                         if (tagId != null) {
                             String xml = FileUtils.readFileToString(tag);
                             SlbModelTree tmpSlbModelTree = DefaultSaxParser.parse(xml);
-                            for (Map.Entry<String, VirtualServer> entry : tmpSlbModelTree.getVirtualServers().entrySet()) {
+                            for (Map.Entry<String, VirtualServer> entry : tmpSlbModelTree.getVirtualServers()
+                                    .entrySet()) {
                                 tagMetas.putIfAbsent(entry.getKey(), new AtomicInteger(0));
                                 if (tagMetas.get(entry.getKey()).intValue() < tagId) {
                                     tagMetas.get(entry.getKey()).set(tagId);
@@ -161,7 +204,7 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
     }
 
     @Override
-    protected String saveTag(String key, String vsName, SlbModelTree slbModelTree) throws IOException {
+    protected String saveTag(String key, String vsName, SlbModelTree slbModelTree) throws IOException, BizException {
         tagMetas.putIfAbsent(vsName, new AtomicInteger(0));
         int tagId = tagMetas.get(vsName).incrementAndGet();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -338,6 +381,7 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
             for (File tagFile : tagFiles) {
                 if (expectedTagId == extractTagIdInt(virtualServerName, tagFile.getName())) {
                     FileUtils.deleteQuietly(tagFile);
+                    saveToGit(tagFile, FileOP.DEL);
                     return;
                 }
             }

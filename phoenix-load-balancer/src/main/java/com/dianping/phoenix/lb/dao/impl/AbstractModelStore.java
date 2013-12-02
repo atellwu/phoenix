@@ -113,7 +113,7 @@ public abstract class AbstractModelStore implements ModelStore {
             slbModelTree.addStrategy(strategy);
             save(baseConfigMeta.key, baseConfigMeta.slbModelTree);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (originalStrategy == null) {
                 baseConfigMeta.slbModelTree.removeStrategy(name);
                 slbModelTree.removeStrategy(name);
@@ -149,7 +149,7 @@ public abstract class AbstractModelStore implements ModelStore {
             slbModelTree.removeStrategy(name);
             save(baseConfigMeta.key, baseConfigMeta.slbModelTree);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             baseConfigMeta.slbModelTree.addStrategy(originalStrategy);
             slbModelTree.addStrategy(originalStrategy);
             ExceptionUtils.logAndRethrowBizException(e, MessageID.STRATEGY_SAVE_FAIL, name);
@@ -193,7 +193,7 @@ public abstract class AbstractModelStore implements ModelStore {
                 configFileEntry.slbModelTree.addVirtualServer(virtualServer);
                 slbModelTree.addVirtualServer(virtualServer);
                 save(configFileEntry.key, configFileEntry.slbModelTree);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 configFileEntry.slbModelTree.addVirtualServer(originalVirtualServer);
                 slbModelTree.addVirtualServer(originalVirtualServer);
                 ExceptionUtils.logAndRethrowBizException(e, MessageID.VIRTUALSERVER_SAVE_FAIL, name);
@@ -242,7 +242,7 @@ public abstract class AbstractModelStore implements ModelStore {
                 } else {
                     save(configFileEntry.key, configFileEntry.slbModelTree);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 configFileEntry.slbModelTree.addVirtualServer(originalVirtualServer);
                 slbModelTree.addVirtualServer(originalVirtualServer);
                 ExceptionUtils.logAndRethrowBizException(e, MessageID.VIRTUALSERVER_SAVE_FAIL, name);
@@ -292,10 +292,10 @@ public abstract class AbstractModelStore implements ModelStore {
                     save(configMeta.key, newSlbModelTree);
                 }
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 slbModelTree.removeVirtualServer(name);
                 virtualServerConfigFileMapping.remove(name);
-                ExceptionUtils.logAndRethrowBizException(new IOException(), MessageID.VIRTUALSERVER_SAVE_FAIL, name);
+                ExceptionUtils.logAndRethrowBizException(e, MessageID.VIRTUALSERVER_SAVE_FAIL, name);
             } finally {
                 configMeta.lock.writeLock().unlock();
             }
@@ -328,7 +328,7 @@ public abstract class AbstractModelStore implements ModelStore {
                 tagSlbModelTree.addVirtualServer(configFileEntry.slbModelTree.findVirtualServer(name));
 
                 return saveTag(configFileEntry.key, name, tagSlbModelTree);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 ExceptionUtils.logAndRethrowBizException(e, MessageID.VIRTUALSERVER_TAG_FAIL, name);
             } finally {
                 configFileEntry.lock.writeLock().unlock();
@@ -384,7 +384,7 @@ public abstract class AbstractModelStore implements ModelStore {
 
                 return doListTagIds(name);
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 ExceptionUtils.logAndRethrowBizException(e, MessageID.VIRTUALSERVER_TAG_LIST_FAIL, name);
             } finally {
                 configFileEntry.lock.readLock().unlock();
@@ -516,7 +516,7 @@ public abstract class AbstractModelStore implements ModelStore {
             slbModelTree.addPool(pool);
             save(baseConfigMeta.key, baseConfigMeta.slbModelTree);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (originalPool == null) {
                 baseConfigMeta.slbModelTree.removePool(name);
                 slbModelTree.removePool(name);
@@ -545,7 +545,7 @@ public abstract class AbstractModelStore implements ModelStore {
             slbModelTree.removePool(name);
             save(baseConfigMeta.key, baseConfigMeta.slbModelTree);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             baseConfigMeta.slbModelTree.addPool(originalPool);
             slbModelTree.addPool(originalPool);
             ExceptionUtils.logAndRethrowBizException(e, MessageID.POOL_SAVE_FAIL, name);
@@ -564,11 +564,11 @@ public abstract class AbstractModelStore implements ModelStore {
 
     protected abstract SlbModelTree loadTag(String key, String vsName, String tagId) throws IOException, SAXException;
 
-    protected abstract String saveTag(String key, String vsName, SlbModelTree slbModelTree) throws IOException;
+    protected abstract String saveTag(String key, String vsName, SlbModelTree slbModelTree) throws IOException, BizException;
 
-    protected abstract void save(String key, SlbModelTree slbModelTree) throws IOException;
+    protected abstract void save(String key, SlbModelTree slbModelTree) throws IOException, BizException;
 
-    protected abstract boolean delete(String key);
+    protected abstract boolean delete(String key) throws BizException;
 
     protected abstract String convertToKey(String virtualServerName);
 }

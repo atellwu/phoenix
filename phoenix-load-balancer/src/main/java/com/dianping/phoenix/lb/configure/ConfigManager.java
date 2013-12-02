@@ -28,6 +28,11 @@ public class ConfigManager implements Initializable {
         }
     }
 
+    public String getModelStoreBaseDir() {
+        check();
+        return m_config.getModelStoreBaseDir();
+    }
+
     public String getModelGitUrl() {
         check();
         if (Constants.ENV_DEV.equals(m_config.getEnv())) {
