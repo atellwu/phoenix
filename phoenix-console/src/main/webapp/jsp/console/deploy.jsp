@@ -37,9 +37,12 @@
 		<div class="span4">
 			<div class="accordion" id="deploy-collapses" style="height: 430px; overflow: auto;">
 				<c:forEach var="deploy" items="${model.deploys}" varStatus="nav_status">
+					<c:if test="${nav_status.first}">
+						<c:set var="first_deploy" value="${deploy}"></c:set>
+					</c:if>
 					<div class="accordion-group">
 						<div class="accordion-heading">
-							<a class="accordion-toggle" data-toggle="collapse" data-parent="#deploy-collapses" href="#deploy-${deploy.id}">
+							<a class="accordion-toggle" data-toggle="collapse" data-parent="#deploy-collapses" href="#deploy-${deploy.id}" meta="${deploy.id}:${deploy.domain}">
 								<span class="label label-info" style="text-transform: capitalize;">${deploy.domain}</span><span
 									class="pull-right label ${
                                         	deploy.status eq 'successful' ? 'label-success' 
@@ -87,60 +90,13 @@
 						class="label label-cancelled">cancelled</span> <span class="label label-success">success</span> <span class="label label-failed">failed&nbsp;</span>
 				</p>
 			</div>
-			<div id="result" style="display: none"></div>
-
-			<button id="cancel" class="btn btn-danger pull-right" onclick="ctrl_cancel()">Cancel Rest</button>
-			<button id="continue" class="btn btn-primary pull-right" onclick="ctrl_continue()">Continue</button>
-			<button id="pause" class="btn btn-warning pull-right" onclick="ctrl_pause()">Pause</button>
+			<div>
+				<span id="current_selected" class="label label-inverse" style="margin-top: 7px; text-transform: capitalize;" meta="${first_deploy.id}">${first_deploy.domain}</span>
+				<button id="ctrl_cancel" class="btn btn-danger btn-small pull-right" style="margin: 0 0 0 5px;">Cancel Rest</button>
+				<button id="ctrl_continue" class="btn btn-primary btn-small pull-right" style="margin: 0 0 0 5px;">Continue</button>
+				<button id="ctrl_pause" class="btn btn-warning btn-small pull-right" style="margin: 0 0 0 5px;">Pause</button>
+			</div>
 		</div>
-		<script type="text/javascript">
-			$(document).ready(setButtonStatus());
-
-			function setButtonStatus() {
-				var deployStatus = $("#deploy_status").text();
-				if (deployStatus == "successful" || deployStatus == "warning" || deployStatus == "failed") {
-					$("#cancel").hide();
-					$("#continue").hide();
-					$("#pause").hide();
-				} else if (deployStatus == "pausing") {
-					$("#pause").hide();
-					$("#cancel").show();
-					$("#continue").show();
-				} else if (deployStatus == "deploying") {
-					$("#pause").show();
-					$("#continue").hide();
-					$("#cancel").hide();
-				}
-			}
-
-			function ctrl_cancel() {
-				$.ajax("", {
-					data : $.param({
-						"op" : "cancel",
-					}, true),
-					cache : false,
-				}).done(setButtonStatus());
-			}
-
-			function ctrl_continue() {
-				$.ajax("", {
-					data : $.param({
-						"op" : "continue",
-					}, true),
-					cache : false,
-				}).done(setButtonStatus());
-			}
-
-			function ctrl_pause() {
-				$.ajax("", {
-					data : $.param({
-						"op" : "pause",
-					}, true),
-					cache : false,
-				}).done(setButtonStatus());
-			}
-		</script>
-
 		<div class="span8">
 			<div class="row-fluid">
 				<c:set var="terminal_idx" value="first" />

@@ -1,5 +1,5 @@
 var continuous_err_times = 0;
-var MAX_CON_ERR_TIMES = 10;
+var MAX_CON_ERR_TIMES = 50;
 var status;
 var DeployStatus = {
 	FAILED : "failed",
@@ -11,6 +11,8 @@ var DeployStatus = {
 	UNKNOWN : "unknown"
 };
 
+var current_selected = $("#current_selected").attr("meta");
+
 $(function() {
 	if (!is_deploy_finished()) {
 		setTimeout(fetch_deploy_status, 500);
@@ -19,6 +21,7 @@ $(function() {
 });
 
 function bind_cmp_evt_handlers() {
+	renew_buttons();
 	$(".host_status").click(function() {
 		var id_ip = $(this).attr("id").split(":");
 		var id = id_ip[0];
@@ -31,6 +34,63 @@ function bind_cmp_evt_handlers() {
 		$("#header-" + id).show();
 		$("#log-" + id + "-" + ip.replace(/\./g, "\\.")).show();
 	});
+
+	$(".accordion-toggle").click(function() {
+		var id_domain = $(this).attr("meta").split(":");
+		current_selected = id_domain[0];
+		$("#current_selected").text(id_domain[1]);
+		renew_buttons();
+	});
+
+	$("#ctrl_continue").click(function() {
+		$.ajax("", {
+			data : $.param({
+				"op" : "continue",
+				"id" : current_selected
+			}, true),
+			cache : false,
+		});
+		renew_buttons();
+	});
+
+	$("#ctrl_pause").click(function() {
+		$.ajax("", {
+			data : $.param({
+				"op" : "pause",
+				"id" : current_selected
+			}, true),
+			cache : false,
+		});
+		renew_buttons();
+	});
+
+	$("#ctrl_cancel").click(function() {
+		$.ajax("", {
+			data : $.param({
+				"op" : "cancel",
+				"id" : current_selected
+			}, true),
+			cache : false,
+		});
+		renew_buttons();
+	});
+}
+
+function renew_buttons() {
+	var status = $("#deploy_status_" + current_selected).text();
+	if (status == "successful" || status == "warning" || status == "failed") {
+		$("#ctrl_cancel").hide();
+		$("#ctrl_continue").hide();
+		$("#ctrl_pause").hide();
+	} else if (status == "pausing") {
+		$("#ctrl_pause").hide();
+		$("#ctrl_cancel").show();
+		$("#ctrl_continue").show();
+	} else if (status == "deploying") {
+		$("#ctrl_pause").show();
+		$("#ctrl_continue").hide();
+		$("#ctrl_cancel").show();
+	}
 }
 
 function fetch_deploy_status() {
@@ -51,20 +111,18 @@ function fetch_deploy_status() {
 				continuous_err_times = 0;
 				if (result != null) {
 					$.each(result, function(index, deploy) {
+						update_deploy_status(deploy.id, deploy.status);
 						$.each(deploy.hosts, function(index, obj) {
 							var deploy_id = deploy.id;
 							var host = obj.host.replace(/\./g, "\\.");
 							update_host_status(deploy_id, host, obj);
 							update_host_log(deploy_id, host, obj);
 						});
-						update_deploy_status(deploy.id, deploy.status);
 						if (result.status != status) {
 							status = result.status;
-							setButtonStatus();
+							renew_buttons();
 						}
 					});
-					for ( var deploy_status in result) {
-					}
 				}
 			},
 			error : function(xhr, errstat, err) {
@@ -141,9 +199,11 @@ function update_deploy_status(id, status) {
 		color = "label-doing";
 		break;
 	case 'cancelled':
+	case 'cancelling':
 		color = "label-cancelled";
 		break;
 	case 'warning':
+	case 'pausing':
 		color = "label-warning";
 		break;
 	default:
