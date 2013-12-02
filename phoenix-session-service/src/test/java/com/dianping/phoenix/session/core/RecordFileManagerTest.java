@@ -1,4 +1,4 @@
-package com.dianping.platform.session.core;
+package com.dianping.phoenix.session.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -14,6 +14,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
+
+import com.dianping.phoenix.session.core.ConfigManager;
+import com.dianping.phoenix.session.core.RecordFileManager;
 
 public class RecordFileManagerTest extends ComponentTestCase {
 
