@@ -1,4 +1,4 @@
-package com.dianping.platform.session.core;
+package com.dianping.phoenix.session.core;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
