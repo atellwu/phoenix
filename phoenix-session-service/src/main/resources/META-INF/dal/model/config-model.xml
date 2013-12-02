@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model model-package="com.dianping.phoenix.configure" enable-sax-parser="true">
+	<entity name="config" root="true">
+	    <element name="event-expire-time" value-type="int" default-value="5000" primitive="true" />
+	    <element name="retry-queue-clean-interval" value-type="int" default-value="1000" primitive="true" />
+	    <element name="retry-queue-safe-length" value-type="int" default-value="1000" primitive="true" />
+	    <element name="max-l1-cache-size" value-type="int" default-value="1000" primitive="true" />
+	    <element name="max-retry-cache-size" value-type="int" default-value="1000" primitive="true" />
+	    <element name="max-l2-cache-size" value-type="int" default-value="1000" primitive="true" />
+	    <element name="record-file-timespan" value-type="int" default-value="300000" primitive="true" />
+	    <element name="record-file-write-queue-size" value-type="int" default-value="1000" primitive="true" />
+	    <element name="record-file-base-dir" value-type="String" default-value="target/record/" />
+	    <element name="record-file-write-queue-scan-interval" value-type="int" default-value="1000" primitive="true" />
+	    <element name="record-file-write-stream-close-scan-interval" value-type="int" default-value="60000" primitive="true" />
+	    <element name="record-file-write-stream-multiply" value-type="int" default-value="3" primitive="true" />
+	    <element name="handler-task-threads" value-type="int" default-value="2" primitive="true" />
+	    <element name="handler-task-queue-capacity" value-type="int" default-value="1000" primitive="true" />
+	</entity>
+</model>
+

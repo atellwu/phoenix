@@ -1,15 +1,36 @@
 <plexus>
 	<components>
 		<component>
-			<role>com.dianping.platform.session.core.ConfigManager</role>
-			<implementation>com.dianping.platform.session.core.ConfigManager</implementation>
+			<role>com.dianping.phoenix.configure.ConfigManager</role>
+			<implementation>com.dianping.phoenix.configure.ConfigManager</implementation>
 		</component>
 		<component>
-			<role>com.dianping.platform.session.core.RecordFileManager</role>
-			<implementation>com.dianping.platform.session.core.RecordFileManager</implementation>
+			<role>com.dianping.phoenix.session.core.RecordFileManager</role>
+			<implementation>com.dianping.phoenix.session.core.RecordFileManager</implementation>
 			<requirements>
 				<requirement>
-					<role>com.dianping.platform.session.core.ConfigManager</role>
+					<role>com.dianping.phoenix.configure.ConfigManager</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.core.RequestEventRecorder</role>
+			<implementation>com.dianping.phoenix.session.core.FileRecorder</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.session.core.RecordFileManager</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.core.RequestEventHandler</role>
+			<implementation>com.dianping.phoenix.session.core.RequestEventHandler</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.configure.ConfigManager</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.session.core.RequestEventRecorder</role>
 				</requirement>
 			</requirements>
 		</component>

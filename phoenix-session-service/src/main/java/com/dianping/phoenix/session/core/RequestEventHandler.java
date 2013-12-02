@@ -1,8 +1,9 @@
 package com.dianping.phoenix.session.core;
 
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.codehaus.plexus.logging.LogEnabled;
@@ -14,7 +15,7 @@ import org.unidal.helper.Threads.Task;
 import org.unidal.lookup.ContainerHolder;
 import org.unidal.lookup.annotation.Inject;
 
-import com.dianping.phoenix.net.Sockets;
+import com.dianping.phoenix.configure.ConfigManager;
 import com.dianping.phoenix.session.RequestEvent;
 import com.dianping.phoenix.session.RequestEventDelegate;
 import com.google.common.cache.Cache;
@@ -32,7 +33,7 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 	private RequestEventDelegate m_sendQ;
 
 	@Inject
-	private RequestEventRecorder m_rec;
+	private RequestEventRecorder m_recorder;
 
 	@Inject
 	private ConfigManager m_config;
@@ -44,6 +45,8 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 	private AtomicBoolean m_stop = new AtomicBoolean();
 
 	private Logger m_logger;
+
+	private BlockingQueue<RequestEvent>[] m_handlerTaskQueues;
 
 	private ConcurrentMap<String, ConcurrentMap<String, RequestEvent>> buildL1Cache() {
 		Cache<String, ConcurrentMap<String, RequestEvent>> l1Cache = CacheBuilder.newBuilder() //
@@ -88,6 +91,7 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 		return m_retryCache;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize() throws InitializationException {
 		m_rcvQ = lookup(RequestEventDelegate.class);
@@ -95,16 +99,21 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 		m_retryCache = buildRetryCache();
 		m_l1Cache = buildL1Cache();
 
-		int port = 0;
-		int maxReceiveThreads = 0;
-		int maxSendThreads = 0;
-		List<String> servers = null;
-
-		Sockets.forServer().listenOn(port).threads("PhoenixSession", maxReceiveThreads).start(m_rcvQ);
-
-		for (String server : servers) {
-			Sockets.forClient().connectTo(port, server).threads("PhoenixSession", maxSendThreads).start(m_sendQ);
+		m_handlerTaskQueues = new BlockingQueue[m_config.getHandlerTasksThreads()];
+		for (int i = 0; i < m_handlerTaskQueues.length; i++) {
+			m_handlerTaskQueues[i] = new LinkedBlockingQueue<RequestEvent>(m_config.getHandlerTaskQueueCapacity());
 		}
+
+		// int port = 0;
+		// int maxReceiveThreads = 0;
+		// int maxSendThreads = 0;
+		// List<String> servers = null;
+		//
+		// Sockets.forServer().listenOn(port).threads("PhoenixSession", maxReceiveThreads).start(m_rcvQ);
+		//
+		// for (String server : servers) {
+		// Sockets.forClient().connectTo(port, server).threads("PhoenixSession", maxSendThreads).start(m_sendQ);
+		// }
 	}
 
 	private boolean isEventExpired(RequestEvent event) {
@@ -136,10 +145,6 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 				referEventNotFound(curEvent);
 			}
 		}
-
-		// client event is also a server event
-		curEvent.setHop(HOP_SERVER);
-		processServerEvent(curEvent);
 
 		if (!m_sendQ.offer(curEvent)) {
 			m_logger.error(String.format("Send queue is full, can not send RequestEvent %s to other server", curEvent));
@@ -178,7 +183,7 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 
 	private void referEventFound(RequestEvent curEvent, RequestEvent referEvent) {
 		try {
-			m_rec.recordEvent(curEvent, referEvent);
+			m_recorder.recordEvent(curEvent, referEvent);
 		} catch (Exception e) {
 			m_logger.error(String.format("Can not record event %s refer to %s", curEvent, referEvent), e);
 		}
@@ -188,9 +193,36 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 		m_retryCache.put(curEvent.getRefererUrlDigest(), curEvent);
 	}
 
+	// for unit test only
+	public void setConfig(ConfigManager config) {
+		m_config = config;
+	}
+
+	// for unit test only
+	public void setRcvQ(RequestEventDelegate rcvQ) {
+		m_rcvQ = rcvQ;
+	}
+
+	// for unit test only
+	public void setRecorder(RequestEventRecorder recorder) {
+		m_recorder = recorder;
+	}
+
+	private int slotForUrl(String urlDigest) {
+		if (urlDigest != null) {
+			return urlDigest.charAt(urlDigest.length() - 1) % m_handlerTaskQueues.length;
+		} else {
+			return 0;
+		}
+	}
+
 	public void start() {
-		Threads.forGroup("Phoenix").start(new HandlerTask());
-		Threads.forGroup("Phoenix").start(new RetryQueueCleanTask());
+		String group = "Phoenix";
+		for (int i = 0; i < m_handlerTaskQueues.length; i++) {
+			Threads.forGroup(group).start(new HandlerTask(m_handlerTaskQueues[i]));
+		}
+		Threads.forGroup(group).start(new RetryQueueCleanTask());
+		Threads.forGroup(group).start(new DispatchTask());
 	}
 
 	public void stop() {
@@ -198,10 +230,34 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 		Threads.forGroup("Phoenix").shutdown();
 	}
 
-	private class HandlerTask implements Task {
+	private class DispatchTask implements Task {
+
+		private RequestEvent cloneToServerEvent(RequestEvent event) {
+			RequestEvent svrEvent = null;
+			try {
+				svrEvent = event.clone();
+			} catch (CloneNotSupportedException e) {
+				// won't happen
+			}
+			svrEvent.setHop(HOP_SERVER);
+			return svrEvent;
+		}
+
 		@Override
 		public String getName() {
 			return this.getClass().getSimpleName();
+		}
+
+		private boolean isValidEvent(RequestEvent event) {
+			return event.getRequestId() != null //
+			      && event.getUrlDigest() != null //
+			      && event.getUserId() != null;
+		}
+
+		private void offerToHandlerTaskQueue(String digest, RequestEvent event) {
+			if (!m_handlerTaskQueues[slotForUrl(digest)].offer(event)) {
+				m_logger.warn(String.format("Handler task queue is full, will discad %s", event));
+			}
 		}
 
 		@Override
@@ -215,13 +271,69 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 					return;
 				}
 
+				if (!isValidEvent(event)) {
+					m_logger.warn(String.format("Invalid RequetEvent %s received, will ignore", event));
+					continue;
+				}
+
 				switch (event.getHop()) {
 				case HOP_CLIENT:
 					if (isEventExpired(event)) {
-						m_logger.info(String.format("Receive expired RequestEvent %s from client, will ignore", event));
+						m_logger.info(String.format(
+						      "Receive expired RequestEvent %s from client, will not calculate refer request id", event));
 					} else {
-						processClientEvent(event);
+						if (event.getRefererUrlDigest() != null) {
+							offerToHandlerTaskQueue(event.getRefererUrlDigest(), event);
+						}
 					}
+
+					offerToHandlerTaskQueue(event.getUrlDigest(), cloneToServerEvent(event));
+					break;
+
+				case HOP_SERVER:
+					offerToHandlerTaskQueue(event.getUrlDigest(), event);
+					break;
+
+				default:
+					m_logger.error(String.format("Unknown hop %d received, will ignore", event.getHop()));
+					break;
+				}
+			}
+		}
+
+		@Override
+		public void shutdown() {
+		}
+
+	}
+
+	private class HandlerTask implements Task {
+
+		private BlockingQueue<RequestEvent> eventQ;
+
+		public HandlerTask(BlockingQueue<RequestEvent> eventQ) {
+			this.eventQ = eventQ;
+		}
+
+		@Override
+		public String getName() {
+			return this.getClass().getSimpleName();
+		}
+
+		@Override
+		public void run() {
+			while (!m_stop.get()) {
+				RequestEvent event = null;
+				try {
+					event = eventQ.take();
+				} catch (InterruptedException e) {
+					m_logger.info("Thread Interrupted, will exit");
+					return;
+				}
+
+				switch (event.getHop()) {
+				case HOP_CLIENT:
+					processClientEvent(event);
 					break;
 
 				case HOP_SERVER:

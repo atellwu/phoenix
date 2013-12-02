@@ -3,7 +3,7 @@ package com.dianping.phoenix.session;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class RequestEvent {
+public class RequestEvent implements Cloneable {
 	private String m_userId;
 
 	private String m_urlDigest;
@@ -17,48 +17,50 @@ public class RequestEvent {
 	private int m_hop;
 
 	@Override
+	public RequestEvent clone() throws CloneNotSupportedException {
+		RequestEvent clone = new RequestEvent();
+
+		clone.m_hop = m_hop;
+		clone.m_refererUrlDigest = m_refererUrlDigest;
+		clone.m_requestId = m_requestId;
+		clone.m_timestamp = m_timestamp;
+		clone.m_urlDigest = m_urlDigest;
+		clone.m_userId = m_userId;
+
+		return clone;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-
 		if (obj == null)
 			return false;
-
 		if (getClass() != obj.getClass())
 			return false;
-
 		RequestEvent other = (RequestEvent) obj;
-
-		if (m_hop != other.m_hop)
-			return false;
-
 		if (m_refererUrlDigest == null) {
 			if (other.m_refererUrlDigest != null)
 				return false;
 		} else if (!m_refererUrlDigest.equals(other.m_refererUrlDigest))
 			return false;
-
-		if (m_timestamp != other.m_timestamp)
-			return false;
-
-		if (m_urlDigest == null) {
-			if (other.m_urlDigest != null)
-				return false;
-		} else if (!m_urlDigest.equals(other.m_urlDigest))
-			return false;
-
-		if (m_userId == null) {
-			if (other.m_userId != null)
-				return false;
-		} else if (!m_userId.equals(other.m_userId))
-			return false;
-
 		if (m_requestId == null) {
 			if (other.m_requestId != null)
 				return false;
 		} else if (!m_requestId.equals(other.m_requestId))
 			return false;
-
+		if (m_timestamp != other.m_timestamp)
+			return false;
+		if (m_urlDigest == null) {
+			if (other.m_urlDigest != null)
+				return false;
+		} else if (!m_urlDigest.equals(other.m_urlDigest))
+			return false;
+		if (m_userId == null) {
+			if (other.m_userId != null)
+				return false;
+		} else if (!m_userId.equals(other.m_userId))
+			return false;
 		return true;
 	}
 
@@ -86,16 +88,15 @@ public class RequestEvent {
 		return m_userId;
 	}
 
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-
-		result = prime * result + m_hop;
 		result = prime * result + ((m_refererUrlDigest == null) ? 0 : m_refererUrlDigest.hashCode());
+		result = prime * result + ((m_requestId == null) ? 0 : m_requestId.hashCode());
 		result = prime * result + (int) (m_timestamp ^ (m_timestamp >>> 32));
 		result = prime * result + ((m_urlDigest == null) ? 0 : m_urlDigest.hashCode());
 		result = prime * result + ((m_userId == null) ? 0 : m_userId.hashCode());
-		result = prime * result + ((m_requestId == null) ? 0 : m_requestId.hashCode());
 		return result;
 	}
 
@@ -130,4 +131,5 @@ public class RequestEvent {
 		      "%s[userId: %s, requestId: %s, urlDigest: %s, refererUrlDigest: %s, timestamp: %s, hop: %s]", getClass()
 		            .getSimpleName(), m_userId, m_requestId, m_urlDigest, m_refererUrlDigest, timestamp, m_hop);
 	}
+
 }

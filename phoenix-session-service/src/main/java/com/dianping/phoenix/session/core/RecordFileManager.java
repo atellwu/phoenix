@@ -13,15 +13,108 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.unidal.helper.Threads;
 import org.unidal.helper.Threads.Task;
 import org.unidal.lookup.annotation.Inject;
 
 import com.dianping.cat.configuration.NetworkInterfaceManager;
+import com.dianping.phoenix.configure.ConfigManager;
 
-public class RecordFileManager {
+public class RecordFileManager implements Initializable {
 
 	private static Logger logger = Logger.getLogger(RecordFileManager.class);
+
+	@Inject
+	private ConfigManager m_config;
+
+	private ConcurrentMap<Long, QueueAndOutputStream> m_writeQueueCache;
+
+	private AtomicBoolean m_stop = new AtomicBoolean(false);
+
+	private String m_ip;
+
+	public BlockingQueue<byte[]> getWriteQueue(long timestamp) throws IOException {
+		long startTime = timestamp - timestamp % m_config.getRecordFileTimespan();
+		if (!m_writeQueueCache.containsKey(startTime)) {
+			BlockingQueue<byte[]> queue = new ArrayBlockingQueue<byte[]>(m_config.getRecordFileWriteQueueSize());
+			OutputStream out = new BufferedOutputStream(new FileOutputStream(tsToFile(timestamp), true));
+			m_writeQueueCache.putIfAbsent(startTime, new QueueAndOutputStream(queue, out));
+		}
+		return m_writeQueueCache.get(startTime).queue;
+	}
+
+	ConcurrentMap<Long, QueueAndOutputStream> getWriteQueueCache() {
+		return m_writeQueueCache;
+	}
+	
+	@Override
+   public void initialize() throws InitializationException {
+		this.m_writeQueueCache = new ConcurrentHashMap<Long, QueueAndOutputStream>();
+		m_ip = NetworkInterfaceManager.INSTANCE.getLocalHostAddress();
+   }
+
+	// for unit test only
+	public void setConfig(ConfigManager config) {
+		m_config = config;
+   }
+
+	public void start() {
+		Threads.forGroup("Phoenix").start(new WriteTask());
+		Threads.forGroup("Phoenix").start(new CleanTask());
+	}
+
+	public void stop() {
+		m_stop.set(true);
+		Threads.forGroup("Phoenix").shutdown();
+	}
+
+	File tsToFile(long timestamp) {
+		long startTime = timestamp - timestamp % m_config.getRecordFileTimespan();
+		String fileName = String.format("%s-%d", m_ip, startTime);
+		return new File(m_config.getRecordFileBaseDir(), fileName);
+	}
+
+	class CleanTask implements Task {
+
+		@Override
+		public String getName() {
+			return this.getClass().getSimpleName();
+		}
+
+		@Override
+		public void run() {
+			while (!m_stop.get()) {
+
+				for (Map.Entry<Long, QueueAndOutputStream> entry : m_writeQueueCache.entrySet()) {
+					long aliveTime = m_config.getRecordFileTimespan() * m_config.getRecordFileWriteStreamMultiply();
+					long startTimestamp = entry.getKey();
+					if (System.currentTimeMillis() > startTimestamp + aliveTime) {
+						logger.info(String.format("Closing stream of %d", startTimestamp));
+						m_writeQueueCache.remove(entry.getKey());
+						try {
+							entry.getValue().out.close();
+						} catch (IOException e) {
+							logger.error(String.format("Error close output stream of %d", startTimestamp), e);
+						}
+					}
+				}
+
+				try {
+					Thread.sleep(m_config.getRecordFileWriteStreamCloseScanInterval());
+				} catch (InterruptedException e) {
+					logger.info("Thread Interrupted, will exit");
+					return;
+				}
+			}
+		}
+
+		@Override
+		public void shutdown() {
+		}
+
+	}
 
 	static class QueueAndOutputStream {
 		BlockingQueue<byte[]> queue;
@@ -36,9 +129,14 @@ public class RecordFileManager {
 	class WriteTask implements Task {
 
 		@Override
+		public String getName() {
+			return this.getClass().getSimpleName();
+		}
+
+		@Override
 		public void run() {
-			while (!stop.get()) {
-				for (Map.Entry<Long, QueueAndOutputStream> entry : writeQueueCache.entrySet()) {
+			while (!m_stop.get()) {
+				for (Map.Entry<Long, QueueAndOutputStream> entry : m_writeQueueCache.entrySet()) {
 
 					BlockingQueue<byte[]> queue = entry.getValue().queue;
 					while (true) {
@@ -58,7 +156,7 @@ public class RecordFileManager {
 				}
 
 				try {
-					Thread.sleep(config.getRecordFileWriteQueueScanInterval());
+					Thread.sleep(m_config.getRecordFileWriteQueueScanInterval());
 				} catch (InterruptedException e) {
 					logger.info("Thread Interrupted, will exit");
 					return;
@@ -67,99 +165,9 @@ public class RecordFileManager {
 		}
 
 		@Override
-		public String getName() {
-			return this.getClass().getSimpleName();
-		}
-
-		@Override
 		public void shutdown() {
 		}
 
-	}
-
-	class CleanTask implements Task {
-
-		@Override
-		public void run() {
-			while (!stop.get()) {
-
-				for (Map.Entry<Long, QueueAndOutputStream> entry : writeQueueCache.entrySet()) {
-					long aliveTime = config.getRecordFileTimespan() * config.getRecordFileWriteStreamMultiply();
-					long startTimestamp = entry.getKey();
-					if (System.currentTimeMillis() > startTimestamp + aliveTime) {
-						logger.info(String.format("Closing stream of %d", startTimestamp));
-						writeQueueCache.remove(entry.getKey());
-						try {
-							entry.getValue().out.close();
-						} catch (IOException e) {
-							logger.error(String.format("Error close output stream of %d", startTimestamp), e);
-						}
-					}
-				}
-
-				try {
-					Thread.sleep(config.getRecordFileWriteStreamCloseScanInterval());
-				} catch (InterruptedException e) {
-					logger.info("Thread Interrupted, will exit");
-					return;
-				}
-			}
-		}
-
-		@Override
-		public String getName() {
-			return this.getClass().getSimpleName();
-		}
-
-		@Override
-		public void shutdown() {
-		}
-
-	}
-
-	@Inject
-	private ConfigManager config;
-
-	private ConcurrentMap<Long, QueueAndOutputStream> writeQueueCache;
-
-	private AtomicBoolean stop = new AtomicBoolean(false);
-	
-	private String ip;
-
-	public RecordFileManager(ConfigManager config) {
-		this.writeQueueCache = new ConcurrentHashMap<Long, QueueAndOutputStream>();
-		this.config = config;
-		ip = NetworkInterfaceManager.INSTANCE.getLocalHostAddress();
-	}
-
-	public BlockingQueue<byte[]> getWriteQueue(long timestamp) throws IOException {
-		long startTime = timestamp - timestamp % config.getRecordFileTimespan();
-		if (!writeQueueCache.containsKey(startTime)) {
-			BlockingQueue<byte[]> queue = new ArrayBlockingQueue<byte[]>(config.getRecordFileWriteQueueSize());
-			OutputStream out = new BufferedOutputStream(new FileOutputStream(tsToFile(timestamp), true));
-			writeQueueCache.putIfAbsent(startTime, new QueueAndOutputStream(queue, out));
-		}
-		return writeQueueCache.get(startTime).queue;
-	}
-
-	File tsToFile(long timestamp) {
-		long startTime = timestamp - timestamp % config.getRecordFileTimespan();
-		String fileName = String.format("%s-%d", ip, startTime);
-		return new File(config.getRecordFileBaseDir(), fileName);
-	}
-
-	public void start() {
-		Threads.forGroup("Phoenix").start(new WriteTask());
-		Threads.forGroup("Phoenix").start(new CleanTask());
-	}
-
-	public void stop() {
-		stop.set(true);
-		Threads.forGroup("Phoenix").shutdown();
-	}
-
-	ConcurrentMap<Long, QueueAndOutputStream> getWriteQueueCache() {
-		return writeQueueCache;
 	}
 
 }

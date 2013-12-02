@@ -136,4 +136,8 @@ public class RequestEventDelegate implements MessageDelegate, Initializable, Log
 	public void initialize() throws InitializationException {
 		m_queue = new LinkedBlockingQueue<RequestEvent>(m_queueSize);
 	}
+	
+	public int size() {
+		return m_queue.size();
+	}
 }
