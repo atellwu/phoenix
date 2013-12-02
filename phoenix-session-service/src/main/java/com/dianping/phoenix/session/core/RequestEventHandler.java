@@ -1,6 +1,5 @@
 package com.dianping.phoenix.session.core;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,7 +13,7 @@ import org.unidal.helper.Threads.Task;
 import org.unidal.lookup.ContainerHolder;
 import org.unidal.lookup.annotation.Inject;
 
-import com.dianping.phoenix.net.Sockets;
+import com.dianping.phoenix.configure.ConfigManager;
 import com.dianping.phoenix.session.RequestEvent;
 import com.dianping.phoenix.session.RequestEventDelegate;
 import com.google.common.cache.Cache;
@@ -32,7 +31,7 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 	private RequestEventDelegate m_sendQ;
 
 	@Inject
-	private RequestEventRecorder m_rec;
+	private RequestEventRecorder m_recorder;
 
 	@Inject
 	private ConfigManager m_config;
@@ -95,16 +94,16 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 		m_retryCache = buildRetryCache();
 		m_l1Cache = buildL1Cache();
 
-		int port = 0;
-		int maxReceiveThreads = 0;
-		int maxSendThreads = 0;
-		List<String> servers = null;
-
-		Sockets.forServer().listenOn(port).threads("PhoenixSession", maxReceiveThreads).start(m_rcvQ);
-
-		for (String server : servers) {
-			Sockets.forClient().connectTo(port, server).threads("PhoenixSession", maxSendThreads).start(m_sendQ);
-		}
+		// int port = 0;
+		// int maxReceiveThreads = 0;
+		// int maxSendThreads = 0;
+		// List<String> servers = null;
+		//
+		// Sockets.forServer().listenOn(port).threads("PhoenixSession", maxReceiveThreads).start(m_rcvQ);
+		//
+		// for (String server : servers) {
+		// Sockets.forClient().connectTo(port, server).threads("PhoenixSession", maxSendThreads).start(m_sendQ);
+		// }
 	}
 
 	private boolean isEventExpired(RequestEvent event) {
@@ -178,7 +177,7 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 
 	private void referEventFound(RequestEvent curEvent, RequestEvent referEvent) {
 		try {
-			m_rec.recordEvent(curEvent, referEvent);
+			m_recorder.recordEvent(curEvent, referEvent);
 		} catch (Exception e) {
 			m_logger.error(String.format("Can not record event %s refer to %s", curEvent, referEvent), e);
 		}
@@ -186,6 +185,21 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 
 	private void referEventNotFound(RequestEvent curEvent) {
 		m_retryCache.put(curEvent.getRefererUrlDigest(), curEvent);
+	}
+
+	// for unit test only
+	public void setConfig(ConfigManager config) {
+		m_config = config;
+	}
+
+	// for unit test only
+	public void setRcvQ(RequestEventDelegate rcvQ) {
+		m_rcvQ = rcvQ;
+	}
+
+	// for unit test only
+	public void setRecorder(RequestEventRecorder recorder) {
+		m_recorder = recorder;
 	}
 
 	public void start() {

@@ -15,8 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
 
-import com.dianping.phoenix.session.core.ConfigManager;
-import com.dianping.phoenix.session.core.RecordFileManager;
+import com.dianping.phoenix.configure.ConfigManager;
 
 public class RecordFileManagerTest extends ComponentTestCase {
 
@@ -24,8 +23,8 @@ public class RecordFileManagerTest extends ComponentTestCase {
 
 	@Before
 	public void before() throws Exception {
-		ConfigManager config = new ConfigManager();
-		mgr = new RecordFileManager(config);
+		ConfigManager config = lookup(ConfigManager.class);
+		mgr = lookup(RecordFileManager.class);
 		File recordBaseDir = config.getRecordFileBaseDir();
 		if (recordBaseDir.exists() && recordBaseDir.isDirectory()) {
 			FileUtils.deleteDirectory(recordBaseDir);
@@ -49,7 +48,11 @@ public class RecordFileManagerTest extends ComponentTestCase {
 
 	@Test
 	public void shouldWriteToFile() throws Exception {
-		mgr = new RecordFileManager(new ConfigManager() {
+		mgr.setConfig(new ConfigManager() {
+			
+			{
+				initialize();
+			}
 
 			@Override
 			public int getRecordFileWriteQueueScanInterval() {
@@ -80,7 +83,11 @@ public class RecordFileManagerTest extends ComponentTestCase {
 
 	@Test
 	public void shouldWriteToSameFile() throws Exception {
-		mgr = new RecordFileManager(new ConfigManager() {
+		mgr.setConfig(new ConfigManager() {
+			
+			{
+				initialize();
+			}
 
 			@Override
 			public int getRecordFileWriteQueueScanInterval() {
@@ -113,15 +120,19 @@ public class RecordFileManagerTest extends ComponentTestCase {
 
 	@Test
 	public void shouldWriteToDifferentFile() throws Exception {
-		mgr = new RecordFileManager(new ConfigManager() {
+		mgr.setConfig(new ConfigManager() {
 
+			{
+				initialize();
+			}
+			
 			@Override
 			public int getRecordFileWriteQueueScanInterval() {
 				return 100;
 			}
 
 			@Override
-			public long getRecordFileTimespan() {
+			public int getRecordFileTimespan() {
 				return 1;
 			}
 			
@@ -167,15 +178,19 @@ public class RecordFileManagerTest extends ComponentTestCase {
 
 	@Test
 	public void shouldCloseFile() throws Exception {
-		mgr = new RecordFileManager(new ConfigManager() {
+		mgr.setConfig(new ConfigManager() {
 
+			{
+				initialize();
+			}
+			
 			@Override
-			public long getRecordFileTimespan() {
+			public int getRecordFileTimespan() {
 				return 1000;
 			}
 
 			@Override
-			public long getRecordFileWriteStreamMultiply() {
+			public int getRecordFileWriteStreamMultiply() {
 				return 1;
 			}
 
