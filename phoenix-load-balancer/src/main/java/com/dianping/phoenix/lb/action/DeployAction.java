@@ -59,9 +59,12 @@ public class DeployAction extends ActionSupport {
 
     private int                  pageNum               = 1;
 
-    private int                  MAX_PAGE_NUM          = 50;
-
     private List<DeploymentTask> list;
+
+    private Paginator            paginator;
+
+    private int                  taskId;
+    private DeploymentTask       deploymentTask;
 
     @PostConstruct
     public void init() {
@@ -71,10 +74,9 @@ public class DeployAction extends ActionSupport {
      * 进入发布的页面，需要的参数是vsName列表
      */
     public String list() {
-        if (pageNum > MAX_PAGE_NUM) {
-            pageNum = 1;
-        }
-        list = deployTaskService.list(pageNum);
+        // 获取用户的历史重发记录
+        paginator = new Paginator();
+        list = deployTaskService.list(paginator, pageNum);
 
         return SUCCESS;
     }
@@ -83,6 +85,7 @@ public class DeployAction extends ActionSupport {
      * 进入发布的页面，需要的参数是vsName列表
      */
     public String task() {
+        deploymentTask = deployTaskService.getTask(taskId);
         return SUCCESS;
     }
 
@@ -136,6 +139,42 @@ public class DeployAction extends ActionSupport {
 
     public void setList(List<DeploymentTask> list) {
         this.list = list;
+    }
+
+    public Paginator getPaginator() {
+        return paginator;
+    }
+
+    public void setPaginator(Paginator paginator) {
+        this.paginator = paginator;
+    }
+
+    public DeploySetting getDeployPlan() {
+        return deployPlan;
+    }
+
+    public void setDeployPlan(DeploySetting deployPlan) {
+        this.deployPlan = deployPlan;
+    }
+
+    public int getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
+    }
+
+    public DeploymentTask getDeploymentTask() {
+        return deploymentTask;
+    }
+
+    public void setDeploymentTask(DeploymentTask deploymentTask) {
+        this.deploymentTask = deploymentTask;
+    }
+
+    public void setDataMap(Map<String, Object> dataMap) {
+        this.dataMap = dataMap;
     }
 
 }

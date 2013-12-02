@@ -15,10 +15,4 @@
 http://www.springframework.org/schema/cache/spring-cache.xsd">
 
 
-    <bean id="modelStore"
-        class="com.dianping.phoenix.lb.dao.impl.LocalFileModelStoreImpl"
-        init-method="init">
-        <property name="baseDir" value="/home/atell/softbalance_data/" />
-    </bean>
-
 </beans>

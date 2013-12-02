@@ -15,6 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.PostConstruct;
+
 import org.xml.sax.SAXException;
 
 import com.dianping.phoenix.lb.constant.MessageID;
@@ -48,9 +50,10 @@ public abstract class AbstractModelStore implements ModelStore {
 
     }
 
+    @PostConstruct
     public void init() {
-        initConfigMetas();
         initCustomizedMetas();
+        initConfigMetas();
     }
 
     protected abstract void initCustomizedMetas();

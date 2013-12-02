@@ -33,12 +33,20 @@
   <script type="text/javascript">
                 $("[rel=tooltip]").tooltip();
                 $(document).ready(function() {
+                	// pom
+                    var nginxConfigEditor = ace.edit("nginxConfigEditor");
+                    nginxConfigEditor.setFontSize(14);
+                    nginxConfigEditor.setTheme("ace/theme/eclipse");
+                    nginxConfigEditor.getSession().setMode("ace/mode/java");
+                    nginxConfigEditor.setReadOnly(true);
+                    window.nginxConfigEditor = nginxConfigEditor;
+                    
                 	##parse("${tabName}/initJs.htm")
                 	angular.element($('#VsController')).scope().getVs('${virtualServerName}');
                 });
                </script>
 
 
-#parse("common/modals.htm")
+  #parse("common/modals.htm")
 </body>
 </html>

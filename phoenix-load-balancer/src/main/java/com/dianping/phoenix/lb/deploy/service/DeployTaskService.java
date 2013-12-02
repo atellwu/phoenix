@@ -2,20 +2,22 @@ package com.dianping.phoenix.lb.deploy.service;
 
 import java.util.List;
 
+import com.dianping.phoenix.lb.action.Paginator;
 import com.dianping.phoenix.lb.deploy.model.DeploymentTask;
 
 public interface DeployTaskService {
 
     /**
      * 获取任务列表
+     * @param paginator 
      * @return 
      */
-    List<DeploymentTask> list(int pageNum);
+    List<DeploymentTask> list(Paginator paginator, int pageNum);
 
     /**
      * 获取某个任务
      */
-    void getTask(int taskId);
+    DeploymentTask getTask(int taskId);
 
     /**
      * 创建任务<br>

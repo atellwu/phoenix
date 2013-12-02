@@ -1185,11 +1185,6 @@ p.zd_title {
 	overflow: auto
 }
 
-.table th,.table td {
-	vertical-align: middle;
-	text-align: center;
-}
-
 #offerAdDiv,#addOfferModel {
 	font-size: 12px;
 }
@@ -1277,4 +1272,8 @@ span.chooseTipsLine {
 .deployBody {
 	background: #fff;
 	background-image: ;
+}
+
+table.slb-datatable thead{
+	color:#0073ea;
 }

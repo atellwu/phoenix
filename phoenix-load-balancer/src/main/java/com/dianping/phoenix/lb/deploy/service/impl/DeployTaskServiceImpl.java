@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.phoenix.lb.PlexusComponentContainer;
+import com.dianping.phoenix.lb.action.Paginator;
 import com.dianping.phoenix.lb.configure.ConfigManager;
 import com.dianping.phoenix.lb.deploy.dao.DeploymentDetailMapper;
 import com.dianping.phoenix.lb.deploy.dao.DeploymentMapper;
@@ -21,7 +22,7 @@ import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 @Service
 public class DeployTaskServiceImpl implements DeployTaskService {
 
-    private static final int       PAGE_SIZE = 20;
+    private static final int       PAGE_SIZE    = 15;
 
     private ConfigManager          configManager;
 
@@ -34,23 +35,41 @@ public class DeployTaskServiceImpl implements DeployTaskService {
     @Autowired
     private DeploymentTaskMapper   deploymentTaskMapper;
 
+    private int                    MAX_PAGE_NUM = 50;
+
     @PostConstruct
     public void init() throws ComponentLookupException {
         configManager = PlexusComponentContainer.INSTANCE.lookup(ConfigManager.class);
     }
 
     @Override
-    public List<DeploymentTask> list(int pageNum) {
+    public List<DeploymentTask> list(Paginator paginator, int pageNum) {
+        if (pageNum > MAX_PAGE_NUM || pageNum <= 0) {
+            pageNum = 1;
+        }
+
         DeploymentTaskExample example = new DeploymentTaskExample();
-        example.setOrderByClause("creation_date desc");
-        RowBounds rowBounds = new RowBounds(PAGE_SIZE * (pageNum - 1), PAGE_SIZE);
+        example.setOrderByClause("creation_date DESC");
+
+        int count = deploymentTaskMapper.countByExample(example);
+
+        paginator.setItemsPerPage(PAGE_SIZE);
+        paginator.setItems(count);
+        paginator.setPage(pageNum);
+
+        if (pageNum > paginator.getLastPage()) {
+            pageNum = paginator.getLastPage();
+        }
+        int offset = PAGE_SIZE * (pageNum - 1);
+        int limit = PAGE_SIZE;
+        RowBounds rowBounds = new RowBounds(offset, limit);
+
         return deploymentTaskMapper.selectByExampleWithRowbounds(example, rowBounds);
     }
 
     @Override
-    public void getTask(int taskId) {
-        // TODO Auto-generated method stub
-
+    public DeploymentTask getTask(int taskId) {
+        return deploymentTaskMapper.selectByPrimaryKey(taskId);
     }
 
     @Override

@@ -103,8 +103,8 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="vs/{virtualServerName}/tag/get/{tagId}" class="virtualServerAction"
-            method="getNginxConfigByTagId">
+        <action name="vs/{virtualServerName}/tag/get/{tagId}"
+            class="virtualServerAction" method="getNginxConfigByTagId">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
@@ -182,11 +182,25 @@
             </result>
         </action>
 
-        <action name="deploy/" class="deployAction" method="list">
+        <action name="deploy" class="deployAction" method="list">
             <result name="success" type="velocity">
                 /deploy/list.htm
             </result>
         </action>
+        <action name="deploy/list/{pageNum}" class="deployAction"
+            method="list">
+            <result name="success" type="velocity">
+                /deploy/list.htm
+            </result>
+        </action>
+        <action name="deploy/{taskId}" class="deployAction"
+            method="task">
+            <result name="success" type="velocity">
+                /deploy/task.htm
+            </result>
+        </action>
+
+
 
 
 
