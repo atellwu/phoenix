@@ -301,7 +301,7 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
     }
 
     @Override
-    protected List<String> doListTagIds(String vsName) throws IOException {
+    protected List<String> doListTagIds(final String vsName) throws IOException {
         List<File> tagFiles = listAllTagFiles(vsName);
 
         List<String> tagIds = new ArrayList<String>();
@@ -320,7 +320,8 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
 
             @Override
             public int compare(String o1, String o2) {
-                return -1 * o1.compareTo(o2);
+                return Integer.valueOf(StringUtils.removeStart(o1, vsName)).compareTo(
+                        Integer.valueOf(StringUtils.removeStart(o2, vsName)));
             }
         });
         return tagIds;

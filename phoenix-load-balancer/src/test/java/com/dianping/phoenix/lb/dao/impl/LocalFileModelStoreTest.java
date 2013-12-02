@@ -808,7 +808,7 @@ public class LocalFileModelStoreTest {
             store.tag("www", 2, store.listPools());
             Assert.fail();
         } catch (BizException e) {
-            Assert.assertEquals(e.getMessageId(), MessageID.VIRTUALSERVER_CONCURRENT_MOD);
+            Assert.assertEquals(MessageID.VIRTUALSERVER_CONCURRENT_MOD, e.getMessageId());
             Assert.assertTrue(e.getCause() instanceof ConcurrentModificationException);
         } catch (Exception e) {
             Assert.fail();
@@ -969,8 +969,10 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testGetMultiFolderTag() throws Exception {
-        SlbModelTree tagSlbModelTree = DefaultSaxParser.parse(FileUtils.readFileToString(new File(tmpDir, "slb_www.xml")));
-        for(Pool pool:DefaultSaxParser.parse(FileUtils.readFileToString(new File(tmpDir, "slb_base.xml"))).getPools().values()){
+        SlbModelTree tagSlbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(tmpDir, "slb_www.xml")));
+        for (Pool pool : DefaultSaxParser.parse(FileUtils.readFileToString(new File(tmpDir, "slb_base.xml")))
+                .getPools().values()) {
             tagSlbModelTree.addPool(pool);
         }
         FileUtils.writeStringToFile(new File(tmpDir, "tag/www/20120101/slb_www.xml_1"), tagSlbModelTree.toString());
@@ -980,13 +982,17 @@ public class LocalFileModelStoreTest {
         store.setBaseDir(tmpDir.getAbsolutePath());
         store.init();
 
-        Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-1").findVirtualServer("www").toString());
-        for(Pool pool: store.listPools()){
-            Assert.assertTrue(EqualsBuilder.reflectionEquals(pool, store.getTag("www", "www-1").findPool(pool.getName()), true));
+        Assert.assertEquals(store.findVirtualServer("www").toString(),
+                store.getTag("www", "www-1").findVirtualServer("www").toString());
+        for (Pool pool : store.listPools()) {
+            Assert.assertTrue(EqualsBuilder.reflectionEquals(pool, store.getTag("www", "www-1")
+                    .findPool(pool.getName()), true));
         }
-        Assert.assertEquals(store.findVirtualServer("www").toString(), store.getTag("www", "www-2").findVirtualServer("www").toString());
-        for(Pool pool: store.listPools()){
-            Assert.assertTrue(EqualsBuilder.reflectionEquals(pool, store.getTag("www", "www-2").findPool(pool.getName()), true));
+        Assert.assertEquals(store.findVirtualServer("www").toString(),
+                store.getTag("www", "www-2").findVirtualServer("www").toString());
+        for (Pool pool : store.listPools()) {
+            Assert.assertTrue(EqualsBuilder.reflectionEquals(pool, store.getTag("www", "www-2")
+                    .findPool(pool.getName()), true));
         }
 
         assertRawFileNotChanged("slb_www.xml");
