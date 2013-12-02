@@ -20,10 +20,10 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
       all.add(C(ScriptExecutor.class, DefaultScriptExecutor.class).is(PER_LOOKUP));
       
       // move following line to top-level project if necessary
-      all.add(C(JdbcDataSourceDescriptorManager.class) //
-              .config(E("datasourceFile").value("/data/appdatas/phoenix/datasources.xml")));
+//      all.add(C(JdbcDataSourceDescriptorManager.class) //
+//              .config(E("datasourceFile").value("/data/appdatas/phoenix/datasources.xml")));
 
-      all.addAll(new PhoenixDatabaseConfigurator().defineComponents());
+      all.addAll(new PhoenixLbDatabaseConfigurator().defineComponents());
 
       return all;
    }

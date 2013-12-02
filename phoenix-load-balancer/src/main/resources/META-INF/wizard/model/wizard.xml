@@ -3,9 +3,6 @@
    <model package="com.dianping.phoenix.lb.model" name="slb-model">
       <sample-model>src/test/resources/slb-model.xml</sample-model>
    </model>
-   <model package="com.dianping.phoenix.lb.model.deploy" name="deploy">
-      <sample-model>src/test/resources/deploy.xml</sample-model>
-   </model>
    <model package="com.dianping.phoenix.lb.config" name="runtime-config">
       <sample-model>src/test/resources/runtime-config.xml</sample-model>
    </model>

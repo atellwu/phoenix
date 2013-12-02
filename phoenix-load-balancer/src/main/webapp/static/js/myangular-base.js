@@ -31,9 +31,16 @@ module.factory('DataService', function($resource) {
 	model.directiveDefinedInputs = DirectiveDefinedInputs.get(function() {
 	});
 
-	var Strategies = $resource(window.contextpath + '/base/strategies');
+	var Strategies = $resource(window.contextpath + '/base/listStrategies');
 	model.strategies = Strategies.query(function() {
 	});
+
+	var Pools = $resource(window.contextpath + '/base/listPools');
+	model.pools = Pools.query(function() {
+	});
+
+	// list tag的resource
+//	model.Tags = $resource(window.contextpath + '/vs/:vsName0/tag/list');
 
 	return model;
 });

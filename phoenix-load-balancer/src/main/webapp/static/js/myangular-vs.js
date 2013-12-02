@@ -15,10 +15,11 @@ module.controller('VsController', function($scope, DataService, $resource,
 	};
 	var vsChanged = false;
 	$scope.vs = null;
+	$scope.tags = [];
 	$scope.getVs = function(vsName) {
 		$http({
 			method : 'GET',
-			url : window.contextpath + '/' + vsName + '/get'
+			url : window.contextpath + '/vs/' + vsName + '/get'
 		}).success(function(data, status, headers, config) {
 			if (data.errorCode == 0) {
 				if (data.virtualServer == null) {// 新建vs
@@ -48,20 +49,36 @@ module.controller('VsController', function($scope, DataService, $resource,
 		}).error(function(data, status, headers, config) {
 			app.appError("响应错误", data);
 		});
+		// 获取tag list
+		// 老是tags含有angularjs的属性
+		// var Tags = $resource(window.contextpath + '/vs/:vsName0/tag/list');
+		// $scope.tags = Tags.query({
+		// vsName0 : vsName
+		// },function(){
+		// console.log($scope.tags);
+		// });
+		$http({
+			method : 'GET',
+			url : window.contextpath + '/vs/' + vsName + '/tag/list'
+		}).success(function(data, status, headers, config) {
+			$scope.tags = data;
+		}).error(function(data, status, headers, config) {
+			app.appError("响应错误", data);
+		});
 	};
 	// 保存
 	$scope.save = function() {
 		$http({
 			method : 'POST',
 			data : $scope.vs,
-			url : window.contextpath + '/' + $scope.vs.name + '/save'
+			url : window.contextpath + '/vs/' + $scope.vs.name + '/save'
 		}).success(
 				function(data, status, headers, config) {
 					if (data.errorCode == 0) {
 						app.alertSuccess("保存成功！ 即将刷新页面...");
 						vsChanged = false;// 保存成功，修改标识重置
 						setTimeout(function() {
-							window.location = window.contextpath + "/"
+							window.location = window.contextpath + "/vs/"
 									+ $scope.vs.name + window.location.hash;
 						}, 700);
 					} else {
@@ -75,8 +92,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 	$scope.removeVirtualServer = function() {
 		$http({
 			method : 'POST',
-			data : $scope.vs,
-			url : window.contextpath + '/' + $scope.vs.name + '/remove'
+			url : window.contextpath + '/vs/' + $scope.vs.name + '/remove'
 		}).success(
 				function(data, status, headers, config) {
 					if (data.errorCode == 0) {
@@ -109,14 +125,88 @@ module.controller('VsController', function($scope, DataService, $resource,
 		return re;
 	}
 	$scope.edit = function() {
-		window.location = window.contextpath + '/' + $scope.vs.name + '/edit'
-				+ window.location.hash;
+		window.location = window.contextpath + '/vs/' + $scope.vs.name
+				+ '/edit' + window.location.hash;
 	}
 	$scope.cancleEdit = function() {
-		window.location = window.contextpath + '/' + $scope.vs.name
+		window.location = window.contextpath + '/vs/' + $scope.vs.name
 				+ window.location.hash;
 	}
 	$scope.preview = function() {
+		showPreviewModal();
+		$http({
+			method : 'POST',
+			data : $scope.vs,
+			url : window.contextpath + '/vs/' + $scope.vs.name + '/preview'
+		}).success(
+				function(data, status, headers, config) {
+					if (data.errorCode == 0) {
+						window.nginxConfigEditor.setValue(data.nginxConfig);
+						window.nginxConfigEditor.moveCursorTo(0, 0);
+					} else {
+						$('#nginxConfigEditor').hide();
+						app.alertError("预览失败: " + data.errorMessage,
+								"previewVirtualServerAlertDiv");
+					}
+				}).error(function(data, status, headers, config) {
+			app.appError("响应错误", data);
+		});
+	}
+
+	// addTag
+	$scope.addingTag = false;
+	$scope.newTag = null;
+	$scope.addTag = function() {
+		app.clearAlertMessage();
+		app.alertProgress();
+		$scope.addingTag  = true;
+		var param = new Object();
+		// param.virtualServerName = $scope.vs.name;
+		param.version = $scope.vs.version;
+		$http({
+			method : 'POST',
+			data : $.param(param),
+			headers : {
+				'Content-Type' : 'application/x-www-form-urlencoded'
+			},
+			url : window.contextpath + '/vs/' + $scope.vs.name + '/tag/add'
+		}).success(function(data, status, headers, config) {
+			$scope.addingTag  = false;
+			if (data.errorCode == 0) {
+				app.alertSuccess("创建发布版本成功！点击“已创建的发布版本”可查看。");
+				$('#tagsUl').addClass('open');
+				$scope.tags.unshift(data.tagId);
+				$scope.newTag = data.tagId;
+			} else {
+				app.alertError("创建失败: " + data.errorMessage);
+			}
+		}).error(function(data, status, headers, config) {
+			$scope.addingTag  = false;
+			app.appError("响应错误", data);
+		});
+	};
+	$scope.viewTag = function(tagId) {
+		showPreviewModal();
+		$http(
+				{
+					method : 'GET',
+					url : window.contextpath + '/vs/' + $scope.vs.name
+							+ '/tag/get/' + tagId
+				}).success(
+				function(data, status, headers, config) {
+					if (data.errorCode == 0) {
+						window.nginxConfigEditor.setValue(data.nginxConfig);
+						window.nginxConfigEditor.moveCursorTo(0, 0);
+					} else {
+						$('#nginxConfigEditor').hide();
+						app.alertError("预览失败: " + data.errorMessage,
+								"previewVirtualServerAlertDiv");
+					}
+				}).error(function(data, status, headers, config) {
+			app.appError("响应错误", data);
+		});
+	};
+	var showPreviewModal = function(){
 		// 显示modal
 		var width = $(window).width();
 		var height = $(window).height();
@@ -135,22 +225,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 		window.nginxConfigEditor.setValue("");
 		$('#nginxConfigEditor').show();
 		$('#previewVirtualServerModal').modal('show');
-		$http({
-			method : 'POST',
-			data : $scope.vs,
-			url : window.contextpath + '/' + $scope.vs.name + '/preview'
-		}).success(function(data, status, headers, config) {
-			if (data.errorCode == 0) {
-				window.nginxConfigEditor.setValue(data.nginxConfig);
-				window.nginxConfigEditor.moveCursorTo(0, 0);
-			} else {
-				$('#nginxConfigEditor').hide();
-				app.alertError("预览失败: " + data.errorMessage,"previewVirtualServerAlertDiv");
-			}
-		}).error(function(data, status, headers, config) {
-			app.appError("响应错误", data);
-		});
-	}
+	};
 	// 离开页面时，对比一下vs是否发生了修改
 	var onunload = function() {
 		if (vsChanged) {

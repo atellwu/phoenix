@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>#parse("common/header.htm")
+</head>
+<!--[if lt IE 7 ]> <body class="ie ie6"> <![endif]-->
+<!--[if IE 7 ]> <body class="ie ie7 "> <![endif]-->
+<!--[if IE 8 ]> <body class="ie ie8 "> <![endif]-->
+<!--[if IE 9 ]> <body class="ie ie9 "> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<body class="">
+  <!--<![endif]-->
+
+  #parse("common/navbar.htm") #parse("common/sidebar.htm") $screen_content
+  
+  <script src="${contextPath}/static/js/jquery-1.7.2.min.js" type="text/javascript"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/jquery.dateFormat-1.0.min.js"></script>
+  <script src="${contextPath}/static/js/bs.min.js"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/s2.min.js"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/ace-src-min/ace.js" type="text/javascript"></script>
+  <script src="${contextPath}/static/js/angular.min.js" type="text/javascript" ng:autobind></script>
+  <script src="${contextPath}/static/js/angular-resource.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript" src="${contextPath}/static/js/application.js?t=20130623"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/myangular-base.js?t=20130623"></script>
+  <script type="text/javascript" src="${contextPath}/static/js/myangular-pool.js?t=20130623"></script>
+
+
+  <!-- HTML5 shim, for IE6-8 support of HTML elements -->
+  <!--[if lt IE 9]>
+    <script src="${contextPath}/static/js/html5.js"></script>
+   <![endif]-->
+  <script type="text/javascript">
+			$("[rel=tooltip]").tooltip();
+			$(document).ready(
+					function() {
+						angular.element($('#PoolController')).scope().getPool(
+								'${poolName}');
+					});
+		</script>
+
+
+#parse("common/modals.htm")
+</body>
+</html>

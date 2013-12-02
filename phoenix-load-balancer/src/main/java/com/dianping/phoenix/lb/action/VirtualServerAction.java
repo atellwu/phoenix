@@ -1,66 +1,45 @@
 package com.dianping.phoenix.lb.action;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.PostConstruct;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.struts2.ServletActionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
-import com.dianping.phoenix.lb.service.model.PoolService;
-import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.dianping.phoenix.lb.utils.JsonBinder;
-import com.opensymphony.xwork2.ActionSupport;
 
 /**
  * @author wukezhu
  */
 @Component("virtualServerAction")
-public class VirtualServerAction extends ActionSupport {
+@Scope("prototype")
+public class VirtualServerAction extends MenuAction {
 
-    private static final int     ERRORCODE_SUCCESS     = 0;
+    private static final int    MAX_TAG_NUM      = 10;
 
-    private static final int     ERRORCODE_PARAM_ERROR = -2;
+    private static final Logger LOG              = LoggerFactory.getLogger(VirtualServerAction.class);
 
-    private static final int     ERRORCODE_INNER_ERROR = -1;
+    private static final long   serialVersionUID = -1084994778030229218L;
 
-    private static final Logger  LOG                   = LoggerFactory.getLogger(VirtualServerAction.class);
+    private String              virtualServerName;
 
-    private static final long    serialVersionUID      = -1084994778030229218L;
+    private String              tagId;
 
-    //post的参数vs，用于save
-    private String               vs;
+    private Integer             version;
 
-    private Map<String, Object>  dataMap               = new HashMap<String, Object>();
-
-    @Autowired
-    private VirtualServerService virtualServerService;
-
-    @Autowired
-    private PoolService          poolService;
-
-    private List<VirtualServer>  virtualServers;
-
-    private String               virtualServerName;
-
-    private String               contextPath;
-
-    private String               editOrShow            = "show";
-
-    @PostConstruct
-    public void init() {
-        virtualServers = virtualServerService.listVirtualServers();
-    }
+    private List<String>        tags;
 
     public String index() {
         if (virtualServers.size() == 0) {
@@ -68,21 +47,6 @@ public class VirtualServerAction extends ActionSupport {
         }
         virtualServerName = virtualServers.get(0).getName();//重定向
         return "redirect";
-    }
-
-    public String show() {
-        editOrShow = "show";
-        return SUCCESS;
-    }
-
-    public String edit() {
-        editOrShow = "edit";
-        return SUCCESS;
-    }
-
-    public String deploy() {
-        editOrShow = "edit";
-        return SUCCESS;
     }
 
     public String get() throws Exception {
@@ -166,11 +130,6 @@ public class VirtualServerAction extends ActionSupport {
         return SUCCESS;
     }
 
-    public String getVirtualServerList() {
-        virtualServers = virtualServerService.listVirtualServers();
-        return SUCCESS;
-    }
-
     public String preview() throws Exception {
         try {
             String vsJson = IOUtils.toString(ServletActionContext.getRequest().getInputStream());
@@ -179,9 +138,8 @@ public class VirtualServerAction extends ActionSupport {
             }
             VirtualServer virtualServer = JsonBinder.getNonNullBinder().fromJson(vsJson, VirtualServer.class);
 
-            List<Pool> poolList = poolService.listPools();
-
-            String nginxConfig = virtualServerService.generateNginxConfig(virtualServer, poolList);
+            pools = poolService.listPools();
+            String nginxConfig = virtualServerService.generateNginxConfig(virtualServer, pools);
 
             dataMap.put("nginxConfig", nginxConfig);
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
@@ -201,44 +159,124 @@ public class VirtualServerAction extends ActionSupport {
         return SUCCESS;
     }
 
-    @Override
-    public void validate() {
-        super.validate();
-        if (contextPath == null) {
-            contextPath = ServletActionContext.getServletContext().getContextPath();
+    public String addTag() throws Exception {
+        try {
+            Validate.notNull(virtualServerName);
+            Validate.notNull(version);
+            dataMap.put("tagId", virtualServerService.tag(virtualServerName, version, pools));
+
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (BizException e) {
+            dataMap.put("errorCode", e.getMessageId());
+            dataMap.put("errorMessage", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            //            LOG.error("Param Error: " + e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
         }
+        return SUCCESS;
     }
 
-    public Map<String, Object> getDataMap() {
-        return dataMap;
+    /**
+     * 查看某个tagId当时的config快照
+     */
+    public String getNginxConfigByTagId() throws Exception {
+        try {
+            SlbModelTree tree = virtualServerService.findTagById(virtualServerName, tagId);
+            if (tree != null) {
+                List<Pool> poolList = new ArrayList<Pool>();
+                Map<String, Pool> pools0 = tree.getPools();
+                for (Entry<String, Pool> entry : pools0.entrySet()) {
+                    Pool pool0 = entry.getValue();
+                    poolList.add(pool0);
+                }
+                Map<String, VirtualServer> virtualServers0 = tree.getVirtualServers();
+                for (Entry<String, VirtualServer> entry : virtualServers0.entrySet()) {
+                    VirtualServer virtualServer = entry.getValue();
+                    String config = virtualServerService.generateNginxConfig(virtualServer, poolList);
+                    dataMap.put("nginxConfig", config);
+                    break;
+                }
+            }
+
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (BizException e) {
+            dataMap.put("errorCode", e.getMessageId());
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Bussiness Error: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Param Error: " + e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
+        }
+        return SUCCESS;
     }
 
-    public String getVs() {
-        return vs;
+    public String listTags() throws Exception {
+        try {
+            tags = virtualServerService.listTag(virtualServerName, MAX_TAG_NUM);
+            //            dataMap.put("tags", tags);
+
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (BizException e) {
+            dataMap.put("errorCode", e.getMessageId());
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Bussiness Error: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Param Error: " + e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
+        }
+        return SUCCESS;
     }
 
-    public void setVs(String vs) {
-        this.vs = vs;
-    }
-
-    public List<VirtualServer> getVirtualServers() {
-        return virtualServers;
+    public String deploy() {
+        editOrShow = "edit";
+        return SUCCESS;
     }
 
     public String getVirtualServerName() {
         return virtualServerName;
     }
 
-    public String getContextPath() {
-        return contextPath;
-    }
-
     public void setVirtualServerName(String virtualServerName) {
         this.virtualServerName = virtualServerName;
     }
 
-    public String getEditOrShow() {
-        return editOrShow;
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public String getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(String tagId) {
+        this.tagId = tagId;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
 }

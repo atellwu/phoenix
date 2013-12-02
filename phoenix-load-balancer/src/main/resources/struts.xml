@@ -13,7 +13,8 @@
     <constant name="struts.velocity.configfile" value="WEB-INF/velocity/velocity.properties" />
 
     <constant name="struts.action.extension" value="" />
-    <constant name="struts.custom.properties" value="classpath:/struts.properties" />
+    <!-- <constant name="struts.custom.properties" value="classpath:/struts.properties" 
+        /> -->
     <constant name="struts.objectFactory"
         value="org.apache.struts2.spring.StrutsSpringObjectFactory" />
     <constant name="struts.patternMatcher" value="namedVariable" />
@@ -42,57 +43,112 @@
 
         <action name="" class="virtualServerAction" method="index">
             <result name="redirect" type="redirect">
-                <param name="location">${virtualServerName}</param>
+                <param name="location">vs/${virtualServerName}</param>
             </result>
-            <result name="noneVs" type="velocity">
+            <result name="none" type="velocity">
                 /none_vs.htm
             </result>
         </action>
-        <action name="{virtualServerName}/save" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/save" class="virtualServerAction"
             method="save">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="{virtualServerName}/get" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/get" class="virtualServerAction"
             method="get">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="{virtualServerName}/remove" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/remove" class="virtualServerAction"
             method="remove">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="{virtualServerName}/edit" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/edit" class="virtualServerAction"
             method="edit">
             <result name="success" type="velocity">
-                /container.htm
+                /virtualserver.htm
             </result>
         </action>
-        <action name="{virtualServerName}/deploy" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/deploy" class="virtualServerAction"
             method="deploy">
             <result name="success" type="velocity">
                 /deploy.htm
             </result>
         </action>
-        <action name="{virtualServerName}/preview" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/preview" class="virtualServerAction"
             method="preview">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-
-        <action name="{virtualServerName}" class="virtualServerAction"
+        <action name="vs/{virtualServerName}/tag/add" class="virtualServerAction"
+            method="addTag">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/tag/list" class="virtualServerAction"
+            method="listTags">
+            <result name="success" type="json">
+                <param name="root">tags</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/tag/get/{tagId}" class="virtualServerAction"
+            method="getNginxConfigByTagId">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}" class="virtualServerAction"
             method="show">
             <result name="success" type="velocity">
-                /container.htm
+                /virtualserver.htm
+            </result>
+        </action>
+
+
+
+        <action name="pool/{poolName}/save" class="poolAction"
+            method="save">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="pool/{poolName}/get" class="poolAction"
+            method="get">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="pool/{poolName}/remove" class="poolAction"
+            method="remove">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="pool/{poolName}/edit" class="poolAction"
+            method="edit">
+            <result name="success" type="velocity">
+                /pool.htm
+            </result>
+        </action>
+        <action name="pool/{poolName}" class="poolAction" method="show">
+            <result name="success" type="velocity">
+                /pool.htm
             </result>
         </action>
 
@@ -111,13 +167,28 @@
             </result>
         </action>
 
-        <action name="base/strategies" class="strategyAction"
-            method="strategies">
+        <action name="base/listStrategies" class="strategyAction"
+            method="listStrategies">
             <result name="success" type="json">
                 <param name="root">strategies</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
+
+        <action name="base/listPools" class="poolAction" method="listPools">
+            <result name="success" type="json">
+                <param name="root">pools</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+
+        <action name="deploy/list" class="deployAction" method="list">
+            <result name="success" type="velocity">
+                /deploy/list.htm
+            </result>
+        </action>
+
+
 
     </package>
 
