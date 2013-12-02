@@ -35,7 +35,7 @@ class MessageSender implements Task {
 
 	private String m_threadNamePrefix;
 
-	private ChannelManager m_manager;
+	private FailoverChannelManager m_manager;
 
 	private Logger m_logger = LoggerFactory.getLogger(MessageReceiver.class);
 
@@ -57,13 +57,13 @@ class MessageSender implements Task {
 
 	public void startClient() {
 		m_active = true;
-		m_manager = new ChannelManager();
+		m_manager = new FailoverChannelManager();
 
 		Threads.forGroup(m_threadNamePrefix).start(this);
 		Threads.forGroup(m_threadNamePrefix).start(m_manager);
 	}
 
-	class ChannelManager implements Task {
+	class FailoverChannelManager implements Task {
 		private List<InetSocketAddress> m_serverAddresses;
 
 		private ClientBootstrap m_bootstrap;
@@ -76,7 +76,7 @@ class MessageSender implements Task {
 
 		private AtomicInteger m_reconnects = new AtomicInteger(999);
 
-		public ChannelManager() {
+		public FailoverChannelManager() {
 			NioClientSocketChannelFactory factory;
 
 			if (m_maxThreads > 0) {

@@ -1,6 +1,7 @@
-package com.dianping.platform.session.core;
+package com.dianping.phoenix.session.core;
 
 import com.dianping.phoenix.session.RequestEvent;
+import com.dianping.phoenix.session.core.RequestEventRecorder;
 
 public class DummyRecorder implements RequestEventRecorder {
 
