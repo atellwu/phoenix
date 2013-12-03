@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +16,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.deploy.DeploySetting;
+import com.dianping.phoenix.lb.deploy.bo.DeploymentTaskBo;
+import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo;
 import com.dianping.phoenix.lb.deploy.model.DeploymentTask;
 import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
-import com.dianping.phoenix.lb.service.model.PoolService;
-import com.dianping.phoenix.lb.service.model.VirtualServerService;
+import com.dianping.phoenix.lb.utils.JsonBinder;
 import com.opensymphony.xwork2.ActionSupport;
 
 /**
@@ -41,12 +44,6 @@ public class DeployAction extends ActionSupport {
     private Map<String, Object>  dataMap               = new HashMap<String, Object>();
 
     @Autowired
-    private VirtualServerService virtualServerService;
-
-    @Autowired
-    private PoolService          poolService;
-
-    @Autowired
     private DeployTaskService    deployTaskService;
 
     private String[]             virtualServerNames;
@@ -64,7 +61,7 @@ public class DeployAction extends ActionSupport {
     private Paginator            paginator;
 
     private int                  taskId;
-    private DeploymentTask       deploymentTask;
+    private DeploymentTaskBo     task;
 
     @PostConstruct
     public void init() {
@@ -82,10 +79,58 @@ public class DeployAction extends ActionSupport {
     }
 
     /**
-     * 进入发布的页面，需要的参数是vsName列表
+     * Task页面
      */
     public String task() {
-        deploymentTask = deployTaskService.getTask(taskId);
+        return SUCCESS;
+    }
+
+    /**
+     * task对象（包含所有静态信息）
+     */
+    public String getTask() {
+        try {
+            //获取task
+            task = deployTaskService.getTask(taskId);
+
+            dataMap.put("task", task);
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Param Error: " + e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
+        }
+        return SUCCESS;
+    }
+
+    /**
+     * task对象（包含所有静态信息）
+     */
+    public String addTask() {
+        try {
+            //获取task
+            String taskJson = IOUtils.toString(ServletActionContext.getRequest().getInputStream());
+            if (StringUtils.isBlank(taskJson)) {
+                throw new IllegalArgumentException("vs 参数不能为空！");
+            }
+            NewTaskInfo newTaskInfo = JsonBinder.getNonNullBinder().fromJson(taskJson, NewTaskInfo.class);
+
+            deployTaskService.addTask(newTaskInfo);
+
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Param Error: " + e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
+        }
         return SUCCESS;
     }
 
@@ -163,14 +208,6 @@ public class DeployAction extends ActionSupport {
 
     public void setTaskId(int taskId) {
         this.taskId = taskId;
-    }
-
-    public DeploymentTask getDeploymentTask() {
-        return deploymentTask;
-    }
-
-    public void setDeploymentTask(DeploymentTask deploymentTask) {
-        this.deploymentTask = deploymentTask;
     }
 
     public void setDataMap(Map<String, Object> dataMap) {

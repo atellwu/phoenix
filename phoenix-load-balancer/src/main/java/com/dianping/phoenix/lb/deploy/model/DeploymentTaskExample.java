@@ -625,6 +625,16 @@ public class DeploymentTaskExample {
             return (Criteria) this;
         }
 
+        public Criteria andStatusLike(DeployStatus value) {
+            addCriterion("status like", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusNotLike(DeployStatus value) {
+            addCriterion("status not like", value, "status");
+            return (Criteria) this;
+        }
+
         public Criteria andStatusIn(List<DeployStatus> values) {
             addCriterion("status in", values, "status");
             return (Criteria) this;

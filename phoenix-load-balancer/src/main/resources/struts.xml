@@ -49,6 +49,13 @@
                 /none_vs.htm
             </result>
         </action>
+        <action name="vs/list" class="virtualServerAction"
+            method="list">
+            <result name="success" type="json">
+                <param name="root">list</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
         <action name="vs/{virtualServerName}/save" class="virtualServerAction"
             method="save">
             <result name="success" type="json">
@@ -193,7 +200,21 @@
                 /deploy/list.htm
             </result>
         </action>
-        <action name="deploy/{taskId}" class="deployAction"
+        <action name="deploy/task/add" class="deployAction"
+            method="addTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{taskId}/get" class="deployAction"
+            method="getTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{taskId}" class="deployAction"
             method="task">
             <result name="success" type="velocity">
                 /deploy/task.htm
