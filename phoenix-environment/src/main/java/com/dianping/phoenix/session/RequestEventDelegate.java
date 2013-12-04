@@ -13,8 +13,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.unidal.lookup.annotation.Inject;
-
-import com.dianping.phoenix.net.MessageDelegate;
+import org.unidal.net.MessageDelegate;
 
 public class RequestEventDelegate implements MessageDelegate, Initializable, LogEnabled {
 	@Inject

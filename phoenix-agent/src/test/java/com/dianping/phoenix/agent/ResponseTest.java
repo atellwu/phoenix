@@ -17,7 +17,7 @@ public class ResponseTest {
 
 		System.out.println(response);
 
-		String json = new DefaultJsonBuilder().buildJson(response);
+		String json = new DefaultJsonBuilder().build(response);
 
 		System.out.println(json);
 

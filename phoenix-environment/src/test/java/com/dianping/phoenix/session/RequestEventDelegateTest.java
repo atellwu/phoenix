@@ -4,10 +4,9 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
-
-import com.dianping.phoenix.net.Sockets;
-import com.dianping.phoenix.net.Sockets.SocketClient;
-import com.dianping.phoenix.net.Sockets.SocketServer;
+import org.unidal.net.Sockets;
+import org.unidal.net.Sockets.SocketClient;
+import org.unidal.net.Sockets.SocketServer;
 
 public class RequestEventDelegateTest extends ComponentTestCase {
 	@Test
