@@ -43,8 +43,8 @@ public class IntegrationTest extends ComponentTestCase {
 
 		WebAppContext webapp = new WebAppContext();
 		webapp.setContextPath("/");
-		webapp.setDescriptor("src/main/webapp/WEB-INF/web.xml");
-		webapp.setResourceBase("src/main/webapp/p");
+		webapp.setDescriptor("src/test/webapp/WEB-INF/web.xml");
+		webapp.setResourceBase("src/test/webapp/p");
 		webapp.setClassLoader(this.getClass().getClassLoader());
 		server.setHandler(webapp);
 
