@@ -1,4 +1,4 @@
-package com.dianping.phoenix.session.core;
+package com.dianping.phoenix.session.requestid;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -12,7 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.unidal.helper.Threads;
@@ -22,9 +23,7 @@ import org.unidal.lookup.annotation.Inject;
 import com.dianping.cat.configuration.NetworkInterfaceManager;
 import com.dianping.phoenix.configure.ConfigManager;
 
-public class RecordFileManager implements Initializable {
-
-	private static Logger logger = Logger.getLogger(RecordFileManager.class);
+public class RecordFileManager implements Initializable, LogEnabled {
 
 	@Inject
 	private ConfigManager m_config;
@@ -35,6 +34,13 @@ public class RecordFileManager implements Initializable {
 
 	private String m_ip;
 
+	private Logger m_logger;
+
+	@Override
+   public void enableLogging(Logger logger) {
+		m_logger = logger;
+   }
+
 	public BlockingQueue<byte[]> getWriteQueue(long timestamp) throws IOException {
 		long startTime = timestamp - timestamp % m_config.getRecordFileTimespan();
 		if (!m_writeQueueCache.containsKey(startTime)) {
@@ -44,15 +50,17 @@ public class RecordFileManager implements Initializable {
 		}
 		return m_writeQueueCache.get(startTime).queue;
 	}
-
+	
 	ConcurrentMap<Long, QueueAndOutputStream> getWriteQueueCache() {
 		return m_writeQueueCache;
 	}
-	
+
 	@Override
    public void initialize() throws InitializationException {
 		this.m_writeQueueCache = new ConcurrentHashMap<Long, QueueAndOutputStream>();
 		m_ip = NetworkInterfaceManager.INSTANCE.getLocalHostAddress();
+		
+		start();
    }
 
 	// for unit test only
@@ -91,12 +99,12 @@ public class RecordFileManager implements Initializable {
 					long aliveTime = m_config.getRecordFileTimespan() * m_config.getRecordFileWriteStreamMultiply();
 					long startTimestamp = entry.getKey();
 					if (System.currentTimeMillis() > startTimestamp + aliveTime) {
-						logger.info(String.format("Closing stream of %d", startTimestamp));
+						m_logger.info(String.format("Closing stream of %d", startTimestamp));
 						m_writeQueueCache.remove(entry.getKey());
 						try {
 							entry.getValue().out.close();
 						} catch (IOException e) {
-							logger.error(String.format("Error close output stream of %d", startTimestamp), e);
+							m_logger.error(String.format("Error close output stream of %d", startTimestamp), e);
 						}
 					}
 				}
@@ -104,7 +112,7 @@ public class RecordFileManager implements Initializable {
 				try {
 					Thread.sleep(m_config.getRecordFileWriteStreamCloseScanInterval());
 				} catch (InterruptedException e) {
-					logger.info("Thread Interrupted, will exit");
+					m_logger.info("Thread Interrupted, will exit");
 					return;
 				}
 			}
@@ -149,7 +157,7 @@ public class RecordFileManager implements Initializable {
 								// TODO remove flush
 								entry.getValue().out.flush();
 							} catch (Exception e) {
-								logger.error(String.format("Error write record %s to file", new String(buf)), e);
+								m_logger.error(String.format("Error write record %s to file", new String(buf)), e);
 							}
 						}
 					}
@@ -158,7 +166,7 @@ public class RecordFileManager implements Initializable {
 				try {
 					Thread.sleep(m_config.getRecordFileWriteQueueScanInterval());
 				} catch (InterruptedException e) {
-					logger.info("Thread Interrupted, will exit");
+					m_logger.info("Thread Interrupted, will exit");
 					return;
 				}
 			}
@@ -169,5 +177,6 @@ public class RecordFileManager implements Initializable {
 		}
 
 	}
+
 
 }

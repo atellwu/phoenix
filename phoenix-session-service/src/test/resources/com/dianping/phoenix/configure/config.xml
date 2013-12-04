@@ -1,5 +1,5 @@
 <config>
-	<event-expire-time>5000</event-expire-time>
+	<event-expire-time>30000</event-expire-time>
 	<retry-queue-clean-interval>1000</retry-queue-clean-interval>
 	<retry-queue-safe-length>1000</retry-queue-safe-length>
 	<max-l1-cache-size>1000</max-l1-cache-size>

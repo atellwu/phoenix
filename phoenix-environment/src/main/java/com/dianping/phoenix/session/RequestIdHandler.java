@@ -1,8 +1,8 @@
 package com.dianping.phoenix.session;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.security.MessageDigest;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
@@ -11,13 +11,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.unidal.lookup.ContainerHolder;
 import org.unidal.lookup.annotation.Inject;
 import org.unidal.net.Networks;
 
 import com.dianping.phoenix.servlet.PhoenixFilterContext;
 import com.dianping.phoenix.servlet.PhoenixFilterHandler;
 
-public class RequestIdHandler implements PhoenixFilterHandler, Initializable {
+public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHandler, Initializable {
 	public static final String ID = "request-id";
 
 	private final static char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
@@ -73,21 +74,16 @@ public class RequestIdHandler implements PhoenixFilterHandler, Initializable {
 	}
 
 	private String getRequestId(PhoenixFilterContext ctx) {
-		
-		
-		return null;
+
+		// TODO
+		return UUID.randomUUID().toString();
 	}
 
 	private String getUrlDigest(PhoenixFilterContext ctx) {
 		HttpServletRequest req = ctx.getHttpServletRequest();
-		String uri = req.getRequestURI();
-		String qs = req.getQueryString();
+		String url = req.getRequestURL().toString();
 
-		if (qs != null) {
-			uri += "?" + qs;
-		}
-
-		return sha1(uri);
+		return sha1(url);
 	}
 
 	private String getUserId(PhoenixFilterContext ctx) {
@@ -147,6 +143,7 @@ public class RequestIdHandler implements PhoenixFilterHandler, Initializable {
 	@Override
 	public void initialize() throws InitializationException {
 		m_ip = Networks.forIp().getLocalHostAddress();
-		
+		m_queue = lookupById(RequestEventDelegate.class, "out");
 	}
+	
 }

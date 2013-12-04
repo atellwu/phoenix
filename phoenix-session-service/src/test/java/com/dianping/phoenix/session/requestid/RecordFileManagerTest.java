@@ -1,4 +1,4 @@
-package com.dianping.phoenix.session.core;
+package com.dianping.phoenix.session.requestid;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
 
 import com.dianping.phoenix.configure.ConfigManager;
+import com.dianping.phoenix.session.requestid.RecordFileManager;
 
 public class RecordFileManagerTest extends ComponentTestCase {
 

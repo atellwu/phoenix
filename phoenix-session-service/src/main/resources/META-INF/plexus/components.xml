@@ -5,8 +5,8 @@
 			<implementation>com.dianping.phoenix.configure.ConfigManager</implementation>
 		</component>
 		<component>
-			<role>com.dianping.phoenix.session.core.RecordFileManager</role>
-			<implementation>com.dianping.phoenix.session.core.RecordFileManager</implementation>
+			<role>com.dianping.phoenix.session.requestid.RecordFileManager</role>
+			<implementation>com.dianping.phoenix.session.requestid.RecordFileManager</implementation>
 			<requirements>
 				<requirement>
 					<role>com.dianping.phoenix.configure.ConfigManager</role>
@@ -14,23 +14,44 @@
 			</requirements>
 		</component>
 		<component>
-			<role>com.dianping.phoenix.session.core.RequestEventRecorder</role>
-			<implementation>com.dianping.phoenix.session.core.FileRecorder</implementation>
+			<role>com.dianping.phoenix.session.requestid.EventRecorder</role>
+			<implementation>com.dianping.phoenix.session.requestid.DefaultEventRecorder</implementation>
 			<requirements>
 				<requirement>
-					<role>com.dianping.phoenix.session.core.RecordFileManager</role>
+					<role>com.dianping.phoenix.session.requestid.RecordFileManager</role>
 				</requirement>
 			</requirements>
 		</component>
 		<component>
-			<role>com.dianping.phoenix.session.core.RequestEventHandler</role>
-			<implementation>com.dianping.phoenix.session.core.RequestEventHandler</implementation>
+			<role>com.dianping.phoenix.session.RequestEventDelegate</role>
+			<implementation>com.dianping.phoenix.session.RequestEventDelegate</implementation>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.requestid.EventDelegateManager</role>
+			<implementation>com.dianping.phoenix.session.requestid.EventDelegateManager</implementation>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.requestid.EventProcessor</role>
+			<implementation>com.dianping.phoenix.session.requestid.EventProcessor</implementation>
 			<requirements>
 				<requirement>
 					<role>com.dianping.phoenix.configure.ConfigManager</role>
 				</requirement>
 				<requirement>
-					<role>com.dianping.phoenix.session.core.RequestEventRecorder</role>
+					<role>com.dianping.phoenix.session.requestid.EventRecorder</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.session.requestid.EventDelegateManager</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.requestid.Bootstrap</role>
+			<implementation>com.dianping.phoenix.session.requestid.Bootstrap</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.session.requestid.EventDelegateManager</role>
 				</requirement>
 			</requirements>
 		</component>
