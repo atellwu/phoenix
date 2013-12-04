@@ -7,6 +7,7 @@
 package com.dianping.phoenix.lb.visitor;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.dianping.phoenix.lb.constant.Constants;
@@ -86,13 +87,15 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
         for (Directive directive : location.getDirectives()) {
             nginxLocation.addDirective(directive);
             if (Constants.DIRECTIVE_PROXY_PASS.equals(directive.getType())) {
-                NginxUpstream upstream = result.getUpstream(directive
+                List<NginxUpstream> upstreams = result.getUpstream(directive
                         .getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME));
-                if (upstream == null) {
+                if (upstreams == null || upstreams.isEmpty()) {
                     throw new RuntimeException(MessageUtils.getMessage(MessageID.PROXY_PASS_NO_POOL,
                             location.getPattern()));
                 }
-                upstream.setUsed(true);
+                for (NginxUpstream upstream : upstreams) {
+                    upstream.setUsed(true);
+                }
             }
         }
 
