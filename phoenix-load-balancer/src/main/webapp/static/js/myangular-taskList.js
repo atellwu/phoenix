@@ -20,7 +20,7 @@ module.directive('ngEnter', function() {
 
 module.controller('TaskListController', function($scope, $resource, $http) {
 	$scope.newTask = {};
-	$scope.newTask.selectedVsAndTag = [ {
+	$scope.newTask.selectedVsAndTags = [ {
 		"vsName" : "",
 		"tag" : ""
 	} ];
@@ -50,7 +50,7 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 		});
 	}
 	$scope.addVsAndTag = function() {
-		$scope.newTask.selectedVsAndTag.push({
+		$scope.newTask.selectedVsAndTags.push({
 			"vsName" : "",
 			"tag" : ""
 		});

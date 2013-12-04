@@ -395,62 +395,62 @@ public class DeploymentDetailExample {
             return (Criteria) this;
         }
 
-        public Criteria andStatusEqualTo(DeployStatus value) {
+        public Criteria andStatusEqualTo(AgentStatus value) {
             addCriterion("status =", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotEqualTo(DeployStatus value) {
+        public Criteria andStatusNotEqualTo(AgentStatus value) {
             addCriterion("status <>", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThan(DeployStatus value) {
+        public Criteria andStatusGreaterThan(AgentStatus value) {
             addCriterion("status >", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusGreaterThanOrEqualTo(DeployStatus value) {
+        public Criteria andStatusGreaterThanOrEqualTo(AgentStatus value) {
             addCriterion("status >=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThan(DeployStatus value) {
+        public Criteria andStatusLessThan(AgentStatus value) {
             addCriterion("status <", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLessThanOrEqualTo(DeployStatus value) {
+        public Criteria andStatusLessThanOrEqualTo(AgentStatus value) {
             addCriterion("status <=", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusLike(DeployStatus value) {
+        public Criteria andStatusLike(AgentStatus value) {
             addCriterion("status like", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotLike(DeployStatus value) {
+        public Criteria andStatusNotLike(AgentStatus value) {
             addCriterion("status not like", value, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusIn(List<DeployStatus> values) {
+        public Criteria andStatusIn(List<AgentStatus> values) {
             addCriterion("status in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotIn(List<DeployStatus> values) {
+        public Criteria andStatusNotIn(List<AgentStatus> values) {
             addCriterion("status not in", values, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusBetween(DeployStatus value1, DeployStatus value2) {
+        public Criteria andStatusBetween(AgentStatus value1, AgentStatus value2) {
             addCriterion("status between", value1, value2, "status");
             return (Criteria) this;
         }
 
-        public Criteria andStatusNotBetween(DeployStatus value1, DeployStatus value2) {
+        public Criteria andStatusNotBetween(AgentStatus value1, AgentStatus value2) {
             addCriterion("status not between", value1, value2, "status");
             return (Criteria) this;
         }

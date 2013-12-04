@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.dianping.phoenix.lb.deploy.DeploySetting;
 import com.dianping.phoenix.lb.deploy.bo.DeploymentTaskBo;
 import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo;
 import com.dianping.phoenix.lb.deploy.model.DeploymentTask;
@@ -51,8 +50,6 @@ public class DeployAction extends ActionSupport {
     private List<VirtualServer>  virtualServers;
 
     private String               contextPath;
-
-    private DeploySetting        deployPlan;
 
     private int                  pageNum               = 1;
 
@@ -133,6 +130,28 @@ public class DeployAction extends ActionSupport {
         }
         return SUCCESS;
     }
+    
+    /**
+     * 启动Task
+     */
+    public String startTask() {
+        try {
+            //获取task
+            
+//            deployTaskService.addTask();
+
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Param Error: " + e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
+        }
+        return SUCCESS;
+    }
 
     public String deploy() {
         return SUCCESS;
@@ -192,14 +211,6 @@ public class DeployAction extends ActionSupport {
 
     public void setPaginator(Paginator paginator) {
         this.paginator = paginator;
-    }
-
-    public DeploySetting getDeployPlan() {
-        return deployPlan;
-    }
-
-    public void setDeployPlan(DeploySetting deployPlan) {
-        this.deployPlan = deployPlan;
     }
 
     public int getTaskId() {

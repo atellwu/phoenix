@@ -66,14 +66,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="selectedVsAndTag in newTask.selectedVsAndTag">
+            <tr ng-repeat="selectedVsAndTag in newTask.selectedVsAndTags">
               <td><select ng-model="selectedVsAndTag.vsName" ng-change="getTags(selectedVsAndTag.vsName)"
                 ng-options="vs.name as vs.name for vs in vsList"><option value="" class="">-- 选择站点 --</option></select></td>
               <td><select ng-model="selectedVsAndTag.tag"
                 ng-options="tag for tag in vs2Tags[selectedVsAndTag.vsName]"><option value="" class="">--
                     选择发布版本 --</option>
               </select></td>
-              <td><a href="javascript:;" ng-click="selectedVsAndTag.splice($index,1)"><i class="icon-remove"></i></a></td>
+              <td><a href="javascript:;" ng-click="newTask.selectedVsAndTags.splice($index,1)"><i class="icon-remove"></i></a></td>
             </tr>
           </tbody>
         </table>

@@ -214,6 +214,13 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
+        <action name="deploy/task/{taskId}/start" class="deployAction"
+            method="startTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
         <action name="deploy/task/{taskId}" class="deployAction"
             method="task">
             <result name="success" type="velocity">

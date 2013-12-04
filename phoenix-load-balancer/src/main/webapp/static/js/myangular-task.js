@@ -100,15 +100,31 @@ module.controller('TaskController', function($scope, $resource, $http) {
 			deploymentBo.deploymentDetails = {};
 		}
 	}
-	$scope.getStatus = function(deploymentDetails,ip){
+	$scope.getStatus = function(deploymentDetails, ip) {
 		var deploymentDetail = deploymentDetails[ip];
-		if(deploymentDetail!=null){
-			if(deploymentDetail.status!=null){
+		if (deploymentDetail != null) {
+			if (deploymentDetail.status != null) {
 				return deploymentDetail.status;
-			}else{
+			} else {
 				return "CREATED";
 			}
 		}
 		return null;
+	}
+	$scope.startDeploy = function() {
+		$http({
+			method : 'GET',
+			url : window.contextpath + '/deploy/task/' + taskId + '/start'
+		}).success(function(data, status, headers, config) {
+			if (data.errorCode == 0) {
+				//修改button为不可点击
+				
+				//开始ajax论询获取task的状态
+			} else {
+				app.alertError("获取失败: " + data.errorMessage);
+			}
+		}).error(function(data, status, headers, config) {
+			app.appError("响应错误", data);
+		});
 	}
 });

@@ -47,18 +47,18 @@
                 javaType="com.dianping.phoenix.lb.deploy.model.DeployStatus"
                 jdbcType="VARCHAR" />
         </table>
-        <table tableName="deployment_detail">
+        <table tableName="deployment">
             <generatedKey column="id" sqlStatement="MySql"
                 identity="true" />
             <columnOverride column="status"
                 javaType="com.dianping.phoenix.lb.deploy.model.DeployStatus"
                 jdbcType="VARCHAR" />
         </table>
-        <table tableName="deployment">
+        <table tableName="deployment_detail">
             <generatedKey column="id" sqlStatement="MySql"
                 identity="true" />
             <columnOverride column="status"
-                javaType="com.dianping.phoenix.lb.deploy.model.DeployStatus"
+                javaType="com.dianping.phoenix.lb.deploy.model.AgentStatus"
                 jdbcType="VARCHAR" />
         </table>
 
