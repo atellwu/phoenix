@@ -81,8 +81,6 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
 
     @Override
     protected void initCustomizedMetas() {
-        initTagMetas();
-
         if (gitService != null) {
             try {
                 configManager = PlexusComponentContainer.INSTANCE.lookup(ConfigManager.class);
@@ -94,6 +92,8 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
                 throw new RuntimeException(e);
             }
         }
+
+        initTagMetas();
     }
 
     @Override
