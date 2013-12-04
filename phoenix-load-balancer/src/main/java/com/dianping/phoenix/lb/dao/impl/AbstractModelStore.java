@@ -196,6 +196,10 @@ public abstract class AbstractModelStore implements ModelStore {
                 configFileEntry.slbModelTree.addVirtualServer(virtualServer);
                 slbModelTree.addVirtualServer(virtualServer);
                 save(configFileEntry.key, configFileEntry.slbModelTree);
+            } catch (BizException e) {
+                configFileEntry.slbModelTree.addVirtualServer(originalVirtualServer);
+                slbModelTree.addVirtualServer(originalVirtualServer);
+                throw e;
             } catch (Exception e) {
                 configFileEntry.slbModelTree.addVirtualServer(originalVirtualServer);
                 slbModelTree.addVirtualServer(originalVirtualServer);
@@ -331,6 +335,8 @@ public abstract class AbstractModelStore implements ModelStore {
                 tagSlbModelTree.addVirtualServer(configFileEntry.slbModelTree.findVirtualServer(name));
 
                 return saveTag(configFileEntry.key, name, tagSlbModelTree);
+            } catch (BizException e) {
+                throw e;
             } catch (Exception e) {
                 ExceptionUtils.logAndRethrowBizException(e, MessageID.VIRTUALSERVER_TAG_FAIL, name);
             } finally {
@@ -567,7 +573,8 @@ public abstract class AbstractModelStore implements ModelStore {
 
     protected abstract SlbModelTree loadTag(String key, String vsName, String tagId) throws IOException, SAXException;
 
-    protected abstract String saveTag(String key, String vsName, SlbModelTree slbModelTree) throws IOException, BizException;
+    protected abstract String saveTag(String key, String vsName, SlbModelTree slbModelTree) throws IOException,
+            BizException;
 
     protected abstract void save(String key, SlbModelTree slbModelTree) throws IOException, BizException;
 
