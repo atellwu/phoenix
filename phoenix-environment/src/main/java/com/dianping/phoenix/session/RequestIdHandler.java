@@ -1,24 +1,33 @@
 package com.dianping.phoenix.session;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.security.MessageDigest;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.unidal.lookup.annotation.Inject;
+import org.unidal.net.Networks;
 
 import com.dianping.phoenix.servlet.PhoenixFilterContext;
 import com.dianping.phoenix.servlet.PhoenixFilterHandler;
 
-public class RequestIdHandler implements PhoenixFilterHandler {
+public class RequestIdHandler implements PhoenixFilterHandler, Initializable {
 	public static final String ID = "request-id";
 
 	private final static char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
 
 	@Inject
 	private RequestEventDelegate m_queue;
+
+	private AtomicInteger m_index = new AtomicInteger();
+
+	private String m_ip;
 
 	private RequestEvent buildEvent(PhoenixFilterContext ctx) {
 		RequestEvent event = new RequestEvent();
@@ -64,7 +73,8 @@ public class RequestIdHandler implements PhoenixFilterHandler {
 	}
 
 	private String getRequestId(PhoenixFilterContext ctx) {
-		// TODO Auto-generated method stub
+		
+		
 		return null;
 	}
 
@@ -132,5 +142,11 @@ public class RequestIdHandler implements PhoenixFilterHandler {
 	// for test purpose
 	RequestEvent take() throws InterruptedException {
 		return m_queue.take();
+	}
+
+	@Override
+	public void initialize() throws InitializationException {
+		m_ip = Networks.forIp().getLocalHostAddress();
+		
 	}
 }

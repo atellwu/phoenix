@@ -22,7 +22,7 @@ public class PhoenixAgentDryRunTest {
 	private String makeResponseJson(String ip) {
 		Response res = new Response();
 		res.setIp(ip);
-		return new DefaultJsonBuilder().buildJson(res);
+		return new DefaultJsonBuilder().build(res);
 	}
 
 	private void error(String resJson) {

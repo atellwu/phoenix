@@ -4,30 +4,20 @@
 	<parent>
 		<groupId>com.dianping.platform</groupId>
 		<artifactId>phoenix-parent</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>0.2.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.dianping.platform</groupId>
 	<artifactId>phoenix-environment</artifactId>
-	<version>0.1.0</version>
 	<name>phoenix-environment</name>
-	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
 			<groupId>org.unidal.framework</groupId>
 			<artifactId>foundation-service</artifactId>
-			<version>2.0.4</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.google.collections</groupId>
-					<artifactId>google-collections</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>15.0</version>
+			<groupId>org.unidal.framework</groupId>
+			<artifactId>test-framework</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.netty</groupId>
@@ -45,12 +35,6 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.unidal.framework</groupId>
-			<artifactId>test-framework</artifactId>
-			<version>2.0.4</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
