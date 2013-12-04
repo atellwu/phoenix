@@ -1,1 +1,1 @@
-ip_hash;
+consistent_hash $remote_addr;

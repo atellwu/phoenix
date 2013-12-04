@@ -1,2 +1,1 @@
-hash $strategy.getDynamicAttribute("target");
-    hash_method $strategy.getDynamicAttribute("method");
+consistent_hash $strategy.getDynamicAttribute("target");
