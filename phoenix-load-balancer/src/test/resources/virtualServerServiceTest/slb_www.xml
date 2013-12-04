@@ -16,13 +16,15 @@
 				<directive type="rewrite" matches="^(/shanghai/.*)/media/(.*)\..*$" target-pattern="$1/mp3/$2.mp3" flag="break" />
 				<directive type="proxy_pass" pool-name="Web.Index" />
 			</location>
-			<location match-type="regex" pattern="^/(images|javascript|js|css|flash|media|static)/"
-				case-sensitive="true">
+			<location match-type="regex" pattern="^/(images|javascript|js|css|flash|media|static)/" case-sensitive="true">
 				<directive type="static-resource" root-doc="/var/www/virtual/big.server.com/htdocs" expires="30d" />
 				<directive type="custom" value="test custom" />
 			</location>
-			<location match-type="prefix" pattern="/beijing" dp_domain="Web.Index">
+			<location match-type="prefix" pattern="/beijing">
 				<directive type="proxy_pass" pool-name="Web.Index" />
+			</location>
+			<location match-type="prefix" pattern="/guangzhou">
+				<directive type="proxy_pass" pool-name="Web.Shop" />
 			</location>
 		</locations>
 	</virtualServer>

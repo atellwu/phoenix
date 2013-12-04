@@ -16,8 +16,9 @@ import java.util.Map;
  * 
  */
 public class NginxConfig {
-    private NginxServer                server;
-    private Map<String, NginxUpstream> upstreams = new HashMap<String, NginxUpstream>();
+    private static final String              UPSTREAM_NAME_PREFIX_SEPARATOR = "@";
+    private NginxServer                      server;
+    private Map<String, List<NginxUpstream>> upstreams                      = new HashMap<String, List<NginxUpstream>>();
 
     /**
      * @return the servers
@@ -38,15 +39,35 @@ public class NginxConfig {
      * @return the upstreams
      */
     public List<NginxUpstream> getUpstreams() {
-        return new ArrayList<NginxUpstream>(upstreams.values());
+        List<NginxUpstream> upstreamList = new ArrayList<NginxUpstream>();
+        for (List<NginxUpstream> ele : upstreams.values()) {
+            upstreamList.addAll(ele);
+        }
+        return upstreamList;
     }
 
     public void addUpstream(NginxUpstream upstream) {
-        this.upstreams.put(upstream.getName(), upstream);
+        String upstreamName = upstream.getName();
+        if (upstreamName != null) {
+            upstreamName = removeUpstreamNameSuffix(upstreamName);
+            if (!this.upstreams.containsKey(upstreamName)) {
+                this.upstreams.put(upstreamName, new ArrayList<NginxUpstream>());
+            }
+            this.upstreams.get(upstreamName).add(upstream);
+        }
     }
 
-    public NginxUpstream getUpstream(String name) {
-        return upstreams.get(name);
+    private String removeUpstreamNameSuffix(String upstreamName) {
+        int prefixSeparatorPos = upstreamName.indexOf(UPSTREAM_NAME_PREFIX_SEPARATOR);
+        if (prefixSeparatorPos > 0) {
+            upstreamName = upstreamName.substring(0, prefixSeparatorPos);
+        }
+
+        return upstreamName;
+    }
+
+    public List<NginxUpstream> getUpstream(String name) {
+        return upstreams.get(removeUpstreamNameSuffix(name));
     }
 
 }
