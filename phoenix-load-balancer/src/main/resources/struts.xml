@@ -49,6 +49,13 @@
                 /none_vs.htm
             </result>
         </action>
+        <action name="vs/list" class="virtualServerAction"
+            method="list">
+            <result name="success" type="json">
+                <param name="root">list</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
         <action name="vs/{virtualServerName}/save" class="virtualServerAction"
             method="save">
             <result name="success" type="json">
@@ -103,8 +110,8 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="vs/{virtualServerName}/tag/get/{tagId}" class="virtualServerAction"
-            method="getNginxConfigByTagId">
+        <action name="vs/{virtualServerName}/tag/get/{tagId}"
+            class="virtualServerAction" method="getNginxConfigByTagId">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
@@ -182,11 +189,46 @@
             </result>
         </action>
 
-        <action name="deploy/" class="deployAction" method="list">
+        <action name="deploy" class="deployAction" method="list">
             <result name="success" type="velocity">
                 /deploy/list.htm
             </result>
         </action>
+        <action name="deploy/list/{pageNum}" class="deployAction"
+            method="list">
+            <result name="success" type="velocity">
+                /deploy/list.htm
+            </result>
+        </action>
+        <action name="deploy/task/add" class="deployAction"
+            method="addTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{taskId}/get" class="deployAction"
+            method="getTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{taskId}/start" class="deployAction"
+            method="startTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{taskId}" class="deployAction"
+            method="task">
+            <result name="success" type="velocity">
+                /deploy/task.htm
+            </result>
+        </action>
+
+
 
 
 

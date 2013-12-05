@@ -41,6 +41,8 @@ public class VirtualServerAction extends MenuAction {
 
     private List<String>        tags;
 
+    private List<VirtualServer> list;
+
     public String index() {
         if (virtualServers.size() == 0) {
             return "noneVs";
@@ -242,6 +244,23 @@ public class VirtualServerAction extends MenuAction {
         return SUCCESS;
     }
 
+    public String list() throws Exception {
+        try {
+            list = virtualServerService.listVirtualServers();
+
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error("Param Error: " + e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
+        }
+        return SUCCESS;
+    }
+
     public String deploy() {
         editOrShow = "edit";
         return SUCCESS;
@@ -277,6 +296,14 @@ public class VirtualServerAction extends MenuAction {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public List<VirtualServer> getList() {
+        return list;
+    }
+
+    public void setList(List<VirtualServer> list) {
+        this.list = list;
     }
 
 }

@@ -1,6 +1,10 @@
-package com.dianping.phoenix.lb.deploy.task;
-
-import com.dianping.phoenix.lb.deploy.model.Deployment;
+/**
+ * Project: phoenix-load-balancer
+ * 
+ * File Created at Nov 20, 2013
+ * 
+ */
+package com.dianping.phoenix.lb.deploy.executor;
 
 /**
  * 
@@ -11,10 +15,11 @@ import com.dianping.phoenix.lb.deploy.model.Deployment;
  * @author atell
  * 
  */
-public class DeployTask {
+public interface TaskExecutor {
 
-    private Deployment task;
-
+    /**
+     * 开始继续运行
+     */
     /**
      * 开始任务（开始之后的任务不能再修改）<br>
      * 
@@ -25,18 +30,20 @@ public class DeployTask {
      * AgentExecutor发布：向ip的agent发起请求，然后论询agent，获取结果存储到detail表。
      * 
      */
-    void startTask() {
-
-    }
+    void start();
 
     /**
-     * 暂停任务。<br>
-     * 在某个AgentTask结束后，暂停。
+     * 暂停运行
      */
-    void stopTask() {
+    void stop();
 
-    }
+    /**
+     * 终止/取消运行
+     */
+    void cancle();
 
-    //显示任务状态和进度的，再独立做只读的查询。
-
+    /**
+     * 获取Task的状态
+     */
+    TaskStatus getStatus();
 }
