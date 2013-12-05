@@ -62,6 +62,8 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 		int seq = m_phoenix_id_index.incrementAndGet();
 
 		StringBuilder sb = new StringBuilder();
+		sb.append(m_ip);
+		sb.append("-");
 		sb.append(Long.toHexString(ts));
 		sb.append("-");
 		sb.append(Integer.toHexString(seq));
