@@ -57,10 +57,18 @@ function bind_cmp_evt_handlers() {
 	$("input[type='checkbox']").click(function() {
 		var product = $(this).attr("meta");
 		if (product != undefined) {
+			reset_table_filter();
 			var status = $("input:checked[meta='" + product + "']").length > 1;
 			set_submit_status(product, status);
 		}
 	});
+}
+
+function reset_table_filter() {
+	var table = $.fn.dataTable.fnTables(true);
+	if (table.length > 0) {
+		$(table).dataTable().fnFilter("");
+	}
 }
 
 function set_submit_status(product, status) {

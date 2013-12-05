@@ -42,8 +42,9 @@
 					</c:if>
 					<div class="accordion-group">
 						<div class="accordion-heading">
-							<a class="accordion-toggle" data-toggle="collapse" data-parent="#deploy-collapses" href="#deploy-${deploy.id}" meta="${deploy.id}:${deploy.domain}">
-								<span class="label label-info" style="text-transform: capitalize;">${deploy.domain}</span><span
+							<a class="accordion-toggle btn" style="text-align: left;" data-toggle="collapse" data-parent="#deploy-collapses" href="#deploy-${deploy.id}"
+								meta="${deploy.id}:${deploy.domain}">
+								<span class="label label-info" style="text-transform: capitalize;">${deploy.id}: ${deploy.domain}</span><span
 									class="pull-right label ${
                                         	deploy.status eq 'successful' ? 'label-success' 
 	                                        	: (deploy.status eq 'failed' ? 'label-failed' 
@@ -57,7 +58,7 @@
 						</div>
 						<div id="deploy-${deploy.id}" class="accordion-body collapse <c:if test="${nav_status.first}">in</c:if>">
 							<div class="accordion-inner">
-								<ul class="nav nav-tabs nav-stacked">
+								<ul class="nav nav-tabs nav-stacked" style="margin-bottom: 0;">
 									<c:forEach var="entry" items="${deploy.hosts}">
 										<c:set var="host" value="${entry.value}" />
 										<li class="host_status" id="${deploy.id}:${host.ip}" data-offset="${host.offset}"><a href="#">

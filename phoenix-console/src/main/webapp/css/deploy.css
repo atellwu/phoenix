@@ -45,3 +45,7 @@
 .selected {
 	background-color: #eee;
 }
+
+.accordion-group {
+	border: none;
+}

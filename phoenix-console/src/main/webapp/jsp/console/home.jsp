@@ -59,7 +59,7 @@
 				</ul>
 			</div>
 		</div>
-		
+
 		<div class="tab-content">
 			<c:set var="flag" scope="page" value="true" />
 			<c:forEach var="product" items="${model.products}">
@@ -73,59 +73,59 @@
 					</c:otherwise>
 				</c:choose>
 				<div>
-				<form method="post">
-					<input type="hidden" name="op" value="cross-domain">
-					<input type="hidden" name="type" value="${payload.plan.warType.name}">
-					<input type="hidden" name="product" value="${product.name}">
-					<table class="table table-bordered table-striped table-condensed">
-						<thead>
-							<tr>
-								<th><input class="all-check" type="checkbox" value="${product.name}"/></th>
-								<th>Project</th>
-								<th><span class="badge badge-success">${product.productActiveCount}</span></th>
-								<th><span class="badge badge-important">${product.productInactiveCount}</span></th>
-								<th>Owner</th>
-								<th>Kernel Versions</th>
-								<th>App Versions</th>
-							</tr>
-						</thead>
-						<tbody>
-							<c:forEach var="domain" items="${product.domains}">
+					<form method="post">
+						<input type="hidden" name="op" value="cross-domain">
+						<input type="hidden" name="type" value="${payload.plan.warType.name}">
+						<input type="hidden" name="product" value="${product.name}">
+						<table class="table table-bordered table-striped table-condensed">
+							<thead>
 								<tr>
-									<td><input type="checkbox" name="domain" value="${domain.value.name}" meta="${product.name}"></td>
-									<td><a class="toProject" href="?op=project&type=${payload.plan.warType.name}&project=${domain.value.name}">${domain.value.name}</a></td>
-									<td><span class="badge badge-success">${domain.value.activeCount}</span></td>
-									<td><span class="badge badge-important">${domain.value.inactiveCount}</span></td>
-									<td><c:choose>
-											<c:when test="${fn:length(domain.value.owners) eq 0}">N/A</c:when>
-											<c:otherwise>
-												<c:forEach var="owner" items="${domain.value.owners}">
+									<th><input class="all-check" type="checkbox" value="${product.name}" /></th>
+									<th>Project</th>
+									<th><span class="badge badge-success">${product.productActiveCount}</span></th>
+									<th><span class="badge badge-important">${product.productInactiveCount}</span></th>
+									<th>Owner</th>
+									<th>Kernel Versions</th>
+									<th>App Versions</th>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach var="domain" items="${product.domains}">
+									<tr>
+										<td><input type="checkbox" name="domain" value="${domain.value.name}" meta="${product.name}"></td>
+										<td><a class="toProject" href="?op=project&type=${payload.plan.warType.name}&project=${domain.value.name}">${domain.value.name}</a></td>
+										<td><span class="badge badge-success">${domain.value.activeCount}</span></td>
+										<td><span class="badge badge-important">${domain.value.inactiveCount}</span></td>
+										<td><c:choose>
+												<c:when test="${fn:length(domain.value.owners) eq 0}">N/A</c:when>
+												<c:otherwise>
+													<c:forEach var="owner" items="${domain.value.owners}">
 													${owner}&nbsp;
 													</c:forEach>
-											</c:otherwise>
-										</c:choose></td>
-									<td><c:choose>
-											<c:when test="${fn:length(domain.value.kernelVersions) eq 0}">N/A</c:when>
-											<c:otherwise>
-												<c:forEach var="kerVersion" items="${domain.value.kernelVersions}">
+												</c:otherwise>
+											</c:choose></td>
+										<td><c:choose>
+												<c:when test="${fn:length(domain.value.kernelVersions) eq 0}">N/A</c:when>
+												<c:otherwise>
+													<c:forEach var="kerVersion" items="${domain.value.kernelVersions}">
 													${kerVersion}&nbsp;
 													</c:forEach>
-											</c:otherwise>
-										</c:choose></td>
-									<td><c:choose>
-											<c:when test="${fn:length(domain.value.appVersions) eq 0}">N/A</c:when>
-											<c:otherwise>
-												<c:forEach var="appVersion" items="${domain.value.appVersions}">
+												</c:otherwise>
+											</c:choose></td>
+										<td><c:choose>
+												<c:when test="${fn:length(domain.value.appVersions) eq 0}">N/A</c:when>
+												<c:otherwise>
+													<c:forEach var="appVersion" items="${domain.value.appVersions}">
 													${appVersion}&nbsp;
 													</c:forEach>
-											</c:otherwise>
-										</c:choose></td>
-								</tr>
-							</c:forEach>
-						</tbody>
-					</table>
-					<input type="submit" class="btn btn-primary disabled" disabled="disabled" value="Cross Projects" meta="${product.name}">
-				</form>
+												</c:otherwise>
+											</c:choose></td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+						<input type="submit" class="btn btn-primary disabled" disabled="disabled" value="Cross Projects" meta="${product.name}">
+					</form>
 				</div>
 		</div>
 		</c:forEach>

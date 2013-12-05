@@ -50,18 +50,62 @@ function add_to_list(domain, host, list) {
 
 function bind_cmp_evt_handlers() {
 	$("#check-all").click(function() {
-		$("input[type='checkbox']").attr("checked", true);
+		if ($(this).hasClass("active")) {
+			$(":checkbox").attr("checked", false);
+			$(this).removeClass("active");
+		} else {
+			$(".check-control").removeClass("active");
+			$(this).addClass("active");
+			$("input[type='checkbox']").attr("checked", true);
+		}
 	});
 
-	$("#uncheck-all").click(function() {
-		$("input[type='checkbox']").attr("checked", false);
-	});
+	$("#check-all-first").click(
+			function() {
+				if ($(this).hasClass("active")) {
+					$(":checkbox").attr("checked", false);
+					$(this).removeClass("active");
+				} else {
+					$(".check-control").removeClass("active");
+					$(this).addClass("active");
 
-	$("#check-all-first").click(function() {
-		$(":checkbox").attr("checked", false);
-		$(":checkbox[meta^='nav-check']").attr("checked", true);
-		$("tbody > tr:first-child > td > input").attr("checked", true);
-	});
+					$(":checkbox").attr("checked", false);
+					// $(":checkbox[meta^='nav-check']").attr("checked", true);
+
+					var version = $("#policy-version").val();
+					$("tbody").each(
+							function() {
+								$(this).find("tr[status='ok'] td:nth-child(6)[version!='" + version + "']")
+										.parent("tr").first().find(":checkbox").attr("checked", true);
+								if ($(this).find(":checkbox:checked").length > 0) {
+									var domain = $(this).parent().attr("id").substring(9);
+									$(":checkbox[meta='nav-check:" + domain + "']").attr("checked", true);
+								}
+							});
+				}
+			});
+
+	$("#check-all-rest").click(
+			function() {
+				if ($(this).hasClass("active")) {
+					$(":checkbox").attr("checked", false);
+					$(this).removeClass("active");
+				} else {
+					$(".check-control").removeClass("active");
+					$(this).addClass("active");
+
+					var version = $("#policy-version").val();
+					$("tbody").each(
+							function() {
+								$(this).find("tr[status='ok'] td:nth-child(6)[version!='" + version + "']")
+										.parent("tr").find(":checkbox").attr("checked", true);
+								if ($(this).find(":checkbox:checked").length > 0) {
+									var domain = $(this).parent().attr("id").substring(9);
+									$(":checkbox[meta='nav-check:" + domain + "']").attr("checked", true);
+								}
+							});
+				}
+			});
 
 	$("#next").click(function() {
 		if ($(":checkbox[meta^='host-check']:checked").length > 0) {
@@ -81,6 +125,8 @@ function bind_cmp_evt_handlers() {
 	});
 
 	$(":checkbox").click(function() {
+		$(".check-control").removeClass("active");
+
 		var metas = $(this).attr("meta").split(":");
 		var type = metas[0];
 		var domain = metas[1];
@@ -102,8 +148,6 @@ function bind_cmp_evt_handlers() {
 		$(".alert").css("visibility", "hidden");
 		$(".alert").css("display", "none");
 	});
-
-	$("")
 }
 
 function on_nav_checked(domain, checked) {

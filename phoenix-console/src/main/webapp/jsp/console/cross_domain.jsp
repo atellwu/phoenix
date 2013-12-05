@@ -47,7 +47,7 @@
 				<c:forEach var="domain" items="${model.domains}">
 					<h4 style="text-transform: capitalize;" id="nav-${domain.name}">${domain.name}</h4>
 					<hr style="margin: 0 0 10px 0">
-					<table id="host-nav" class="table table-striped table-condensed table-bordered">
+					<table id="host-nav-${domain.name}" class="table table-striped table-condensed table-bordered">
 						<thead>
 							<tr>
 								<th width="2%"><input type="checkbox" meta="domain-check-all:${domain.name}" /></th>
@@ -61,7 +61,7 @@
 						</thead>
 						<tbody>
 							<c:forEach var="host" items="${domain.hosts}" varStatus="status">
-								<tr>
+								<tr status="${host.value.phoenixAgent.status}">
 									<td><input class="host-check" type="checkbox" name="host" value="${domain.name}:${host.value.ip}" meta="host-check:${domain.name}:${host.value.ip}"></td>
 									<td>${host.value.ip}</td>
 									<td><c:if test="${host.value.phoenixAgent.status=='ok'}">
@@ -73,7 +73,7 @@
 									<td>${host.value.env}</td>
 									<c:choose>
 										<c:when test="${fn:length(host.value.container.apps) eq 0}">
-											<td>N/A</td>
+											<td version="N/A">N/A</td>
 											<td>N/A</td>
 										</c:when>
 										<c:otherwise>
@@ -81,7 +81,7 @@
 											<c:forEach var="app" items="${host.value.container.apps}">
 												<c:if test="${app.name==domain.name}">
 													<c:set var="isShowed" value="true"></c:set>
-													<td><c:choose>
+													<td version="${app.kernel.version}"><c:choose>
 															<c:when test="${fn:length(app.kernel.version) eq 0}">
 																	N/A
 																</c:when>
@@ -100,7 +100,7 @@
 												</c:if>
 											</c:forEach>
 											<c:if test="${isShowed == false}">
-												<td>N/A</td>
+												<td version="N/A">N/A</td>
 												<td>N/A</td>
 											</c:if>
 										</c:otherwise>
@@ -121,13 +121,13 @@
 		</div>
 
 		<div class="well well-small">
-			<a class="btn btn-success btn-small" id="check-all">全选</a>
-			<a class="btn btn-success btn-small" id="check-all-first">灰度选择</a>
-			<a class="btn btn-danger btn-small" id="uncheck-all">重置</a>
-			<!-- <button class="btn btn-primary btn-small pull-right" id="submit">下一步</button> -->
-			<a class="btn btn-primary btn-small pull-right" data-toggle="modal" id="next">下一步</a>
+			<strong style="color: #08C;">版本号 (${payload.type})&emsp;</strong><select name="plan.version" class="selectpicker" id="policy-version"> ${w:showOptions(model.deliverables, payload.plan.version, 'warVersion', 'warVersion')}
+			</select>
+			<a class="btn btn-success check-control" id="check-all">全选</a>
+			<a class="btn btn-warning check-control" id="check-all-first">灰度选择</a>
+			<a class="btn btn-info check-control" id="check-all-rest">选择剩余</a>
+			<a class="btn btn-primary pull-right" data-toggle="modal" id="next">下一步</a>
 		</div>
-
 
 		<div id="policy-select" class="modal hide fade" aria-hidden="true">
 			<div class="modal-header">
@@ -135,13 +135,6 @@
 				<h4>Select Deploy Policies</h4>
 			</div>
 			<div class="modal-body">
-				<div class="control-group">
-					<label class="control-label" for="policy-version">版本号 (${payload.type})</label>
-					<div class="controls">
-						<select name="plan.version" class="selectpicker" id="policy-version"> ${w:showOptions(model.deliverables, payload.plan.version, 'warVersion', 'warVersion')}
-						</select>
-					</div>
-				</div>
 				<div class="control-group">
 					<label class="control-label" for="policy-deploy-method">部署方式</label>
 					<div class="controls">
