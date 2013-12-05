@@ -9,7 +9,8 @@
 	    <element name="max-l2-cache-size" value-type="int" default-value="1000" primitive="true" />
 	    <element name="record-file-timespan" value-type="int" default-value="300000" primitive="true" />
 	    <element name="record-file-write-queue-size" value-type="int" default-value="1000" primitive="true" />
-	    <element name="record-file-base-dir" value-type="String" default-value="target/record/" />
+	    <element name="record-file-tmp-dir" value-type="String" default-value="target/record-tmp/" />
+	    <element name="record-file-target-dir" value-type="String" default-value="target/record-done/" />
 	    <element name="record-file-write-queue-scan-interval" value-type="int" default-value="1000" primitive="true" />
 	    <element name="record-file-write-stream-close-scan-interval" value-type="int" default-value="60000" primitive="true" />
 	    <element name="record-file-write-stream-multiply" value-type="int" default-value="3" primitive="true" />

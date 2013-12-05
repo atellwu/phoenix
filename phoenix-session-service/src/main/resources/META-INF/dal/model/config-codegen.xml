@@ -9,7 +9,8 @@
     <element name="max-l2-cache-size" value-type="int" />
     <element name="record-file-timespan" value-type="int" />
     <element name="record-file-write-queue-size" value-type="int" />
-    <element name="record-file-base-dir" value-type="String" />
+    <element name="record-file-tmp-dir" value-type="String" />
+    <element name="record-file-target-dir" value-type="String" />
     <element name="record-file-write-queue-scan-interval" value-type="int" />
     <element name="record-file-write-stream-close-scan-interval" value-type="int" />
     <element name="record-file-write-stream-multiply" value-type="int" />

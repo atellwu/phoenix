@@ -26,7 +26,7 @@ public class RecordFileManagerTest extends ComponentTestCase {
 	public void before() throws Exception {
 		ConfigManager config = lookup(ConfigManager.class);
 		mgr = lookup(RecordFileManager.class);
-		File recordBaseDir = config.getRecordFileBaseDir();
+		File recordBaseDir = config.getRecordFileTmpDir();
 		if (recordBaseDir.exists() && recordBaseDir.isDirectory()) {
 			FileUtils.deleteDirectory(recordBaseDir);
 		}

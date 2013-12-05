@@ -39,6 +39,15 @@ public class ConfigManager implements Initializable {
 		} catch (Exception e) {
 			throw new InitializationException(String.format("Unable to load configuration file(%s)!", m_configFile), e);
 		}
+
+		File recordFileTmpDir = new File(m_config.getRecordFileTmpDir());
+		if (!recordFileTmpDir.exists()) {
+			recordFileTmpDir.mkdirs();
+		}
+		File recordFileTargetDir = new File(m_config.getRecordFileTargetDir());
+		if (!recordFileTargetDir.exists()) {
+			recordFileTargetDir.mkdirs();
+		}
 	}
 
 	public int getEventExpireTime() {
@@ -89,10 +98,16 @@ public class ConfigManager implements Initializable {
 		return m_config.getRecordFileWriteQueueSize();
 	}
 
-	public File getRecordFileBaseDir() {
+	public File getRecordFileTmpDir() {
 		check();
 
-		return new File(m_config.getRecordFileBaseDir());
+		return new File(m_config.getRecordFileTmpDir());
+	}
+
+	public File getRecordFileTargetDir() {
+		check();
+
+		return new File(m_config.getRecordFileTargetDir());
 	}
 
 	public int getRecordFileWriteQueueScanInterval() {
@@ -115,14 +130,14 @@ public class ConfigManager implements Initializable {
 
 	public int getHandlerTasksThreads() {
 		check();
-		
+
 		return m_config.getHandlerTaskThreads();
-   }
+	}
 
 	public int getHandlerTaskQueueCapacity() {
 		check();
-		
+
 		return m_config.getHandlerTaskQueueCapacity();
-   }
+	}
 
 }
