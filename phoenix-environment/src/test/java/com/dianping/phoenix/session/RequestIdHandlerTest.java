@@ -90,7 +90,7 @@ public class RequestIdHandlerTest extends JettyServer {
 
 		RequestIdHandler handler = (RequestIdHandler) lookup(PhoenixFilterHandler.class, RequestIdHandler.ID);
 		RequestEvent event = handler.take();
-		String actual = String.format("%s:%s:%s:%s", event.getUserId(), event.getRequestId(), event.getUrlDigest(),
+		String actual = String.format("%s:%s:%s:%s", event.getPhoenixId(), event.getRequestId(), event.getUrlDigest(),
 		      event.getRefererUrlDigest());
 
 		Assert.assertEquals(expected, actual);

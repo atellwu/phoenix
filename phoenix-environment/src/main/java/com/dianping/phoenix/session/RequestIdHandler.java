@@ -47,7 +47,7 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 	private RequestEvent buildEvent(PhoenixFilterContext ctx) {
 		RequestEvent event = new RequestEvent();
 
-		event.setUserId(getPhoenixId(ctx));
+		event.setPhoenixId(getPhoenixId(ctx));
 		event.setRequestId(getRequestId(ctx));
 		event.setUrlDigest(getUrlDigest(ctx));
 		event.setRefererUrlDigest(getRefererUrlDigest(ctx));

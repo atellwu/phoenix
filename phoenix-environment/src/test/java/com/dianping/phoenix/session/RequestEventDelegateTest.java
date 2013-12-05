@@ -22,7 +22,7 @@ public class RequestEventDelegateTest extends ComponentTestCase {
 		for (int i = 0; i < toSend; i++) {
 			RequestEvent origin = new RequestEvent();
 
-			origin.setUserId("user-id-" + i);
+			origin.setPhoenixId("user-id-" + i);
 			origin.setRequestId("request-id-" + i);
 			origin.setUrlDigest("url-" + i);
 			origin.setRefererUrlDigest("referer-url-" + i);

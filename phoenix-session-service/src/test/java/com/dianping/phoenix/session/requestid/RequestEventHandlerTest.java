@@ -53,21 +53,21 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 		svrEvent1.setRequestId("svrEvent1");
 		svrEvent1.setTimestamp(System.currentTimeMillis());
 		svrEvent1.setUrlDigest(svrEventUrlDigest);
-		svrEvent1.setUserId(uid);
+		svrEvent1.setPhoenixId(uid);
 
 		svrEvent2 = new RequestEvent();
 		svrEvent2.setHop(EventProcessor.HOP_SERVER);
 		svrEvent2.setRequestId("svrEvent2");
 		svrEvent2.setTimestamp(System.currentTimeMillis() + 1);
 		svrEvent2.setUrlDigest(svrEventUrlDigest);
-		svrEvent2.setUserId(uid);
+		svrEvent2.setPhoenixId(uid);
 
 		clientEvent1 = new RequestEvent();
 		clientEvent1.setHop(EventProcessor.HOP_CLIENT);
 		clientEvent1.setRequestId("clientEvent1");
 		clientEvent1.setTimestamp(System.currentTimeMillis());
 		clientEvent1.setUrlDigest(clientEventUrlDigest);
-		clientEvent1.setUserId(uid);
+		clientEvent1.setPhoenixId(uid);
 
 		clientEventRTSvrEvent1 = new RequestEvent();
 		clientEventRTSvrEvent1.setHop(EventProcessor.HOP_CLIENT);
@@ -75,7 +75,7 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 		clientEventRTSvrEvent1.setRequestId("referToServerEvent1");
 		clientEventRTSvrEvent1.setTimestamp(System.currentTimeMillis() + 2);
 		clientEventRTSvrEvent1.setUrlDigest("any" + +rnd.nextLong());
-		clientEventRTSvrEvent1.setUserId(uid);
+		clientEventRTSvrEvent1.setPhoenixId(uid);
 
 		clientEventRTClientEvent1 = new RequestEvent();
 		clientEventRTClientEvent1.setHop(EventProcessor.HOP_CLIENT);
@@ -83,7 +83,7 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 		clientEventRTClientEvent1.setRequestId("referToClientEvent1");
 		clientEventRTClientEvent1.setTimestamp(System.currentTimeMillis() + 3);
 		clientEventRTClientEvent1.setUrlDigest("any" + +rnd.nextLong());
-		clientEventRTClientEvent1.setUserId(uid);
+		clientEventRTClientEvent1.setPhoenixId(uid);
 
 		clientEventRTNothing = new RequestEvent();
 		clientEventRTNothing.setHop(EventProcessor.HOP_CLIENT);
@@ -91,7 +91,7 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 		clientEventRTNothing.setRequestId("clientEventRTNothing");
 		clientEventRTNothing.setTimestamp(System.currentTimeMillis());
 		clientEventRTNothing.setUrlDigest("any" + +rnd.nextLong());
-		clientEventRTNothing.setUserId(uid);
+		clientEventRTNothing.setPhoenixId(uid);
 
 	}
 

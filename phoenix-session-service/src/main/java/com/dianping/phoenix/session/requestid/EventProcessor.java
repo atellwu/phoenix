@@ -130,7 +130,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 	}
 
 	private void processClientEvent(RequestEvent curEvent) {
-		String userId = curEvent.getUserId();
+		String userId = curEvent.getPhoenixId();
 		String refererUrlDigest = curEvent.getRefererUrlDigest();
 
 		ConcurrentMap<String, RequestEvent> l2Cache = m_l1Cache.get(userId);
@@ -153,7 +153,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 	}
 
 	private void processServerEvent(RequestEvent curEvent) {
-		String userId = curEvent.getUserId();
+		String userId = curEvent.getPhoenixId();
 		ConcurrentMap<String, RequestEvent> l2Cache = m_l1Cache.get(userId);
 		String urlDigest = curEvent.getUrlDigest();
 
@@ -252,7 +252,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 		private boolean isValidEvent(RequestEvent event) {
 			return event.getRequestId() != null //
 			      && event.getUrlDigest() != null //
-			      && event.getUserId() != null;
+			      && event.getPhoenixId() != null;
 		}
 
 		private void offerToHandlerTaskQueue(String digest, RequestEvent event) {

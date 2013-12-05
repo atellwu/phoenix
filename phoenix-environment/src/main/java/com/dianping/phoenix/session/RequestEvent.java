@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class RequestEvent implements Cloneable {
-	private String m_userId;
+	private String m_phoenixId;
 
 	private String m_urlDigest;
 
@@ -25,7 +25,7 @@ public class RequestEvent implements Cloneable {
 		clone.m_requestId = m_requestId;
 		clone.m_timestamp = m_timestamp;
 		clone.m_urlDigest = m_urlDigest;
-		clone.m_userId = m_userId;
+		clone.m_phoenixId = m_phoenixId;
 
 		return clone;
 	}
@@ -56,16 +56,20 @@ public class RequestEvent implements Cloneable {
 				return false;
 		} else if (!m_urlDigest.equals(other.m_urlDigest))
 			return false;
-		if (m_userId == null) {
-			if (other.m_userId != null)
+		if (m_phoenixId == null) {
+			if (other.m_phoenixId != null)
 				return false;
-		} else if (!m_userId.equals(other.m_userId))
+		} else if (!m_phoenixId.equals(other.m_phoenixId))
 			return false;
 		return true;
 	}
 
 	public int getHop() {
 		return m_hop;
+	}
+
+	public String getPhoenixId() {
+		return m_phoenixId;
 	}
 
 	public String getRefererUrlDigest() {
@@ -84,10 +88,6 @@ public class RequestEvent implements Cloneable {
 		return m_urlDigest;
 	}
 
-	public String getUserId() {
-		return m_userId;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -96,12 +96,16 @@ public class RequestEvent implements Cloneable {
 		result = prime * result + ((m_requestId == null) ? 0 : m_requestId.hashCode());
 		result = prime * result + (int) (m_timestamp ^ (m_timestamp >>> 32));
 		result = prime * result + ((m_urlDigest == null) ? 0 : m_urlDigest.hashCode());
-		result = prime * result + ((m_userId == null) ? 0 : m_userId.hashCode());
+		result = prime * result + ((m_phoenixId == null) ? 0 : m_phoenixId.hashCode());
 		return result;
 	}
 
 	public void setHop(int hop) {
 		m_hop = hop;
+	}
+
+	public void setPhoenixId(String phoenixId) {
+		m_phoenixId = phoenixId;
 	}
 
 	public void setRefererUrlDigest(String refererUrlDigest) {
@@ -120,16 +124,12 @@ public class RequestEvent implements Cloneable {
 		m_urlDigest = urlDigest;
 	}
 
-	public void setUserId(String userId) {
-		m_userId = userId;
-	}
-
 	public String toString() {
 		String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(m_timestamp));
 
 		return String.format(
-		      "%s[userId: %s, requestId: %s, urlDigest: %s, refererUrlDigest: %s, timestamp: %s, hop: %s]", getClass()
-		            .getSimpleName(), m_userId, m_requestId, m_urlDigest, m_refererUrlDigest, timestamp, m_hop);
+		      "%s[phoenixId: %s, requestId: %s, urlDigest: %s, refererUrlDigest: %s, timestamp: %s, hop: %s]", getClass()
+		            .getSimpleName(), m_phoenixId, m_requestId, m_urlDigest, m_refererUrlDigest, timestamp, m_hop);
 	}
 
 }
