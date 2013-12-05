@@ -2,7 +2,6 @@ package com.dianping.phoenix.session;
 
 import java.io.IOException;
 import java.security.MessageDigest;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
@@ -21,19 +20,34 @@ import com.dianping.phoenix.servlet.PhoenixFilterHandler;
 public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHandler, Initializable {
 	public static final String ID = "request-id";
 
+	public static final String PHOENIX_ID_COOKIE_NAME = "PHOENIX_ID";
+
 	private final static char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
 
 	@Inject
 	private RequestEventDelegate m_queue;
 
-	private AtomicInteger m_index = new AtomicInteger();
+	private AtomicInteger m_req_index = new AtomicInteger();
+
+	private AtomicInteger m_phoenix_id_index = new AtomicInteger();
 
 	private String m_ip;
+
+	private String bytesToHex(byte[] bytes) {
+		char[] hexChars = new char[bytes.length * 2];
+		int v;
+		for (int j = 0; j < bytes.length; j++) {
+			v = bytes[j] & 0xFF;
+			hexChars[j * 2] = HEX_DIGITS[v >>> 4];
+			hexChars[j * 2 + 1] = HEX_DIGITS[v & 0x0F];
+		}
+		return new String(hexChars);
+	}
 
 	private RequestEvent buildEvent(PhoenixFilterContext ctx) {
 		RequestEvent event = new RequestEvent();
 
-		event.setUserId(getUserId(ctx));
+		event.setUserId(getPhoenixId(ctx));
 		event.setRequestId(getRequestId(ctx));
 		event.setUrlDigest(getUrlDigest(ctx));
 		event.setRefererUrlDigest(getRefererUrlDigest(ctx));
@@ -41,6 +55,29 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 		event.setHop(0);
 
 		return event;
+	}
+
+	private String generatePhoenixId(PhoenixFilterContext ctx) {
+		long ts = System.currentTimeMillis();
+		int seq = m_phoenix_id_index.incrementAndGet();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(Long.toHexString(ts));
+		sb.append(Integer.toHexString(seq));
+
+		return sb.toString();
+	}
+
+	private String generateRequestId() {
+		long ts = System.currentTimeMillis();
+		int seq = m_req_index.incrementAndGet();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(m_ip);
+		sb.append(Long.toHexString(ts));
+		sb.append(Integer.toHexString(seq));
+
+		return sb.toString();
 	}
 
 	private String getCookie(PhoenixFilterContext ctx, String name) {
@@ -62,6 +99,17 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 		return 10;
 	}
 
+	private String getPhoenixId(PhoenixFilterContext ctx) {
+		String phoenixId = getCookie(ctx, PHOENIX_ID_COOKIE_NAME);
+
+		if (phoenixId == null) {
+			phoenixId = generatePhoenixId(ctx);
+			setCookie(ctx, PHOENIX_ID_COOKIE_NAME, phoenixId);
+		}
+
+		return phoenixId;
+	}
+
 	private String getRefererUrlDigest(PhoenixFilterContext ctx) {
 		HttpServletRequest req = ctx.getHttpServletRequest();
 		String referer = req.getHeader("referer");
@@ -75,8 +123,8 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 
 	private String getRequestId(PhoenixFilterContext ctx) {
 
-		// TODO
-		return UUID.randomUUID().toString();
+		return generateRequestId();
+
 	}
 
 	private String getUrlDigest(PhoenixFilterContext ctx) {
@@ -84,24 +132,6 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 		String url = req.getRequestURL().toString();
 
 		return sha1(url);
-	}
-
-	private String getUserId(PhoenixFilterContext ctx) {
-		String userId = getCookie(ctx, "_hc.v");
-
-		if (userId != null) {
-			int len = userId.length();
-
-			// remove the quotes if necessary
-			if (len > 2 && userId.charAt(0) == '"' && userId.charAt(len - 1) == '"') {
-				return userId.substring(1, len - 1);
-			} else {
-				return userId;
-			}
-		} else {
-			// TODO how about if not exist?
-			return null;
-		}
 	}
 
 	@Override
@@ -115,6 +145,16 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 		ctx.doFilter();
 	}
 
+	@Override
+	public void initialize() throws InitializationException {
+		m_ip = bytesToHex(Networks.forIp().getLocalAddress());
+		m_queue = lookupById(RequestEventDelegate.class, "out");
+	}
+
+	private void setCookie(PhoenixFilterContext ctx, String cookieName, String cookieValue) {
+		ctx.getHttpServletResponse().addCookie(new Cookie(cookieName, cookieValue));
+	}
+
 	String sha1(String value) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-1");
@@ -122,14 +162,7 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 			digest.update(value.getBytes("utf-8"));
 			byte[] data = digest.digest();
 
-			StringBuilder sb = new StringBuilder(data.length * 2);
-
-			for (byte b : data) {
-				sb.append(HEX_DIGITS[(b >> 4) & 0x0F]);
-				sb.append(HEX_DIGITS[b & 0x0F]);
-			}
-
-			return sb.toString();
+			return bytesToHex(data);
 		} catch (Exception e) {
 			throw new RuntimeException(String.format("Error when calculating SHA-1 of %s.", value));
 		}
@@ -140,10 +173,4 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 		return m_queue.take();
 	}
 
-	@Override
-	public void initialize() throws InitializationException {
-		m_ip = Networks.forIp().getLocalHostAddress();
-		m_queue = lookupById(RequestEventDelegate.class, "out");
-	}
-	
 }
