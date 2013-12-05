@@ -63,6 +63,7 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(Long.toHexString(ts));
+		sb.append("-");
 		sb.append(Integer.toHexString(seq));
 
 		return sb.toString();
@@ -74,7 +75,9 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(m_ip);
+		sb.append("-");
 		sb.append(Long.toHexString(ts));
+		sb.append("-");
 		sb.append(Integer.toHexString(seq));
 
 		return sb.toString();
