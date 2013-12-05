@@ -10,8 +10,18 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private final DeploymentTaskBo deploymentTaskBo;
 
+    //记录任务的发布进度
+    /** 正在发布的哪个站点 */
+    private String currentVsName;
+    /** 已经完成到第几台agent */
+    private int index;
+    
     public DefaultTaskExecutor(DeploymentTaskBo deploymentTaskBo) {
         this.deploymentTaskBo = deploymentTaskBo;
+        
+        //
+        int totalCount = this.deploymentTaskBo.getDeploymentBos().size();
+//        int intervalCount = this.deploymentTaskBo.getTask().getDeployPolicy().getIntervalCount(totalCount);
     }
 
     @Override

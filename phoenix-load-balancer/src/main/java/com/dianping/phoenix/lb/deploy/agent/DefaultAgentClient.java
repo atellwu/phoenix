@@ -4,7 +4,7 @@ import com.dianping.phoenix.lb.deploy.model.AgentStatus;
 
 
 //需要使用service，怎么办
-public class DefaultAgentClient implements AgentCleint {
+public class DefaultAgentClient implements AgentClient {
 
     private int    deployId;
     private String vsName;
