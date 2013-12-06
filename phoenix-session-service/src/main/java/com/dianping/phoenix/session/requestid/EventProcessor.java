@@ -28,7 +28,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 
 	@Inject
 	EventDelegateManager eventDelegateMgr;
-	
+
 	@Inject
 	private EventRecorder m_recorder;
 
@@ -36,9 +36,9 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 	private ConfigManager m_config;
 
 	private RequestEventDelegate m_rcvQ;
-	
+
 	private RequestEventDelegate m_sendQ;
-	
+
 	private ConcurrentMap<String, RequestEvent> m_retryCache;
 
 	private ConcurrentMap<String, ConcurrentMap<String, RequestEvent>> m_l1Cache;
@@ -105,16 +105,6 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 			m_handlerTaskQueues[i] = new LinkedBlockingQueue<RequestEvent>(m_config.getHandlerTaskQueueCapacity());
 		}
 
-		// int port = 0;
-		// int maxReceiveThreads = 0;
-		// int maxSendThreads = 0;
-		// List<String> servers = null;
-		//
-		// Sockets.forServer().listenOn(port).threads("PhoenixSession", maxReceiveThreads).start(m_rcvQ);
-		//
-		// for (String server : servers) {
-		// Sockets.forClient().connectTo(port, server).threads("PhoenixSession", maxSendThreads).start(m_sendQ);
-		// }
 	}
 
 	private boolean isEventExpired(RequestEvent event) {
@@ -271,7 +261,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 					m_logger.info("Thread Interrupted, will exit");
 					return;
 				}
-				
+
 				m_logger.info("Receiving " + event);
 
 				if (!isValidEvent(event)) {
@@ -333,6 +323,8 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 					m_logger.info("Thread Interrupted, will exit");
 					return;
 				}
+
+				m_logger.info("Processing " + event.getRequestId());
 
 				switch (event.getHop()) {
 				case HOP_CLIENT:
