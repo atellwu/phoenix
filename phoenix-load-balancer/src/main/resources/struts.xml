@@ -201,28 +201,28 @@
             </result>
         </action>
         <action name="deploy/task/add" class="deployAction"
-            method="addTask">
+            method="addDeployTask">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="deploy/task/{taskId}/get" class="deployAction"
-            method="getTask">
+        <action name="deploy/task/{deployTaskId}/get" class="deployAction"
+            method="getDeployTask">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="deploy/task/{taskId}/start" class="deployAction"
-            method="startTask">
+        <action name="deploy/task/{deployTaskId}/start" class="deployAction"
+            method="startDeployTask">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="deploy/task/{taskId}" class="deployAction"
-            method="task">
+        <action name="deploy/task/{deployTaskId}" class="deployAction"
+            method="showDeployTask">
             <result name="success" type="velocity">
                 /deploy/task.htm
             </result>

@@ -19,20 +19,21 @@ import org.springframework.stereotype.Service;
 import com.dianping.phoenix.lb.PlexusComponentContainer;
 import com.dianping.phoenix.lb.action.Paginator;
 import com.dianping.phoenix.lb.configure.ConfigManager;
-import com.dianping.phoenix.lb.deploy.bo.DeploymentBo;
-import com.dianping.phoenix.lb.deploy.bo.DeploymentTaskBo;
+import com.dianping.phoenix.lb.deploy.bo.DeployTaskBo;
+import com.dianping.phoenix.lb.deploy.bo.DeployVsBo;
 import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo;
 import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo.VsAndTag;
-import com.dianping.phoenix.lb.deploy.dao.DeploymentDetailMapper;
-import com.dianping.phoenix.lb.deploy.dao.DeploymentMapper;
-import com.dianping.phoenix.lb.deploy.dao.DeploymentTaskMapper;
-import com.dianping.phoenix.lb.deploy.model.DeployStatus;
-import com.dianping.phoenix.lb.deploy.model.Deployment;
-import com.dianping.phoenix.lb.deploy.model.DeploymentDetail;
-import com.dianping.phoenix.lb.deploy.model.DeploymentDetailExample;
-import com.dianping.phoenix.lb.deploy.model.DeploymentExample;
-import com.dianping.phoenix.lb.deploy.model.DeploymentTask;
-import com.dianping.phoenix.lb.deploy.model.DeploymentTaskExample;
+import com.dianping.phoenix.lb.deploy.dao.DeployAgentMapper;
+import com.dianping.phoenix.lb.deploy.dao.DeployTaskMapper;
+import com.dianping.phoenix.lb.deploy.dao.DeployVsMapper;
+import com.dianping.phoenix.lb.deploy.model.DeployAgent;
+import com.dianping.phoenix.lb.deploy.model.DeployAgentExample;
+import com.dianping.phoenix.lb.deploy.model.DeployTask;
+import com.dianping.phoenix.lb.deploy.model.DeployTaskExample;
+import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
+import com.dianping.phoenix.lb.deploy.model.DeployVs;
+import com.dianping.phoenix.lb.deploy.model.DeployVsExample;
+import com.dianping.phoenix.lb.deploy.model.DeployVsStatus;
 import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
@@ -41,24 +42,24 @@ import com.dianping.phoenix.lb.service.model.VirtualServerService;
 @Service
 public class DeployTaskServiceImpl implements DeployTaskService {
 
-    private static final int       PAGE_SIZE    = 15;
+    private static final int     PAGE_SIZE    = 15;
 
     @SuppressWarnings("unused")
-    private ConfigManager          configManager;
+    private ConfigManager        configManager;
 
     @Autowired
-    private DeploymentMapper       deploymentMapper;
+    private DeployVsMapper       deployVsMapper;
 
     @Autowired
-    private DeploymentDetailMapper deploymentDetailMapper;
+    private DeployAgentMapper    deployAgentMapper;
 
     @Autowired
-    private DeploymentTaskMapper   deploymentTaskMapper;
+    private DeployTaskMapper     deployTaskMapper;
 
     @Autowired
-    private VirtualServerService   virtualServerService;
+    private VirtualServerService virtualServerService;
 
-    private int                    MAX_PAGE_NUM = 50;
+    private int                  MAX_PAGE_NUM = 50;
 
     @PostConstruct
     public void init() throws ComponentLookupException {
@@ -66,15 +67,15 @@ public class DeployTaskServiceImpl implements DeployTaskService {
     }
 
     @Override
-    public List<DeploymentTask> list(Paginator paginator, int pageNum) {
+    public List<DeployTask> list(Paginator paginator, int pageNum) {
         if (pageNum > MAX_PAGE_NUM || pageNum <= 0) {
             pageNum = 1;
         }
 
-        DeploymentTaskExample example = new DeploymentTaskExample();
+        DeployTaskExample example = new DeployTaskExample();
         example.setOrderByClause("creation_date DESC");
 
-        int count = deploymentTaskMapper.countByExample(example);
+        int count = deployTaskMapper.countByExample(example);
 
         paginator.setItemsPerPage(PAGE_SIZE);
         paginator.setItems(count);
@@ -87,54 +88,54 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         int limit = PAGE_SIZE;
         RowBounds rowBounds = new RowBounds(offset, limit);
 
-        return deploymentTaskMapper.selectByExampleWithRowbounds(example, rowBounds);
+        return deployTaskMapper.selectByExampleWithRowbounds(example, rowBounds);
     }
 
     @Override
-    public DeploymentTaskBo getTask(int taskId) throws BizException {
-        DeploymentTaskBo task = new DeploymentTaskBo();
+    public DeployTaskBo getTask(long taskId) throws BizException {
+        DeployTaskBo task = new DeployTaskBo();
 
-        DeploymentTask deploymentTask = deploymentTaskMapper.selectByPrimaryKey(taskId);
+        DeployTask deployVsTask = deployTaskMapper.selectByPrimaryKey(taskId);
 
-        DeploymentExample example = new DeploymentExample();
-        example.createCriteria().andTaskIdEqualTo(taskId);
-        List<Deployment> deployments = deploymentMapper.selectByExample(example);
+        DeployVsExample example = new DeployVsExample();
+        example.createCriteria().andDeployTaskIdEqualTo(taskId);
+        List<DeployVs> deployVsList = deployVsMapper.selectByExample(example);
 
-        List<DeploymentBo> deploymentBos = new ArrayList<DeploymentBo>();
-        for (Deployment deployment : deployments) {
-            DeploymentBo deploymentBo = new DeploymentBo();
-            DeploymentDetailExample example2 = new DeploymentDetailExample();
-            example2.createCriteria().andDeployIdEqualTo(deployment.getId());
-            List<DeploymentDetail> deploymentDetails = deploymentDetailMapper.selectByExample(example2);
-            VirtualServer vs = virtualServerService.findVirtualServer(deployment.getVs());
+        List<DeployVsBo> deployVsBos = new ArrayList<DeployVsBo>();
+        for (DeployVs deployVs : deployVsList) {
+            DeployVsBo deployVsBo = new DeployVsBo();
+            DeployAgentExample example2 = new DeployAgentExample();
+            example2.createCriteria().andDeployVsIdEqualTo(deployVs.getId());
+            List<DeployAgent> deployAgents = deployAgentMapper.selectByExample(example2);
+            VirtualServer vs = virtualServerService.findVirtualServer(deployVs.getVsName());
 
-            deploymentBo.setDeployment(deployment);
-            deploymentBo.setVs(vs);
-            deploymentBo.setDeploymentDetails(convertDetailsToMap(deploymentDetails));
+            deployVsBo.setDeployVs(deployVs);
+            deployVsBo.setVs(vs);
+            deployVsBo.setDeployAgents(convertDetailsToMap(deployAgents));
 
-            deploymentBos.add(deploymentBo);
+            deployVsBos.add(deployVsBo);
         }
 
-        task.setTask(deploymentTask);
-        task.setDeploymentBos(convertDeploymentsToMap(deploymentBos));
+        task.setTask(deployVsTask);
+        task.setDeployVsBos(convertDeployVssToMap(deployVsBos));
 
         return task;
     }
 
-    private Map<String, DeploymentBo> convertDeploymentsToMap(List<DeploymentBo> deploymentBos) {
-        Map<String, DeploymentBo> map = new HashMap<String, DeploymentBo>();
-        for (DeploymentBo deploymentBo : deploymentBos) {
-            String vsName = deploymentBo.getVs().getName();
-            map.put(vsName, deploymentBo);
+    private Map<String, DeployVsBo> convertDeployVssToMap(List<DeployVsBo> deployVsBos) {
+        Map<String, DeployVsBo> map = new HashMap<String, DeployVsBo>();
+        for (DeployVsBo deployVsBo : deployVsBos) {
+            String vsName = deployVsBo.getVs().getName();
+            map.put(vsName, deployVsBo);
         }
         return map;
     }
 
-    private Map<String, DeploymentDetail> convertDetailsToMap(List<DeploymentDetail> deploymentDetails) {
-        Map<String, DeploymentDetail> map = new HashMap<String, DeploymentDetail>();
-        for (DeploymentDetail deploymentDetail : deploymentDetails) {
-            String ip = deploymentDetail.getIpAddress();
-            map.put(ip, deploymentDetail);
+    private Map<String, DeployAgent> convertDetailsToMap(List<DeployAgent> deployAgents) {
+        Map<String, DeployAgent> map = new HashMap<String, DeployAgent>();
+        for (DeployAgent deployAgent : deployAgents) {
+            String ip = deployAgent.getIpAddress();
+            map.put(ip, deployAgent);
         }
         return map;
     }
@@ -154,20 +155,20 @@ public class DeployTaskServiceImpl implements DeployTaskService {
     @Override
     public void addTask(NewTaskInfo newTaskInfo) {
         validate(newTaskInfo);
-        DeploymentTask task = new DeploymentTask();
+        DeployTask task = new DeployTask();
         task.setName(newTaskInfo.getTaskName());
         task.setLastModifiedDate(new Date());
-        task.setStatus(DeployStatus.CREATED);
-        deploymentTaskMapper.insert(task);
+        task.setStatus(DeployTaskStatus.CREATED);
+        deployTaskMapper.insert(task);
 
         for (VsAndTag vsAndTag : newTaskInfo.getSelectedVsAndTag()) {
-            Deployment deployment = new Deployment();
-            deployment.setVs(vsAndTag.getVsName());
-            deployment.setTag(vsAndTag.getTag());
-            deployment.setTaskId(task.getId());
-            deployment.setStatus(DeployStatus.CREATED);
-            deployment.setLastModifiedDate(new Date());
-            deploymentMapper.insertSelective(deployment);
+            DeployVs deployVs = new DeployVs();
+            deployVs.setVsName(vsAndTag.getVsName());
+            deployVs.setVsTag(vsAndTag.getTag());
+            deployVs.setDeployTaskId(task.getId());
+            deployVs.setStatus(DeployVsStatus.CREATED);
+            deployVs.setLastModifiedDate(new Date());
+            deployVsMapper.insertSelective(deployVs);
         }
     }
 

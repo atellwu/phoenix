@@ -5,36 +5,35 @@
   <div class="container-fluid">
     <div class="row-fluid">
       <div class="span6">
-        <div ng-repeat="deploymentBo in task.deploymentBos">
+        <div ng-repeat="deployVsBo in task.deployVsBos">
           <table style="margin-top: 30px; margin-bottom: 5px;" class="table table-bordered table-condensed nohover">
             <thead>
               <tr>
                 <th width="60">站点名称</th>
-                <td width="100">{{ deploymentBo.deployment.vs }}</td>
+                <td width="100">{{ deployVsBo.deployVs.vsName }}</td>
                 <th width="60">发布版本</th>
-                <td width="120">{{ deploymentBo.deployment.tag }}</td>
+                <td width="120">{{ deployVsBo.deployVs.vsTag }}</td>
                 <th width="60">状态</th>
-                <td width="120">{{ deploymentBo.deployment.status }}</td>
+                <td width="120">{{ deployVsBo.deployVs.status }}</td>
               </tr>
             </thead>
           </table>
           <table style="margin-top: 0px;" class="slb-datatable table table-bordered table-condensed lion">
             <thead>
               <tr>
-                <th width="20px"><input type="checkbox" ng-click="checkAllIp(deploymentBo,$event)"
-                  ng-checked="isContainAll(deploymentBo.deploymentDetails,deploymentBo.vs.instances)" /></th>
+                <th width="20px"><input type="checkbox" ng-click="checkAllIp(deployVsBo,$event)"
+                  ng-checked="isContainAll(deployVsBo.deployAgents,deployVsBo.vs.instances)" /></th>
                 <th>IP</th>
                 <th>状态</th>
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="instance in deploymentBo.vs.instances">
-                <td width="20px"><input type="checkbox"
-                  ng-click="checkIp(deploymentBo.deploymentDetails,instance.ip)"
-                  ng-checked="isContain(deploymentBo.deploymentDetails,instance.ip)"></td>
-                <td ng-click="checkIp(deploymentBo.deploymentDetails,instance.ip)">{{instance.ip}}</td>
+              <tr ng-repeat="instance in deployVsBo.vs.instances">
+                <td width="20px"><input type="checkbox" ng-click="checkIp(deployVsBo.deployAgents,instance.ip)"
+                  ng-checked="isContain(deployVsBo.deployAgents,instance.ip)"></td>
+                <td ng-click="checkIp(deployVsBo.deployAgents,instance.ip)">{{instance.ip}}</td>
                 <td style="width: 200px; padding-right: 10px;"
-                  ng-switch="getStatus(deploymentBo.deploymentDetails,instance.ip)">
+                  ng-switch="getStatus(deployVsBo.deployAgents,instance.ip)">
                   <div ng-switch-when="CREATED" class="progress progress-success">
                     <div style="width: 0%" class="bar"></div>
                     <p style="position: relative; text-align: center;">未开始</p>
@@ -48,7 +47,7 @@
       </div>
       <div class="span6">
         <button id="deployButton" style="float: right; margin-bottom: 10px; margin-right: 0px;" type="button"
-          ng-click="startDeploy()" class="btn btn-success">发布</button>
+          ng-click="startTask()" class="btn btn-success">发布</button>
         <button id="shutdownButton" type="button" onclick="rundemo_app.shutdown()" class="btn btn-danger"
           style="display: none;">Shutdown</button>
         <div class="row-fluid">

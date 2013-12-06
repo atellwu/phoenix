@@ -2,7 +2,7 @@ package com.dianping.phoenix.lb.deploy.agent;
 
 import com.dianping.phoenix.lb.PlexusComponentContainer;
 import com.dianping.phoenix.lb.configure.ConfigManager;
-import com.dianping.phoenix.lb.deploy.model.AgentStatus;
+import com.dianping.phoenix.lb.deploy.model.DeployAgentStatus;
 
 /**
  * agentClient內部需要使用service(比如访问tag，生成config)，使用ioc框架的get的方式去獲取（PlexusComponentContainer.INSTANCE.lookup(ConfigManager.class);）
@@ -19,7 +19,7 @@ public interface AgentClient {
     /**
      * 获取Agent的状态
      */
-    AgentStatus getAgentStatus();
+    DeployAgentStatus getAgentStatus();
 
     /**
      * 获取agent的执行日志

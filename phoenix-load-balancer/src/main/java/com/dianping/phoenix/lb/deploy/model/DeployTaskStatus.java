@@ -1,6 +1,6 @@
 package com.dianping.phoenix.lb.deploy.model;
 
-public enum DeployStatus {
+public enum DeployTaskStatus {
 
     CREATED("新建的任务"),
 
@@ -18,7 +18,7 @@ public enum DeployStatus {
 
     private String desc;
 
-    private DeployStatus(String desc) {
+    private DeployTaskStatus(String desc) {
         this.desc = desc;
     }
 
@@ -42,7 +42,7 @@ public enum DeployStatus {
     //        return defaultStatus;
     //    }
 
-    public static boolean isFinalStatus(DeployStatus status) {
+    public static boolean isFinalStatus(DeployTaskStatus status) {
         return status == SUCCESS || status == WARNING;
     }
 
