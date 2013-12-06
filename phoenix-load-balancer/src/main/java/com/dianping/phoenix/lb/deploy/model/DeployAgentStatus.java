@@ -3,10 +3,10 @@ package com.dianping.phoenix.lb.deploy.model;
 import java.util.HashSet;
 import java.util.Set;
 
-public enum AgentStatus {
+public enum DeployAgentStatus {
     INIT, REJECTED, PROCESSING, FAILED, SUCCESS, KILLED;
 
-    private final static Set<AgentStatus> COMPLETED_STATUS_SET = new HashSet<AgentStatus>();
+    private final static Set<DeployAgentStatus> COMPLETED_STATUS_SET = new HashSet<DeployAgentStatus>();
     static {
         COMPLETED_STATUS_SET.add(REJECTED);
         COMPLETED_STATUS_SET.add(FAILED);

@@ -2,11 +2,11 @@ package com.dianping.phoenix.lb.deploy.executor;
 
 import java.util.Map;
 
-import com.dianping.phoenix.lb.deploy.model.DeployStatus;
+import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
 
 public class TaskStatus {
 
-    private DeployStatus          status;
+    private DeployTaskStatus          status;
 
     private Map<String, VsStatus> vsStatusMap;
 
@@ -24,14 +24,14 @@ public class TaskStatus {
     }
 
     public static class HostStatus {
-        private DeployStatus status;
+        private DeployTaskStatus status;
         private String       rawLog;
 
-        public DeployStatus getStatus() {
+        public DeployTaskStatus getStatus() {
             return status;
         }
 
-        public void setStatus(DeployStatus status) {
+        public void setStatus(DeployTaskStatus status) {
             this.status = status;
         }
 
@@ -45,11 +45,11 @@ public class TaskStatus {
 
     }
 
-    public DeployStatus getStatus() {
+    public DeployTaskStatus getStatus() {
         return status;
     }
 
-    public void setStatus(DeployStatus status) {
+    public void setStatus(DeployTaskStatus status) {
         this.status = status;
     }
 

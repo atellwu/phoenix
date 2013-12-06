@@ -3,9 +3,9 @@ package com.dianping.phoenix.lb.deploy.service;
 import java.util.List;
 
 import com.dianping.phoenix.lb.action.Paginator;
-import com.dianping.phoenix.lb.deploy.bo.DeploymentTaskBo;
+import com.dianping.phoenix.lb.deploy.bo.DeployTaskBo;
 import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo;
-import com.dianping.phoenix.lb.deploy.model.DeploymentTask;
+import com.dianping.phoenix.lb.deploy.model.DeployTask;
 import com.dianping.phoenix.lb.exception.BizException;
 
 public interface DeployTaskService {
@@ -16,13 +16,13 @@ public interface DeployTaskService {
      * @param paginator
      * @return
      */
-    List<DeploymentTask> list(Paginator paginator, int pageNum);
+    List<DeployTask> list(Paginator paginator, int pageNum);
 
     /**
      * 获取某个任务
      * @throws BizException 
      */
-    DeploymentTaskBo getTask(int taskId) throws BizException;
+    DeployTaskBo getTask(long taskId) throws BizException;
 
     /**
      * 创建任务<br>

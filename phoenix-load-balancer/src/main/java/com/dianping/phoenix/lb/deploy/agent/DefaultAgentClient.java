@@ -1,6 +1,6 @@
 package com.dianping.phoenix.lb.deploy.agent;
 
-import com.dianping.phoenix.lb.deploy.model.AgentStatus;
+import com.dianping.phoenix.lb.deploy.model.DeployAgentStatus;
 
 
 //需要使用service，怎么办
@@ -24,7 +24,7 @@ public class DefaultAgentClient implements AgentClient {
     }
 
     @Override
-    public AgentStatus getAgentStatus() {
+    public DeployAgentStatus getAgentStatus() {
         // TODO Auto-generated method stub
         return null;
     }

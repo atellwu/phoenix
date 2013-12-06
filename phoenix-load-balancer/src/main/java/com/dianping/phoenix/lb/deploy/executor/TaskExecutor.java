@@ -33,7 +33,7 @@ public interface TaskExecutor {
     void start();
 
     /**
-     * 暂停运行
+     * 暂停运行（最小粒度是agent，暂停时，记录进度）
      */
     void stop();
 

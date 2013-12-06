@@ -34,7 +34,7 @@
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
 
-        <table tableName="deployment_task">
+        <table tableName="deploy_task">
             <generatedKey column="id" sqlStatement="MySql"
                 identity="true" />
             <columnOverride column="deploy_policy"
@@ -44,24 +44,30 @@
                 javaType="com.dianping.phoenix.lb.deploy.model.ErrorPolicy"
                 jdbcType="VARCHAR" />
             <columnOverride column="status"
-                javaType="com.dianping.phoenix.lb.deploy.model.DeployStatus"
-                jdbcType="VARCHAR" />
-        </table>
-        <table tableName="deployment">
-            <generatedKey column="id" sqlStatement="MySql"
-                identity="true" />
-            <columnOverride column="status"
-                javaType="com.dianping.phoenix.lb.deploy.model.DeployStatus"
-                jdbcType="VARCHAR" />
-        </table>
-        <table tableName="deployment_detail">
-            <generatedKey column="id" sqlStatement="MySql"
-                identity="true" />
-            <columnOverride column="status"
-                javaType="com.dianping.phoenix.lb.deploy.model.AgentStatus"
+                javaType="com.dianping.phoenix.lb.deploy.model.DeployTaskStatus"
                 jdbcType="VARCHAR" />
         </table>
 
+        <table tableName="deploy_vs">
+            <generatedKey column="id" sqlStatement="MySql"
+                identity="true" />
+            <columnOverride column="status"
+                javaType="com.dianping.phoenix.lb.deploy.model.DeployVsStatus"
+                jdbcType="VARCHAR" />
+        </table>
+
+        <table tableName="deploy_agent">
+            <generatedKey column="id" sqlStatement="MySql"
+                identity="true" />
+            <columnOverride column="status"
+                javaType="com.dianping.phoenix.lb.deploy.model.DeployAgentStatus"
+                jdbcType="VARCHAR" />
+        </table>
+
+        <table tableName="agent_id_sequence">
+            <generatedKey column="id" sqlStatement="MySql"
+                identity="true" />
+        </table>
 
     </context>
 
