@@ -20,7 +20,8 @@ public interface DeployTaskService {
 
     /**
      * 获取某个任务
-     * @throws BizException 
+     * 
+     * @throws BizException
      */
     DeployTaskBo getTask(long taskId) throws BizException;
 
@@ -28,7 +29,7 @@ public interface DeployTaskService {
      * 创建任务<br>
      * 参数是：填写的task名称，所选择的vs名/tag名列表。
      */
-    void createTask();
+    void addTask(NewTaskInfo newTaskInfo);
 
     /**
      * 点击开始任务后，ajax首先更新task。(更新完初始化页面的显示，开始论询显示各个DeployTask的状态)<br>
@@ -37,8 +38,6 @@ public interface DeployTaskService {
      * 获取用户提交的： 每个vs下的ip列表，DeployPlan，然后更新Task。 <br>
      * 更新deployTask。创建deployment。创建DeploymentDetail。<br>
      */
-    void updateTask();
-
-    void addTask(NewTaskInfo newTaskInfo);
+    void updateTask(DeployTaskBo deployTaskBo);
 
 }

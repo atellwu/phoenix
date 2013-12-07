@@ -28,6 +28,7 @@ import com.dianping.phoenix.lb.deploy.dao.DeployTaskMapper;
 import com.dianping.phoenix.lb.deploy.dao.DeployVsMapper;
 import com.dianping.phoenix.lb.deploy.model.DeployAgent;
 import com.dianping.phoenix.lb.deploy.model.DeployAgentExample;
+import com.dianping.phoenix.lb.deploy.model.DeployAgentStatus;
 import com.dianping.phoenix.lb.deploy.model.DeployTask;
 import com.dianping.phoenix.lb.deploy.model.DeployTaskExample;
 import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
@@ -124,9 +125,11 @@ public class DeployTaskServiceImpl implements DeployTaskService {
 
     private Map<String, DeployVsBo> convertDeployVssToMap(List<DeployVsBo> deployVsBos) {
         Map<String, DeployVsBo> map = new HashMap<String, DeployVsBo>();
-        for (DeployVsBo deployVsBo : deployVsBos) {
-            String vsName = deployVsBo.getVs().getName();
-            map.put(vsName, deployVsBo);
+        if (deployVsBos != null) {
+            for (DeployVsBo deployVsBo : deployVsBos) {
+                String vsName = deployVsBo.getVs().getName();
+                map.put(vsName, deployVsBo);
+            }
         }
         return map;
     }
@@ -138,18 +141,6 @@ public class DeployTaskServiceImpl implements DeployTaskService {
             map.put(ip, deployAgent);
         }
         return map;
-    }
-
-    @Override
-    public void createTask() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateTask() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -183,4 +174,53 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         }
     }
 
+    @Override
+    public void updateTask(DeployTaskBo deployTaskBo) {
+        //验证
+        validate(deployTaskBo);
+        //更新发布策略
+        DeployTask task0 = new DeployTask();
+        DeployTask task = deployTaskBo.getTask();
+        task0.setId(task.getId());
+        task0.setAutoContinue(task.getAutoContinue());
+        task0.setDeployInterval(task.getDeployInterval());
+        task0.setDeployPolicy(task.getDeployPolicy());
+        task0.setErrorPolicy(task.getErrorPolicy());
+        //添加DeployAgent
+        Map<String, DeployVsBo> vsBos = deployTaskBo.getDeployVsBos();
+        for (DeployVsBo vsBo : vsBos.values()) {
+            DeployVs vs = vsBo.getDeployVs();
+            Map<String, DeployAgent> agents = vsBo.getDeployAgents();
+            if (agents != null) {
+                for (DeployAgent agent : agents.values()) {
+                    DeployAgent deployAgent = new DeployAgent();
+                    deployAgent.setDeployVsId(vs.getId());
+                    deployAgent.setStatus(DeployAgentStatus.CREATED);
+                    deployAgent.setIpAddress(agent.getIpAddress());
+                    deployAgent.setLastModifiedDate(new Date());
+                    deployAgentMapper.insertSelective(deployAgent);
+                }
+            }
+        }
+        task0.setStatus(DeployTaskStatus.READY);
+        deployTaskMapper.updateByPrimaryKeySelective(task0);
+    }
+
+    private void validate(DeployTaskBo deployTaskBo) {
+        //id不为null
+        Validate.notNull(deployTaskBo.getTask().getId(), "Id can not be null!");
+        //策略字段不为null
+        Validate.notNull(deployTaskBo.getTask().getAutoContinue(), "AutoContinue can not be null!");
+        Validate.notNull(deployTaskBo.getTask().getDeployInterval(), "DeployInterval can not be null!");
+        Validate.notNull(deployTaskBo.getTask().getDeployPolicy(), "DeployPolicy can not be null!");
+        //agent都必选
+        Map<String, DeployVsBo> vsBos = deployTaskBo.getDeployVsBos();
+        Validate.notNull(vsBos, "agent host must selected!");
+        Validate.notEmpty(vsBos.values(), "agent host must selected!");
+        for (DeployVsBo vsBo : vsBos.values()) {
+            Map<String, DeployAgent> agents = vsBo.getDeployAgents();
+            Validate.notNull(agents, "agent host must selected!");
+            Validate.notEmpty(agents.values(), "agent host must selected!");
+        }
+    }
 }

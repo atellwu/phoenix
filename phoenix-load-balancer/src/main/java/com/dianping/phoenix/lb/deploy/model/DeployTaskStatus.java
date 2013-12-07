@@ -4,6 +4,8 @@ public enum DeployTaskStatus {
 
     CREATED("新建的任务"),
 
+    READY("已就绪"),
+
     DEPLOYING("正在执行"),
 
     CANCELLING("已被取消"),

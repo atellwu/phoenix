@@ -214,8 +214,22 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
+        <action name="deploy/task/{deployTaskId}/status" class="deployAction"
+            method="getStatus">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
         <action name="deploy/task/{deployTaskId}/start" class="deployAction"
             method="startDeployTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{deployTaskId}/update" class="deployAction"
+            method="updateDeployTask">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>
