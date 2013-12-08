@@ -1,5 +1,7 @@
 package com.dianping.phoenix.lb.action;
 
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.ServletActionContext;
@@ -25,12 +27,22 @@ public class PoolAction extends MenuAction {
 
     private String              poolName;
 
+    private Boolean             showInfluencing;
+
     public String get() throws Exception {
         try {
             //获取pool
             Pool pool = poolService.findPool(poolName);
+
+            //该pool影响的vs
+            if (showInfluencing != null && showInfluencing) {
+                List<String> influencingVsList = virtualServerService.findVirtualServerByPool(poolName);
+                if (influencingVsList != null && influencingVsList.size() > 0) {
+                    dataMap.put("influencingVsList", influencingVsList);
+                }
+            }
+
             dataMap.put("pool", pool);
-            LOG.info("execute");
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
@@ -63,6 +75,7 @@ public class PoolAction extends MenuAction {
             } else {
                 poolService.addPool(poolName, pool);
             }
+
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
@@ -110,6 +123,14 @@ public class PoolAction extends MenuAction {
 
     public void setPoolName(String poolName) {
         this.poolName = poolName;
+    }
+
+    public Boolean getShowInfluencing() {
+        return showInfluencing;
+    }
+
+    public void setShowInfluencing(Boolean showInfluencing) {
+        this.showInfluencing = showInfluencing;
     }
 
 }

@@ -93,5 +93,18 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 			app.appError("响应错误", data);
 		});
 	}
-
+	//如果地址栏含有“#showInfluencing:vs,vs”，则显示
+	var hash = ''+window.location.hash;
+	if(app.startWith(hash,'#showInfluencing:')){
+		hash = hash.substring(17);
+		var vsNames = hash.split(',');
+		console.log(vsNames);
+		$.each(vsNames, function(i, vsName) {
+			$scope.newTask.selectedVsAndTags = [ {
+				"vsName" : vsName,
+				"tag" : ""
+			} ];
+		});
+		$scope.addTaskModal();
+	}
 });

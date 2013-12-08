@@ -211,7 +211,9 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         Validate.notNull(deployTaskBo.getTask().getId(), "Id can not be null!");
         //策略字段不为null
         Validate.notNull(deployTaskBo.getTask().getAutoContinue(), "AutoContinue can not be null!");
-        Validate.notNull(deployTaskBo.getTask().getDeployInterval(), "DeployInterval can not be null!");
+        if (deployTaskBo.getTask().getAutoContinue()) {
+            Validate.notNull(deployTaskBo.getTask().getDeployInterval(), "DeployInterval can not be null!");
+        }
         Validate.notNull(deployTaskBo.getTask().getDeployPolicy(), "DeployPolicy can not be null!");
         //agent都必选
         Map<String, DeployVsBo> vsBos = deployTaskBo.getDeployVsBos();

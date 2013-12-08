@@ -16,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import sun.font.CreatedFontTracker;
-
 import com.dianping.phoenix.lb.deploy.StatusContainer;
 import com.dianping.phoenix.lb.deploy.TaskContainer;
 import com.dianping.phoenix.lb.deploy.bo.DeployTaskBo;
@@ -29,7 +27,9 @@ import com.dianping.phoenix.lb.deploy.model.DeployTask;
 import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
 import com.dianping.phoenix.lb.deploy.model.DeployVsStatus;
 import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
+import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
+import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.dianping.phoenix.lb.utils.JsonBinder;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -40,42 +40,48 @@ import com.opensymphony.xwork2.ActionSupport;
 @Scope("prototype")
 public class DeployAction extends ActionSupport {
 
-    private static final long   serialVersionUID      = -7250754630706893980L;
+    private static final long    serialVersionUID      = -7250754630706893980L;
 
-    private static final Logger LOG                   = LoggerFactory.getLogger(DeployAction.class);
+    private static final Logger  LOG                   = LoggerFactory.getLogger(DeployAction.class);
 
-    private static final int    ERRORCODE_SUCCESS     = 0;
+    private static final int     ERRORCODE_SUCCESS     = 0;
 
-    private static final int    ERRORCODE_PARAM_ERROR = -2;
+    private static final int     ERRORCODE_PARAM_ERROR = -2;
 
-    private static final int    ERRORCODE_INNER_ERROR = -1;
+    private static final int     ERRORCODE_INNER_ERROR = -1;
 
-    private Map<String, Object> dataMap               = new HashMap<String, Object>();
+    private Map<String, Object>  dataMap               = new HashMap<String, Object>();
 
     @Autowired
-    private DeployTaskService   deployTaskService;
+    private DeployTaskService    deployTaskService;
 
-    private String[]            virtualServerNames;
+    @Autowired
+    private VirtualServerService virtualServerService;
 
-    private List<VirtualServer> virtualServers;
+    private String[]             virtualServerNames;
 
-    private String              contextPath;
+    private List<VirtualServer>  virtualServers;
 
-    private int                 pageNum               = 1;
+    private String               contextPath;
 
-    private List<DeployTask>    list;
+    private int                  pageNum               = 1;
 
-    private Paginator           paginator;
+    private List<DeployTask>     list;
 
-    private long                deployTaskId;
+    private Paginator            paginator;
 
-    private DeployTaskBo        deployTaskBo;
+    private long                 deployTaskId;
+
+    private DeployTaskBo         deployTaskBo;
+
+    /** 该pool影响到的vs自动弹出创建 */
+    private String               autoShowByPool;
 
     //    @Autowired
-    private TaskContainer       taskContainer;
+    private TaskContainer        taskContainer;
 
     //    @Autowired
-    private StatusContainer     statusContainer;
+    private StatusContainer      statusContainer;
 
     @PostConstruct
     public void init() {
@@ -112,7 +118,6 @@ public class DeployAction extends ActionSupport {
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
@@ -139,7 +144,6 @@ public class DeployAction extends ActionSupport {
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
@@ -173,7 +177,6 @@ public class DeployAction extends ActionSupport {
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
@@ -197,7 +200,6 @@ public class DeployAction extends ActionSupport {
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
@@ -255,7 +257,6 @@ public class DeployAction extends ActionSupport {
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
