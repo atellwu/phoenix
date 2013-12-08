@@ -152,7 +152,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         task.setStatus(DeployTaskStatus.CREATED);
         deployTaskMapper.insert(task);
 
-        for (VsAndTag vsAndTag : newTaskInfo.getSelectedVsAndTag()) {
+        for (VsAndTag vsAndTag : newTaskInfo.getSelectedVsAndTags()) {
             DeployVs deployVs = new DeployVs();
             deployVs.setVsName(vsAndTag.getVsName());
             deployVs.setVsTag(vsAndTag.getTag());
@@ -165,9 +165,9 @@ public class DeployTaskServiceImpl implements DeployTaskService {
 
     private void validate(NewTaskInfo newTaskInfo) {
         Validate.notEmpty(newTaskInfo.getTaskName(), "Task's name can not be empty!");
-        Validate.notEmpty(newTaskInfo.getSelectedVsAndTag(), "Must add one vs and tag at least !");
+        Validate.notEmpty(newTaskInfo.getSelectedVsAndTags(), "Must add one vs and tag at least !");
         Set<String> set = new HashSet<String>();
-        for (VsAndTag vsAndTag : newTaskInfo.getSelectedVsAndTag()) {
+        for (VsAndTag vsAndTag : newTaskInfo.getSelectedVsAndTags()) {
             Validate.notEmpty(vsAndTag.getVsName(), "Vs's name can not be empty!");
             Validate.notEmpty(vsAndTag.getTag(), "Vs's tag can not be empty!");
             Validate.isTrue(set.add(vsAndTag.getVsName()), "Vs's name can not be duplicate！");

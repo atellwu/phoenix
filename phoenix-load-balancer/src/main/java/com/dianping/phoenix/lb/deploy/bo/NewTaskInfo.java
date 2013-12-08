@@ -6,7 +6,7 @@ public class NewTaskInfo {
 
     private String         taskName;
 
-    private List<VsAndTag> selectedVsAndTag;
+    private List<VsAndTag> selectedVsAndTags;
 
     public String getTaskName() {
         return taskName;
@@ -16,13 +16,15 @@ public class NewTaskInfo {
         this.taskName = taskName;
     }
 
-    public List<VsAndTag> getSelectedVsAndTag() {
-        return selectedVsAndTag;
+
+    public List<VsAndTag> getSelectedVsAndTags() {
+        return selectedVsAndTags;
     }
 
-    public void setSelectedVsAndTag(List<VsAndTag> selectedVsAndTag) {
-        this.selectedVsAndTag = selectedVsAndTag;
+    public void setSelectedVsAndTags(List<VsAndTag> selectedVsAndTags) {
+        this.selectedVsAndTags = selectedVsAndTags;
     }
+
 
     public static class VsAndTag {
         private String vsName;
@@ -53,7 +55,7 @@ public class NewTaskInfo {
 
     @Override
     public String toString() {
-        return "NewTaskInfo [vsName=" + taskName + ", selectedVsAndTag=" + selectedVsAndTag + "]";
+        return "NewTaskInfo [vsName=" + taskName + ", selectedVsAndTags=" + selectedVsAndTags + "]";
     }
 
 }

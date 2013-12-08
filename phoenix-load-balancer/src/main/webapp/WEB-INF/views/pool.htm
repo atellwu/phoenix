@@ -16,8 +16,7 @@
         <button type="button" class="close" data-dismiss="alert">
           <i class="icon-remove icon-white"></i>
         </button>
-        <span style="text-align: center;"><i class="icon-exclamation-sign"></i>&nbsp; <span> 本次修改影响了这些站点（
-            <span ng-repeat="influencingVs in influencingVsList"> <span>{{influencingVs}}</span> </span> ），是否前往发布页面？ &nbsp; <a
+        <span style="text-align: center;"><i class="icon-exclamation-sign"></i>&nbsp; <span> 本次修改影响了这些站点（ {{influencingVsList.join()}} ），是否前往发布页面？ &nbsp; <a
             ng-href="${contextPath}/deploy#showInfluencing:{{influencingVsList.join()}}" target="_blank">去发布</a>
         </span></span>
       </div>

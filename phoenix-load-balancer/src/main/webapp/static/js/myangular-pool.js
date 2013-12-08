@@ -52,7 +52,7 @@ module.controller('PoolController', function($scope, DataService, $resource,
 						setTimeout(function() {
 							window.location = window.contextpath + "/pool/"
 									+ $scope.pool.name
-									+ "?showInfluencing=true";
+									+ "#showInfluencing";
 						}, 700);
 					} else {
 						app.alertError("保存失败: " + data.errorMessage);
