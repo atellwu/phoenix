@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum DeployAgentStatus {
-    INIT, REJECTED, PROCESSING, FAILED, SUCCESS, KILLED;
+    CREATED, INIT, REJECTED, PROCESSING, FAILED, SUCCESS, KILLED;
 
     private final static Set<DeployAgentStatus> COMPLETED_STATUS_SET = new HashSet<DeployAgentStatus>();
     static {

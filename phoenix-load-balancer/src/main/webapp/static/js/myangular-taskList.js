@@ -35,7 +35,6 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 	});
 	$scope.vs2Tags = {};// vs和tag的cache
 	$scope.getTags = function(vsName) {
-		console.log(vsName);
 		if (vsName == null || vsName.trim() == ""
 				|| $scope.vs2Tags[vsName] != null) {
 			return;
@@ -72,6 +71,7 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 		modalBody.css('height', height - 170);
 		modalBody.css('max-height', height - 145);
 		$('#addTaskModal').modal('show');
+		$('#addTaskModalInput').focus();
 	}
 	$scope.addTask = function() {
 		$http({
@@ -84,7 +84,7 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 						app.alertSuccess("保存成功！ 即将刷新页面...","addTaskAlertDiv");
 						vsChanged = false;// 保存成功，修改标识重置
 						setTimeout(function() {
-							app.refresh();
+							window.location = window.contextpath + '/deploy';
 						}, 700);
 					} else {
 						app.alertError("保存失败: " + data.errorMessage,"addTaskAlertDiv");
@@ -93,5 +93,19 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 			app.appError("响应错误", data);
 		});
 	}
-
+	//如果地址栏含有“#showInfluencing:vs,vs”，则显示
+	var hash = ''+window.location.hash;
+	if(app.startWith(hash,'#showInfluencing:')){
+		hash = hash.substring(17);
+		var vsNames = hash.split(',');
+		$scope.newTask.selectedVsAndTags = [];
+		$.each(vsNames, function(i, vsName) {
+			$scope.newTask.selectedVsAndTags.push( {
+				"vsName" : vsName,
+				"tag" : ""
+			} );
+			$scope.getTags(vsName);
+		});
+		$scope.addTaskModal();
+	}
 });

@@ -27,7 +27,7 @@
           <tr>
             <td>$task.name</td>
             <td style=''>$task.status.desc</td>
-            <td><a href="/deploy/task/$task.id" target="_blank"><span class="label label-success">&nbsp;
+            <td><a href="${contextPath}/deploy/task/$task.id" target="_blank"><span class="label label-success">&nbsp;
                   查看任务 </span></a></td>
           </tr>
           #end
@@ -51,7 +51,7 @@
         <div class="control-group">
           <label class="control-label" for="">任务名</label>
           <div class="controls">
-            <input ng-trim="true" type="text" ng-model="newTask.taskName" placeholder="输入任务名" class="ng-pristine ng-valid">
+            <input id="addTaskModalInput" ng-trim="true" type="text" ng-model="newTask.taskName" placeholder="输入任务名" class="ng-pristine ng-valid">
           </div>
         </div>
       </form>

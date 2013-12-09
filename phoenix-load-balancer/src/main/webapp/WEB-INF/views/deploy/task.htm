@@ -1,7 +1,8 @@
 #set($layout = "taskLayout.htm")
 <div class="row" style="padding: 20px 50px 0 50px;" ng-app="MyApp" ng-controller="TaskController" id="TaskController">
-  <span style="color: #0073ea; font-size: 14px">任务ID:{{task.task.id}} &nbsp;&nbsp; 任务名称:{{task.task.name}}</span>
+  <span style="color: #0073ea; font-size: 14px">任务ID:{{task.task.id}} &nbsp;&nbsp; &nbsp; 任务名称:{{task.task.name}} &nbsp;&nbsp; &nbsp; 任务状态:{{task.task.status}}</span>
   <hr style="margin-top: 0px; margin-bottom: 5px">
+   <div id="alertMessageDiv" style="text-align: center;"></div>
   <div class="container-fluid">
     <div class="row-fluid">
       <div class="span6">
@@ -21,7 +22,7 @@
           <table style="margin-top: 0px;" class="slb-datatable table table-bordered table-condensed lion">
             <thead>
               <tr>
-                <th width="20px"><input type="checkbox" ng-click="checkAllIp(deployVsBo,$event)"
+                <th width="20px"><input ng-disabled="!canUpdate" type="checkbox" ng-click="checkAllIp(deployVsBo,$event)"
                   ng-checked="isContainAll(deployVsBo.deployAgents,deployVsBo.vs.instances)" /></th>
                 <th>IP</th>
                 <th>状态</th>
@@ -29,7 +30,7 @@
             </thead>
             <tbody>
               <tr ng-repeat="instance in deployVsBo.vs.instances">
-                <td width="20px"><input type="checkbox" ng-click="checkIp(deployVsBo.deployAgents,instance.ip)"
+                <td width="20px"><input ng-disabled="!canUpdate" type="checkbox" ng-click="checkIp(deployVsBo.deployAgents,instance.ip)"
                   ng-checked="isContain(deployVsBo.deployAgents,instance.ip)"></td>
                 <td ng-click="checkIp(deployVsBo.deployAgents,instance.ip)">{{instance.ip}}</td>
                 <td style="width: 200px; padding-right: 10px;"
@@ -37,6 +38,10 @@
                   <div ng-switch-when="CREATED" class="progress progress-success">
                     <div style="width: 0%" class="bar"></div>
                     <p style="position: relative; text-align: center;">未开始</p>
+                  </div>
+                  <div ng-switch-when="PROCESSING" class="progress progress-success">
+                    <div style="width: 10%" class="bar"></div>
+                    <p style="position: relative; text-align: center;">正在发布</p>
                   </div>
                   <div ng-switch-default></div>
                 </td>
@@ -46,10 +51,12 @@
         </div>
       </div>
       <div class="span6">
-        <button id="deployButton" style="float: right; margin-bottom: 10px; margin-right: 0px;" type="button"
-          ng-click="startTask()" class="btn btn-success">发布</button>
-        <button id="shutdownButton" type="button" onclick="rundemo_app.shutdown()" class="btn btn-danger"
-          style="display: none;">Shutdown</button>
+        <button id="startButton" style="float: right; margin-bottom: 10px; margin-right: 0px;" type="button" ng-click="updateAndStartTask()"
+          ng-hide="isStarting" class="btn btn-primary">启动发布任务</button>
+        <button id="pauseButton" type="button" style="float: right; margin-bottom: 10px; margin-right:20px" ng-click="startTask()"  class="btn"
+          ng-show="isStarting">暂停任务</button>
+        <button id="shutdownButton" type="button" style="float: right; margin-bottom: 10px; margin-right:20px" ng-click="startTask()" class="btn btn-danger"
+          ng-show="isStarting">取消任务</button>
         <div class="row-fluid">
           <div class="span12 thumbnail">
             <form class="form-inline">
@@ -62,11 +69,11 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td width="190"><label class="radio"><input type="radio"
+                    <td width="190"><label class="radio"><input ng-disabled="!canUpdate" type="radio"
                         ng-model="task.task.deployPolicy" value="ONE_BY_ONE"> 1->1->1 (每次一台)</label></td>
-                    <td width="190"><label class="radio"><input type="radio"
+                    <td width="190"><label class="radio"><input ng-disabled="!canUpdate" type="radio"
                         ng-model="task.task.deployPolicy" value="TWO_BY_TWO"> 1->2->2 (每次两台) </label></td>
-                    <td width="190"><label class="radio"><input type="radio"
+                    <td width="190"><label class="radio"><input ng-disabled="!canUpdate" type="radio"
                         ng-model="task.task.deployPolicy" value="THREE_BY_THREE"> 1->3->3 (每次三台) </label></td>
                   </tr>
                 </tbody>
@@ -80,9 +87,9 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td width="180"><label class="radio"><input type="radio"
+                    <td width="180"><label class="radio"><input ng-disabled="!canUpdate" type="radio"
                         ng-model="task.task.errorPolicy" value="FALL_THROUGH"> 跳过错误 </label></td>
-                    <td><label class="radio"><input type="radio" ng-model="task.task.errorPolicy"
+                    <td><label class="radio"><input ng-disabled="!canUpdate" type="radio" ng-model="task.task.errorPolicy"
                         value="ABORT_ON_ERROR"> 中断发布</label></td>
                   </tr>
                 </tbody>
@@ -96,10 +103,10 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td width="180"><label class="radio"><input type="radio"
-                        ng-model="task.task.autoContinue" value="false"> 手动控制</label></td>
-                    <td><label class="radio"><input type="radio" ng-model="task.task.autoContinue"
-                        value="true"> 发布间隔/秒: </label> <input class="input-mini" type="text" style="height: 12px"
+                    <td width="180"><label class="radio"><input ng-disabled="!canUpdate" ng:model="task.task.autoContinue" boolean-value="false" type="radio"
+                         > 手动控制</label></td>
+                    <td><label class="radio"><input ng-disabled="!canUpdate" type="radio" ng:model="task.task.autoContinue" boolean-value="true"
+                        > 发布间隔/秒: </label> <input ng-disabled="!canUpdate" class="input-mini" type="text" style="height: 12px"
                       ng-model="task.task.deployInterval" ng-disabled="task.task.autoContinue=='false'"></td>
                   </tr>
                 </tbody>

@@ -4,9 +4,15 @@ module.controller('PoolController', function($scope, DataService, $resource,
 	var poolChanged = false;
 	$scope.pool = null;
 	$scope.getPool = function(poolName) {
+		var hash = window.location.hash;
+		console.log(hash);
+		var url  = window.contextpath + '/pool/' + poolName + '/get';
+		if(hash == '#showInfluencing'){
+			url += '?showInfluencing=true';
+		}
 		$http({
 			method : 'GET',
-			url : window.contextpath + '/pool/' + poolName + '/get'
+			url : url
 		}).success(function(data, status, headers, config) {
 			if (data.errorCode == 0) {
 				if (data.pool == null) {// 新建pool
@@ -17,6 +23,8 @@ module.controller('PoolController', function($scope, DataService, $resource,
 					$scope.pool = data.pool;
 					$scope.newPool = false;
 				}
+				// 如果需要显示受影响的vs，则显示
+				$scope.influencingVsList = data.influencingVsList; 
 				// 开始监听pool的修改
 				$scope.$watch('pool', function(newValue, oldValue) {
 					if (newValue != oldValue) {
@@ -43,7 +51,8 @@ module.controller('PoolController', function($scope, DataService, $resource,
 						poolChanged = false;// 保存成功，修改标识重置
 						setTimeout(function() {
 							window.location = window.contextpath + "/pool/"
-									+ $scope.pool.name;
+									+ $scope.pool.name
+									+ "#showInfluencing";
 						}, 700);
 					} else {
 						app.alertError("保存失败: " + data.errorMessage);
