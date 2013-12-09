@@ -2,9 +2,10 @@
 server {
     listen       $config.server.listen;
     server_name  $config.server.serverName;
-    $nginx.properties($config.server.properties)
+$nginx.properties($config.server.properties)
     
     location /{
+        dp_domain $config.server.defaultPool;
     
         set $hcv "-";
         if ( $http_cookie ~* "_hc.v=(\S+)(;.*|$)"){
@@ -31,8 +32,7 @@ server {
         }
 
         if ( !-f $request_filename ) {
-            dp_domain $config.server.defaultPool;
-            proxy_pass                $dp_upstream;
+            proxy_pass                http://$dp_upstream;
             break;
         }
         
