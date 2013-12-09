@@ -56,6 +56,27 @@
 			</requirements>
 		</component>
 		<component>
+			<role>com.dianping.phoenix.session.requestid.FileSystemManager</role>
+			<implementation>com.dianping.phoenix.session.requestid.FileSystemManager</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.configure.ConfigManager</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.requestid.FileUploader</role>
+			<implementation>com.dianping.phoenix.session.requestid.FileUploader</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.configure.ConfigManager</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.session.requestid.FileSystemManager</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
 			<role>org.unidal.web.mvc.model.ModuleRegistry</role>
 			<implementation>org.unidal.web.mvc.model.ModuleRegistry</implementation>
 			<configuration>

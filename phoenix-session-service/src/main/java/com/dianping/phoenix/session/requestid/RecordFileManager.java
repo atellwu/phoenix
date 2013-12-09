@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.MessageFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -26,7 +28,6 @@ import com.dianping.cat.configuration.NetworkInterfaceManager;
 import com.dianping.phoenix.configure.ConfigManager;
 
 public class RecordFileManager implements Initializable, LogEnabled {
-
 	@Inject
 	private ConfigManager m_config;
 
@@ -45,11 +46,14 @@ public class RecordFileManager implements Initializable, LogEnabled {
 
 	public BlockingQueue<byte[]> getWriteQueue(long timestamp) throws IOException {
 		long startTime = timestamp - timestamp % m_config.getRecordFileTimespan();
+
 		if (!m_writeQueueCache.containsKey(startTime)) {
 			BlockingQueue<byte[]> queue = new ArrayBlockingQueue<byte[]>(m_config.getRecordFileWriteQueueSize());
-			File tmpFile = tsToFile(timestamp);
+			String tmpFile = tsToFileName(timestamp);
+
 			m_writeQueueCache.putIfAbsent(startTime, new QueueAndOutputStream(queue, tmpFile));
 		}
+
 		return m_writeQueueCache.get(startTime).queue;
 	}
 
@@ -66,7 +70,7 @@ public class RecordFileManager implements Initializable, LogEnabled {
 	}
 
 	// for unit test only
-	public void setConfig(ConfigManager config) {
+	void setConfig(ConfigManager config) {
 		m_config = config;
 	}
 
@@ -81,9 +85,15 @@ public class RecordFileManager implements Initializable, LogEnabled {
 	}
 
 	File tsToFile(long timestamp) {
+		return new File(m_config.getRecordFileTmpDir(), tsToFileName(timestamp));
+	}
+
+	String tsToFileName(long timestamp) {
 		long startTime = timestamp - timestamp % m_config.getRecordFileTimespan();
-		String fileName = String.format("%s-%d", m_ip, startTime);
-		return new File(m_config.getRecordFileTmpDir(), fileName);
+		MessageFormat format = new MessageFormat("requestid/{0,date,yyyy/MM/dd/HH}/{1}-{0,date,mmss}");
+		String fileName = format.format(new Object[] { new Date(startTime), m_ip });
+
+		return fileName;
 	}
 
 	class CleanTask implements Task {
@@ -104,13 +114,9 @@ public class RecordFileManager implements Initializable, LogEnabled {
 						m_logger.info(String.format("Closing stream of %d", startTimestamp));
 						m_writeQueueCache.remove(entry.getKey());
 						QueueAndOutputStream queueAndStream = entry.getValue();
-						try {
-							queueAndStream.out.close();
-						} catch (IOException e) {
-							m_logger.error(String.format("Error close output stream of %d", startTimestamp), e);
-						}
 
-						moveTmpFileToTarget(queueAndStream);
+						queueAndStream.close();
+						queueAndStream.moveTmpFileToTarget();
 					}
 				}
 
@@ -123,37 +129,54 @@ public class RecordFileManager implements Initializable, LogEnabled {
 			}
 		}
 
-		private void moveTmpFileToTarget(QueueAndOutputStream queueAndStream) {
-			File targetFile = new File(m_config.getRecordFileTargetDir(), queueAndStream.file.getName());
+		@Override
+		public void shutdown() {
+		}
+	}
+
+	class QueueAndOutputStream {
+		private BlockingQueue<byte[]> queue;
+
+		private OutputStream out;
+
+		private File file;
+
+		private String path;
+
+		public QueueAndOutputStream(BlockingQueue<byte[]> queue, String path) throws FileNotFoundException {
+			this.queue = queue;
+			this.path = path;
+			this.file = new File(m_config.getRecordFileTmpDir(), path);
+
+			this.file.getParentFile().mkdirs();
+
+			this.out = new BufferedOutputStream(new FileOutputStream(this.file, true));
+		}
+
+		public void close() {
+			try {
+				this.out.close();
+			} catch (IOException e) {
+				m_logger.error(String.format("Error when closing file(%s)!", this.file), e);
+			}
+		}
+
+		public void moveTmpFileToTarget() {
+			File targetFile = new File(m_config.getRecordFileTargetDir(), this.path);
+
+			targetFile.getParentFile().mkdirs();
+
 			if (targetFile.exists()) {
-				File newTargetFile = new File(m_config.getRecordFileTargetDir(), UUID.randomUUID().toString());
+				File newTargetFile = new File(m_config.getRecordFileTargetDir(), this.path + "-"
+				      + UUID.randomUUID().toString());
 				m_logger.warn(String.format("Target file %s already exists, will rename to %s", targetFile, newTargetFile));
 				targetFile = newTargetFile;
 			}
 
-			if (!queueAndStream.file.renameTo(targetFile)) {
-				m_logger.error(String.format("Can not move %s to %s", queueAndStream.file.getAbsolutePath(),
+			if (!this.file.renameTo(targetFile)) {
+				m_logger.error(String.format("Can not move %s to %s", this.file.getAbsolutePath(),
 				      targetFile.getAbsolutePath()));
 			}
-		}
-
-		@Override
-		public void shutdown() {
-		}
-
-	}
-
-	static class QueueAndOutputStream {
-		BlockingQueue<byte[]> queue;
-
-		OutputStream out;
-
-		File file;
-
-		public QueueAndOutputStream(BlockingQueue<byte[]> queue, File file) throws FileNotFoundException {
-			this.queue = queue;
-			this.file = file;
-			this.out = new BufferedOutputStream(new FileOutputStream(file, true));
 		}
 	}
 
