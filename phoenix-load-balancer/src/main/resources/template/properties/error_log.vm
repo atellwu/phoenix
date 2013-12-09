@@ -1,1 +1,1 @@
-error_log $value;
+    error_log $value;
