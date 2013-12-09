@@ -1,5 +1,5 @@
 <config>
-	<event-expire-time>5000</event-expire-time>
+	<event-expire-time>30000</event-expire-time>
 	<retry-queue-clean-interval>1000</retry-queue-clean-interval>
 	<retry-queue-safe-length>1000</retry-queue-safe-length>
 	<max-l1-cache-size>1000</max-l1-cache-size>
@@ -7,7 +7,8 @@
 	<max-l2-cache-size>1000</max-l2-cache-size>
 	<record-file-timespan>300000</record-file-timespan>
 	<record-file-write-queue-size>1000</record-file-write-queue-size>
-	<record-file-base-dir>target/record/</record-file-base-dir>
+	<record-file-tmp-dir>target/record-tmp/</record-file-tmp-dir>
+	<record-file-target-dir>target/record-done/</record-file-target-dir>
 	<record-file-write-queue-scan-interval>1000</record-file-write-queue-scan-interval>
 	<record-file-write-stream-close-scan-interval>60000</record-file-write-stream-close-scan-interval>
 	<record-file-write-stream-multiply>3</record-file-write-stream-multiply>

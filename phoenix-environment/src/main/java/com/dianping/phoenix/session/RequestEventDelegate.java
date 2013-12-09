@@ -40,7 +40,7 @@ public class RequestEventDelegate implements MessageDelegate, Initializable, Log
 			ChannelBuffer buffer = ChannelBuffers.dynamicBuffer(200);
 
 			buffer.writeInt(0);
-			writeString(buffer, event.getUserId());
+			writeString(buffer, event.getPhoenixId());
 			writeString(buffer, event.getRequestId());
 			writeString(buffer, event.getUrlDigest());
 			writeString(buffer, event.getRefererUrlDigest());
@@ -73,7 +73,7 @@ public class RequestEventDelegate implements MessageDelegate, Initializable, Log
 		RequestEvent event = new RequestEvent();
 
 		buffer.readInt(); // get rid of length
-		event.setUserId(readString(buffer));
+		event.setPhoenixId(readString(buffer));
 		event.setRequestId(readString(buffer));
 		event.setUrlDigest(readString(buffer));
 		event.setRefererUrlDigest(readString(buffer));

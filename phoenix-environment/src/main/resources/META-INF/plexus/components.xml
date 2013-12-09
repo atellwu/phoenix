@@ -4,11 +4,6 @@
 			<role>com.dianping.phoenix.servlet.PhoenixFilterHandler</role>
 			<role-hint>request-id</role-hint>
 			<implementation>com.dianping.phoenix.session.RequestIdHandler</implementation>
-			<requirements>
-				<requirement>
-					<role>com.dianping.phoenix.session.RequestEventDelegate</role>
-				</requirement>
-			</requirements>
 		</component>
 		<component>
 			<role>com.dianping.phoenix.session.RequestEventDelegate</role>

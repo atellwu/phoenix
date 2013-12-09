@@ -1,4 +1,4 @@
-package com.dianping.phoenix.session.core;
+package com.dianping.phoenix.session.requestid;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -16,10 +16,12 @@ import org.unidal.lookup.ComponentTestCase;
 import com.dianping.phoenix.configure.ConfigManager;
 import com.dianping.phoenix.session.RequestEvent;
 import com.dianping.phoenix.session.RequestEventDelegate;
+import com.dianping.phoenix.session.requestid.EventProcessor;
+import com.dianping.phoenix.session.requestid.EventRecorder;
 
 public class RequestEventHandlerTest extends ComponentTestCase {
 
-	private RequestEventHandler handler;
+	private EventProcessor handler;
 	private RequestEventDelegate rcvQ;
 
 	String uid = "uid";
@@ -36,7 +38,7 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 	@Before
 	public void before() throws Exception {
 		rcvQ = lookup(RequestEventDelegate.class);
-		handler = lookup(RequestEventHandler.class);
+		handler = lookup(EventProcessor.class);
 		handler.setRecorder(new DummyRecorder());
 		handler.setRcvQ(rcvQ);
 
@@ -47,49 +49,49 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 		clientEventUrlDigest = "clientEventUrlDigest";
 
 		svrEvent1 = new RequestEvent();
-		svrEvent1.setHop(RequestEventHandler.HOP_SERVER);
+		svrEvent1.setHop(EventProcessor.HOP_SERVER);
 		svrEvent1.setRequestId("svrEvent1");
 		svrEvent1.setTimestamp(System.currentTimeMillis());
 		svrEvent1.setUrlDigest(svrEventUrlDigest);
-		svrEvent1.setUserId(uid);
+		svrEvent1.setPhoenixId(uid);
 
 		svrEvent2 = new RequestEvent();
-		svrEvent2.setHop(RequestEventHandler.HOP_SERVER);
+		svrEvent2.setHop(EventProcessor.HOP_SERVER);
 		svrEvent2.setRequestId("svrEvent2");
 		svrEvent2.setTimestamp(System.currentTimeMillis() + 1);
 		svrEvent2.setUrlDigest(svrEventUrlDigest);
-		svrEvent2.setUserId(uid);
+		svrEvent2.setPhoenixId(uid);
 
 		clientEvent1 = new RequestEvent();
-		clientEvent1.setHop(RequestEventHandler.HOP_CLIENT);
+		clientEvent1.setHop(EventProcessor.HOP_CLIENT);
 		clientEvent1.setRequestId("clientEvent1");
 		clientEvent1.setTimestamp(System.currentTimeMillis());
 		clientEvent1.setUrlDigest(clientEventUrlDigest);
-		clientEvent1.setUserId(uid);
+		clientEvent1.setPhoenixId(uid);
 
 		clientEventRTSvrEvent1 = new RequestEvent();
-		clientEventRTSvrEvent1.setHop(RequestEventHandler.HOP_CLIENT);
+		clientEventRTSvrEvent1.setHop(EventProcessor.HOP_CLIENT);
 		clientEventRTSvrEvent1.setRefererUrlDigest(svrEventUrlDigest);
 		clientEventRTSvrEvent1.setRequestId("referToServerEvent1");
 		clientEventRTSvrEvent1.setTimestamp(System.currentTimeMillis() + 2);
 		clientEventRTSvrEvent1.setUrlDigest("any" + +rnd.nextLong());
-		clientEventRTSvrEvent1.setUserId(uid);
+		clientEventRTSvrEvent1.setPhoenixId(uid);
 
 		clientEventRTClientEvent1 = new RequestEvent();
-		clientEventRTClientEvent1.setHop(RequestEventHandler.HOP_CLIENT);
+		clientEventRTClientEvent1.setHop(EventProcessor.HOP_CLIENT);
 		clientEventRTClientEvent1.setRefererUrlDigest(clientEventUrlDigest);
 		clientEventRTClientEvent1.setRequestId("referToClientEvent1");
 		clientEventRTClientEvent1.setTimestamp(System.currentTimeMillis() + 3);
 		clientEventRTClientEvent1.setUrlDigest("any" + +rnd.nextLong());
-		clientEventRTClientEvent1.setUserId(uid);
+		clientEventRTClientEvent1.setPhoenixId(uid);
 
 		clientEventRTNothing = new RequestEvent();
-		clientEventRTNothing.setHop(RequestEventHandler.HOP_CLIENT);
+		clientEventRTNothing.setHop(EventProcessor.HOP_CLIENT);
 		clientEventRTNothing.setRefererUrlDigest("not exists");
 		clientEventRTNothing.setRequestId("clientEventRTNothing");
 		clientEventRTNothing.setTimestamp(System.currentTimeMillis());
 		clientEventRTNothing.setUrlDigest("any" + +rnd.nextLong());
-		clientEventRTNothing.setUserId(uid);
+		clientEventRTNothing.setPhoenixId(uid);
 
 	}
 
@@ -139,7 +141,7 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 	@Test
 	public void shouldRecordClientEventReferToSvrEvent() throws Exception {
 		final CountDownLatch latch = new CountDownLatch(1);
-		handler.setRecorder(new RequestEventRecorder() {
+		handler.setRecorder(new EventRecorder() {
 
 			@Override
 			public void recordEvent(RequestEvent curEvent, RequestEvent referToEvent) {
@@ -160,7 +162,7 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 	@Test
 	public void shouldRecordClientEventReferToClientEvent() throws Exception {
 		final CountDownLatch latch = new CountDownLatch(1);
-		handler.setRecorder(new RequestEventRecorder() {
+		handler.setRecorder(new EventRecorder() {
 
 			@Override
 			public void recordEvent(RequestEvent curEvent, RequestEvent referToEvent) {
@@ -180,7 +182,7 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 	@Test
 	public void shouldNotRecordClientEventReferToNothing() throws Exception {
 		final CountDownLatch latch = new CountDownLatch(1);
-		handler.setRecorder(new RequestEventRecorder() {
+		handler.setRecorder(new EventRecorder() {
 
 			@Override
 			public void recordEvent(RequestEvent curEvent, RequestEvent referToEvent) {
@@ -200,7 +202,7 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 	@Test
 	public void shouldRetryRecordClientEventReferToClientEvent() throws Exception {
 		final CountDownLatch latch = new CountDownLatch(1);
-		handler.setRecorder(new RequestEventRecorder() {
+		handler.setRecorder(new EventRecorder() {
 
 			@Override
 			public void recordEvent(RequestEvent curEvent, RequestEvent referToEvent) {

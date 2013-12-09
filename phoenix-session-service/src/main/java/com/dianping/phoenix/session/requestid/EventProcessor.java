@@ -1,4 +1,4 @@
-package com.dianping.phoenix.session.core;
+package com.dianping.phoenix.session.requestid;
 
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -21,23 +21,24 @@ import com.dianping.phoenix.session.RequestEventDelegate;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-public class RequestEventHandler extends ContainerHolder implements Initializable, LogEnabled {
+public class EventProcessor extends ContainerHolder implements Initializable, LogEnabled {
 	public final static int HOP_CLIENT = 0;
 
 	public final static int HOP_SERVER = 1;
 
 	@Inject
-	private RequestEventDelegate m_rcvQ;
-
+	EventDelegateManager eventDelegateMgr;
+	
 	@Inject
-	private RequestEventDelegate m_sendQ;
-
-	@Inject
-	private RequestEventRecorder m_recorder;
+	private EventRecorder m_recorder;
 
 	@Inject
 	private ConfigManager m_config;
 
+	private RequestEventDelegate m_rcvQ;
+	
+	private RequestEventDelegate m_sendQ;
+	
 	private ConcurrentMap<String, RequestEvent> m_retryCache;
 
 	private ConcurrentMap<String, ConcurrentMap<String, RequestEvent>> m_l1Cache;
@@ -94,8 +95,8 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize() throws InitializationException {
-		m_rcvQ = lookup(RequestEventDelegate.class);
-		m_sendQ = lookup(RequestEventDelegate.class);
+		m_rcvQ = eventDelegateMgr.getIn();
+		m_sendQ = eventDelegateMgr.getOut();
 		m_retryCache = buildRetryCache();
 		m_l1Cache = buildL1Cache();
 
@@ -129,7 +130,7 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 	}
 
 	private void processClientEvent(RequestEvent curEvent) {
-		String userId = curEvent.getUserId();
+		String userId = curEvent.getPhoenixId();
 		String refererUrlDigest = curEvent.getRefererUrlDigest();
 
 		ConcurrentMap<String, RequestEvent> l2Cache = m_l1Cache.get(userId);
@@ -152,7 +153,7 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 	}
 
 	private void processServerEvent(RequestEvent curEvent) {
-		String userId = curEvent.getUserId();
+		String userId = curEvent.getPhoenixId();
 		ConcurrentMap<String, RequestEvent> l2Cache = m_l1Cache.get(userId);
 		String urlDigest = curEvent.getUrlDigest();
 
@@ -204,7 +205,7 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 	}
 
 	// for unit test only
-	public void setRecorder(RequestEventRecorder recorder) {
+	public void setRecorder(EventRecorder recorder) {
 		m_recorder = recorder;
 	}
 
@@ -222,7 +223,7 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 			Threads.forGroup(group).start(new HandlerTask(m_handlerTaskQueues[i]));
 		}
 		Threads.forGroup(group).start(new RetryQueueCleanTask());
-		Threads.forGroup(group).start(new DispatchTask());
+		Threads.forGroup(group).start(new DispatchTask(), false);
 	}
 
 	public void stop() {
@@ -251,7 +252,7 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 		private boolean isValidEvent(RequestEvent event) {
 			return event.getRequestId() != null //
 			      && event.getUrlDigest() != null //
-			      && event.getUserId() != null;
+			      && event.getPhoenixId() != null;
 		}
 
 		private void offerToHandlerTaskQueue(String digest, RequestEvent event) {
@@ -270,6 +271,8 @@ public class RequestEventHandler extends ContainerHolder implements Initializabl
 					m_logger.info("Thread Interrupted, will exit");
 					return;
 				}
+				
+				m_logger.info("Receiving " + event);
 
 				if (!isValidEvent(event)) {
 					m_logger.warn(String.format("Invalid RequetEvent %s received, will ignore", event));
