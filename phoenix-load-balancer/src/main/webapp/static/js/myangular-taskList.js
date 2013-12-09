@@ -81,30 +81,43 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 		}).success(
 				function(data, status, headers, config) {
 					if (data.errorCode == 0) {
-						app.alertSuccess("保存成功！ 即将刷新页面...","addTaskAlertDiv");
+						app.alertSuccess("保存成功！ 即将刷新页面...", "addTaskAlertDiv");
 						vsChanged = false;// 保存成功，修改标识重置
 						setTimeout(function() {
 							window.location = window.contextpath + '/deploy';
 						}, 700);
 					} else {
-						app.alertError("保存失败: " + data.errorMessage,"addTaskAlertDiv");
+						app.alertError("保存失败: " + data.errorMessage,
+								"addTaskAlertDiv");
 					}
 				}).error(function(data, status, headers, config) {
 			app.appError("响应错误", data);
 		});
 	}
-	//如果地址栏含有“#showInfluencing:vs,vs”，则显示
-	var hash = ''+window.location.hash;
-	if(app.startWith(hash,'#showInfluencing:')){
+	// 如果地址栏含有“#showInfluencing:vs,vs”，则显示
+	var hash = '' + window.location.hash;
+	if (app.startWith(hash, '#showInfluencing:')) {
 		hash = hash.substring(17);
-		var vsNames = hash.split(',');
+		var vsNamesStr = hash;
+		var tagIdsStr = null;
+		if (hash.indexOf('&')>0) {
+			var hashSplit = hash.split('&');
+			vsNamesStr = hashSplit[0];
+			tagIdsStr = hashSplit[1];
+		}
+		//
+		var vsNames = vsNamesStr.split(',');
+		var tags = null;
+		if (tagIdsStr != null) {
+			tags = tagIdsStr.split(',');
+		}
 		$scope.newTask.selectedVsAndTags = [];
 		$.each(vsNames, function(i, vsName) {
-			$scope.newTask.selectedVsAndTags.push( {
-				"vsName" : vsName,
-				"tag" : ""
-			} );
 			$scope.getTags(vsName);
+			$scope.newTask.selectedVsAndTags.push({
+				"vsName" : vsName,
+				"tag" : (tags != null) ? tags[i] : ""
+			});
 		});
 		$scope.addTaskModal();
 	}

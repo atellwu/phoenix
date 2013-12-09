@@ -9,7 +9,6 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private final DeployTaskBo deploymentTaskBo;
 
-    //记录任务的发布进度
     /** 正在发布的哪个站点 */
     private String             currentVsName;
     /** 已经完成到第几台agent */

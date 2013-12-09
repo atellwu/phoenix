@@ -56,6 +56,12 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
+        <action name="vs/tag/addBatch" class="virtualServerAction"
+            method="addBatchTag">
+            <result name="redirect" type="redirect">
+                <param name="location"><![CDATA[/deploy#showInfluencing:${vsListToTagStr}&${tagIdsStr}]]></param>
+            </result>
+        </action>
         <action name="vs/{virtualServerName}/save" class="virtualServerAction"
             method="save">
             <result name="success" type="json">
