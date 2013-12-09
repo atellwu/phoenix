@@ -37,6 +37,8 @@ public class NginxVelocityTools {
                 return "~*";
             case REGEX_CASE_SENSITIVE:
                 return "~";
+            case EXACT:
+                return "=";
             default:
                 return "";
         }
