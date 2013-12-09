@@ -15,14 +15,4 @@ public interface AgentClient {
      * 执行发布运行
      */
     void execute();
-
-    /**
-     * 获取Agent的状态
-     */
-    DeployAgentStatus getAgentStatus();
-
-    /**
-     * 获取agent的执行日志
-     */
-    String getRawLog();
 }
