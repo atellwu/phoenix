@@ -19,6 +19,15 @@ public class NginxServer {
     private int                 listen    = 80;
     private String              serverName;
     private Map<String, String> properties;
+    private String              defaultPool;
+
+    public String getDefaultPool() {
+        return defaultPool;
+    }
+
+    public void setDefaultPool(String defaultPool) {
+        this.defaultPool = defaultPool;
+    }
 
     /**
      * @return the properties

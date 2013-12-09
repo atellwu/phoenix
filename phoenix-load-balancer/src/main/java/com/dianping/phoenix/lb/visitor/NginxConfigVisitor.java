@@ -48,15 +48,7 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
         server.setProperties(virtualServer.getDynamicAttributes());
         server.setListen(virtualServer.getPort());
         server.setServerName(virtualServer.getDomain());
-        NginxLocation defaultLocation = new NginxLocation();
-        defaultLocation.setMatchType(MatchType.COMMON);
-        defaultLocation.setPattern("/");
-        Directive directive = new Directive();
-        directive.setType(Constants.DIRECTIVE_PROXY_PASS);
-        directive.setDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME,
-                toUpstreamName(virtualServer.getDefaultPoolName()));
-        defaultLocation.addDirective(directive);
-        server.addLocations(defaultLocation);
+        server.setDefaultPool(virtualServer.getDefaultPoolName());
         result.setServer(server);
 
         super.visitVirtualServer(virtualServer);

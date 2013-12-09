@@ -1,2 +1,2 @@
 dp_domain $dp_domain;
-        proxy_pass $dp_upstream;
+            proxy_pass $dp_upstream;

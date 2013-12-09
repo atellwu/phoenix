@@ -1,20 +1,23 @@
 package com.dianping.phoenix.lb.deploy.agent;
 
-import com.dianping.phoenix.lb.deploy.model.DeployAgentStatus;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
+import com.dianping.phoenix.lb.service.model.VirtualServerService;
 
-//需要使用service，怎么办
 public class DefaultAgentClient implements AgentClient {
 
-    private int    deployId;
-    private String vsName;
-    private String tag;
+    private int                  deployId;
+    private String               vsName;
+    private String               tag;
+    private VirtualServerService virtualServerService;
 
-    private DefaultAgentClient(int deployId, String vsName, String tag) {
+    private DefaultAgentClient(int deployId, String vsName, String tag, VirtualServerService virtualServerService) {
         super();
         this.deployId = deployId;
         this.vsName = vsName;
         this.tag = tag;
+        this.virtualServerService = virtualServerService;
     }
 
     @Override
@@ -24,44 +27,8 @@ public class DefaultAgentClient implements AgentClient {
     }
 
     @Override
-    public DeployAgentStatus getAgentStatus() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getRawLog() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public int getDeployId() {
-        return deployId;
-    }
-
-    public void setDeployId(int deployId) {
-        this.deployId = deployId;
-    }
-
-    public String getVsName() {
-        return vsName;
-    }
-
-    public void setVsName(String vsName) {
-        this.vsName = vsName;
-    }
-
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
-    @Override
     public String toString() {
-        return String.format("DefaultAgentClient [deployId=%s, vsName=%s, tag=%s]", deployId, vsName, tag);
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 
 }
