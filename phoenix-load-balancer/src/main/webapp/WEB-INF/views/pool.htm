@@ -17,7 +17,7 @@
           <i class="icon-remove icon-white"></i>
         </button>
         <span style="text-align: center;"><i class="icon-exclamation-sign"></i>&nbsp; <span> 本次修改影响了这些站点（ {{influencingVsList.join()}} ），是否前往发布页面？ &nbsp; <a
-            ng-href="${contextPath}/deploy#showInfluencing:{{influencingVsList.join()}}" target="_blank">去发布</a>
+           ng-click="addTagAndDeploy(influencingVsList)" href="javascript:;" target="_blank">去发布</a>
         </span></span>
       </div>
       <a ng-show="editOrShow=='edit' && !newPool" ng-click="cancleEdit()" href="javascript:;"

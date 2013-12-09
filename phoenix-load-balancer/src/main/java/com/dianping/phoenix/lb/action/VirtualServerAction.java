@@ -43,6 +43,12 @@ public class VirtualServerAction extends MenuAction {
 
     private List<VirtualServer> list;
 
+    private String[]            vsListToTag;
+
+    private String              vsListToTagStr;
+
+    private String              tagIdsStr;
+
     public String index() {
         if (virtualServers.size() == 0) {
             return "noneVs";
@@ -183,6 +189,22 @@ public class VirtualServerAction extends MenuAction {
         return SUCCESS;
     }
 
+    public String addBatchTag() throws Exception {
+        System.out.println(vsListToTag);
+        List<String> tagIds = new ArrayList<String>();
+        if (vsListToTag != null) {
+            for (String vs : vsListToTag) {
+                System.out.println(vs);
+                VirtualServer virtualServer = virtualServerService.findVirtualServer(vs);
+                Validate.notNull(virtualServer, "vs(" + vs + ") not found.");
+                tagIds.add(virtualServerService.tag(vs, virtualServer.getVersion(), pools));
+            }
+        }
+        vsListToTagStr = StringUtils.join(vsListToTag, ',');
+        tagIdsStr = StringUtils.join(tagIds, ',');
+        return "redirect";
+    }
+
     /**
      * 查看某个tagId当时的config快照
      */
@@ -304,6 +326,30 @@ public class VirtualServerAction extends MenuAction {
 
     public void setList(List<VirtualServer> list) {
         this.list = list;
+    }
+
+    public String[] getVsListToTag() {
+        return vsListToTag;
+    }
+
+    public void setVsListToTag(String[] vsListToTag) {
+        this.vsListToTag = vsListToTag;
+    }
+
+    public String getVsListToTagStr() {
+        return vsListToTagStr;
+    }
+
+    public void setVsListToTagStr(String vsListToTagStr) {
+        this.vsListToTagStr = vsListToTagStr;
+    }
+
+    public String getTagIdsStr() {
+        return tagIdsStr;
+    }
+
+    public void setTagIdsStr(String tagIdsStr) {
+        this.tagIdsStr = tagIdsStr;
     }
 
 }
