@@ -35,7 +35,7 @@ public interface TaskExecutor {
     /**
      * 暂停运行（最小粒度是agent，暂停时，记录进度）
      */
-    void stop();
+    void pause();
 
     /**
      * 终止/取消运行
@@ -46,4 +46,6 @@ public interface TaskExecutor {
      * 获取Task的状态
      */
     TaskStatus getStatus();
+
+    void resume();
 }

@@ -223,7 +223,7 @@ public class DeployAction extends ActionSupport {
                     status = DeployTaskStatus.CREATED;
                     break;
                 case 1:
-                    status = DeployTaskStatus.DEPLOYING;
+                    status = DeployTaskStatus.PROCESSING;
                     ;
                     break;
                 case 2:
@@ -242,7 +242,7 @@ public class DeployAction extends ActionSupport {
 
             Map<String, DeployVsBo> vsVsBos = deployTaskBo.getDeployVsBos();
             for (DeployVsBo bo : vsVsBos.values()) {
-                bo.getDeployVs().setStatus(DeployVsStatus.DEPLOYING);
+                bo.getDeployVs().setStatus(DeployVsStatus.PROCESSING);
                 bo.getDeployVs().setSummaryLog("SummaryLog");
                 Map<String, DeployAgent> agents = bo.getDeployAgents();
                 for (DeployAgent agent : agents.values()) {

@@ -37,8 +37,8 @@
         <table tableName="deploy_task">
             <generatedKey column="id" sqlStatement="MySql"
                 identity="true" />
-            <columnOverride column="deploy_policy"
-                javaType="com.dianping.phoenix.lb.deploy.model.DeployPolicy"
+            <columnOverride column="agent_batch"
+                javaType="com.dianping.phoenix.lb.deploy.model.AgentBatch"
                 jdbcType="VARCHAR" />
             <columnOverride column="error_policy"
                 javaType="com.dianping.phoenix.lb.deploy.model.ErrorPolicy"
