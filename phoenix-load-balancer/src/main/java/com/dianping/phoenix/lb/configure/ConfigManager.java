@@ -106,11 +106,11 @@ public class ConfigManager implements Initializable {
     }
 
     public String getDeployWithDynamicRefreshUrl(String host, int deployId, String vsName, String configFileName,
-            String version, String refreshUrl, String refreshMethod) {
+            String version) {
         check();
         String gitUrl = getTengineConfigGitUrl();
         return String.format(m_config.getDeployUrlDynamicRefreshPattern(), host, deployId, vsName, configFileName,
-                version, gitUrl, refreshUrl, refreshMethod);
+                version, gitUrl);
     }
 
     public String getTengineConfigGitUrl() {
@@ -160,6 +160,21 @@ public class ConfigManager implements Initializable {
     public String getAgentTengineConfigVersionUrl(String host, String vsName) {
         check();
         return String.format(m_config.getAgentTengineConfigVersionUrlPattern(), host, vsName);
+    }
+
+    public String getNginxDynamicAddUpstreamUrlPattern(String upstreamName) {
+        check();
+        return String.format(m_config.getNginxDynamicAddUpstreamUrlPattern(), upstreamName);
+    }
+
+    public String getNginxDynamicDeleteUpstreamUrlPattern(String upstreamName) {
+        check();
+        return String.format(m_config.getNginxDynamicDeleteUpstreamUrlPattern(), upstreamName);
+    }
+
+    public String getNginxDynamicUpdateUpstreamUrlPattern(String upstreamName) {
+        check();
+        return String.format(m_config.getNginxDynamicUpdateUpstreamUrlPattern(), upstreamName);
     }
 
     public File getGitScript() {

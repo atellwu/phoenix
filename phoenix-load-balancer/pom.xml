@@ -179,6 +179,7 @@
                             <manifest><![CDATA[
 							${basedir}/src/main/resources/META-INF/dal/model/slb-model-manifest.xml,
 							${basedir}/src/main/resources/META-INF/dal/model/runtime-config-manifest.xml,
+							${basedir}/src/main/resources/META-INF/dal/model/response-manifest.xml,
 							]]></manifest>
                         </configuration>
                     </execution>
