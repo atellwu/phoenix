@@ -104,6 +104,7 @@ function dynamic_refresh_config {
 	if [ `pgrep nginx | wc -l` != 0 ]; then
 	    log "curling $dynamic_refresh_url with request method $refresh_method(post data: $dynamic_refresh_post_data)"
 	    local command=`echo "curl -X$refresh_method -d$dynamic_refresh_post_data $dynamic_refresh_url"`
+	    log "Curl CMD is $command"
 		local response=`eval $command`
 		if [ "$response"x != "success"x ] && [ "$response"x != "not found uptream"x ];then
 			log "fail to curl"
