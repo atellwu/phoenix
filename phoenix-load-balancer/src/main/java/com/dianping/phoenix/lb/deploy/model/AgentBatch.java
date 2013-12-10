@@ -1,6 +1,6 @@
 package com.dianping.phoenix.lb.deploy.model;
 
-public enum DeployPolicy {
+public enum AgentBatch {
     ONE_BY_ONE("one-by-one", 1, "1 -> 1 -> 1 -> 1 (每次一台)"),
 
     TWO_BY_TWO("two-by-two", 2, "1 -> 2 -> 2 -> 2 (每次两台)"),
@@ -13,7 +13,7 @@ public enum DeployPolicy {
 
     private String desc;
 
-    private DeployPolicy(String id, int batchSize, String description) {
+    private AgentBatch(String id, int batchSize, String description) {
         m_id = id;
         m_batchSize = batchSize;
         desc = description;

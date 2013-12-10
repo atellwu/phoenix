@@ -7,12 +7,12 @@ import com.dianping.phoenix.lb.service.model.VirtualServerService;
 
 public class DefaultAgentClient implements AgentClient {
 
-    private int                  deployId;
+    private long                  deployId;
     private String               vsName;
     private String               tag;
     private VirtualServerService virtualServerService;
 
-    private DefaultAgentClient(int deployId, String vsName, String tag, VirtualServerService virtualServerService) {
+    public DefaultAgentClient(long deployId, String vsName, String tag, VirtualServerService virtualServerService) {
         super();
         this.deployId = deployId;
         this.vsName = vsName;
