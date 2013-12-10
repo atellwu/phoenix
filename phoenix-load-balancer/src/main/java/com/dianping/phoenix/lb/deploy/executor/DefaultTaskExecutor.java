@@ -23,12 +23,15 @@ import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
 import com.dianping.phoenix.lb.deploy.model.DeployVs;
 import com.dianping.phoenix.lb.deploy.model.DeployVsStatus;
 import com.dianping.phoenix.lb.deploy.model.ErrorPolicy;
+import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.service.model.StrategyService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
 
 public class DefaultTaskExecutor implements TaskExecutor {
 
     private final DeployTaskBo         deployTaskBo;
+
+    private final DeployTaskService    deployTaskService;
 
     private final VirtualServerService virtualServerService;
 
@@ -48,8 +51,10 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private ExecutorService            executor;
 
-    public DefaultTaskExecutor(DeployTaskBo deployTaskBo, VirtualServerService virtualServerService, StrategyService strategyService, ConfigManager configManager) {
+    public DefaultTaskExecutor(DeployTaskBo deployTaskBo, DeployTaskService deployTaskService, VirtualServerService virtualServerService, StrategyService strategyService, ConfigManager configManager) {
         this.deployTaskBo = deployTaskBo;
+
+        this.deployTaskService = deployTaskService;
         this.virtualServerService = virtualServerService;
         this.strategyService = strategyService;
         this.configManager = configManager;
@@ -263,10 +268,11 @@ public class DefaultTaskExecutor implements TaskExecutor {
         DeployVsStatus status = deployVsBo.getDeployVs().getStatus();
         deployVsBo.getDeployVs().setStatus(status.calculate(list));
 
+        deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
     }
 
     /**
-     * 根据孩子更新状态
+     * agent执行过程中，更新agent状态
      */
     private void updateAgentStatus(Map<String, DeployAgentBo> deployAgentBos, Map<String, AgentClient> agentClients) {
         for (Map.Entry<String, AgentClient> entry : agentClients.entrySet()) {
@@ -284,12 +290,17 @@ public class DefaultTaskExecutor implements TaskExecutor {
             deployAgentBo.setProcessPct(processPct);
             deployAgentBo.getDeployAgent().setRawLog(convertToRawLog(log));
             deployAgentBo.getDeployAgent().setStatus(status);
+
+            deployTaskService.updateDeployAgentStatus(deployAgentBo.getDeployAgent());
         }
     }
 
-    private String convertToRawLog(List<String> log) {
-
-        return null;
+    private String convertToRawLog(List<String> logs) {
+        StringBuilder sb = new StringBuilder();
+        for (String line : logs) {
+            sb.append(line).append("\n");
+        }
+        return sb.toString();
     }
 
     @Override
@@ -298,15 +309,19 @@ public class DefaultTaskExecutor implements TaskExecutor {
         if (taskStatus.canPaused()) {
             //将task和vs设置成暂停
             this.deployTaskBo.getTask().setStatus(DeployTaskStatus.PAUSED);
+            deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+
             Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
             for (DeployVsBo deployVsBo : deployVsBos.values()) {
                 DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
                 if (vsStatus.canPaused()) {
                     deployVsBo.getDeployVs().setStatus(DeployVsStatus.PAUSED);
+                    deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
                 }
             }
             //终止线程
             taskThread.interrupt();
+
         }
     }
 
@@ -321,11 +336,14 @@ public class DefaultTaskExecutor implements TaskExecutor {
         if (taskStatus == DeployTaskStatus.PAUSED) {
             //将task和vs的状态设置从暂停设置成ready
             this.deployTaskBo.getTask().setStatus(DeployTaskStatus.READY);
+            deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+
             Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
             for (DeployVsBo deployVsBo : deployVsBos.values()) {
                 DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
                 if (vsStatus == DeployVsStatus.PAUSED) {
                     deployVsBo.getDeployVs().setStatus(DeployVsStatus.READY);
+                    deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
                 }
             }
             //然后再调用start
@@ -339,21 +357,19 @@ public class DefaultTaskExecutor implements TaskExecutor {
         if (taskStatus.canCancel()) {
             //将task和vs设置成暂停
             this.deployTaskBo.getTask().setStatus(DeployTaskStatus.CANCELLING);
+            deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+
             Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
             for (DeployVsBo deployVsBo : deployVsBos.values()) {
                 DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
                 if (vsStatus.canCancel()) {
                     deployVsBo.getDeployVs().setStatus(DeployVsStatus.CANCELLING);
+                    deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
                 }
             }
             //终止线程
             taskThread.interrupt();
         }
-    }
-
-    @Override
-    public TaskStatus getStatus() {
-        return null;
     }
 
     private class AgentTask implements Runnable {
@@ -371,6 +387,11 @@ public class DefaultTaskExecutor implements TaskExecutor {
             doneSignal.countDown();
         }
 
+    }
+
+    @Override
+    public DeployTaskBo getDeployTaskBo() {
+        return deployTaskBo;
     }
 
 }

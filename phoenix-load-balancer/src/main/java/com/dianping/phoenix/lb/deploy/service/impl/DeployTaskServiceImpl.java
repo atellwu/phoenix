@@ -230,4 +230,22 @@ public class DeployTaskServiceImpl implements DeployTaskService {
             Validate.notEmpty(agents.values(), "agent host must selected!");
         }
     }
+
+    @Override
+    public void updateDeployTaskStatus(DeployTask deployTask) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void updateDeployVsStatus(DeployVs deployVs) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void updateDeployAgentStatus(DeployAgent deployAgent) {
+        // TODO Auto-generated method stub
+
+    }
 }
