@@ -50,6 +50,16 @@ public class AgentClientResult {
         }
     }
 
+    public void addRawLog(String rawLog) {
+        logs.add(rawLog);
+    }
+
+    public void addRawLogs(List<String> rawLogs) {
+        for (String rawLog : rawLogs) {
+            addRawLog(rawLog);
+        }
+    }
+
     public void logError(String msg) {
         logError(msg, null);
     }

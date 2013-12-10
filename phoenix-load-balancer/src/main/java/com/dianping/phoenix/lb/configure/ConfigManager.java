@@ -74,7 +74,7 @@ public class ConfigManager implements Initializable {
         return m_config.getDeployGetlogRetrycount();
     }
 
-    public String getDeployLogUrl(String host, int deployId) {
+    public String getDeployLogUrl(String host, long deployId) {
         check();
 
         String pattern = m_config.getDeployLogUrlPattern();
@@ -90,7 +90,7 @@ public class ConfigManager implements Initializable {
         return interval;
     }
 
-    public String getDeployStatusUrl(String host, int deployId) {
+    public String getDeployStatusUrl(String host, long deployId) {
         check();
 
         String pattern = m_config.getDeployStatusUrlPattern();
