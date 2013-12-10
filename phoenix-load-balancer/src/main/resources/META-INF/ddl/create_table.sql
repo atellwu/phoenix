@@ -3,7 +3,7 @@ delimiter ;
 CREATE TABLE `deploy_task` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL COMMENT '发布任务的备注名，仅用于方便查看',
-  `deploy_policy` varchar(32) DEFAULT NULL COMMENT '部署策略, 可选值: one-by-one, two-by-two, three-by-three',
+  `agent_batch` varchar(32) DEFAULT NULL COMMENT '部署策略, 可选值: one-by-one, two-by-two, three-by-three',
   `error_policy` varchar(32) DEFAULT NULL COMMENT '出错处理策略, 可选值: 1 - abort on error, 2 - fall through',
   `auto_continue` tinyint(1) DEFAULT NULL COMMENT '是否自动继续下一个Rollout，可选值: 1 - auto continue, 2 - mannul continue',
   `deploy_interval` int(1) DEFAULT NULL COMMENT '自动deploy的间隔时间，单位:分钟',

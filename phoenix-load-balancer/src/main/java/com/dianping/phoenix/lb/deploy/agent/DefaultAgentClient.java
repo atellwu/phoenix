@@ -22,18 +22,16 @@ import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.Member;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
-import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.model.nginx.NginxUpstreamServer;
 import com.dianping.phoenix.lb.service.model.StrategyService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.dianping.phoenix.lb.utils.GsonUtils;
 import com.dianping.phoenix.lb.velocity.TemplateManager;
 import com.dianping.phoenix.lb.velocity.VelocityEngineManager;
-import com.dianping.phoenix.lb.visitor.NginxConfigVisitor;
 
 public class DefaultAgentClient implements AgentClient {
 
-    private int                  deployId;
+    private long                 deployId;
     private String               vsName;
     private String               tag;
     private String               ip;
@@ -44,7 +42,7 @@ public class DefaultAgentClient implements AgentClient {
 
     private static final String  RESP_MSG_OK = "ok";
 
-    private DefaultAgentClient(int deployId, String vsName, String tag, String ip,
+    private DefaultAgentClient(long deployId, String vsName, String tag, String ip,
             VirtualServerService virtualServerService, StrategyService strategyService, ConfigManager configManager) {
         super();
         this.deployId = deployId;
@@ -196,7 +194,6 @@ public class DefaultAgentClient implements AgentClient {
         return VelocityEngineManager.INSTANCE.merge(
                 TemplateManager.INSTANCE.getTemplate("upstream", "dynamic_upstream"), context);
     }
-
 
     private static class VsCompareResult {
         private boolean    needReload    = true;

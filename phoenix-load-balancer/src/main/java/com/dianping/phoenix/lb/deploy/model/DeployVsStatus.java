@@ -2,15 +2,17 @@ package com.dianping.phoenix.lb.deploy.model;
 
 public enum DeployVsStatus {
 
-    CREATED("新建的任务"),
+    CREATED("新建的任务"), //创建完，选择了vs，未选择agent
 
-    DEPLOYING("正在执行"),
+    WAITING("已就绪，未执行"), //创建完，选择了vs和选择agent，可以被点击启动执行
 
-    CANCELLING("已被取消"),
+    READY("即将执行"), //已准备好，等待executor调度 （只有这个状态可被执行）
+
+    PROCESSING("正在执行"), //内存状态，不需要持久化
 
     PAUSING("暂停中"),
 
-    UNKNOWN("未知状态"), WARNING("执行完成(有警告信息)"), // completed with partial failures
+    WARNING("执行完成(有警告信息)"), // completed with partial failures
 
     FAILED("执行失败"), // complete with all failed
 

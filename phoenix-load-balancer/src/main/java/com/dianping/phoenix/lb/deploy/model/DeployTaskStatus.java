@@ -2,19 +2,19 @@ package com.dianping.phoenix.lb.deploy.model;
 
 public enum DeployTaskStatus {
 
-    CREATED("新建的任务"),
+    CREATED("新建的任务"), //创建完，选择了vs，未选择agent
 
-    READY("已就绪"),
+    WAITING("已就绪，未执行"), //创建完，选择了vs和选择agent，可以被点击启动执行
 
-    DEPLOYING("正在执行"),
+    READY("即将执行"), //已准备好，等待executor调度 （只有这个状态可被执行）
 
-    CANCELLING("已被取消"),
+    PROCESSING("正在执行"), //内存状态，不需要持久化
 
     PAUSING("暂停中"),
 
-    UNKNOWN("未知状态"), WARNING("执行完成(有警告信息)"), // completed with partial failures
-
     FAILED("执行失败"), // complete with all failed
+
+    CANCELLING("已被取消"),
 
     SUCCESS("执行成功"); // completed with all successful
 
@@ -45,7 +45,7 @@ public enum DeployTaskStatus {
     //    }
 
     public static boolean isFinalStatus(DeployTaskStatus status) {
-        return status == SUCCESS || status == WARNING;
+        return status == SUCCESS || status == CANCELLING;
     }
 
     public String getDesc() {

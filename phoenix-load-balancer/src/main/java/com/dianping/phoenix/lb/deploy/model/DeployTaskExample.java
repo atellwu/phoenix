@@ -325,73 +325,73 @@ public class DeployTaskExample {
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyIsNull() {
-            addCriterion("deploy_policy is null");
+        public Criteria andAgentBatchIsNull() {
+            addCriterion("agent_batch is null");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyIsNotNull() {
-            addCriterion("deploy_policy is not null");
+        public Criteria andAgentBatchIsNotNull() {
+            addCriterion("agent_batch is not null");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyEqualTo(DeployPolicy value) {
-            addCriterion("deploy_policy =", value, "deployPolicy");
+        public Criteria andAgentBatchEqualTo(AgentBatch value) {
+            addCriterion("agent_batch =", value, "agentBatch");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyNotEqualTo(DeployPolicy value) {
-            addCriterion("deploy_policy <>", value, "deployPolicy");
+        public Criteria andAgentBatchNotEqualTo(AgentBatch value) {
+            addCriterion("agent_batch <>", value, "agentBatch");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyGreaterThan(DeployPolicy value) {
-            addCriterion("deploy_policy >", value, "deployPolicy");
+        public Criteria andAgentBatchGreaterThan(AgentBatch value) {
+            addCriterion("agent_batch >", value, "agentBatch");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyGreaterThanOrEqualTo(DeployPolicy value) {
-            addCriterion("deploy_policy >=", value, "deployPolicy");
+        public Criteria andAgentBatchGreaterThanOrEqualTo(AgentBatch value) {
+            addCriterion("agent_batch >=", value, "agentBatch");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyLessThan(DeployPolicy value) {
-            addCriterion("deploy_policy <", value, "deployPolicy");
+        public Criteria andAgentBatchLessThan(AgentBatch value) {
+            addCriterion("agent_batch <", value, "agentBatch");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyLessThanOrEqualTo(DeployPolicy value) {
-            addCriterion("deploy_policy <=", value, "deployPolicy");
+        public Criteria andAgentBatchLessThanOrEqualTo(AgentBatch value) {
+            addCriterion("agent_batch <=", value, "agentBatch");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyLike(DeployPolicy value) {
-            addCriterion("deploy_policy like", value, "deployPolicy");
+        public Criteria andAgentBatchLike(AgentBatch value) {
+            addCriterion("agent_batch like", value, "agentBatch");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyNotLike(DeployPolicy value) {
-            addCriterion("deploy_policy not like", value, "deployPolicy");
+        public Criteria andAgentBatchNotLike(AgentBatch value) {
+            addCriterion("agent_batch not like", value, "agentBatch");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyIn(List<DeployPolicy> values) {
-            addCriterion("deploy_policy in", values, "deployPolicy");
+        public Criteria andAgentBatchIn(List<AgentBatch> values) {
+            addCriterion("agent_batch in", values, "agentBatch");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyNotIn(List<DeployPolicy> values) {
-            addCriterion("deploy_policy not in", values, "deployPolicy");
+        public Criteria andAgentBatchNotIn(List<AgentBatch> values) {
+            addCriterion("agent_batch not in", values, "agentBatch");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyBetween(DeployPolicy value1, DeployPolicy value2) {
-            addCriterion("deploy_policy between", value1, value2, "deployPolicy");
+        public Criteria andAgentBatchBetween(AgentBatch value1, AgentBatch value2) {
+            addCriterion("agent_batch between", value1, value2, "agentBatch");
             return (Criteria) this;
         }
 
-        public Criteria andDeployPolicyNotBetween(DeployPolicy value1, DeployPolicy value2) {
-            addCriterion("deploy_policy not between", value1, value2, "deployPolicy");
+        public Criteria andAgentBatchNotBetween(AgentBatch value1, AgentBatch value2) {
+            addCriterion("agent_batch not between", value1, value2, "agentBatch");
             return (Criteria) this;
         }
 

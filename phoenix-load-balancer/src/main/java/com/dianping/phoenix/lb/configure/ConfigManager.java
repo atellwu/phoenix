@@ -98,14 +98,14 @@ public class ConfigManager implements Initializable {
         return String.format(pattern, host, deployId);
     }
 
-    public String getDeployWithReloadUrl(String host, int deployId, String vsName, String configFileName, String version) {
+    public String getDeployWithReloadUrl(String host, long deployId, String vsName, String configFileName, String version) {
         check();
         String gitUrl = getTengineConfigGitUrl();
         return String.format(m_config.getDeployUrlReloadPattern(), host, deployId, vsName, configFileName, version,
                 gitUrl);
     }
 
-    public String getDeployWithDynamicRefreshUrl(String host, int deployId, String vsName, String configFileName,
+    public String getDeployWithDynamicRefreshUrl(String host, long deployId, String vsName, String configFileName,
             String version) {
         check();
         String gitUrl = getTengineConfigGitUrl();

@@ -184,12 +184,15 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         task0.setId(task.getId());
         task0.setAutoContinue(task.getAutoContinue());
         task0.setDeployInterval(task.getDeployInterval());
-        task0.setDeployPolicy(task.getDeployPolicy());
+        task0.setAgentBatch(task.getAgentBatch());
         task0.setErrorPolicy(task.getErrorPolicy());
         //添加DeployAgent
         Map<String, DeployVsBo> vsBos = deployTaskBo.getDeployVsBos();
         for (DeployVsBo vsBo : vsBos.values()) {
             DeployVs vs = vsBo.getDeployVs();
+            DeployVs vs0 = new DeployVs();
+            vs0.setId(vs.getId());
+            vs0.setStatus(DeployVsStatus.READY);
             Map<String, DeployAgent> agents = vsBo.getDeployAgents();
             if (agents != null) {
                 for (DeployAgent agent : agents.values()) {
@@ -201,6 +204,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
                     deployAgentMapper.insertSelective(deployAgent);
                 }
             }
+            deployVsMapper.updateByPrimaryKeySelective(vs0);
         }
         task0.setStatus(DeployTaskStatus.READY);
         deployTaskMapper.updateByPrimaryKeySelective(task0);
@@ -214,7 +218,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         if (deployTaskBo.getTask().getAutoContinue()) {
             Validate.notNull(deployTaskBo.getTask().getDeployInterval(), "DeployInterval can not be null!");
         }
-        Validate.notNull(deployTaskBo.getTask().getDeployPolicy(), "DeployPolicy can not be null!");
+        Validate.notNull(deployTaskBo.getTask().getAgentBatch(), "DeployPolicy can not be null!");
         //agent都必选
         Map<String, DeployVsBo> vsBos = deployTaskBo.getDeployVsBos();
         Validate.notNull(vsBos, "agent host must selected!");
