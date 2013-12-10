@@ -1,7 +1,11 @@
 package com.dianping.phoenix.lb.deploy.agent;
 
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -28,6 +32,8 @@ import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.dianping.phoenix.lb.utils.GsonUtils;
 import com.dianping.phoenix.lb.velocity.TemplateManager;
 import com.dianping.phoenix.lb.velocity.VelocityEngineManager;
+import com.dianping.phoenix.lb.visitor.VirtualServerComparisionVisitor;
+import com.dianping.phoenix.lb.visitor.VirtualServerComparisionVisitor.ComparisionResult;
 
 public class DefaultAgentClient implements AgentClient {
 
@@ -42,7 +48,7 @@ public class DefaultAgentClient implements AgentClient {
 
     private static final String  RESP_MSG_OK = "ok";
 
-    private DefaultAgentClient(long deployId, String vsName, String tag, String ip,
+    public DefaultAgentClient(long deployId, String vsName, String tag, String ip,
             VirtualServerService virtualServerService, StrategyService strategyService, ConfigManager configManager) {
         super();
         this.deployId = deployId;
@@ -64,73 +70,33 @@ public class DefaultAgentClient implements AgentClient {
         String currentWorkingVersion = getAgentConfigVersion();
         if (StringUtils.isNotBlank(currentWorkingVersion)) {
             try {
-                if (currentWorkingVersion.equals(tag)) {
-                    result.logInfo(String
-                            .format("Config of vs(%s) for host(%s) is already version %s, no need to redeploy", vsName,
-                                    ip, tag));
-                    endWithSuccess();
+                if (sameVersion(currentWorkingVersion)) {
                     return;
                 }
 
                 SlbModelTree currentWorkingSlbModelTree = virtualServerService.findTagById(vsName,
                         currentWorkingVersion);
-                if (currentWorkingSlbModelTree == null || currentWorkingSlbModelTree.findVirtualServer(vsName) == null) {
-                    result.logError(String.format("Config with version %s not found", currentWorkingVersion));
-                    endWithFail();
-                    return;
-                }
-
                 SlbModelTree deployingSlbModelTree = virtualServerService.findTagById(vsName, tag);
-                if (deployingSlbModelTree == null || deployingSlbModelTree.findVirtualServer(vsName) == null) {
-                    result.logError(String.format("Config with version %s not found", tag));
-                    endWithFail();
+
+                if (!versionExists(currentWorkingVersion, currentWorkingSlbModelTree)) {
                     return;
                 }
 
-                VsCompareResult compareResult = compare(currentWorkingSlbModelTree, deployingSlbModelTree);
+                if (!versionExists(tag, deployingSlbModelTree)) {
+                    return;
+                }
 
-                if (compareResult.needReload) {
-                    result.logInfo("Need to reload nginx");
-                    URL deployUrl = new URL(configManager.getDeployWithReloadUrl(ip, deployId, vsName,
-                            configManager.getTengineConfigFileName(), tag));
-                    result.logInfo(String.format("Deploy url is %s", deployUrl));
-                    HttpURLConnection conn = (HttpURLConnection) deployUrl.openConnection();
-                    conn.setConnectTimeout(configManager.getDeployConnectTimeout());
+                VirtualServerComparisionVisitor comparisionVisitor = new VirtualServerComparisionVisitor(
+                        currentWorkingSlbModelTree.findVirtualServer(vsName), currentWorkingSlbModelTree.getPools());
+                deployingSlbModelTree.accept(comparisionVisitor);
+                ComparisionResult compareResult = comparisionVisitor.getVisitorResult();
 
-                    Response response;
-
-                    response = DefaultJsonParser.parse(IOUtils.toString(conn.getInputStream()));
-
-                    if (!RESP_MSG_OK.equals(response.getStatus())) {
-                        result.logError(String.format("Failed to deploy (status: %s, error msg: %s)",
-                                response.getStatus(), response.getMessage()));
-                        endWithFail();
+                if (compareResult.needReload()) {
+                    if (!callAgentWithReload()) {
                         return;
                     }
                 } else {
-                    result.logInfo("No need to reload nginx, use dynamic refresh strategy");
-                    URL deployUrl = new URL(configManager.getDeployWithDynamicRefreshUrl(ip, deployId, vsName,
-                            configManager.getTengineConfigFileName(), tag));
-
-                    String postData = getDynamicRefreshPostData(compareResult);
-                    result.logInfo(String.format("Deploy url is %s, post data is %s", deployUrl, postData));
-                    HttpURLConnection conn = (HttpURLConnection) deployUrl.openConnection();
-                    conn.setConnectTimeout(configManager.getDeployConnectTimeout());
-                    conn.setRequestMethod("POST");
-                    conn.setDoOutput(true);
-                    PrintWriter out = new PrintWriter(conn.getOutputStream());
-                    out.print(URLEncoder.encode("refreshPostData", "UTF-8") + "="
-                            + URLEncoder.encode(postData, "UTF-8"));
-                    out.flush();
-                    out.close();
-
-                    Response response;
-
-                    response = DefaultJsonParser.parse(IOUtils.toString(conn.getInputStream()));
-                    if (!RESP_MSG_OK.equals(response.getStatus())) {
-                        result.logError(String.format("Failed to deploy (status: %s, error msg: %s)",
-                                response.getStatus(), response.getMessage()));
-                        endWithFail();
+                    if (!callAgentWithDynamicRefresh(compareResult)) {
                         return;
                     }
 
@@ -148,14 +114,72 @@ public class DefaultAgentClient implements AgentClient {
         }
     }
 
-    private VsCompareResult compare(SlbModelTree currentWorkingSlbModelTree, SlbModelTree deployingSlbModelTree) {
-        // TODO Auto-generated method stub
-        return null;
+    private boolean callAgentWithDynamicRefresh(ComparisionResult compareResult) throws MalformedURLException,
+            BizException, IOException, ProtocolException, UnsupportedEncodingException {
+        result.logInfo("No need to reload nginx, use dynamic refresh strategy");
+        URL deployUrl = new URL(configManager.getDeployWithDynamicRefreshUrl(ip, deployId, vsName,
+                configManager.getTengineConfigFileName(), tag));
+
+        String postData = genDynamicRefreshPostData(compareResult);
+        result.logInfo(String.format("Deploy url is %s, post data is %s", deployUrl, postData));
+        HttpURLConnection conn = (HttpURLConnection) deployUrl.openConnection();
+        conn.setConnectTimeout(configManager.getDeployConnectTimeout());
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+        PrintWriter out = new PrintWriter(conn.getOutputStream());
+        out.print(URLEncoder.encode("refreshPostData", "UTF-8") + "=" + URLEncoder.encode(postData, "UTF-8"));
+        out.flush();
+        out.close();
+
+        return checkAgentResponse(conn);
     }
 
-    private String getDynamicRefreshPostData(VsCompareResult compareResult) throws BizException {
+    private boolean checkAgentResponse(HttpURLConnection conn) throws IOException {
+        Response response;
+
+        response = DefaultJsonParser.parse(IOUtils.toString(conn.getInputStream()));
+        if (!RESP_MSG_OK.equals(response.getStatus())) {
+            result.logError(String.format("Failed to deploy (status: %s, error msg: %s)", response.getStatus(),
+                    response.getMessage()));
+            endWithFail();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean callAgentWithReload() throws MalformedURLException, IOException {
+        result.logInfo("Need to reload nginx");
+        URL deployUrl = new URL(configManager.getDeployWithReloadUrl(ip, deployId, vsName,
+                configManager.getTengineConfigFileName(), tag));
+        result.logInfo(String.format("Deploy url is %s", deployUrl));
+        HttpURLConnection conn = (HttpURLConnection) deployUrl.openConnection();
+        conn.setConnectTimeout(configManager.getDeployConnectTimeout());
+
+        return checkAgentResponse(conn);
+    }
+
+    private boolean versionExists(String version, SlbModelTree slbModelTree) {
+        if (slbModelTree == null || slbModelTree.findVirtualServer(vsName) == null) {
+            result.logError(String.format("Config with version %s not found", version));
+            endWithFail();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean sameVersion(String currentWorkingVersion) {
+        if (currentWorkingVersion.equals(tag)) {
+            result.logInfo(String.format("Config of vs(%s) for host(%s) is already version %s, no need to redeploy",
+                    vsName, ip, tag));
+            endWithSuccess();
+            return true;
+        }
+        return false;
+    }
+
+    private String genDynamicRefreshPostData(ComparisionResult compareResult) throws BizException {
         List<Map<String, String>> postDataList = new ArrayList<Map<String, String>>();
-        for (Pool pool : compareResult.addedPools) {
+        for (Pool pool : compareResult.getAddedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
             postData.put("url", configManager.getNginxDynamicAddUpstreamUrlPattern(pool.getName()));
             postData.put("method", "post");
@@ -163,17 +187,17 @@ public class DefaultAgentClient implements AgentClient {
             postDataList.add(postData);
         }
 
-        for (Pool pool : compareResult.modifiedPools) {
+        for (Pool pool : compareResult.getModifiedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
-            postData.put("url", configManager.getNginxDynamicAddUpstreamUrlPattern(pool.getName()));
+            postData.put("url", configManager.getNginxDynamicUpdateUpstreamUrlPattern(pool.getName()));
             postData.put("method", "post");
             postData.put("data", generateUpstreamContent(pool));
             postDataList.add(postData);
         }
 
-        for (Pool pool : compareResult.deletedPools) {
+        for (Pool pool : compareResult.getDeletedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
-            postData.put("url", configManager.getNginxDynamicAddUpstreamUrlPattern(pool.getName()));
+            postData.put("url", configManager.getNginxDynamicDeleteUpstreamUrlPattern(pool.getName()));
             postData.put("method", "delete");
             postDataList.add(postData);
         }
@@ -193,13 +217,6 @@ public class DefaultAgentClient implements AgentClient {
         context.put("servers", nginxUpstreamServers);
         return VelocityEngineManager.INSTANCE.merge(
                 TemplateManager.INSTANCE.getTemplate("upstream", "dynamic_upstream"), context);
-    }
-
-    private static class VsCompareResult {
-        private boolean    needReload    = true;
-        private List<Pool> addedPools    = new ArrayList<Pool>();
-        private List<Pool> deletedPools  = new ArrayList<Pool>();
-        private List<Pool> modifiedPools = new ArrayList<Pool>();
     }
 
     private void endWithSuccess() {
@@ -247,7 +264,9 @@ public class DefaultAgentClient implements AgentClient {
         return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.dianping.phoenix.lb.deploy.agent.AgentClient#getResult()
      */
     @Override

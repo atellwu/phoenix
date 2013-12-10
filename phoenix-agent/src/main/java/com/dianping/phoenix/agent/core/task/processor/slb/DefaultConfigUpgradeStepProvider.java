@@ -2,6 +2,7 @@ package com.dianping.phoenix.agent.core.task.processor.slb;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 import org.unidal.lookup.ContainerHolder;
 import org.unidal.lookup.annotation.Inject;
@@ -10,8 +11,7 @@ import com.dianping.phoenix.agent.core.task.workflow.Context;
 import com.dianping.phoenix.agent.core.task.workflow.Step;
 import com.dianping.phoenix.configure.ConfigManager;
 
-public class DefaultConfigUpgradeStepProvider extends ContainerHolder implements
-        ConfigUpgradeStepProvider {
+public class DefaultConfigUpgradeStepProvider extends ContainerHolder implements ConfigUpgradeStepProvider {
 
     @Inject
     private ConfigManager config;
@@ -21,6 +21,29 @@ public class DefaultConfigUpgradeStepProvider extends ContainerHolder implements
         String script = jointShellCmd(shellFunc, (ConfigUpgradeTask) myCtx.getTask());
         int exitCode = myCtx.getScriptExecutor().exec(script, myCtx.getLogOut(), myCtx.getLogOut());
         return exitCode;
+    }
+
+    private int runDynamicRefreshShellCmd(Context ctx) throws Exception {
+        ConfigUpgradeContext myCtx = (ConfigUpgradeContext) ctx;
+
+        ConfigUpgradeTask task = (ConfigUpgradeTask) ctx.getTask();
+
+        for (Map<String, String> postDataItem : task.getDynamicRefreshPostData()) {
+            StringBuilder script = new StringBuilder();
+            script.append(config.getTengineScriptFile().getAbsolutePath());
+            script.append(String.format(" --env \"%s\" ", config.getEnv()));
+            script.append(String.format(" --dynamic_refresh_url \"%s\" ", postDataItem.get("url")));
+            script.append(String.format(" --refresh_method \"%s\" ", postDataItem.get("method").toUpperCase()));
+            script.append(String.format(" --dynamic_refresh_post_data \"%s\" ", postDataItem.get("data")));
+            script.append(String.format(" --func \"%s\" ", "dynamic_refresh_config"));
+            int exitCode = myCtx.getScriptExecutor().exec(script.toString(), myCtx.getLogOut(), myCtx.getLogOut());
+
+            if (exitCode != 0) {
+                return exitCode;
+            }
+        }
+
+        return 0;
     }
 
     private String jointShellCmd(String shellFunc, ConfigUpgradeTask task) {
@@ -47,11 +70,6 @@ public class DefaultConfigUpgradeStepProvider extends ContainerHolder implements
         sb.append(String.format(" --git_url \"%s\" ", gitUrl));
         sb.append(String.format(" --git_host \"%s\" ", gitHost));
         sb.append(String.format(" --tengine_reload \"%s\" ", task.isReload() ? "1" : "0"));
-        if (!task.isReload()) {
-            sb.append(String.format(" --dynamic_refresh_url \"%s\" ", task.getDynamicRefreshUrl()));
-            sb.append(String.format(" --dynamic_refresh_post_data \"%s\" ", task.getDynamicRefreshPostData()));
-            sb.append(String.format(" --refresh_method \"%s\" ", task.getRefreshMethod()));
-        }
         sb.append(String.format(" --func \"%s\" ", shellFunc));
 
         return sb.toString();
@@ -79,7 +97,11 @@ public class DefaultConfigUpgradeStepProvider extends ContainerHolder implements
 
     @Override
     public int reloadOrDynamicRefreshConfig(Context ctx) throws Exception {
-        return runShellCmd("reload_or_dynamic_refresh_config", ctx);
+        if (((ConfigUpgradeTask) ctx.getTask()).isReload()) {
+            return runShellCmd("reload_config", ctx);
+        } else {
+            return runDynamicRefreshShellCmd(ctx);
+        }
     }
 
     @Override
