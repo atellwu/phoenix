@@ -247,4 +247,13 @@ public class DefaultAgentClient implements AgentClient {
         return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 
+    /* (non-Javadoc)
+     * @see com.dianping.phoenix.lb.deploy.agent.AgentClient#getResult()
+     */
+    @Override
+    public AgentClientResult getResult() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

@@ -30,6 +30,8 @@ public class AgentClientResult {
     private static final DateFormat DATE_FOMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private DeployAgentStatus       status        = DeployAgentStatus.PROCESSING;
     private List<String>            logs          = new ArrayList<String>();
+    private String                  currentStep;
+    private int                     processPct;
 
     public void logInfo(String msg) {
         logs.add("[" + DATE_FOMATTER.format(new Date()) + "] [INFO] " + msg);
@@ -50,6 +52,22 @@ public class AgentClientResult {
 
     public void logError(String msg) {
         logError(msg, null);
+    }
+
+    public String getCurrentStep() {
+        return currentStep;
+    }
+
+    public void setCurrentStep(String currentStep) {
+        this.currentStep = currentStep;
+    }
+
+    public int getProcessPct() {
+        return processPct;
+    }
+
+    public void setProcessPct(int processPct) {
+        this.processPct = processPct;
     }
 
     public DeployAgentStatus getStatus() {
