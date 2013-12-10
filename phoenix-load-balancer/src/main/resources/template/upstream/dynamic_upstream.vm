@@ -1,0 +1,1 @@
+$nginx.lbStrategy($strategy);#foreach($server in $servers)$nginx.upstreamServer($server)#end

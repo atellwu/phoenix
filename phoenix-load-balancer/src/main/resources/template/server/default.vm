@@ -44,7 +44,8 @@ $nginx.properties($config.server.properties)
 upstream $upstream.name {
     $nginx.lbStrategy($upstream.lbStrategy)
 #foreach($server in $upstream.servers)
-$nginx.upstreamServer($server)#end
+    $nginx.upstreamServer($server)
+#end
 }
 #end
 #end
