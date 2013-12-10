@@ -99,24 +99,36 @@ public class DefaultAgentClient implements AgentClient {
                     if (!callAgentWithDynamicRefresh(compareResult)) {
                         return;
                     }
-
                 }
 
-            } catch (Exception e) {
+                result.logInfo("Agent accepted.");
+
+                readLog();
+
+            } catch (Throwable e) {
                 result.logError("Exception occurs", e);
                 endWithFail();
                 return;
             }
-        } else {
-            result.logError(String.format("Failed to deploy phoenix-slb config(%s) to host(%s)", tag, ip));
-            endWithFail();
-            return;
         }
+    }
+
+    private void readLog() throws IOException {
+        result.logInfo(String.format("Getting status from host(%s) for deploy(%s) ... ", ip, deployId));
+
+        AgentReader sr = new AgentReader(new PhoenixInputStreamReader(configManager.getDeployLogUrl(ip, deployId),
+                configManager.getDeployConnectTimeout(), configManager.getDeployGetlogRetrycount()));
+
+        while (sr.hasNext()) {
+            result.addRawLogs(sr.next(result));
+        }
+
+        endWithSuccess();
     }
 
     private boolean callAgentWithDynamicRefresh(ComparisionResult compareResult) throws MalformedURLException,
             BizException, IOException, ProtocolException, UnsupportedEncodingException {
-        result.logInfo("No need to reload nginx, use dynamic refresh strategy");
+        result.logInfo("No need to reload nginx, switch to dynamic refresh strategy");
         URL deployUrl = new URL(configManager.getDeployWithDynamicRefreshUrl(ip, deployId, vsName,
                 configManager.getTengineConfigFileName(), tag));
 
@@ -135,15 +147,14 @@ public class DefaultAgentClient implements AgentClient {
     }
 
     private boolean checkAgentResponse(HttpURLConnection conn) throws IOException {
-        Response response;
-
-        response = DefaultJsonParser.parse(IOUtils.toString(conn.getInputStream()));
+        Response response = DefaultJsonParser.parse(IOUtils.toString(conn.getInputStream()));
         if (!RESP_MSG_OK.equals(response.getStatus())) {
             result.logError(String.format("Failed to deploy (status: %s, error msg: %s)", response.getStatus(),
                     response.getMessage()));
             endWithFail();
             return false;
         }
+
         return true;
     }
 
@@ -182,7 +193,7 @@ public class DefaultAgentClient implements AgentClient {
         for (Pool pool : compareResult.getAddedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
             postData.put("url", configManager.getNginxDynamicAddUpstreamUrlPattern(pool.getName()));
-            postData.put("method", "post");
+            postData.put("method", "POST");
             postData.put("data", generateUpstreamContent(pool));
             postDataList.add(postData);
         }
@@ -190,7 +201,7 @@ public class DefaultAgentClient implements AgentClient {
         for (Pool pool : compareResult.getModifiedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
             postData.put("url", configManager.getNginxDynamicUpdateUpstreamUrlPattern(pool.getName()));
-            postData.put("method", "post");
+            postData.put("method", "POST");
             postData.put("data", generateUpstreamContent(pool));
             postDataList.add(postData);
         }
@@ -198,7 +209,7 @@ public class DefaultAgentClient implements AgentClient {
         for (Pool pool : compareResult.getDeletedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
             postData.put("url", configManager.getNginxDynamicDeleteUpstreamUrlPattern(pool.getName()));
-            postData.put("method", "delete");
+            postData.put("method", "DELETE");
             postDataList.add(postData);
         }
 
@@ -250,11 +261,11 @@ public class DefaultAgentClient implements AgentClient {
                 return version;
             } else {
                 result.logError(String.format("Failed to fetch version(error msg: %s)", response.getMessage()));
-                result.setStatus(DeployAgentStatus.FAILED);
+                endWithFail();
             }
         } catch (Exception e) {
             result.logError("Exception occurs while fetching version of current working config", e);
-            result.setStatus(DeployAgentStatus.FAILED);
+            endWithFail();
         }
         return null;
     }
@@ -264,15 +275,9 @@ public class DefaultAgentClient implements AgentClient {
         return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.dianping.phoenix.lb.deploy.agent.AgentClient#getResult()
-     */
     @Override
     public AgentClientResult getResult() {
-        // TODO Auto-generated method stub
-        return null;
+        return result;
     }
 
 }
