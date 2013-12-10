@@ -1,5 +1,8 @@
 package com.dianping.phoenix.agent.page.nginx;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.unidal.web.mvc.ActionContext;
@@ -8,35 +11,42 @@ import org.unidal.web.mvc.ErrorObject;
 import org.unidal.web.mvc.payload.annotation.FieldMeta;
 
 import com.dianping.phoenix.agent.AgentPage;
-import com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeTask;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class Payload implements ActionPayload<AgentPage, Action> {
-    private AgentPage m_page;
+    private AgentPage                 m_page;
 
     @FieldMeta("op")
-    private Action    m_action               = Action.VIEW;
+    private Action                    m_action = Action.VIEW;
     @FieldMeta("deployId")
-    private long      m_deployId;
+    private long                      m_deployId;
     @FieldMeta("vs")
-    private String    m_virtualServerName;
+    private String                    m_virtualServerName;
     @FieldMeta("config")
-    private String    m_configFileName;
+    private String                    m_configFileName;
     @FieldMeta("version")
-    private String    m_version;
+    private String                    m_version;
     @FieldMeta("gitUrl")
-    private String    m_girUrl;
+    private String                    m_girUrl;
     @FieldMeta("reload")
-    private String    m_reload               = "true";
-    @FieldMeta("refreshUrl")
-    private String    m_dynamicRefreshUrl;
+    private String                    m_reload = "true";
     @FieldMeta("refreshPostData")
-    private String    m_dynamicRefreshPostData;
-    @FieldMeta("refreshMethod")
-    private String    m_dynamicRefreshMethod = ConfigUpgradeTask.HTTP_METHOD_GET;
+    private String                    m_dynamicRefreshPostDataStr;
+
+    private List<Map<String, String>> m_dynamicRefreshPostData;
     @FieldMeta("offset")
-    private int       m_offset;
+    private int                       m_offset;
     @FieldMeta("br")
-    private int       m_br;
+    private int                       m_br;
+
+    public List<Map<String, String>> getDynamicRefreshPostData() {
+        return m_dynamicRefreshPostData;
+    }
+
+    public void setDynamicRefreshPostData(List<Map<String, String>> dynamicRefreshPostData) {
+        m_dynamicRefreshPostData = dynamicRefreshPostData;
+    }
 
     public int getOffset() {
         return m_offset;
@@ -113,28 +123,12 @@ public class Payload implements ActionPayload<AgentPage, Action> {
         m_reload = reload;
     }
 
-    public String getDynamicRefreshUrl() {
-        return m_dynamicRefreshUrl;
+    public String getDynamicRefreshPostDataStr() {
+        return m_dynamicRefreshPostDataStr;
     }
 
-    public void setDynamicRefreshUrl(String dynamicRefreshUrl) {
-        m_dynamicRefreshUrl = dynamicRefreshUrl;
-    }
-
-    public String getDynamicRefreshPostData() {
-        return m_dynamicRefreshPostData;
-    }
-
-    public void setDynamicRefreshPostData(String dynamicRefreshPostData) {
-        m_dynamicRefreshPostData = dynamicRefreshPostData;
-    }
-
-    public String getDynamicRefreshMethod() {
-        return m_dynamicRefreshMethod;
-    }
-
-    public void setDynamicRefreshMethod(String refreshMethod) {
-        m_dynamicRefreshMethod = refreshMethod;
+    public void setDynamicRefreshPostDataStr(String dynamicRefreshPostDataStr) {
+        m_dynamicRefreshPostDataStr = dynamicRefreshPostDataStr;
     }
 
     public long getDeployId() {
@@ -170,15 +164,15 @@ public class Payload implements ActionPayload<AgentPage, Action> {
                     ctx.addError(new ErrorObject("reload.missing"));
                 }
 
-                if (!Boolean.parseBoolean(m_reload) && StringUtils.isBlank(m_dynamicRefreshUrl)) {
-                    ctx.addError(new ErrorObject("refreshUrl.missing"));
+                if (!Boolean.parseBoolean(m_reload) && StringUtils.isBlank(m_dynamicRefreshPostDataStr)) {
+                    ctx.addError(new ErrorObject("dynamicRefreshPostData.missing"));
                 }
 
-                if (!Boolean.parseBoolean(m_reload) && StringUtils.isBlank(m_dynamicRefreshMethod)
-                        && !ConfigUpgradeTask.HTTP_METHOD_DELETE.equalsIgnoreCase(m_dynamicRefreshMethod)
-                        && !ConfigUpgradeTask.HTTP_METHOD_GET.equalsIgnoreCase(m_dynamicRefreshMethod)
-                        && !ConfigUpgradeTask.HTTP_METHOD_POST.equalsIgnoreCase(m_dynamicRefreshMethod)) {
-                    ctx.addError(new ErrorObject("refreshMethod.missing"));
+                if (StringUtils.isNotBlank(m_dynamicRefreshPostDataStr)) {
+                    Gson gson = new Gson();
+                    m_dynamicRefreshPostData = gson.fromJson(m_dynamicRefreshPostDataStr,
+                            new TypeToken<List<Map<String, String>>>() {
+                            }.getType());
                 }
 
                 break;
@@ -191,7 +185,7 @@ public class Payload implements ActionPayload<AgentPage, Action> {
                 }
                 break;
             case VERSION:
-                if(StringUtils.isBlank(m_virtualServerName)){
+                if (StringUtils.isBlank(m_virtualServerName)) {
                     ctx.addError(new ErrorObject("vsName.missing"));
                 }
                 break;

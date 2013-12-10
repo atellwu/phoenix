@@ -90,21 +90,27 @@ function copy_config {
 	log "config copied"
 }
 
-function reload_or_dynamic_refresh_config {
+function reload_config {
 	if [ `pgrep nginx | wc -l` != 0 ]; then
-		if [ $tengine_reload -eq 1  ];then
-			log "reload tengine config"
-			sudo -u root /etc/init.d/nginx -s reload || { log_error "fail to reload tengine, exit code is $?"; exit 1; }
-	
-		else
-			log "curling $dynamic_refresh_url with request method $refresh_method(post data: $dynamic_refresh_post_data)"
-			local response=`curl -X$refresh_method -d"$dynamic_refresh_post_data" $dynamic_refresh_url`
-			if [ "$response"x != "sucess"x ];then
-				log "fail to curl"
-				exit 1
-			fi
+		log "reload tengine config"
+		sudo -u root /etc/init.d/nginx -s reload || { log_error "fail to reload tengine, exit code is $?"; exit 1; }
+	else
+		log "start tengine"
+		sudo -u root /etc/init.d/nginx || { log_error "fail to start tengine, exit code is $?"; exit 1; }
+	fi
+}
+
+function dynamic_refresh_config {
+	if [ `pgrep nginx | wc -l` != 0 ]; then
+	    log "curling $dynamic_refresh_url with request method $refresh_method(post data: $dynamic_refresh_post_data)"
+	    local command=`echo "curl -X$refresh_method -d$dynamic_refresh_post_data $dynamic_refresh_url"`
+		local response=`eval $command`
+		if [ "$response"x != "success"x ] && [ "$response"x != "not found uptream"x ];then
+			log "fail to curl"
+			exit 1
 		fi
 	else
+		log "start tengine"
 		sudo -u root /etc/init.d/nginx || { log_error "fail to start tengine, exit code is $?"; exit 1; }
 	fi
 }
@@ -125,6 +131,7 @@ function rollback {
 	rm -rf $config_dir/*
 	git_rollback $config_dir
 	log "tengine config version $version rolled back"
+	reload_config
 }
 
 # Commit a git directory
