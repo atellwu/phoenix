@@ -46,6 +46,9 @@
             <columnOverride column="status"
                 javaType="com.dianping.phoenix.lb.deploy.model.DeployTaskStatus"
                 jdbcType="VARCHAR" />
+            <columnOverride column="state_action"
+                javaType="com.dianping.phoenix.lb.deploy.model.StateAction"
+                jdbcType="VARCHAR" />    
         </table>
 
         <table tableName="deploy_vs">
@@ -65,7 +68,7 @@
         </table>
 
         <table tableName="agent_id_sequence">
-            <generatedKey column="id" sqlStatement="MySql"
+            <generatedKey column="agent_id" sqlStatement="MySql"
                 identity="true" />
         </table>
 

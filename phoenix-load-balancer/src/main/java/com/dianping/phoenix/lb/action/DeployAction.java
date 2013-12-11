@@ -178,7 +178,9 @@ public class DeployAction extends ActionSupport {
     public String startDeployTask() {
         try {
             //提交任务
-            taskContainer.submitTaskExecutor(deployTaskId);
+            TaskExecutor taskExecutor = taskContainer.submitTaskExecutor(deployTaskId);
+
+            taskExecutor.start();
 
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (IllegalArgumentException e) {
@@ -192,14 +194,33 @@ public class DeployAction extends ActionSupport {
         return SUCCESS;
     }
 
-    /**
-     * 暂停Task
-     */
-    public String pauseDeployTask() {
+    //    /**
+    //     * 暂停Task
+    //     */
+    //    public String pauseDeployTask() {
+    //        try {
+    //            TaskExecutor taskExecutor = taskContainer.getTaskExecutor(deployTaskId);
+    //            if (taskExecutor != null) {
+    //                taskExecutor.pause();
+    //            }
+    //
+    //            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+    //        } catch (IllegalArgumentException e) {
+    //            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+    //            dataMap.put("errorMessage", e.getMessage());
+    //        } catch (Exception e) {
+    //            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+    //            dataMap.put("errorMessage", e.getMessage());
+    //            LOG.error(e.getMessage(), e);
+    //        }
+    //        return SUCCESS;
+    //    }
+
+    public String stopDeployTask() {
         try {
             TaskExecutor taskExecutor = taskContainer.getTaskExecutor(deployTaskId);
             if (taskExecutor != null) {
-                taskExecutor.pause();
+                taskExecutor.stop();
             }
 
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
@@ -214,27 +235,27 @@ public class DeployAction extends ActionSupport {
         return SUCCESS;
     }
 
-    /**
-     * 取消Task
-     */
-    public String cancelDeployTask() {
-        try {
-            TaskExecutor taskExecutor = taskContainer.getTaskExecutor(deployTaskId);
-            if (taskExecutor != null) {
-                taskExecutor.cancel();
-            }
-
-            dataMap.put("errorCode", ERRORCODE_SUCCESS);
-        } catch (IllegalArgumentException e) {
-            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
-            dataMap.put("errorMessage", e.getMessage());
-        } catch (Exception e) {
-            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
-            dataMap.put("errorMessage", e.getMessage());
-            LOG.error(e.getMessage(), e);
-        }
-        return SUCCESS;
-    }
+//    /**
+//     * 重试Task
+//     */
+//    public String retryDeployTask() {
+//        try {
+//            TaskExecutor taskExecutor = taskContainer.getTaskExecutor(deployTaskId);
+//            if (taskExecutor != null) {
+//                //                taskExecutor.retry();
+//            }
+//
+//            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+//        } catch (IllegalArgumentException e) {
+//            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+//            dataMap.put("errorMessage", e.getMessage());
+//        } catch (Exception e) {
+//            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+//            dataMap.put("errorMessage", e.getMessage());
+//            LOG.error(e.getMessage(), e);
+//        }
+//        return SUCCESS;
+//    }
 
     public String getStatus() {
         try {

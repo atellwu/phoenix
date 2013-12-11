@@ -248,8 +248,15 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="deploy/task/{deployTaskId}/cancel" class="deployAction"
-            method="cancelDeployTask">
+        <action name="deploy/task/{deployTaskId}/stop" class="deployAction"
+            method="stopDeployTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{deployTaskId}/retry" class="deployAction"
+            method="retryDeployTask">
             <result name="success" type="json">
                 <param name="root">dataMap</param>
                 <param name="encoding">UTF-8</param>

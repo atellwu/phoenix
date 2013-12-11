@@ -1271,9 +1271,17 @@ span.chooseTipsLine {
 
 .deployBody {
 	background: #fff;
-	background-image: ;
+	background-image:;
 }
 
-table.slb-datatable thead{
-	color:#0073ea;
+table.slb-datatable thead {
+	color: #0073ea;
+}
+
+.my-progress-bar .progress {
+	position: relative;
+}
+
+.my-progress-bar .progress>p {
+	position: absolute;
 }

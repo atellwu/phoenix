@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.phoenix.lb.configure.ConfigManager;
 import com.dianping.phoenix.lb.deploy.agent.AgentClient;
@@ -26,6 +28,7 @@ import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
 import com.dianping.phoenix.lb.deploy.model.DeployVs;
 import com.dianping.phoenix.lb.deploy.model.DeployVsStatus;
 import com.dianping.phoenix.lb.deploy.model.ErrorPolicy;
+import com.dianping.phoenix.lb.deploy.model.StateAction;
 import com.dianping.phoenix.lb.deploy.service.AgentSequenceService;
 import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.service.model.StrategyService;
@@ -33,7 +36,9 @@ import com.dianping.phoenix.lb.service.model.VirtualServerService;
 
 public class DefaultTaskExecutor implements TaskExecutor {
 
-    private static final String        pattern    = "mm-dd hh:MM:ss";
+    private static final Logger        LOG        = LoggerFactory.getLogger(DefaultTaskExecutor.class);
+
+    private static final String        pattern    = "yyyy-mm-dd hh:MM:ss";
 
     private final DeployTaskBo         deployTaskBo;
 
@@ -49,7 +54,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private final boolean              autoContinue;
 
-    private final int                  deployInterval;
+    private final Integer              deployInterval;
 
     private final AgentBatch           agentBatch;
 
@@ -78,39 +83,11 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     }
 
-    /**
-     * 程序启动时，需要扫描数据库，状态为READY就会拿来跑。<br>
-     * 
-     */
-    @Override
-    public void start() {
-        if (actionLock.tryLock()) {
-            try {
-                //当前的状态为READY，才会执行
-                DeployTaskStatus taskStatus = deployTaskBo.getTask().getStatus();
-                if (taskStatus != DeployTaskStatus.READY) {
-                    return;
-                }
-
-                if (taskThread != null) {//make sure
-                    taskThread.interrupt();
-                }
-                taskThread = new Thread(new InnerTask(), "TaskExecutor-" + this.deployTaskBo.getTask().getName());
-                taskThread.start();
-
-            } finally {
-                actionLock.unlock();
-            }
-        }
-
-    }
-
     private class InnerTask implements Runnable {
 
         @Override
         public void run() {
-            //task启动了，更新状态为PROCESSING
-            deployTaskBo.getTask().setStatus(DeployTaskStatus.PROCESSING);
+            LOG.info("Task " + DefaultTaskExecutor.this.deployTaskBo.getTask().getName() + " begin.");
 
             // 每次启动，都使用新的agentId
             deployTaskBo.setAgentId(agentSequenceService.getAgentId());
@@ -119,9 +96,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
             //获取接下来要发布的vs和agent
             DeployVsBo deployVsBo = null;
-            while ((deployVsBo = nextReadyDeployVs(deployTaskBo)) != null && !Thread.currentThread().isInterrupted()) {
-                //vs启动了，更新状态为PROCESSING
-                deployVsBo.getDeployVs().setStatus(DeployVsStatus.PROCESSING);
+            while ((deployVsBo = nextDeployVs(deployTaskBo)) != null && !Thread.currentThread().isInterrupted()) {
 
                 Map<String, DeployAgentBo> deployAgentBos = null;
                 while ((deployAgentBos = nextReadyDeployAgents(deployVsBo, agentBatch.getBatchSize())).size() > 0 && !Thread.currentThread().isInterrupted()) {
@@ -133,23 +108,25 @@ public class DefaultTaskExecutor implements TaskExecutor {
                     }
                 }
                 //执行完一个vs(或者因为暂停/取消而退出)，需要更新一下vs的状态
-                updateVsStatus(deployVsBo);
+                autoUpdateVsStatusByChildren(deployVsBo);
             }
 
             //执行完所有vs(或者因为暂停/取消而退出)，需要更新一下task的状态
-            updateTaskStatus(deployTaskBo);
+            autoUpdateTaskStatusByChildren(deployTaskBo);
+
+            LOG.info("Task " + DefaultTaskExecutor.this.deployTaskBo.getTask().getName() + " end.");
         }
     }
 
-    private DeployVsBo nextReadyDeployVs(DeployTaskBo deployTaskBo) {
+    private DeployVsBo nextDeployVs(DeployTaskBo deployTaskBo) {
         Map<String, DeployVsBo> deployVsBos = deployTaskBo.getDeployVsBos();
         DeployVsBo vsToBeDeploy = null;
         Set<String> vsNameSet = deployVsBos.keySet();
         for (String vsName : vsNameSet) {
             DeployVsBo deployVsBo = deployVsBos.get(vsName);
             DeployVs deployVs = deployVsBo.getDeployVs();
-            //顺序遍历vs,获取到第一个需要执行的vs。
-            if (deployVs.getStatus() == DeployVsStatus.READY) {
+            //顺序遍历vs,获取到第一个未完成的vs。
+            if (!deployVs.getStatus().isCompleted()) {
                 vsToBeDeploy = deployVsBo;
                 break;
             }
@@ -166,7 +143,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
         for (String ip : hostNameSet) {
             index++;
             DeployAgentBo deployAgentBo = deployAgentBos.get(ip);
-            if (deployAgentBo.getDeployAgent().getStatus() == DeployAgentStatus.INIT) {
+            if (!deployAgentBo.getDeployAgent().getStatus().isCompleted()) {
                 re.put(ip, deployAgentBo);
                 if (index == 1) {//如果要执行的是第一个agent，那么只执行这一个agent。因为第一次都是执行第一台的。
                     break;
@@ -206,8 +183,6 @@ public class DefaultTaskExecutor implements TaskExecutor {
             try {
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
-                //task线程被中断，则认为是cancel或pause，那么不管任务了
-                //executor.shutdownNow();//不在这里shutdown了，在cancel方法自己shutdown吧，因为pause是不能中断executor正在运行的agent的
                 break;
             }
         }
@@ -231,8 +206,8 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
         String summaryLog = deployVs.getSummaryLog();
 
-        StringBuilder sb = new StringBuilder(summaryLog);
-        sb.append('[').append(timeStamp).append("] ").append(line).append("\n");
+        StringBuilder sb = new StringBuilder(summaryLog != null ? summaryLog : "");
+        sb.append('[').append(timeStamp).append("] ").append(line).append('\n');
 
         deployVs.setSummaryLog(sb.toString());
 
@@ -249,7 +224,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
             doWhenAgentBatchSuccess();
         } else {
             //TODO task不设置fail状态，有失败不跳过，则是暂停。
-            this.pause();
+            this.autoPause();
         }
     }
 
@@ -260,19 +235,11 @@ public class DefaultTaskExecutor implements TaskExecutor {
      */
     private void doWhenAgentBatchSuccess() throws InterruptedException {
         if (!this.autoContinue) {
-            this.pause();
+            this.autoPause();
         } else {
-            this.pause(this.deployInterval);
+            //            this.innerPause(this.deployInterval);
+            TimeUnit.SECONDS.sleep(deployInterval);
         }
-    }
-
-    /**
-     * 暂停deployInterval秒后继续执行
-     */
-    private void pause(int deployInterval) throws InterruptedException {
-        this.pause();
-        TimeUnit.SECONDS.sleep(deployInterval);
-        this.start();
     }
 
     /**
@@ -293,7 +260,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
     /**
      * 根据孩子(vs)更新task状态
      */
-    private void updateTaskStatus(DeployTaskBo deployTaskBo) {
+    private void autoUpdateTaskStatusByChildren(DeployTaskBo deployTaskBo) {
         Map<String, DeployVsBo> deployVsBos = deployTaskBo.getDeployVsBos();
 
         List<DeployVsStatus> list = new ArrayList<DeployVsStatus>();
@@ -303,12 +270,21 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
         DeployTaskStatus status = deployTaskBo.getTask().getStatus();
         deployTaskBo.getTask().setStatus(status.calculate(list));
+
+        deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+
+        //如果是结束状态，则StateAction设置为DONE
+        if (deployTaskBo.getTask().getStatus().isCompleted()) {
+            DefaultTaskExecutor.this.deployTaskBo.getTask().setStateAction(StateAction.STOP);
+            deployTaskService.updateDeployTaskStateAction(DefaultTaskExecutor.this.deployTaskBo.getTask());
+        }
+
     }
 
     /**
      * 根据孩子(agent)更新vs状态
      */
-    private void updateVsStatus(DeployVsBo deployVsBo) {
+    private void autoUpdateVsStatusByChildren(DeployVsBo deployVsBo) {
         Map<String, DeployAgentBo> deployAgentBos = deployVsBo.getDeployAgentBos();
 
         List<DeployAgentStatus> list = new ArrayList<DeployAgentStatus>();
@@ -318,7 +294,6 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
         DeployVsStatus status = deployVsBo.getDeployVs().getStatus();
         deployVsBo.getDeployVs().setStatus(status.calculate(list));
-        //        deployVsBo.getDeployVs().setSummaryLog(deployVsBo.getDeployVs().getSummaryLog());
 
         deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
     }
@@ -343,14 +318,14 @@ public class DefaultTaskExecutor implements TaskExecutor {
             deployAgentBo.getDeployAgent().setRawLog(convertToRawLog(log));
             deployAgentBo.getDeployAgent().setStatus(status);
 
-            deployTaskService.updateDeployAgentStatus(deployAgentBo.getDeployAgent());
+            deployTaskService.updateDeployAgentStatusAndLog(deployAgentBo.getDeployAgent());
         }
     }
 
     private String convertToRawLog(List<String> logs) {
         StringBuilder sb = new StringBuilder();
         for (String line : logs) {
-            sb.append(line).append("\n");
+            sb.append(line).append('\n');
         }
         return sb.toString();
     }
@@ -383,69 +358,54 @@ public class DefaultTaskExecutor implements TaskExecutor {
         return deployTaskBo;
     }
 
-    @Override
-    public void pause() {
-
-        if (actionLock.tryLock()) {
-            try {
-                DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
-                if (taskStatus.canPaused()) {
-
-                    //终止主线程
-                    taskThread.interrupt();
-                    while (taskThread.isAlive()) {
-                        try {
-                            taskThread.join();
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                    //将task和vs设置成暂停
-                    this.deployTaskBo.getTask().setStatus(DeployTaskStatus.PAUSED);
-                    deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
-
-                    Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
-                    for (DeployVsBo deployVsBo : deployVsBos.values()) {
-                        DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
-                        if (vsStatus.canPaused()) {
-                            deployVsBo.getDeployVs().setStatus(DeployVsStatus.PAUSED);
-                            deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
-                        }
-                    }
-                }
-
-            } finally {
-                actionLock.unlock();
-            }
-        }
-
-    }
-
     /**
-     * 遇到错误时，手动处理： 将状态变成fail<br>
-     * 设置手动一步步执行时：将状态变成pause<br>
+     * 将非SUCCESS状态的task,vs,agent的状态重置为READY
      */
-    @Override
-    public void resume() {
-        if (actionLock.tryLock()) {
-            try {
-                //与start方法不同，这里是先把pause状态的任务变成ready
-                DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
-                if (taskStatus == DeployTaskStatus.PAUSED) {
-                    //将task和vs的状态设置从暂停设置成ready
-                    this.deployTaskBo.getTask().setStatus(DeployTaskStatus.READY);
-                    deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+    private void resetAllAgentStatus() {
+        DefaultTaskExecutor.this.deployTaskBo.getTask().setStatus(DeployTaskStatus.READY);
+        deployTaskService.updateDeployTaskStatus(DefaultTaskExecutor.this.deployTaskBo.getTask());
 
-                    Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
-                    for (DeployVsBo deployVsBo : deployVsBos.values()) {
-                        DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
-                        if (vsStatus == DeployVsStatus.PAUSED) {
-                            deployVsBo.getDeployVs().setStatus(DeployVsStatus.READY);
-                            deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
-                        }
+        Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
+
+        for (DeployVsBo deployVsBo : deployVsBos.values()) {
+            DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
+            if (vsStatus.isNotSuccess()) {
+
+                deployVsBo.getDeployVs().setStatus(DeployVsStatus.READY);
+                deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
+
+                Map<String, DeployAgentBo> deployAgentBos = deployVsBo.getDeployAgentBos();
+                for (DeployAgentBo deployAgentBo : deployAgentBos.values()) {
+                    DeployAgentStatus agentStatus = deployAgentBo.getDeployAgent().getStatus();
+                    if (agentStatus.isNotSuccess()) {
+                        deployAgentBo.getDeployAgent().setStatus(DeployAgentStatus.READY);
+                        deployTaskService.updateDeployAgentStatusAndLog(deployAgentBo.getDeployAgent());
                     }
-                    //然后再调用start
-                    this.start();
                 }
+            }
+        }
+    }
+
+    @Override
+    public void start() {
+        if (actionLock.tryLock()) {
+            LOG.info("Task " + DefaultTaskExecutor.this.deployTaskBo.getTask().getName() + " start().");
+
+            try {
+                if (taskThread != null && taskThread.isAlive()) {//make sure
+                    throw new IllegalArgumentException("Task is running, cannot start.");
+                }
+
+                //如果上次的状态是失败的，则认为本次启动是重试失败
+                if (DefaultTaskExecutor.this.deployTaskBo.getTask().getStatus().isNotSuccess()) {
+                    resetAllAgentStatus();
+                }
+
+                taskThread = new Thread(new InnerTask(), "TaskExecutor-" + this.deployTaskBo.getTask().getName());
+                taskThread.start();
+
+                DefaultTaskExecutor.this.deployTaskBo.getTask().setStateAction(StateAction.START);
+                deployTaskService.updateDeployTaskStateAction(DefaultTaskExecutor.this.deployTaskBo.getTask());
 
             } finally {
                 actionLock.unlock();
@@ -453,15 +413,48 @@ public class DefaultTaskExecutor implements TaskExecutor {
         }
     }
 
+//    @Override
+//    public void pause() {
+//        if (actionLock.tryLock()) {
+//            try {
+//                LOG.info("Task " + DefaultTaskExecutor.this.deployTaskBo.getTask().getName() + " pause().");
+//
+//                if (taskThread.isAlive()) {
+//                    //终止agent线程
+//                    executor.shutdown();
+//                    try {
+//                        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
+//                    } catch (InterruptedException e1) {
+//                    }
+//
+//                    //终止主线程
+//                    taskThread.interrupt();
+//                    while (taskThread.isAlive()) {
+//                        try {
+//                            taskThread.join();
+//                        } catch (InterruptedException e) {
+//                        }
+//                    }
+//
+//                    DefaultTaskExecutor.this.deployTaskBo.getTask().setStateAction(StateAction.PAUSE);
+//                    deployTaskService.updateDeployTaskStateAction(DefaultTaskExecutor.this.deployTaskBo.getTask());
+//                }
+//
+//            } finally {
+//                actionLock.unlock();
+//            }
+//        }
+//    }
+
     @Override
-    public void cancel() {
+    public void stop() {
         if (actionLock.tryLock()) {
             try {
-                DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
-                if (taskStatus.canCancel()) {
+                LOG.info("Task " + DefaultTaskExecutor.this.deployTaskBo.getTask().getName() + " pause().");
 
+                if (taskThread.isAlive()) {
                     //终止agent线程
-                    executor.shutdownNow();
+                    executor.shutdown();
                     try {
                         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
                     } catch (InterruptedException e1) {
@@ -476,18 +469,8 @@ public class DefaultTaskExecutor implements TaskExecutor {
                         }
                     }
 
-                    //将task和vs设置成暂停
-                    this.deployTaskBo.getTask().setStatus(DeployTaskStatus.CANCELLING);
-                    deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
-
-                    Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
-                    for (DeployVsBo deployVsBo : deployVsBos.values()) {
-                        DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
-                        if (vsStatus.canCancel()) {
-                            deployVsBo.getDeployVs().setStatus(DeployVsStatus.CANCELLING);
-                            deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
-                        }
-                    }
+                    deployTaskBo.getTask().setStateAction(StateAction.STOP);
+                    deployTaskService.updateDeployTaskStateAction(DefaultTaskExecutor.this.deployTaskBo.getTask());
                 }
 
             } finally {
@@ -496,33 +479,21 @@ public class DefaultTaskExecutor implements TaskExecutor {
         }
     }
 
-    @Override
-    public void retry() {
-        if (actionLock.tryLock()) {
-            try {
-                //将fail的改为Ready
-                DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
-                if (taskStatus == DeployTaskStatus.FAILED) {
-                    //将task和vs的状态设置从暂停设置成ready
-                    this.deployTaskBo.getTask().setStatus(DeployTaskStatus.READY);
-                    deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+    private void autoPause() {
+        LOG.info("Task " + DefaultTaskExecutor.this.deployTaskBo.getTask().getName() + " auto pause.");
 
-                    Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
-                    for (DeployVsBo deployVsBo : deployVsBos.values()) {
-                        DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
-                        if (vsStatus == DeployVsStatus.FAILED) {
-                            deployVsBo.getDeployVs().setStatus(DeployVsStatus.READY);
-                            deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
-                        }
-                    }
-                    //然后再调用start
-                    this.start();
-                }
-
-            } finally {
-                actionLock.unlock();
-            }
+        //终止agent线程
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
+        } catch (InterruptedException e1) {
         }
-    }
 
+        //终止主线程
+        Thread.currentThread().interrupt();
+
+        DefaultTaskExecutor.this.deployTaskBo.getTask().setStateAction(StateAction.PAUSE);
+        deployTaskService.updateDeployTaskStateAction(DefaultTaskExecutor.this.deployTaskBo.getTask());
+
+    }
 }

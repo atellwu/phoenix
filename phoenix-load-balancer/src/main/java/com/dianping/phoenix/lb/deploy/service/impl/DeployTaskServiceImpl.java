@@ -36,6 +36,7 @@ import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
 import com.dianping.phoenix.lb.deploy.model.DeployVs;
 import com.dianping.phoenix.lb.deploy.model.DeployVsExample;
 import com.dianping.phoenix.lb.deploy.model.DeployVsStatus;
+import com.dianping.phoenix.lb.deploy.model.StateAction;
 import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
@@ -106,7 +107,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
     }
 
     @Override
-    public List<DeployTaskBo> getTasks(DeployTaskStatus status) throws BizException {
+    public List<DeployTaskBo> getTasksByStatus(DeployTaskStatus status) throws BizException {
         List<DeployTaskBo> re = new ArrayList<DeployTaskBo>();
 
         DeployTaskExample example = new DeployTaskExample();
@@ -125,17 +126,37 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         return re;
     }
 
+    @Override
+    public List<DeployTaskBo> getTasksByStateAction(StateAction stateAction) throws BizException {
+        List<DeployTaskBo> re = new ArrayList<DeployTaskBo>();
+
+        DeployTaskExample example = new DeployTaskExample();
+        example.createCriteria().andStateActionEqualTo(stateAction);
+        List<DeployTask> deployTasks = deployTaskMapper.selectByExample(example);
+
+        for (DeployTask deployTask : deployTasks) {
+            DeployTaskBo deployTaskBo = new DeployTaskBo();
+
+            buildTaskBo(deployTask.getId(), deployTaskBo);
+
+            deployTaskBo.setTask(deployTask);
+            re.add(deployTaskBo);
+        }
+
+        return re;
+    }
+
     private void buildTaskBo(long taskId, DeployTaskBo task) throws BizException {
         DeployVsExample example = new DeployVsExample();
         example.createCriteria().andDeployTaskIdEqualTo(taskId);
-        List<DeployVs> deployVsList = deployVsMapper.selectByExample(example);
+        List<DeployVs> deployVsList = deployVsMapper.selectByExampleWithBLOBs(example);
 
         List<DeployVsBo> deployVsBos = new ArrayList<DeployVsBo>();
         for (DeployVs deployVs : deployVsList) {
             DeployVsBo deployVsBo = new DeployVsBo();
             DeployAgentExample example2 = new DeployAgentExample();
             example2.createCriteria().andDeployVsIdEqualTo(deployVs.getId());
-            List<DeployAgent> deployAgents = deployAgentMapper.selectByExample(example2);
+            List<DeployAgent> deployAgents = deployAgentMapper.selectByExampleWithBLOBs(example2);
             VirtualServer vs = virtualServerService.findVirtualServer(deployVs.getVsName());
 
             deployVsBo.setDeployVs(deployVs);
@@ -181,7 +202,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
             deployVs.setVsName(vsAndTag.getVsName());
             deployVs.setVsTag(vsAndTag.getTag());
             deployVs.setDeployTaskId(task.getId());
-            deployVs.setStatus(DeployVsStatus.CREATED);
+            deployVs.setStatus(DeployVsStatus.READY);
             deployVs.setLastModifiedDate(new Date());
             deployVsMapper.insertSelective(deployVs);
         }
@@ -222,7 +243,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
                 for (DeployAgentBo agentBo : agents.values()) {
                     DeployAgent deployAgent = new DeployAgent();
                     deployAgent.setDeployVsId(vs.getId());
-                    deployAgent.setStatus(DeployAgentStatus.CREATED);
+                    deployAgent.setStatus(DeployAgentStatus.READY);
                     deployAgent.setIpAddress(agentBo.getDeployAgent().getIpAddress());
                     deployAgent.setLastModifiedDate(new Date());
                     deployAgentMapper.insertSelective(deployAgent);
@@ -274,10 +295,16 @@ public class DeployTaskServiceImpl implements DeployTaskService {
     }
 
     @Override
-    public void updateDeployAgentStatus(DeployAgent deployAgent) {
+    public void updateDeployAgentStatusAndLog(DeployAgent deployAgent) {
+        if (deployAgent.getStatus() == DeployAgentStatus.PROCESSING) {
+            return;
+        }
         DeployAgent deployAgent0 = new DeployAgent();
         deployAgent0.setId(deployAgent.getId());
         deployAgent0.setStatus(deployAgent.getStatus());
+        if (deployAgent.getRawLog() != null) {
+            deployAgent0.setRawLog(deployAgent.getRawLog());
+        }
 
         deployAgentMapper.updateByPrimaryKeySelective(deployAgent0);
     }
@@ -290,6 +317,15 @@ public class DeployTaskServiceImpl implements DeployTaskService {
 
         deployVsMapper.updateByPrimaryKeySelective(deployVs0);
 
+    }
+
+    @Override
+    public void updateDeployTaskStateAction(DeployTask deployTask) {
+        DeployTask deployTask0 = new DeployTask();
+        deployTask0.setId(deployTask.getId());
+        deployTask0.setStateAction(deployTask.getStateAction());
+
+        deployTaskMapper.updateByPrimaryKeySelective(deployTask0);
     }
 
 }

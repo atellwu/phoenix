@@ -1,12 +1,12 @@
 delimiter ;
 
 CREATE TABLE `agent_id_sequence` (
-  `agent_id` bigint(20) NOT NULL,
+  `agent_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`agent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用于产生agent_id流水号';
 
-delimiter ;
+
 
 CREATE TABLE `deploy_agent` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,

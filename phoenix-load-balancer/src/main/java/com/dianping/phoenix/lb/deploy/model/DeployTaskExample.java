@@ -964,6 +964,76 @@ public class DeployTaskExample {
             addCriterion("last_modified_date not between", value1, value2, "lastModifiedDate");
             return (Criteria) this;
         }
+
+        public Criteria andStateActionIsNull() {
+            addCriterion("state_action is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionIsNotNull() {
+            addCriterion("state_action is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionEqualTo(StateAction value) {
+            addCriterion("state_action =", value, "stateAction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionNotEqualTo(StateAction value) {
+            addCriterion("state_action <>", value, "stateAction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionGreaterThan(StateAction value) {
+            addCriterion("state_action >", value, "stateAction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionGreaterThanOrEqualTo(StateAction value) {
+            addCriterion("state_action >=", value, "stateAction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionLessThan(StateAction value) {
+            addCriterion("state_action <", value, "stateAction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionLessThanOrEqualTo(StateAction value) {
+            addCriterion("state_action <=", value, "stateAction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionLike(StateAction value) {
+            addCriterion("state_action like", value, "stateAction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionNotLike(StateAction value) {
+            addCriterion("state_action not like", value, "stateAction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionIn(List<StateAction> values) {
+            addCriterion("state_action in", values, "stateAction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionNotIn(List<StateAction> values) {
+            addCriterion("state_action not in", values, "stateAction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionBetween(StateAction value1, StateAction value2) {
+            addCriterion("state_action between", value1, value2, "stateAction");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateActionNotBetween(StateAction value1, StateAction value2) {
+            addCriterion("state_action not between", value1, value2, "stateAction");
+            return (Criteria) this;
+        }
     }
 
     /**
