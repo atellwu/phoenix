@@ -21,15 +21,22 @@ public class PhoenixAgent {
 		String contextPath = args[1];
 		File warRoot = new File(args[2]);
 
-		logger.info(String.format("starting jetty@%d, contextPath %s, warRoot %s", port, contextPath,
-				warRoot.getAbsoluteFile().getAbsolutePath()));
+		logger.info(String.format("starting jetty@%d, contextPath %s, warRoot %s", port, contextPath, warRoot
+				.getAbsoluteFile().getAbsolutePath()));
 
 		Server server = new Server(port);
 		addTerminateSingalHandler(server);
 		WebAppContext context = new WebAppContext();
 
+		File jettyTmpDir = new File("/data/appdatas/phoenix/jsp-work");
+		if (!jettyTmpDir.exists()) {
+			if (!jettyTmpDir.mkdirs()) {
+				throw new RuntimeException("Can not create jetty tmp dir at " + jettyTmpDir.getAbsolutePath());
+			}
+		}
 		context.setContextPath(contextPath);
 		context.setDescriptor(new File(warRoot, "WEB-INF/web.xml").getPath());
+		context.setTempDirectory(jettyTmpDir);
 		context.setResourceBase(warRoot.getPath());
 
 		server.setHandler(context);
@@ -38,7 +45,7 @@ public class PhoenixAgent {
 	}
 
 	public static void addTerminateSingalHandler(final Server server) {
-		// not officially supported API 
+		// not officially supported API
 		sun.misc.Signal.handle(new sun.misc.Signal("TERM"), new sun.misc.SignalHandler() {
 			@Override
 			public void handle(sun.misc.Signal signal) {
