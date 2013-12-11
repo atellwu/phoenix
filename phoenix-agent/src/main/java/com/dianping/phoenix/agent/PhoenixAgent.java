@@ -1,10 +1,13 @@
 package com.dianping.phoenix.agent;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;
+
+import com.dianping.phoenix.agent.module.ModuleLoader;
 
 public class PhoenixAgent {
 
@@ -24,6 +27,8 @@ public class PhoenixAgent {
 		logger.info(String.format("starting jetty@%d, contextPath %s, warRoot %s", port, contextPath, warRoot
 				.getAbsoluteFile().getAbsolutePath()));
 
+		startModules();
+		
 		Server server = new Server(port);
 		addTerminateSingalHandler(server);
 		WebAppContext context = new WebAppContext();
@@ -42,6 +47,21 @@ public class PhoenixAgent {
 		server.setHandler(context);
 		server.start();
 
+	}
+
+	private static void startModules() {
+		new Thread() {
+
+			@Override
+			public void run() {
+				try {
+					ModuleLoader.getInstance().load();
+				} catch (IOException e) {
+					logger.error("error load modules", e);
+				}
+			}
+			
+		}.start();
 	}
 
 	public static void addTerminateSingalHandler(final Server server) {
