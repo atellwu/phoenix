@@ -44,8 +44,9 @@ public interface TaskExecutor {
      */
     void cancle();
 
-
     void resume();
 
     DeployTaskBo getDeployTaskBo();
+
+    void retry();
 }

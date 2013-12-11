@@ -95,10 +95,37 @@ public class DeployTaskServiceImpl implements DeployTaskService {
 
     @Override
     public DeployTaskBo getTask(long taskId) throws BizException {
-        DeployTaskBo task = new DeployTaskBo();
+        DeployTask deployTask = deployTaskMapper.selectByPrimaryKey(taskId);
 
-        DeployTask deployVsTask = deployTaskMapper.selectByPrimaryKey(taskId);
+        DeployTaskBo deployTaskBo = new DeployTaskBo();
+        buildTaskBo(taskId, deployTaskBo);
 
+        deployTaskBo.setTask(deployTask);
+
+        return deployTaskBo;
+    }
+
+    @Override
+    public List<DeployTaskBo> getTasks(DeployTaskStatus status) throws BizException {
+        List<DeployTaskBo> re = new ArrayList<DeployTaskBo>();
+
+        DeployTaskExample example = new DeployTaskExample();
+        example.createCriteria().andStatusEqualTo(status);
+        List<DeployTask> deployTasks = deployTaskMapper.selectByExample(example);
+
+        for (DeployTask deployTask : deployTasks) {
+            DeployTaskBo deployTaskBo = new DeployTaskBo();
+
+            buildTaskBo(deployTask.getId(), deployTaskBo);
+
+            deployTaskBo.setTask(deployTask);
+            re.add(deployTaskBo);
+        }
+
+        return re;
+    }
+
+    private void buildTaskBo(long taskId, DeployTaskBo task) throws BizException {
         DeployVsExample example = new DeployVsExample();
         example.createCriteria().andDeployTaskIdEqualTo(taskId);
         List<DeployVs> deployVsList = deployVsMapper.selectByExample(example);
@@ -117,11 +144,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
 
             deployVsBos.add(deployVsBo);
         }
-
-        task.setTask(deployVsTask);
         task.setDeployVsBos(convertDeployVssToMap(deployVsBos));
-
-        return task;
     }
 
     private Map<String, DeployVsBo> convertDeployVssToMap(List<DeployVsBo> deployVsBos) {
@@ -233,19 +256,40 @@ public class DeployTaskServiceImpl implements DeployTaskService {
 
     @Override
     public void updateDeployTaskStatus(DeployTask deployTask) {
-        // TODO Auto-generated method stub
+        DeployTask deployTask0 = new DeployTask();
+        deployTask0.setId(deployTask.getId());
+        deployTask0.setStatus(deployTask.getStatus());
 
+        deployTaskMapper.updateByPrimaryKeySelective(deployTask0);
     }
 
     @Override
     public void updateDeployVsStatus(DeployVs deployVs) {
-        // TODO Auto-generated method stub
+        DeployVs deployVs0 = new DeployVs();
+        deployVs0.setId(deployVs.getId());
+        deployVs0.setStatus(deployVs.getStatus());
+
+        deployVsMapper.updateByPrimaryKeySelective(deployVs0);
 
     }
 
     @Override
     public void updateDeployAgentStatus(DeployAgent deployAgent) {
-        // TODO Auto-generated method stub
+        DeployAgent deployAgent0 = new DeployAgent();
+        deployAgent0.setId(deployAgent.getId());
+        deployAgent0.setStatus(deployAgent.getStatus());
+
+        deployAgentMapper.updateByPrimaryKeySelective(deployAgent0);
+    }
+
+    @Override
+    public void updateDeployVsSummaryLog(DeployVs deployVs) {
+        DeployVs deployVs0 = new DeployVs();
+        deployVs0.setId(deployVs.getId());
+        deployVs0.setSummaryLog(deployVs.getSummaryLog());
+
+        deployVsMapper.updateByPrimaryKeySelective(deployVs0);
 
     }
+
 }

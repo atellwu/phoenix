@@ -4,7 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum DeployAgentStatus {
-    CREATED, INIT, REJECTED, PROCESSING, FAILED, SUCCESS, KILLED;
+    CREATED(""), INIT(""), REJECTED(""), PROCESSING(""), FAILED(""), SUCCESS(""), KILLED("");
+
+    private String desc;
+
+    private DeployAgentStatus(String desc) {
+        this.desc = desc;
+    }
 
     private final static Set<DeployAgentStatus> COMPLETED_STATUS_SET = new HashSet<DeployAgentStatus>();
     static {
@@ -32,6 +38,10 @@ public enum DeployAgentStatus {
 
     public boolean isNotSuccess() {
         return ERROR_STATUS_SET.contains(this);
+    }
+
+    public String getDesc() {
+        return desc;
     }
 
 }

@@ -7,6 +7,7 @@ import com.dianping.phoenix.lb.deploy.bo.DeployTaskBo;
 import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo;
 import com.dianping.phoenix.lb.deploy.model.DeployAgent;
 import com.dianping.phoenix.lb.deploy.model.DeployTask;
+import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
 import com.dianping.phoenix.lb.deploy.model.DeployVs;
 import com.dianping.phoenix.lb.exception.BizException;
 
@@ -43,18 +44,27 @@ public interface DeployTaskService {
     void updateTask(DeployTaskBo deployTaskBo);
 
     /**
-     * 更新Task状态
+     * 更新Task状态（如果状态是Processing，则不更新，此状态不会持久化到数据库）
      */
     void updateDeployTaskStatus(DeployTask deployTask);
 
     /**
-     * 更新Vs状态
+     * 更新Vs状态（如果状态是Processing，则不更新，此状态不会持久化到数据库）
      */
     void updateDeployVsStatus(DeployVs deployVs);
 
+    void updateDeployVsSummaryLog(DeployVs deployVs);
+
     /**
-     * 更新Agent状态
+     * 更新Agent状态（如果状态是Processing，则不更新，此状态不会持久化到数据库）
      */
     void updateDeployAgentStatus(DeployAgent deployAgent);
+
+    /***
+     * 获取状态为ready的task
+     * 
+     * @throws BizException
+     */
+    List<DeployTaskBo> getTasks(DeployTaskStatus ready) throws BizException;
 
 }

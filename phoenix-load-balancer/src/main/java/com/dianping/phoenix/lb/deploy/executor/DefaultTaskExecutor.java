@@ -10,6 +10,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+
 import com.dianping.phoenix.lb.configure.ConfigManager;
 import com.dianping.phoenix.lb.deploy.agent.AgentClient;
 import com.dianping.phoenix.lb.deploy.agent.AgentClientResult;
@@ -23,11 +25,15 @@ import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
 import com.dianping.phoenix.lb.deploy.model.DeployVs;
 import com.dianping.phoenix.lb.deploy.model.DeployVsStatus;
 import com.dianping.phoenix.lb.deploy.model.ErrorPolicy;
+import com.dianping.phoenix.lb.deploy.service.AgentSequenceService;
 import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.service.model.StrategyService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
 
+//TODO deployId的生成？？
 public class DefaultTaskExecutor implements TaskExecutor {
+
+    private static final String        pattern = "mm-dd hh:MM:ss";
 
     private final DeployTaskBo         deployTaskBo;
 
@@ -36,6 +42,8 @@ public class DefaultTaskExecutor implements TaskExecutor {
     private final VirtualServerService virtualServerService;
 
     private final StrategyService      strategyService;
+
+    private final AgentSequenceService agentSequenceService;
 
     private final ConfigManager        configManager;
 
@@ -51,12 +59,14 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private ExecutorService            executor;
 
-    public DefaultTaskExecutor(DeployTaskBo deployTaskBo, DeployTaskService deployTaskService, VirtualServerService virtualServerService, StrategyService strategyService, ConfigManager configManager) {
+    public DefaultTaskExecutor(DeployTaskBo deployTaskBo, DeployTaskService deployTaskService, VirtualServerService virtualServerService, StrategyService strategyService,
+            AgentSequenceService agentSequenceService, ConfigManager configManager) {
         this.deployTaskBo = deployTaskBo;
 
         this.deployTaskService = deployTaskService;
         this.virtualServerService = virtualServerService;
         this.strategyService = strategyService;
+        this.agentSequenceService = agentSequenceService;
         this.configManager = configManager;
 
         this.autoContinue = deployTaskBo.getTask().getAutoContinue();
@@ -90,6 +100,9 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
         @Override
         public void run() {
+            // 每次启动，都使用新的agentId
+            deployTaskBo.setAgentId(agentSequenceService.getAgentId());
+
             executor = Executors.newCachedThreadPool();
 
             //获取接下来要发布的vs和agent
@@ -134,10 +147,15 @@ public class DefaultTaskExecutor implements TaskExecutor {
         Map<String, DeployAgentBo> deployAgentBos = deployVsBo.getDeployAgentBos();
         Set<String> hostNameSet = deployAgentBos.keySet();
         //顺序遍历agent,获取到第一个需要执行的agent。
+        int index = 0;
         for (String ip : hostNameSet) {
+            index++;
             DeployAgentBo deployAgentBo = deployAgentBos.get(ip);
             if (deployAgentBo.getDeployAgent().getStatus() == DeployAgentStatus.INIT) {
                 re.put(ip, deployAgentBo);
+                if (index == 1) {//如果要执行的是第一个agent，那么只执行这一个agent。因为第一次都是执行第一台的。
+                    break;
+                }
                 if (re.size() >= n) {
                     break;
                 }
@@ -150,18 +168,22 @@ public class DefaultTaskExecutor implements TaskExecutor {
         //创建Agent执行者
         Map<String, AgentClient> agentClients = new HashMap<String, AgentClient>();
         for (DeployAgentBo deployAgentBo : deployAgentBos.values()) {
-            long deployId = deployTaskBo.getTask().getAgentId();
+            long agentId = deployTaskBo.getTask().getAgentId();
             String vsName = deployVsBo.getDeployVs().getVsName();
             String vsTag = deployVsBo.getDeployVs().getVsTag();
             String ip = deployAgentBo.getDeployAgent().getIpAddress();
-            DefaultAgentClient agentClient = new DefaultAgentClient(deployId, vsName, vsTag, ip, virtualServerService, strategyService, configManager);
+            DefaultAgentClient agentClient = new DefaultAgentClient(agentId, vsName, vsTag, ip, virtualServerService, strategyService, configManager);
             agentClients.put(ip, agentClient);
         }
 
         //多线程执行agent执行者
+
+        //记录开始执行的log
         CountDownLatch doneSignal = new CountDownLatch(agentClients.size());
-        for (AgentClient agentClient : agentClients.values()) {
-            executor.execute(new AgentTask(agentClient, doneSignal));
+        for (Map.Entry<String, AgentClient> entry : agentClients.entrySet()) {
+            String ip = entry.getKey();
+            AgentClient agentClient = entry.getValue();
+            executor.execute(new AgentTask(agentClient, doneSignal, deployVsBo.getDeployVs(), ip));
         }
         //执行的过程中，所有状态，需要反馈过去，包括持久花到数据库
         while (doneSignal.getCount() > 0) {
@@ -186,7 +208,22 @@ public class DefaultTaskExecutor implements TaskExecutor {
         } else {
             doWhenAgentBatchError();
         }
+    }
 
+    /**
+     * 给vs添加log
+     */
+    private void appendLog(DeployVs deployVs, String line) {
+        String timeStamp = DateFormatUtils.format(System.currentTimeMillis(), pattern);
+
+        String summaryLog = deployVs.getSummaryLog();
+
+        StringBuilder sb = new StringBuilder(summaryLog);
+        sb.append('[').append(timeStamp).append("] ").append(line).append("\n");
+
+        deployVs.setSummaryLog(sb.toString());
+
+        deployTaskService.updateDeployVsSummaryLog(deployVs);
     }
 
     /**
@@ -240,7 +277,9 @@ public class DefaultTaskExecutor implements TaskExecutor {
         return hasError;
     }
 
-    //根据
+    /**
+     * 根据孩子(vs)更新task状态
+     */
     private void updateTaskStatus(DeployTaskBo deployTaskBo) {
         Map<String, DeployVsBo> deployVsBos = deployTaskBo.getDeployVsBos();
 
@@ -251,11 +290,10 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
         DeployTaskStatus status = deployTaskBo.getTask().getStatus();
         deployTaskBo.getTask().setStatus(status.calculate(list));
-
     }
 
     /**
-     * 根据孩子更新状态
+     * 根据孩子(agent)更新vs状态
      */
     private void updateVsStatus(DeployVsBo deployVsBo) {
         Map<String, DeployAgentBo> deployAgentBos = deployVsBo.getDeployAgentBos();
@@ -267,6 +305,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
         DeployVsStatus status = deployVsBo.getDeployVs().getStatus();
         deployVsBo.getDeployVs().setStatus(status.calculate(list));
+        //        deployVsBo.getDeployVs().setSummaryLog(deployVsBo.getDeployVs().getSummaryLog());
 
         deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
     }
@@ -352,7 +391,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public void cancle() {
+    public synchronized void cancle() {
         DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
         if (taskStatus.canCancel()) {
             //将task和vs设置成暂停
@@ -375,16 +414,22 @@ public class DefaultTaskExecutor implements TaskExecutor {
     private class AgentTask implements Runnable {
         private AgentClient    agentClient;
         private CountDownLatch doneSignal;
+        private DeployVs       deployVs;
+        private String         ip;
 
-        public AgentTask(AgentClient agentClient, CountDownLatch doneSignal) {
+        public AgentTask(AgentClient agentClient, CountDownLatch doneSignal, DeployVs deployVs, String ip) {
             this.agentClient = agentClient;
             this.doneSignal = doneSignal;
+            this.ip = ip;
+            this.deployVs = deployVs;
         }
 
         @Override
         public void run() {
+            appendLog(deployVs, "Agent(" + ip + ") executing.");
             agentClient.execute();
             doneSignal.countDown();
+            appendLog(deployVs, "Agent(" + ip + ") done. Result is " + agentClient.getResult().getStatus().getDesc());
         }
 
     }
@@ -392,6 +437,28 @@ public class DefaultTaskExecutor implements TaskExecutor {
     @Override
     public DeployTaskBo getDeployTaskBo() {
         return deployTaskBo;
+    }
+
+    @Override
+    public synchronized void retry() {
+        //将fail的改为Ready
+        DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
+        if (taskStatus == DeployTaskStatus.FAILED) {
+            //将task和vs的状态设置从暂停设置成ready
+            this.deployTaskBo.getTask().setStatus(DeployTaskStatus.READY);
+            deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+
+            Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
+            for (DeployVsBo deployVsBo : deployVsBos.values()) {
+                DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
+                if (vsStatus == DeployVsStatus.FAILED) {
+                    deployVsBo.getDeployVs().setStatus(DeployVsStatus.READY);
+                    deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
+                }
+            }
+            //然后再调用start
+            this.start();
+        }
     }
 
 }
