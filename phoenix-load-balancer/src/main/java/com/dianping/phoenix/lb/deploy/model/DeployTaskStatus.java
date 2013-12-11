@@ -1,5 +1,9 @@
 package com.dianping.phoenix.lb.deploy.model;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public enum DeployTaskStatus {
 
     CREATED("新建的任务"), //创建完，选择了vs，未选择agent
@@ -10,7 +14,9 @@ public enum DeployTaskStatus {
 
     PROCESSING("正在执行"), //内存状态，不需要持久化
 
-    PAUSING("暂停中"),
+    PAUSED("已暂停"),
+
+    WARNING("执行完成(部分失败)"), // completed with partial failures
 
     FAILED("执行失败"), // complete with all failed
 
@@ -44,16 +50,66 @@ public enum DeployTaskStatus {
     //        return defaultStatus;
     //    }
 
-    public static boolean isFinalStatus(DeployTaskStatus status) {
-        return status == SUCCESS || status == CANCELLING;
+    private final static Set<DeployTaskStatus> COMPLETED_STATUS_SET = new HashSet<DeployTaskStatus>();
+    static {
+        COMPLETED_STATUS_SET.add(WARNING);
+        COMPLETED_STATUS_SET.add(FAILED);
+        COMPLETED_STATUS_SET.add(SUCCESS);
+    };
+
+    private final static Set<DeployTaskStatus> ERROR_STATUS_SET     = new HashSet<DeployTaskStatus>();
+    static {
+        COMPLETED_STATUS_SET.add(WARNING);
+        COMPLETED_STATUS_SET.add(FAILED);
+    };
+
+    public boolean isCompleted() {
+        return COMPLETED_STATUS_SET.contains(this);
+    }
+
+    public boolean isNotSuccess() {
+        return ERROR_STATUS_SET.contains(this);
+    }
+
+    public boolean canPaused() {
+        return this == READY || this == PROCESSING;
+    }
+
+    public boolean canCancel() {
+        return this != SUCCESS;//非成功的任务，均可取消
+    }
+
+    /**
+     * 根据子任务(vs任务)的状态，计算父亲的状态
+     */
+    public DeployTaskStatus calculate(List<DeployVsStatus> deployVsStatusList) {
+        boolean hasFailed = false;
+        boolean hasSuccess = false;
+        boolean hasNoCompleted = false;
+        for (DeployVsStatus deployVsStatus : deployVsStatusList) {
+            if (deployVsStatus == DeployVsStatus.SUCCESS) {
+                hasSuccess = true;
+            } else if (deployVsStatus.isNotSuccess()) {
+                hasFailed = true;
+            } else if (!deployVsStatus.isCompleted()) {
+                hasNoCompleted = true;
+            }
+        }
+        if (hasNoCompleted) {
+            //有未完成的孩子状态，则Task保持现有状态
+            return this;
+        } else if (hasSuccess && hasFailed) {
+            return DeployTaskStatus.WARNING;
+        } else if (hasSuccess) {
+            return DeployTaskStatus.SUCCESS;
+        } else {
+            return DeployTaskStatus.FAILED;
+        }
+
     }
 
     public String getDesc() {
         return desc;
     }
-
-    //    public int getId() {
-    //        return m_id;
-    //    }
 
 }

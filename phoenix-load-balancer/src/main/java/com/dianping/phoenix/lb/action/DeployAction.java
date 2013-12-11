@@ -18,16 +18,15 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.deploy.StatusContainer;
 import com.dianping.phoenix.lb.deploy.TaskContainer;
+import com.dianping.phoenix.lb.deploy.bo.DeployAgentBo;
 import com.dianping.phoenix.lb.deploy.bo.DeployTaskBo;
 import com.dianping.phoenix.lb.deploy.bo.DeployVsBo;
 import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo;
-import com.dianping.phoenix.lb.deploy.model.DeployAgent;
 import com.dianping.phoenix.lb.deploy.model.DeployAgentStatus;
 import com.dianping.phoenix.lb.deploy.model.DeployTask;
 import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
 import com.dianping.phoenix.lb.deploy.model.DeployVsStatus;
 import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
-import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.dianping.phoenix.lb.utils.JsonBinder;
@@ -227,7 +226,7 @@ public class DeployAction extends ActionSupport {
                     ;
                     break;
                 case 2:
-                    status = DeployTaskStatus.PAUSING;
+                    status = DeployTaskStatus.PAUSED;
                     break;
                 case 3:
                     status = DeployTaskStatus.SUCCESS;
@@ -244,10 +243,10 @@ public class DeployAction extends ActionSupport {
             for (DeployVsBo bo : vsVsBos.values()) {
                 bo.getDeployVs().setStatus(DeployVsStatus.PROCESSING);
                 bo.getDeployVs().setSummaryLog("SummaryLog");
-                Map<String, DeployAgent> agents = bo.getDeployAgents();
-                for (DeployAgent agent : agents.values()) {
-                    agent.setStatus(DeployAgentStatus.PROCESSING);
-                    agent.setRawLog("rawlog");
+                Map<String, DeployAgentBo> agents = bo.getDeployAgentBos();
+                for (DeployAgentBo agent : agents.values()) {
+                    agent.getDeployAgent().setStatus(DeployAgentStatus.PROCESSING);
+                    agent.getDeployAgent().setRawLog("rawlog");
                 }
             }
 

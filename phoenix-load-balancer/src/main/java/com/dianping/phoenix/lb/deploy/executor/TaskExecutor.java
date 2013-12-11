@@ -6,6 +6,8 @@
  */
 package com.dianping.phoenix.lb.deploy.executor;
 
+import com.dianping.phoenix.lb.deploy.bo.DeployTaskBo;
+
 /**
  * 
  * 负责一个DeployTask的执行。<br>
@@ -42,10 +44,8 @@ public interface TaskExecutor {
      */
     void cancle();
 
-    /**
-     * 获取Task的状态
-     */
-    TaskStatus getStatus();
 
     void resume();
+
+    DeployTaskBo getDeployTaskBo();
 }
