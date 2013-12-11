@@ -19,6 +19,7 @@ import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.utils.AdvEqualsBuilder;
+import com.dianping.phoenix.lb.utils.PoolNameUtils;
 import com.dianping.phoenix.lb.visitor.VirtualServerComparisionVisitor.ComparisionResult;
 
 /**
@@ -96,7 +97,7 @@ public class VirtualServerComparisionVisitor extends AbstractVisitor<Comparision
 
     private void comparePools(Set<String> usedPoolNamePrefixs, Map<String, Pool> pools) {
         for (Pool basePool : basePools.values()) {
-            if (usedPoolNamePrefixs.contains(getPoolNamePrefix(basePool.getName()))) {
+            if (usedPoolNamePrefixs.contains(PoolNameUtils.getPoolNamePrefix(basePool.getName()))) {
                 if (!pools.containsKey(basePool.getName())) {
                     result.addDeletedPools(basePool);
                 } else {
@@ -109,7 +110,7 @@ public class VirtualServerComparisionVisitor extends AbstractVisitor<Comparision
         }
 
         for (Pool pool : pools.values()) {
-            if (usedPoolNamePrefixs.contains(getPoolNamePrefix(pool.getName()))) {
+            if (usedPoolNamePrefixs.contains(PoolNameUtils.getPoolNamePrefix(pool.getName()))) {
                 if (!basePools.containsKey(pool.getName())) {
                     result.addAddedPools(pool);
                 } else {
@@ -123,12 +124,4 @@ public class VirtualServerComparisionVisitor extends AbstractVisitor<Comparision
         }
     }
 
-    private String getPoolNamePrefix(String poolName) {
-        int prefixPos = poolName.indexOf("@");
-        if (prefixPos >= 0) {
-            return poolName.substring(0, prefixPos);
-        } else {
-            return poolName;
-        }
-    }
 }
