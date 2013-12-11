@@ -52,6 +52,16 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
         result.setServer(server);
 
         super.visitVirtualServer(virtualServer);
+        
+        List<NginxUpstream> upstreams =  result.getUpstream(virtualServer.getDefaultPoolName());
+        
+        if (upstreams == null || upstreams.isEmpty()) {
+            throw new RuntimeException(MessageUtils.getMessage(MessageID.VIRTUALSERVER_DEFAULTPOOL_NOT_EXISTS,
+                    virtualServer.getDefaultPoolName()));
+        }
+        for (NginxUpstream upstream : upstreams) {
+            upstream.setUsed(true);
+        }
     }
 
     @Override
