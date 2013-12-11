@@ -46,7 +46,8 @@ public class DefaultAgentClient implements AgentClient {
     private AgentClientResult    result;
     private StrategyService      strategyService;
 
-    private static final String  RESP_MSG_OK = "ok";
+    private static final String  RESP_MSG_OK   = "ok";
+    private static final String  FIRST_VERSION = "firstV";
 
     public DefaultAgentClient(long deployId, String vsName, String tag, String ip,
             VirtualServerService virtualServerService, StrategyService strategyService, ConfigManager configManager) {
@@ -74,29 +75,35 @@ public class DefaultAgentClient implements AgentClient {
                     return;
                 }
 
-                SlbModelTree currentWorkingSlbModelTree = virtualServerService.findTagById(vsName,
-                        currentWorkingVersion);
-                SlbModelTree deployingSlbModelTree = virtualServerService.findTagById(vsName, tag);
+                if (!FIRST_VERSION.equals(currentWorkingVersion)) {
+                    SlbModelTree currentWorkingSlbModelTree = virtualServerService.findTagById(vsName,
+                            currentWorkingVersion);
+                    SlbModelTree deployingSlbModelTree = virtualServerService.findTagById(vsName, tag);
 
-                if (!versionExists(currentWorkingVersion, currentWorkingSlbModelTree)) {
-                    return;
-                }
-
-                if (!versionExists(tag, deployingSlbModelTree)) {
-                    return;
-                }
-
-                VirtualServerComparisionVisitor comparisionVisitor = new VirtualServerComparisionVisitor(
-                        currentWorkingSlbModelTree.findVirtualServer(vsName), currentWorkingSlbModelTree.getPools());
-                deployingSlbModelTree.accept(comparisionVisitor);
-                ComparisionResult compareResult = comparisionVisitor.getVisitorResult();
-
-                if (compareResult.needReload()) {
-                    if (!callAgentWithReload()) {
+                    if (!versionExists(currentWorkingVersion, currentWorkingSlbModelTree)) {
                         return;
                     }
+
+                    if (!versionExists(tag, deployingSlbModelTree)) {
+                        return;
+                    }
+
+                    VirtualServerComparisionVisitor comparisionVisitor = new VirtualServerComparisionVisitor(
+                            currentWorkingSlbModelTree.findVirtualServer(vsName), currentWorkingSlbModelTree.getPools());
+                    deployingSlbModelTree.accept(comparisionVisitor);
+                    ComparisionResult compareResult = comparisionVisitor.getVisitorResult();
+
+                    if (compareResult.needReload()) {
+                        if (!callAgentWithReload()) {
+                            return;
+                        }
+                    } else {
+                        if (!callAgentWithDynamicRefresh(compareResult)) {
+                            return;
+                        }
+                    }
                 } else {
-                    if (!callAgentWithDynamicRefresh(compareResult)) {
+                    if (!callAgentWithReload()) {
                         return;
                     }
                 }
@@ -260,6 +267,10 @@ public class DefaultAgentClient implements AgentClient {
                 result.logInfo(String.format("Version fetched, current working config version is %s", version));
                 return version;
             } else {
+                if ("Unknown version".equals(response.getMessage())) {
+                    result.logInfo(String.format("Vs(%s) is the first deployment for host(%s)", this.vsName, this.ip));
+                    return FIRST_VERSION;
+                }
                 result.logError(String.format("Failed to fetch version(error msg: %s)", response.getMessage()));
                 endWithFail();
             }

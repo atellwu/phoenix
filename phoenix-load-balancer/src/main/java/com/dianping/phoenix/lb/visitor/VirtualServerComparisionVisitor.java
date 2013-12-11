@@ -75,8 +75,8 @@ public class VirtualServerComparisionVisitor extends AbstractVisitor<Comparision
     public void visitSlbModelTree(SlbModelTree slbModelTree) {
 
         VirtualServer vs = slbModelTree.findVirtualServer(baseVs.getName());
-        if (EqualsBuilder.reflectionEquals(baseVs, vs, new String[] { "m_creationDate", "m_lastModifiedDate",
-                "m_version", "m_instances" })) {
+        if (EqualsBuilder.reflectionEquals(baseVs, vs, true, null, new String[] { "m_creationDate",
+                "m_lastModifiedDate", "m_version", "m_instances" })) {
             Set<String> usedPoolNamePrefixs = new HashSet<String>();
 
             usedPoolNamePrefixs.add(vs.getDefaultPoolName());
@@ -101,8 +101,8 @@ public class VirtualServerComparisionVisitor extends AbstractVisitor<Comparision
                 if (!pools.containsKey(basePool.getName())) {
                     result.addDeletedPools(basePool);
                 } else {
-                    if (!EqualsBuilder.reflectionEquals(basePool, pools.get(basePool.getName()), new String[] {
-                            "m_creationDate", "m_lastModifiedDate" })) {
+                    if (!EqualsBuilder.reflectionEquals(basePool, pools.get(basePool.getName()), true, null,
+                            new String[] { "m_creationDate", "m_lastModifiedDate" })) {
                         result.addModifiedPools(pools.get(basePool.getName()));
                     }
                 }
