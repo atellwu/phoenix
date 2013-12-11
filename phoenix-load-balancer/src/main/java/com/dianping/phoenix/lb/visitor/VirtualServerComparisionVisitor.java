@@ -29,12 +29,17 @@ import com.dianping.phoenix.lb.visitor.VirtualServerComparisionVisitor.Comparisi
 public class VirtualServerComparisionVisitor extends AbstractVisitor<ComparisionResult> {
 
     public static class ComparisionResult {
+        private boolean    needReload    = true;
         private List<Pool> addedPools    = new ArrayList<Pool>();
         private List<Pool> deletedPools  = new ArrayList<Pool>();
         private List<Pool> modifiedPools = new ArrayList<Pool>();
 
+        public void setNeedReload(boolean needReload) {
+            this.needReload = needReload;
+        }
+
         public boolean needReload() {
-            return addedPools.isEmpty() && modifiedPools.isEmpty() && deletedPools.isEmpty();
+            return needReload;
         }
 
         public List<Pool> getAddedPools() {
@@ -101,6 +106,11 @@ public class VirtualServerComparisionVisitor extends AbstractVisitor<Comparision
                 if (!pools.containsKey(basePool.getName())) {
                     result.addDeletedPools(basePool);
                 } else {
+                    if (!basePool.getLoadbalanceStrategyName().equals(
+                            pools.get(basePool.getName()).getLoadbalanceStrategyName())) {
+                        return;
+                    }
+
                     if (!AdvEqualsBuilder.reflectionEquals(basePool, pools.get(basePool.getName()), true, null,
                             new String[] { "m_creationDate", "m_lastModifiedDate" })) {
                         result.addModifiedPools(pools.get(basePool.getName()));
@@ -114,6 +124,10 @@ public class VirtualServerComparisionVisitor extends AbstractVisitor<Comparision
                 if (!basePools.containsKey(pool.getName())) {
                     result.addAddedPools(pool);
                 } else {
+                    if (!pool.getLoadbalanceStrategyName().equals(
+                            basePools.get(pool.getName()).getLoadbalanceStrategyName())) {
+                        return;
+                    }
                     if (!result.getModifiedPools().contains(pool)
                             && !AdvEqualsBuilder.reflectionEquals(pool, basePools.get(pool.getName()), new String[] {
                                     "m_creationDate", "m_lastModifiedDate" })) {
@@ -122,6 +136,8 @@ public class VirtualServerComparisionVisitor extends AbstractVisitor<Comparision
                 }
             }
         }
+        
+        result.setNeedReload(false);
     }
 
 }
