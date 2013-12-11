@@ -3,7 +3,8 @@
 	<strategies>
 		<strategy name="uri-hash" type="hash" target="$request_uri" creation-date="2013-10-15 16:40:00" last-modified-date="2013-10-15 16:40:00" />
 		<strategy name="ip-hash" type="ip-hash" creation-date="2013-10-15 16:40:00" last-modified-date="2013-10-15 16:40:00" />
-		<strategy name="roundrobin" type="roundrobin" creation-date="2013-10-15 16:40:00" last-modified-date="2013-10-15 16:40:00" />
+		<strategy name="round-robin" type="round-robin" creation-date="2013-10-15 16:40:00" last-modified-date="2013-10-15 16:40:00" />
+		<strategy name="fair" type="fair" creation-date="2013-10-15 16:40:00" last-modified-date="2013-10-15 16:40:00" />
 	</strategies>
 	<pools>
 		<pool name="Web.Index" loadbalance-strategy-name="uri-hash" min-available-member-percentage="50" creation-date="2013-10-15 16:40:00"
@@ -24,7 +25,7 @@
 			<member name="index-web03" ip="10.1.1.8" port="8080" weight="5" max-fails="5" fail-timeout="30s" state="DISABLED"
 				availability="AVAILABLE" />
 		</pool>
-		<pool name="Web.Shop" loadbalance-strategy-name="ip-hash" min-available-member-percentage="50" creation-date="2013-10-15 16:40:00"
+		<pool name="Web.Shop" loadbalance-strategy-name="fair" min-available-member-percentage="50" creation-date="2013-10-15 16:40:00"
 			last-modified-date="2013-10-15 16:40:00">
 			<member name="index-web01" ip="10.1.1.9" port="8080" weight="5" max-fails="5" fail-timeout="30s" state="ENABLED"
 				availability="AVAILABLE" />
@@ -42,7 +43,7 @@
 			<member name="index-web03" ip="10.1.1.14" port="8080" weight="5" max-fails="5" fail-timeout="30s" state="DISABLED"
 				availability="AVAILABLE" />
 		</pool>
-		<pool name="Web.Shop@new" loadbalance-strategy-name="roundrobin" min-available-member-percentage="50" creation-date="2013-10-15 16:40:00"
+		<pool name="Web.Shop@new" loadbalance-strategy-name="round-robin" min-available-member-percentage="50" creation-date="2013-10-15 16:40:00"
 			last-modified-date="2013-10-15 16:40:00">
 			<member name="index-web01" ip="10.1.1.15" port="8080" weight="5" max-fails="5" fail-timeout="30s" state="ENABLED"
 				availability="AVAILABLE" />
