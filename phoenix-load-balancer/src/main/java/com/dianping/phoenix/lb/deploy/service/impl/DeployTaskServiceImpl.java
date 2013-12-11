@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.phoenix.lb.PlexusComponentContainer;
 import com.dianping.phoenix.lb.action.Paginator;
 import com.dianping.phoenix.lb.configure.ConfigManager;
+import com.dianping.phoenix.lb.deploy.bo.DeployAgentBo;
 import com.dianping.phoenix.lb.deploy.bo.DeployTaskBo;
 import com.dianping.phoenix.lb.deploy.bo.DeployVsBo;
 import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo;
@@ -112,7 +113,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
 
             deployVsBo.setDeployVs(deployVs);
             deployVsBo.setVs(vs);
-            deployVsBo.setDeployAgents(convertDetailsToMap(deployAgents));
+            deployVsBo.setDeployAgentBos(convertDetailsToMap(deployAgents));
 
             deployVsBos.add(deployVsBo);
         }
@@ -134,11 +135,11 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         return map;
     }
 
-    private Map<String, DeployAgent> convertDetailsToMap(List<DeployAgent> deployAgents) {
-        Map<String, DeployAgent> map = new HashMap<String, DeployAgent>();
+    private Map<String, DeployAgentBo> convertDetailsToMap(List<DeployAgent> deployAgents) {
+        Map<String, DeployAgentBo> map = new HashMap<String, DeployAgentBo>();
         for (DeployAgent deployAgent : deployAgents) {
             String ip = deployAgent.getIpAddress();
-            map.put(ip, deployAgent);
+            map.put(ip, new DeployAgentBo(deployAgent));
         }
         return map;
     }
@@ -193,13 +194,13 @@ public class DeployTaskServiceImpl implements DeployTaskService {
             DeployVs vs0 = new DeployVs();
             vs0.setId(vs.getId());
             vs0.setStatus(DeployVsStatus.READY);
-            Map<String, DeployAgent> agents = vsBo.getDeployAgents();
+            Map<String, DeployAgentBo> agents = vsBo.getDeployAgentBos();
             if (agents != null) {
-                for (DeployAgent agent : agents.values()) {
+                for (DeployAgentBo agentBo : agents.values()) {
                     DeployAgent deployAgent = new DeployAgent();
                     deployAgent.setDeployVsId(vs.getId());
                     deployAgent.setStatus(DeployAgentStatus.CREATED);
-                    deployAgent.setIpAddress(agent.getIpAddress());
+                    deployAgent.setIpAddress(agentBo.getDeployAgent().getIpAddress());
                     deployAgent.setLastModifiedDate(new Date());
                     deployAgentMapper.insertSelective(deployAgent);
                 }
@@ -224,9 +225,27 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         Validate.notNull(vsBos, "agent host must selected!");
         Validate.notEmpty(vsBos.values(), "agent host must selected!");
         for (DeployVsBo vsBo : vsBos.values()) {
-            Map<String, DeployAgent> agents = vsBo.getDeployAgents();
+            Map<String, DeployAgentBo> agents = vsBo.getDeployAgentBos();
             Validate.notNull(agents, "agent host must selected!");
             Validate.notEmpty(agents.values(), "agent host must selected!");
         }
+    }
+
+    @Override
+    public void updateDeployTaskStatus(DeployTask deployTask) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void updateDeployVsStatus(DeployVs deployVs) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void updateDeployAgentStatus(DeployAgent deployAgent) {
+        // TODO Auto-generated method stub
+
     }
 }

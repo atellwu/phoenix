@@ -5,7 +5,9 @@ import java.util.List;
 import com.dianping.phoenix.lb.action.Paginator;
 import com.dianping.phoenix.lb.deploy.bo.DeployTaskBo;
 import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo;
+import com.dianping.phoenix.lb.deploy.model.DeployAgent;
 import com.dianping.phoenix.lb.deploy.model.DeployTask;
+import com.dianping.phoenix.lb.deploy.model.DeployVs;
 import com.dianping.phoenix.lb.exception.BizException;
 
 public interface DeployTaskService {
@@ -39,5 +41,20 @@ public interface DeployTaskService {
      * 更新deployTask。创建deployment。创建DeploymentDetail。<br>
      */
     void updateTask(DeployTaskBo deployTaskBo);
+
+    /**
+     * 更新Task状态
+     */
+    void updateDeployTaskStatus(DeployTask deployTask);
+
+    /**
+     * 更新Vs状态
+     */
+    void updateDeployVsStatus(DeployVs deployVs);
+
+    /**
+     * 更新Agent状态
+     */
+    void updateDeployAgentStatus(DeployAgent deployAgent);
 
 }
