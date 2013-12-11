@@ -8,7 +8,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.RandomUtils;
 import org.apache.struts2.ServletActionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,19 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.dianping.phoenix.lb.deploy.StatusContainer;
-import com.dianping.phoenix.lb.deploy.TaskContainer;
-import com.dianping.phoenix.lb.deploy.bo.DeployAgentBo;
 import com.dianping.phoenix.lb.deploy.bo.DeployTaskBo;
-import com.dianping.phoenix.lb.deploy.bo.DeployVsBo;
 import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo;
-import com.dianping.phoenix.lb.deploy.model.DeployAgentStatus;
+import com.dianping.phoenix.lb.deploy.executor.TaskExecutor;
+import com.dianping.phoenix.lb.deploy.executor.TaskExecutorContainer;
 import com.dianping.phoenix.lb.deploy.model.DeployTask;
 import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
-import com.dianping.phoenix.lb.deploy.model.DeployVsStatus;
 import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
-import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.dianping.phoenix.lb.utils.JsonBinder;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -39,48 +33,42 @@ import com.opensymphony.xwork2.ActionSupport;
 @Scope("prototype")
 public class DeployAction extends ActionSupport {
 
-    private static final long    serialVersionUID      = -7250754630706893980L;
+    private static final long     serialVersionUID      = -7250754630706893980L;
 
-    private static final Logger  LOG                   = LoggerFactory.getLogger(DeployAction.class);
+    private static final Logger   LOG                   = LoggerFactory.getLogger(DeployAction.class);
 
-    private static final int     ERRORCODE_SUCCESS     = 0;
+    private static final int      ERRORCODE_SUCCESS     = 0;
 
-    private static final int     ERRORCODE_PARAM_ERROR = -2;
+    private static final int      ERRORCODE_PARAM_ERROR = -2;
 
-    private static final int     ERRORCODE_INNER_ERROR = -1;
+    private static final int      ERRORCODE_INNER_ERROR = -1;
 
-    private Map<String, Object>  dataMap               = new HashMap<String, Object>();
-
-    @Autowired
-    private DeployTaskService    deployTaskService;
+    private Map<String, Object>   dataMap               = new HashMap<String, Object>();
 
     @Autowired
-    private VirtualServerService virtualServerService;
+    private DeployTaskService     deployTaskService;
 
-    private String[]             virtualServerNames;
+    private String[]              virtualServerNames;
 
-    private List<VirtualServer>  virtualServers;
+    private List<VirtualServer>   virtualServers;
 
-    private String               contextPath;
+    private String                contextPath;
 
-    private int                  pageNum               = 1;
+    private int                   pageNum               = 1;
 
-    private List<DeployTask>     list;
+    private List<DeployTask>      list;
 
-    private Paginator            paginator;
+    private Paginator             paginator;
 
-    private long                 deployTaskId;
+    private long                  deployTaskId;
 
-    private DeployTaskBo         deployTaskBo;
+    private DeployTaskBo          deployTaskBo;
 
-    /** 该pool影响到的vs自动弹出创建 */
-    private String               autoShowByPool;
+    //    /** 该pool影响到的vs自动弹出创建 */
+    //    private String                autoShowByPool;
 
-    //    @Autowired
-    private TaskContainer        taskContainer;
-
-    //    @Autowired
-    private StatusContainer      statusContainer;
+    @Autowired
+    private TaskExecutorContainer taskContainer;
 
     @PostConstruct
     public void init() {
@@ -189,11 +177,8 @@ public class DeployAction extends ActionSupport {
      */
     public String startDeployTask() {
         try {
-            //获取task
-            deployTaskBo = deployTaskService.getTask(deployTaskId);
-
             //提交任务
-            //            taskContainer.submitTask(deployTaskBo);
+            taskContainer.submitTaskExecutor(deployTaskId);
 
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (IllegalArgumentException e) {
@@ -208,46 +193,58 @@ public class DeployAction extends ActionSupport {
     }
 
     /**
-     * 
+     * 暂停Task
      */
+    public String pauseDeployTask() {
+        try {
+            TaskExecutor taskExecutor = taskContainer.getTaskExecutor(deployTaskId);
+            if (taskExecutor != null) {
+                taskExecutor.pause();
+            }
+
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
+        }
+        return SUCCESS;
+    }
+
+    /**
+     * 取消Task
+     */
+    public String cancelDeployTask() {
+        try {
+            TaskExecutor taskExecutor = taskContainer.getTaskExecutor(deployTaskId);
+            if (taskExecutor != null) {
+                taskExecutor.cancel();
+            }
+
+            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+        } catch (IllegalArgumentException e) {
+            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+            dataMap.put("errorMessage", e.getMessage());
+            LOG.error(e.getMessage(), e);
+        }
+        return SUCCESS;
+    }
+
     public String getStatus() {
         try {
-            //            DeployTaskBo deployTask = statusContainer.getDeployTask(deployTaskId);
-
-            //mock
-            deployTaskBo = deployTaskService.getTask(deployTaskId);
-            DeployTaskStatus status = null;
-            switch (RandomUtils.nextInt(5)) {
-                case 0:
-                    status = DeployTaskStatus.CREATED;
-                    break;
-                case 1:
-                    status = DeployTaskStatus.PROCESSING;
-                    ;
-                    break;
-                case 2:
-                    status = DeployTaskStatus.PAUSED;
-                    break;
-                case 3:
-                    status = DeployTaskStatus.SUCCESS;
-                    ;
-                    break;
-                case 4:
-                    status = DeployTaskStatus.FAILED;
-                    ;
-                    break;
-            }
-            deployTaskBo.getTask().setStatus(status);
-
-            Map<String, DeployVsBo> vsVsBos = deployTaskBo.getDeployVsBos();
-            for (DeployVsBo bo : vsVsBos.values()) {
-                bo.getDeployVs().setStatus(DeployVsStatus.PROCESSING);
-                bo.getDeployVs().setSummaryLog("SummaryLog");
-                Map<String, DeployAgentBo> agents = bo.getDeployAgentBos();
-                for (DeployAgentBo agent : agents.values()) {
-                    agent.getDeployAgent().setStatus(DeployAgentStatus.PROCESSING);
-                    agent.getDeployAgent().setRawLog("rawlog");
-                }
+            TaskExecutor taskExecutor = taskContainer.getTaskExecutor(deployTaskId);
+            if (taskExecutor != null) {
+                //从内存拿
+                deployTaskBo = taskExecutor.getDeployTaskBo();
+            } else {
+                //从数据库读取
+                deployTaskBo = deployTaskService.getTask(deployTaskId);
             }
 
             dataMap.put("task", deployTaskBo);

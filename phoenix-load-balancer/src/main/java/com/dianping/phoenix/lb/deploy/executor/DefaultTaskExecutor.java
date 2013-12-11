@@ -9,6 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 
@@ -30,10 +31,9 @@ import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.service.model.StrategyService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
 
-//TODO deployId的生成？？
 public class DefaultTaskExecutor implements TaskExecutor {
 
-    private static final String        pattern = "mm-dd hh:MM:ss";
+    private static final String        pattern    = "mm-dd hh:MM:ss";
 
     private final DeployTaskBo         deployTaskBo;
 
@@ -54,6 +54,8 @@ public class DefaultTaskExecutor implements TaskExecutor {
     private final AgentBatch           agentBatch;
 
     private final ErrorPolicy          errorPolicy;
+
+    private final ReentrantLock        actionLock = new ReentrantLock();
 
     private Thread                     taskThread;
 
@@ -77,29 +79,39 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     /**
-     * (1)程序启动时，需要扫描数据库，状态为READY就会拿来跑。<br>
-     * (2)失败后重试和手动点击启动，都是start方法，一样的流程。（重试前会将状态设置称READY，所以和手动点击start是一样的情况） (3)
+     * 程序启动时，需要扫描数据库，状态为READY就会拿来跑。<br>
      * 
      */
     @Override
-    public synchronized void start() {
-        //当前的状态为READY，才会执行
-        DeployTaskStatus taskStatus = deployTaskBo.getTask().getStatus();
-        if (taskStatus != DeployTaskStatus.READY) {
-            return;
+    public void start() {
+        if (actionLock.tryLock()) {
+            try {
+                //当前的状态为READY，才会执行
+                DeployTaskStatus taskStatus = deployTaskBo.getTask().getStatus();
+                if (taskStatus != DeployTaskStatus.READY) {
+                    return;
+                }
+
+                if (taskThread != null) {//make sure
+                    taskThread.interrupt();
+                }
+                taskThread = new Thread(new InnerTask(), "TaskExecutor-" + this.deployTaskBo.getTask().getName());
+                taskThread.start();
+
+            } finally {
+                actionLock.unlock();
+            }
         }
 
-        if (taskThread != null) {//make sure
-            taskThread.interrupt();
-        }
-        taskThread = new Thread(new InnerTask(), "TaskExecutor-" + this.deployTaskBo.getTask().getName());
-        taskThread.start();
     }
 
     private class InnerTask implements Runnable {
 
         @Override
         public void run() {
+            //task启动了，更新状态为PROCESSING
+            deployTaskBo.getTask().setStatus(DeployTaskStatus.PROCESSING);
+
             // 每次启动，都使用新的agentId
             deployTaskBo.setAgentId(agentSequenceService.getAgentId());
 
@@ -108,6 +120,9 @@ public class DefaultTaskExecutor implements TaskExecutor {
             //获取接下来要发布的vs和agent
             DeployVsBo deployVsBo = null;
             while ((deployVsBo = nextReadyDeployVs(deployTaskBo)) != null && !Thread.currentThread().isInterrupted()) {
+                //vs启动了，更新状态为PROCESSING
+                deployVsBo.getDeployVs().setStatus(DeployVsStatus.PROCESSING);
+
                 Map<String, DeployAgentBo> deployAgentBos = null;
                 while ((deployAgentBos = nextReadyDeployAgents(deployVsBo, agentBatch.getBatchSize())).size() > 0 && !Thread.currentThread().isInterrupted()) {
                     try {
@@ -168,7 +183,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
         //创建Agent执行者
         Map<String, AgentClient> agentClients = new HashMap<String, AgentClient>();
         for (DeployAgentBo deployAgentBo : deployAgentBos.values()) {
-            long agentId = deployTaskBo.getTask().getAgentId();
+            long agentId = deployTaskBo.getAgentId();
             String vsName = deployVsBo.getDeployVs().getVsName();
             String vsTag = deployVsBo.getDeployVs().getVsTag();
             String ip = deployAgentBo.getDeployAgent().getIpAddress();
@@ -177,8 +192,6 @@ public class DefaultTaskExecutor implements TaskExecutor {
         }
 
         //多线程执行agent执行者
-
-        //记录开始执行的log
         CountDownLatch doneSignal = new CountDownLatch(agentClients.size());
         for (Map.Entry<String, AgentClient> entry : agentClients.entrySet()) {
             String ip = entry.getKey();
@@ -193,8 +206,8 @@ public class DefaultTaskExecutor implements TaskExecutor {
             try {
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
-                //task线程被中断，则认为是cancel，那么不管任务了
-                executor.shutdownNow();//不在这里shutdown了，在cancel方法自己shutdown吧
+                //task线程被中断，则认为是cancel或pause，那么不管任务了
+                //executor.shutdownNow();//不在这里shutdown了，在cancel方法自己shutdown吧，因为pause是不能中断executor正在运行的agent的
                 break;
             }
         }
@@ -342,75 +355,6 @@ public class DefaultTaskExecutor implements TaskExecutor {
         return sb.toString();
     }
 
-    @Override
-    public synchronized void pause() {
-        DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
-        if (taskStatus.canPaused()) {
-            //将task和vs设置成暂停
-            this.deployTaskBo.getTask().setStatus(DeployTaskStatus.PAUSED);
-            deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
-
-            Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
-            for (DeployVsBo deployVsBo : deployVsBos.values()) {
-                DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
-                if (vsStatus.canPaused()) {
-                    deployVsBo.getDeployVs().setStatus(DeployVsStatus.PAUSED);
-                    deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
-                }
-            }
-            //终止线程
-            taskThread.interrupt();
-
-        }
-    }
-
-    /**
-     * 遇到错误时，手动处理： 将状态变成fail<br>
-     * 设置手动一步步执行时：将状态变成pause<br>
-     */
-    @Override
-    public synchronized void resume() {
-        //与start方法不同，这里是先把pause状态的任务变成ready
-        DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
-        if (taskStatus == DeployTaskStatus.PAUSED) {
-            //将task和vs的状态设置从暂停设置成ready
-            this.deployTaskBo.getTask().setStatus(DeployTaskStatus.READY);
-            deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
-
-            Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
-            for (DeployVsBo deployVsBo : deployVsBos.values()) {
-                DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
-                if (vsStatus == DeployVsStatus.PAUSED) {
-                    deployVsBo.getDeployVs().setStatus(DeployVsStatus.READY);
-                    deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
-                }
-            }
-            //然后再调用start
-            this.start();
-        }
-    }
-
-    @Override
-    public synchronized void cancle() {
-        DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
-        if (taskStatus.canCancel()) {
-            //将task和vs设置成暂停
-            this.deployTaskBo.getTask().setStatus(DeployTaskStatus.CANCELLING);
-            deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
-
-            Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
-            for (DeployVsBo deployVsBo : deployVsBos.values()) {
-                DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
-                if (vsStatus.canCancel()) {
-                    deployVsBo.getDeployVs().setStatus(DeployVsStatus.CANCELLING);
-                    deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
-                }
-            }
-            //终止线程
-            taskThread.interrupt();
-        }
-    }
-
     private class AgentTask implements Runnable {
         private AgentClient    agentClient;
         private CountDownLatch doneSignal;
@@ -440,24 +384,144 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public synchronized void retry() {
-        //将fail的改为Ready
-        DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
-        if (taskStatus == DeployTaskStatus.FAILED) {
-            //将task和vs的状态设置从暂停设置成ready
-            this.deployTaskBo.getTask().setStatus(DeployTaskStatus.READY);
-            deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+    public void pause() {
 
-            Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
-            for (DeployVsBo deployVsBo : deployVsBos.values()) {
-                DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
-                if (vsStatus == DeployVsStatus.FAILED) {
-                    deployVsBo.getDeployVs().setStatus(DeployVsStatus.READY);
-                    deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
+        if (actionLock.tryLock()) {
+            try {
+                DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
+                if (taskStatus.canPaused()) {
+
+                    //终止主线程
+                    taskThread.interrupt();
+                    while (taskThread.isAlive()) {
+                        try {
+                            taskThread.join();
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                    //将task和vs设置成暂停
+                    this.deployTaskBo.getTask().setStatus(DeployTaskStatus.PAUSED);
+                    deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+
+                    Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
+                    for (DeployVsBo deployVsBo : deployVsBos.values()) {
+                        DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
+                        if (vsStatus.canPaused()) {
+                            deployVsBo.getDeployVs().setStatus(DeployVsStatus.PAUSED);
+                            deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
+                        }
+                    }
                 }
+
+            } finally {
+                actionLock.unlock();
             }
-            //然后再调用start
-            this.start();
+        }
+
+    }
+
+    /**
+     * 遇到错误时，手动处理： 将状态变成fail<br>
+     * 设置手动一步步执行时：将状态变成pause<br>
+     */
+    @Override
+    public void resume() {
+        if (actionLock.tryLock()) {
+            try {
+                //与start方法不同，这里是先把pause状态的任务变成ready
+                DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
+                if (taskStatus == DeployTaskStatus.PAUSED) {
+                    //将task和vs的状态设置从暂停设置成ready
+                    this.deployTaskBo.getTask().setStatus(DeployTaskStatus.READY);
+                    deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+
+                    Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
+                    for (DeployVsBo deployVsBo : deployVsBos.values()) {
+                        DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
+                        if (vsStatus == DeployVsStatus.PAUSED) {
+                            deployVsBo.getDeployVs().setStatus(DeployVsStatus.READY);
+                            deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
+                        }
+                    }
+                    //然后再调用start
+                    this.start();
+                }
+
+            } finally {
+                actionLock.unlock();
+            }
+        }
+    }
+
+    @Override
+    public void cancel() {
+        if (actionLock.tryLock()) {
+            try {
+                DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
+                if (taskStatus.canCancel()) {
+
+                    //终止agent线程
+                    executor.shutdownNow();
+                    try {
+                        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
+                    } catch (InterruptedException e1) {
+                    }
+
+                    //终止主线程
+                    taskThread.interrupt();
+                    while (taskThread.isAlive()) {
+                        try {
+                            taskThread.join();
+                        } catch (InterruptedException e) {
+                        }
+                    }
+
+                    //将task和vs设置成暂停
+                    this.deployTaskBo.getTask().setStatus(DeployTaskStatus.CANCELLING);
+                    deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+
+                    Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
+                    for (DeployVsBo deployVsBo : deployVsBos.values()) {
+                        DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
+                        if (vsStatus.canCancel()) {
+                            deployVsBo.getDeployVs().setStatus(DeployVsStatus.CANCELLING);
+                            deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
+                        }
+                    }
+                }
+
+            } finally {
+                actionLock.unlock();
+            }
+        }
+    }
+
+    @Override
+    public void retry() {
+        if (actionLock.tryLock()) {
+            try {
+                //将fail的改为Ready
+                DeployTaskStatus taskStatus = this.deployTaskBo.getTask().getStatus();
+                if (taskStatus == DeployTaskStatus.FAILED) {
+                    //将task和vs的状态设置从暂停设置成ready
+                    this.deployTaskBo.getTask().setStatus(DeployTaskStatus.READY);
+                    deployTaskService.updateDeployTaskStatus(deployTaskBo.getTask());
+
+                    Map<String, DeployVsBo> deployVsBos = this.deployTaskBo.getDeployVsBos();
+                    for (DeployVsBo deployVsBo : deployVsBos.values()) {
+                        DeployVsStatus vsStatus = deployVsBo.getDeployVs().getStatus();
+                        if (vsStatus == DeployVsStatus.FAILED) {
+                            deployVsBo.getDeployVs().setStatus(DeployVsStatus.READY);
+                            deployTaskService.updateDeployVsStatus(deployVsBo.getDeployVs());
+                        }
+                    }
+                    //然后再调用start
+                    this.start();
+                }
+
+            } finally {
+                actionLock.unlock();
+            }
         }
     }
 

@@ -241,6 +241,20 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
+        <action name="deploy/task/{deployTaskId}/pause" class="deployAction"
+            method="pauseDeployTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{deployTaskId}/cancel" class="deployAction"
+            method="cancelDeployTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
         <action name="deploy/task/{deployTaskId}" class="deployAction"
             method="showDeployTask">
             <result name="success" type="velocity">

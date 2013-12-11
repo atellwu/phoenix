@@ -42,7 +42,7 @@ public interface TaskExecutor {
     /**
      * 终止/取消运行
      */
-    void cancle();
+    void cancel();
 
     void resume();
 
