@@ -453,6 +453,8 @@ public class AdvEqualsBuilder {
             if (lhs instanceof java.math.BigDecimal) {
                 isEquals = (((java.math.BigDecimal) lhs).compareTo((java.math.BigDecimal) rhs) == 0);
             } else if (lhs instanceof List) {
+                isEquals = lhs.equals(rhs);
+                
                 for (int i = 0; i < ((List) lhs).size(); i++) {
                     if (!isEquals()) {
                         return this;
@@ -461,6 +463,8 @@ public class AdvEqualsBuilder {
                     isEquals = reflectionEquals(((List) lhs).get(i), ((List) rhs).get(i));
                 }
             } else if (lhs instanceof Map) {
+                isEquals = lhs.equals(rhs);
+                
                 for (Object lkey : ((Map) lhs).keySet()) {
                     if (!isEquals()) {
                         return this;
