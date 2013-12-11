@@ -1,1 +1,2 @@
-consistent_hash $strategy.getDynamicAttribute("target");
+hash $strategy.getDynamicAttribute("target");
+    hash_method  crc32;

@@ -85,10 +85,10 @@ public class NginxVelocityTools {
         }
     }
 
-    public String upstreamServer(NginxUpstreamServer server) {
+    public String upstreamServer(NginxUpstreamServer server, Strategy strategy) {
         if (server.getMember().getAvailability() == Availability.AVAILABLE
                 && server.getMember().getState() == State.ENABLED) {
-            String template = getTemplate("upstream", "default");
+            String template = getTemplate("upstream", "hash".equals(strategy.getType()) ? "default_hash" : "default");
             if (StringUtils.isNotBlank(template)) {
                 Map<String, Object> context = new HashMap<String, Object>();
                 context.put("server", server);

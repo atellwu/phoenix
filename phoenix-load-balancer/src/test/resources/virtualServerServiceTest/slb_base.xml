@@ -15,7 +15,7 @@
 			<member name="index-web03" ip="10.1.1.5" port="8080" weight="5" max-fails="5" fail-timeout="30s" state="DISABLED"
 				availability="AVAILABLE" />
 		</pool>
-		<pool name="Web.Tuangou" loadbalance-strategy-name="uri-hash" min-available-member-percentage="50" creation-date="2013-10-15 16:40:00"
+		<pool name="Web.Tuangou" loadbalance-strategy-name="ip-hash" min-available-member-percentage="50" creation-date="2013-10-15 16:40:00"
 			last-modified-date="2013-10-15 16:40:00">
 			<member name="index-web01" ip="10.1.1.6" port="8080" weight="5" max-fails="5" fail-timeout="30s" state="ENABLED"
 				availability="AVAILABLE" />
@@ -24,7 +24,7 @@
 			<member name="index-web03" ip="10.1.1.8" port="8080" weight="5" max-fails="5" fail-timeout="30s" state="DISABLED"
 				availability="AVAILABLE" />
 		</pool>
-		<pool name="Web.Shop" loadbalance-strategy-name="uri-hash" min-available-member-percentage="50" creation-date="2013-10-15 16:40:00"
+		<pool name="Web.Shop" loadbalance-strategy-name="ip-hash" min-available-member-percentage="50" creation-date="2013-10-15 16:40:00"
 			last-modified-date="2013-10-15 16:40:00">
 			<member name="index-web01" ip="10.1.1.9" port="8080" weight="5" max-fails="5" fail-timeout="30s" state="ENABLED"
 				availability="AVAILABLE" />
@@ -42,7 +42,7 @@
 			<member name="index-web03" ip="10.1.1.14" port="8080" weight="5" max-fails="5" fail-timeout="30s" state="DISABLED"
 				availability="AVAILABLE" />
 		</pool>
-		<pool name="Web.Shop@new" loadbalance-strategy-name="uri-hash" min-available-member-percentage="50" creation-date="2013-10-15 16:40:00"
+		<pool name="Web.Shop@new" loadbalance-strategy-name="roundrobin" min-available-member-percentage="50" creation-date="2013-10-15 16:40:00"
 			last-modified-date="2013-10-15 16:40:00">
 			<member name="index-web01" ip="10.1.1.15" port="8080" weight="5" max-fails="5" fail-timeout="30s" state="ENABLED"
 				availability="AVAILABLE" />
