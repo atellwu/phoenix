@@ -104,8 +104,8 @@ public class Handler implements PageHandler<Context> {
                 break;
             case DEPLOY:
                 task = new ConfigUpgradeTask(payload.getVirtualServerName(), payload.getConfigFileName(),
-                        payload.getVersion(), payload.getGirUrl(), payload.isReload(), payload.getDynamicRefreshUrl(),
-                        payload.getDynamicRefreshPostData(), payload.getDynamicRefreshMethod());
+                        payload.getVersion(), payload.getGirUrl(), payload.isReload(),
+                        payload.getDynamicRefreshPostData());
                 submitTask(task, txId, res, ctx);
                 break;
             case GETLOG:

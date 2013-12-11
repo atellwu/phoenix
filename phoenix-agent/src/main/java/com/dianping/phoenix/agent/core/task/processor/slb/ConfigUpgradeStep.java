@@ -13,7 +13,7 @@ public class ConfigUpgradeStep extends AbstractStep {
 		super(nextStepWhenSuccess, nextStepWhenFail, stepSeq);
 	}
 
-	private static ConfigUpgradeStep FAILED = new ConfigUpgradeStep(null, null, 8) {
+	private static ConfigUpgradeStep FAILED = new ConfigUpgradeStep(null, null, 7) {
 		@Override
 		public int doStep(Context ctx) throws Exception {
 			ConfigUpgradeContext myCtx = (ConfigUpgradeContext) ctx;
@@ -41,7 +41,7 @@ public class ConfigUpgradeStep extends AbstractStep {
 
 	};
 
-	private static ConfigUpgradeStep SUCCESS = new ConfigUpgradeStep(null, null, 8) {
+	private static ConfigUpgradeStep SUCCESS = new ConfigUpgradeStep(null, null, 7) {
 		@Override
 		public int doStep(Context ctx) throws Exception {
 			ConfigUpgradeContext myCtx = (ConfigUpgradeContext) ctx;
@@ -68,7 +68,7 @@ public class ConfigUpgradeStep extends AbstractStep {
 		}
 	};
 
-	private static ConfigUpgradeStep ROLLBACK = new ConfigUpgradeStep(FAILED, FAILED, 7) {
+	private static ConfigUpgradeStep ROLLBACK = new ConfigUpgradeStep(FAILED, FAILED, 6) {
 
 		@Override
 		protected int doActivity(Context ctx) throws Exception {
@@ -182,7 +182,7 @@ public class ConfigUpgradeStep extends AbstractStep {
 
 	@Override
 	protected int getTotalStep() {
-		return 8;
+		return 7;
 	}
 
 	@Override

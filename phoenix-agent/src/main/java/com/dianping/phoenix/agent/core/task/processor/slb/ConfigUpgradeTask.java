@@ -1,35 +1,31 @@
 package com.dianping.phoenix.agent.core.task.processor.slb;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
 import com.dianping.phoenix.agent.core.task.AbstractTask;
 
 public class ConfigUpgradeTask extends AbstractTask {
-    public static final String HTTP_METHOD_GET    = "get";
-    public static final String HTTP_METHOD_POST   = "post";
-    public static final String HTTP_METHOD_DELETE = "delete";
 
-    private String             virtualServerName;
-    private String             configFileName;
-    private String             version;
-    private String             girUrl;
-    private boolean            reload             = true;
-    private String             dynamicRefreshUrl;
-    private String             dynamicRefreshPostData;
-    private String             refreshMethod      = HTTP_METHOD_GET;
+    private String                    virtualServerName;
+    private String                    configFileName;
+    private String                    version;
+    private String                    girUrl;
+    private boolean                   reload = true;
+    private List<Map<String, String>> dynamicRefreshPostData;
 
     public ConfigUpgradeTask(String virtualServerName, String configFileName, String version, String girUrl,
-            boolean reload, String dynamicRefreshUrl, String dynamicRefreshPostData, String refreshMethod) {
+            boolean reload, List<Map<String, String>> dynamicRefreshPostData) {
         super();
         this.virtualServerName = virtualServerName;
         this.configFileName = configFileName;
         this.version = version;
         this.girUrl = girUrl;
         this.reload = reload;
-        this.dynamicRefreshUrl = dynamicRefreshUrl;
         this.dynamicRefreshPostData = dynamicRefreshPostData;
-        this.refreshMethod = refreshMethod;
     }
 
     /**
@@ -74,19 +70,8 @@ public class ConfigUpgradeTask extends AbstractTask {
         return reload;
     }
 
-    /**
-     * @return the dynamicRefreshUrl
-     */
-    public String getDynamicRefreshUrl() {
-        return dynamicRefreshUrl;
-    }
-
-    public String getDynamicRefreshPostData() {
+    public List<Map<String, String>> getDynamicRefreshPostData() {
         return dynamicRefreshPostData;
-    }
-
-    public String getRefreshMethod() {
-        return refreshMethod;
     }
 
     @Override
@@ -95,9 +80,7 @@ public class ConfigUpgradeTask extends AbstractTask {
         int result = 1;
         result = prime * result + ((configFileName == null) ? 0 : configFileName.hashCode());
         result = prime * result + ((dynamicRefreshPostData == null) ? 0 : dynamicRefreshPostData.hashCode());
-        result = prime * result + ((dynamicRefreshUrl == null) ? 0 : dynamicRefreshUrl.hashCode());
         result = prime * result + ((girUrl == null) ? 0 : girUrl.hashCode());
-        result = prime * result + ((refreshMethod == null) ? 0 : refreshMethod.hashCode());
         result = prime * result + (reload ? 1231 : 1237);
         result = prime * result + ((version == null) ? 0 : version.hashCode());
         result = prime * result + ((virtualServerName == null) ? 0 : virtualServerName.hashCode());
@@ -123,20 +106,10 @@ public class ConfigUpgradeTask extends AbstractTask {
                 return false;
         } else if (!dynamicRefreshPostData.equals(other.dynamicRefreshPostData))
             return false;
-        if (dynamicRefreshUrl == null) {
-            if (other.dynamicRefreshUrl != null)
-                return false;
-        } else if (!dynamicRefreshUrl.equals(other.dynamicRefreshUrl))
-            return false;
         if (girUrl == null) {
             if (other.girUrl != null)
                 return false;
         } else if (!girUrl.equals(other.girUrl))
-            return false;
-        if (refreshMethod == null) {
-            if (other.refreshMethod != null)
-                return false;
-        } else if (!refreshMethod.equals(other.refreshMethod))
             return false;
         if (reload != other.reload)
             return false;
