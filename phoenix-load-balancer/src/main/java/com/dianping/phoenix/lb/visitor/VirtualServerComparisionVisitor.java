@@ -12,14 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-
 import com.dianping.phoenix.lb.constant.Constants;
 import com.dianping.phoenix.lb.model.entity.Directive;
 import com.dianping.phoenix.lb.model.entity.Location;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
+import com.dianping.phoenix.lb.utils.AdvEqualsBuilder;
 import com.dianping.phoenix.lb.visitor.VirtualServerComparisionVisitor.ComparisionResult;
 
 /**
@@ -75,7 +74,7 @@ public class VirtualServerComparisionVisitor extends AbstractVisitor<Comparision
     public void visitSlbModelTree(SlbModelTree slbModelTree) {
 
         VirtualServer vs = slbModelTree.findVirtualServer(baseVs.getName());
-        if (EqualsBuilder.reflectionEquals(baseVs, vs, true, null, new String[] { "m_creationDate",
+        if (AdvEqualsBuilder.reflectionEquals(baseVs, vs, true, null, new String[] { "m_creationDate",
                 "m_lastModifiedDate", "m_version", "m_instances" })) {
             Set<String> usedPoolNamePrefixs = new HashSet<String>();
 
@@ -101,7 +100,7 @@ public class VirtualServerComparisionVisitor extends AbstractVisitor<Comparision
                 if (!pools.containsKey(basePool.getName())) {
                     result.addDeletedPools(basePool);
                 } else {
-                    if (!EqualsBuilder.reflectionEquals(basePool, pools.get(basePool.getName()), true, null,
+                    if (!AdvEqualsBuilder.reflectionEquals(basePool, pools.get(basePool.getName()), true, null,
                             new String[] { "m_creationDate", "m_lastModifiedDate" })) {
                         result.addModifiedPools(pools.get(basePool.getName()));
                     }
@@ -115,7 +114,7 @@ public class VirtualServerComparisionVisitor extends AbstractVisitor<Comparision
                     result.addAddedPools(pool);
                 } else {
                     if (!result.getModifiedPools().contains(pool)
-                            && !EqualsBuilder.reflectionEquals(pool, basePools.get(pool.getName()), new String[] {
+                            && !AdvEqualsBuilder.reflectionEquals(pool, basePools.get(pool.getName()), new String[] {
                                     "m_creationDate", "m_lastModifiedDate" })) {
                         result.addModifiedPools(pool);
                     }
