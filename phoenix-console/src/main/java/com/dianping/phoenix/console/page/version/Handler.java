@@ -81,6 +81,8 @@ public class Handler implements PageHandler<Context>, LogEnabled {
 			case REMOVE:
 				removeVersion(ctx, payload);
 				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -104,6 +106,8 @@ public class Handler implements PageHandler<Context>, LogEnabled {
 			break;
 		case GET_VERSIONS:
 			getVersions(ctx, model, payload.getType());
+			break;
+		default:
 			break;
 		}
 

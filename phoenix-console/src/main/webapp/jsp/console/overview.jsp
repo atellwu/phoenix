@@ -23,55 +23,20 @@
 			<div class="span3">
 				<div id="accordion" class="accordion">
 					<c:set var="flagc" scope="page" value="true" />
-					<c:forEach var="product" items="${model.products}">
+					<c:forEach var="product" items="${model.catalog}" varStatus="status">
 						<div class="accordion-group">
 							<div class="accordion-heading">
-								<a class="accordion-toggle btn btn-accordion" data-toggle="collapse" data-parent="#accordion" href="#_${product.name}">${product.name}</a>
+								<a class="accordion-toggle btn btn-accordion" data-toggle="collapse" data-parent="#accordion" href="#_${product.key}">${product.key}</a>
 							</div>
-							<c:choose>
-								<c:when test="${flagc}">
-									<div id="_${product.name}" class="accordion-body collapse in">
-										<div class="accordion-inner">
-											<ul class="nav nav-pills nav-stacked">
-												<c:set var="flagl" scope="page" value="true" />
-												<c:forEach var="domain" items="${product.domains}">
-													<c:choose>
-														<c:when test="${flagl}">
-															<li class="active"><a href="#">${domain.key}</a></li>
-															<c:set var="flagl" scope="page" value="false" />
-														</c:when>
-														<c:otherwise>
-															<li><a href="#">${domain.key}</a></li>
-														</c:otherwise>
-													</c:choose>
-												</c:forEach>
-											</ul>
-										</div>
-									</div>
-									<c:set var="flagc" scope="page" value="false" />
-								</c:when>
-								<c:otherwise>
-									<div id="_${product.name}" class="accordion-body collapse">
-										<div class="accordion-inner">
-											<ul class="nav nav-pills nav-stacked">
-												<c:set var="flagl" scope="page" value="true" />
-												<c:forEach var="domain" items="${product.domains}">
-													<c:choose>
-														<c:when test="${flagl}">
-															<li class="active"><a href="#">${domain.key}</a></li>
-															<c:set var="flagl" scope="page" value="false" />
-														</c:when>
-														<c:otherwise>
-															<li><a href="#">${domain.key}</a></li>
-														</c:otherwise>
-													</c:choose>
-												</c:forEach>
-											</ul>
-										</div>
-									</div>
-								</c:otherwise>
-							</c:choose>
-
+							<div id="_${product.key}" class="accordion-body collapse <c:if test="${status.first}">in</c:if>">
+								<div class="accordion-inner">
+									<ul class="nav nav-pills nav-stacked" style="height: 300px; overflow: auto;">
+										<c:forEach var="domain" items="${product.value}" varStatus="inner_status">
+											<li class="<c:if test="${inner_status.first}">active</c:if>"><a href="#">${domain}</a></li>
+										</c:forEach>
+									</ul>
+								</div>
+							</div>
 						</div>
 					</c:forEach>
 				</div>
@@ -81,7 +46,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<res:useJs value="${res.js.local['jquery.dataTables.min.js']}" target="datatable-js" />
 	<res:useJs value="${res.js.local['DT_bootstrap.js']}" target="dtboot-js" />
 	<res:useJs value="${res.js.local['FixedColumns.js']}" target="fixcolumn-js" />

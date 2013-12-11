@@ -8,7 +8,7 @@ function parsePayload() {
 	var verarray = getArrayFromString($("#payload_versions").val());
 	var jointarray = getArrayFromString($("#payload_joints").val());
 
-	for ( var idx = 0; idx < deparray.length; idx++) {
+	for (var idx = 0; idx < deparray.length; idx++) {
 		if (idx > 0) {
 			payloadStr += "&joint=".concat(jointarray[idx - 1]);
 			queryTips += " " + jointarray[idx - 1] + " ";
@@ -22,10 +22,8 @@ function parsePayload() {
 	var agentversion = $("#payload_agentversion").val();
 	var agentoperator = $("#payload_agentoperator").val();
 
-	payloadStr += agentversion == "" ? "" : "&agentversion="
-			.concat(agentversion);
-	payloadStr += agentoperator == "" ? "" : "&agentoperator="
-			.concat(agentoperator);
+	payloadStr += agentversion == "" ? "" : "&agentversion=".concat(agentversion);
+	payloadStr += agentoperator == "" ? "" : "&agentoperator=".concat(agentoperator);
 	if (agentversion != "" && agentoperator != "") {
 		queryTips += "AgentVersion " + agentoperator + " " + agentversion;
 	}
@@ -41,12 +39,46 @@ function parsePayload() {
 function getArrayFromString(str) {
 	var sourceArray = str.substring(1, str.length - 1).split(", ");
 	var finalArray = [];
-	for ( var idx = 0; idx < sourceArray.length; idx++) {
+	for (var idx = 0; idx < sourceArray.length; idx++) {
 		if (sourceArray[idx] != "") {
 			finalArray.push(sourceArray[idx]);
 		}
 	}
 	return finalArray;
+}
+
+function bind_cmp_evt_handlers() {
+	$("input.all-check").click(function() {
+		var product = $(this).val();
+		var status = $(this).is(":checked");
+		$("input[meta='" + product + "']").attr("checked", status);
+		set_submit_status(product, status);
+	});
+	$("input[type='checkbox']").click(function() {
+		var product = $(this).attr("meta");
+		if (product != undefined) {
+			reset_table_filter();
+			var status = $("input:checked[meta='" + product + "']").length > 1;
+			set_submit_status(product, status);
+		}
+	});
+}
+
+function reset_table_filter() {
+	var table = $.fn.dataTable.fnTables(true);
+	if (table.length > 0) {
+		$(table).dataTable().fnFilter("");
+	}
+}
+
+function set_submit_status(product, status) {
+	var submit = $("input:submit[meta='" + product + "']");
+	submit.attr("disabled", !status);
+	if (!status) {
+		submit.addClass("disabled");
+	} else {
+		submit.removeClass("disabled");
+	}
 }
 
 $(function() {
@@ -61,6 +93,7 @@ $(function() {
 		if (table.length > 0) {
 			$(table).dataTable().fnAdjustColumnSizing();
 		}
+		bind_cmp_evt_handlers();
 	});
 	$('table').dataTable({
 		"sScrollY" : "400px",
@@ -68,6 +101,11 @@ $(function() {
 		"oLanguage" : {
 			"sInfo" : "Total Domains：_TOTAL_"
 		},
-		"sDom" : "<'row-fluid'<'span6'f><'span6'i>r>t<'row-fluid'<'span6'l><'span6'p>>"
+		"sDom" : "<'row-fluid'<'span6'f><'span6'i>>t<'row-fluid'<'span6'l><'span6'p>>",
+		"aoColumns" : [ {
+			"bSortable" : false
+		}, null, null, null, null, null, null ],
+		"aaSorting" : [ [ 1, 'asc' ] ]
 	});
+	bind_cmp_evt_handlers();
 });

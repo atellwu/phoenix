@@ -228,6 +228,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 			host.addSegment(new SegmentModel().setText(text));
 			return this;
 		}
+
 		private Pair<CountDownLatch, List<String>> submitNextBatch(Transaction t, boolean waitObjSwitch) {
 			Pair<CountDownLatch, List<String>> pair = null;
 			if (m_hostIndex < m_hosts.size()) {
@@ -263,6 +264,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 			}
 			return pair;
 		}
+
 		private boolean cancelRestIfNeeded() {
 			if (DeployStatus.CANCELLING.getName().equals(m_model.getStatus())) {
 				cancelResetTasks();
@@ -277,6 +279,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 				return false;
 			}
 		}
+
 		@Override
 		public void run() {
 			if (m_old) {
@@ -338,6 +341,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 				t.complete();
 			}
 		}
+
 		private void loadDeployModel() {
 			m_hosts = new ArrayList<String>();
 			for (HostModel host : m_model.getHosts().values()) {
@@ -583,6 +587,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 				throw new IllegalStateException(String.format("Not implemented yet(%s)!", url));
 			}
 		}
+
 		@Override
 		public AgentContext print(String pattern, Object... args) {
 			if (m_log.length() == 0 && m_controller.getConfigManager().isShowLogTimestamp()) {
@@ -636,15 +641,17 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 
 			try {
 				switch (state) {
-					case CREATED :
-						m_listener.onStart(this);
-						break;
-					case SUCCESSFUL :
-						m_listener.onEnd(this, AgentStatus.SUCCESS);
-						break;
-					case FAILED :
-						m_listener.onEnd(this, AgentStatus.FAILED);
-						break;
+				case CREATED:
+					m_listener.onStart(this);
+					break;
+				case SUCCESSFUL:
+					m_listener.onEnd(this, AgentStatus.SUCCESS);
+					break;
+				case FAILED:
+					m_listener.onEnd(this, AgentStatus.FAILED);
+					break;
+				default:
+					break;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
