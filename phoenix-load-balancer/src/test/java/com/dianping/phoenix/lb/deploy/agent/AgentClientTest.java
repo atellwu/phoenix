@@ -24,7 +24,7 @@ public class AgentClientTest {
     public void test() throws Exception {
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/applicationContext.xml");
 
-        AgentClient client = new DefaultAgentClient(2L, "leo", "leo-2", "192.168.22.114",
+        AgentClient client = new DefaultAgentClient(4L, "leo", "leo-3", "192.168.22.114",
                 context.getBean(VirtualServerService.class), context.getBean(StrategyService.class),
                 PlexusComponentContainer.INSTANCE.lookup(ConfigManager.class));
         client.execute();
