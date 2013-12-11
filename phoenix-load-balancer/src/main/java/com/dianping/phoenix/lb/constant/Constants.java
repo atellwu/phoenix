@@ -16,6 +16,7 @@ public class Constants {
     public static String   DEPLOY_SUMMARY                 = "summary";
     public static String   ENV_DEV                        = "dev";
     public static String   ENV_PRODUCT                    = "product";
+    public static String   ENV_PPE                        = "ppe";
     public static String   DIRECTIVE_PROXY_PASS           = "proxy_pass";
     public static String   DIRECTIVE_PROXY_PASS_POOL_NAME = "pool-name";
 

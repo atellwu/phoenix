@@ -39,6 +39,8 @@ public class ConfigManager implements Initializable {
             return m_config.getModelGitUrlDev();
         } else if (Constants.ENV_PRODUCT.equals(m_config.getEnv())) {
             return m_config.getModelGitUrlProduct();
+        } else if (Constants.ENV_PPE.equals(m_config.getEnv())){
+            return m_config.getModelGitUrlPpe();
         }
         return m_config.getModelGitUrlDev();
     }
@@ -117,6 +119,8 @@ public class ConfigManager implements Initializable {
         check();
         if (Constants.ENV_PRODUCT.equals(m_config.getEnv())) {
             return m_config.getTengineConfigGitUrlProduct();
+        }else if(Constants.ENV_PPE.equals(m_config.getEnv())){
+            return m_config.getTengineConfigGitUrlPpe();
         }
         return m_config.getTengineConfigGitUrlDev();
     }

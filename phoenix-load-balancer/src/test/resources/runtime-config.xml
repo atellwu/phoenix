@@ -1,8 +1,10 @@
 <runtime-config>
     <tengine-config-git-url-dev>ssh://git@code.dianpingoa.com/arch/phoenix-slb-tengine-config-dev.git</tengine-config-git-url-dev>
     <tengine-config-git-url-product>ssh://git@code.dianpingoa.com/arch/phoenix-slb-tengine-config-product.git</tengine-config-git-url-product>
+    <tengine-config-git-url-ppe>ssh://git@code.dianpingoa.com/arch/phoenix-slb-tengine-config-ppe.git</tengine-config-git-url-ppe>
     <model-git-url-dev>ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-dev.git</model-git-url-dev>
     <model-git-url-product>ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-product.git</model-git-url-product>
+    <model-git-url-ppe>ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-ppe.git</model-git-url-ppe>
     <model-store-base-dir>/data/appdatas/phoenix/slb/model</model-store-base-dir>
     <tengine-config-base-dir>/data/appdatas/phoenix/slb/tengine</tengine-config-base-dir>
     <tengine-config-file-name>server.conf</tengine-config-file-name>
