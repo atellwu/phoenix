@@ -11,14 +11,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.dianping.phoenix.lb.utils.PoolNameUtils;
+
 /**
  * @author Leo Liang
  * 
  */
 public class NginxConfig {
-    private static final String              UPSTREAM_NAME_PREFIX_SEPARATOR = "@";
     private NginxServer                      server;
-    private Map<String, List<NginxUpstream>> upstreams                      = new HashMap<String, List<NginxUpstream>>();
+    private Map<String, List<NginxUpstream>> upstreams = new HashMap<String, List<NginxUpstream>>();
 
     /**
      * @return the servers
@@ -49,7 +50,7 @@ public class NginxConfig {
     public void addUpstream(NginxUpstream upstream) {
         String upstreamName = upstream.getName();
         if (upstreamName != null) {
-            upstreamName = removeUpstreamNameSuffix(upstreamName);
+            upstreamName = PoolNameUtils.getPoolNamePrefix(upstreamName);
             if (!this.upstreams.containsKey(upstreamName)) {
                 this.upstreams.put(upstreamName, new ArrayList<NginxUpstream>());
             }
@@ -57,17 +58,8 @@ public class NginxConfig {
         }
     }
 
-    private String removeUpstreamNameSuffix(String upstreamName) {
-        int prefixSeparatorPos = upstreamName.indexOf(UPSTREAM_NAME_PREFIX_SEPARATOR);
-        if (prefixSeparatorPos > 0) {
-            upstreamName = upstreamName.substring(0, prefixSeparatorPos);
-        }
-
-        return upstreamName;
-    }
-
     public List<NginxUpstream> getUpstream(String name) {
-        return upstreams.get(removeUpstreamNameSuffix(name));
+        return upstreams.get(PoolNameUtils.getPoolNamePrefix(name));
     }
 
 }
