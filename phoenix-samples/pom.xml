@@ -4,12 +4,10 @@
 	<parent>
 		<groupId>com.dianping.platform</groupId>
 		<artifactId>phoenix-parent</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>0.2.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.dianping.platform</groupId>
 	<artifactId>phoenix-samples</artifactId>
-	<version>0.1-SNAPSHOT</version>
 	<name>phoenix-samples</name>
 	<packaging>pom</packaging>
 	<modules>

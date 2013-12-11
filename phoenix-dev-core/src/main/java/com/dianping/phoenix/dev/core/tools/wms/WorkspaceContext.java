@@ -30,7 +30,7 @@ public class WorkspaceContext implements Serializable {
     private static final long serialVersionUID     = -7734656051647733810L;
     private File              baseDir;
     private List<BizProject>  projects             = new ArrayList<BizProject>();
-    private String            phoenixRouterVersion = "0.1-SNAPSHOT";
+    private String            phoenixRouterVersion = "0.2-SNAPSHOT";
     private boolean           cleanFolder;
     private String            from;
 
