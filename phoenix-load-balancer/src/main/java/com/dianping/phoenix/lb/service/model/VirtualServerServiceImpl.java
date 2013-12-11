@@ -40,6 +40,7 @@ import com.dianping.phoenix.lb.service.GitService;
 import com.dianping.phoenix.lb.service.NginxService;
 import com.dianping.phoenix.lb.service.NginxService.NginxCheckResult;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
+import com.dianping.phoenix.lb.utils.PoolNameUtils;
 import com.dianping.phoenix.lb.velocity.TemplateManager;
 import com.dianping.phoenix.lb.velocity.VelocityEngineManager;
 import com.dianping.phoenix.lb.visitor.NginxConfigVisitor;
@@ -92,7 +93,8 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
         this.virtualServerDao = virtualServerDao;
     }
 
-    public List<String> findVirtualServerByPool(final String poolName) throws BizException {
+    public List<String> findVirtualServerByPool(String poolName) throws BizException {
+        final String poolNamePrefix = PoolNameUtils.getPoolNamePrefix(poolName);
         try {
             return read(new ReadOperation<List<String>>() {
 
@@ -103,7 +105,7 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
 
                         boolean found = false;
 
-                        if (StringUtils.equals(vs.getDefaultPoolName(), poolName)) {
+                        if (StringUtils.equals(vs.getDefaultPoolName(), poolNamePrefix)) {
                             vsNames.add(vs.getName());
                             found = true;
                         }
@@ -121,7 +123,7 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
                                         && StringUtils
                                                 .equals(directive
                                                         .getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME),
-                                                        poolName)) {
+                                                        poolNamePrefix)) {
                                     vsNames.add(vs.getName());
                                     found = true;
                                     break;
