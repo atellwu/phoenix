@@ -1,2 +1,1 @@
 hash $strategy.getDynamicAttribute("target");
-    hash_method  crc32;
