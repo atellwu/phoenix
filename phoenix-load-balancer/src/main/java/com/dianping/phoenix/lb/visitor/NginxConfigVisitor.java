@@ -113,7 +113,9 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
             return MatchType.PREFIX;
         } else if (Constants.LOCATION_MATCHTYPE_REGEX.equals(location.getMatchType())) {
             return location.getCaseSensitive() ? MatchType.REGEX_CASE_SENSITIVE : MatchType.REGEX_CASE_INSENSITIVE;
-        } else {
+        } else if(Constants.LOCATION_MATCHTYPE_EXACT.equals(location.getMatchType())){
+            return MatchType.EXACT;
+        }else{
             return MatchType.COMMON;
         }
     }

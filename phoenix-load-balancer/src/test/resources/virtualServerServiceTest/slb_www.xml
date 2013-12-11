@@ -26,6 +26,9 @@
 			<location match-type="prefix" pattern="/guangzhou">
 				<directive type="proxy_pass" pool-name="Web.Shop" />
 			</location>
+			<location match-type="exact" pattern="/a">
+				<directive type="proxy_pass" pool-name="Web.Shop" />
+			</location>
 		</locations>
 	</virtualServer>
 </slb-model-tree>
