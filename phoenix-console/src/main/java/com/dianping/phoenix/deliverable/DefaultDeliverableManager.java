@@ -140,6 +140,7 @@ public class DefaultDeliverableManager implements DeliverableManager, LogEnabled
 				m_d.setStatus(DeliverableStatus.ACTIVE.getId());
 				m_dao.updateByPK(m_d, DeliverableEntity.UPDATESET_FULL);
 			} catch (Exception e) {
+				e.printStackTrace();
 				m_logService.log(key, "Error when creating the deliverable(%s:%s)! Message: %s.", type, version, e);
 				t.setStatus(e);
 				Cat.logError(e);
