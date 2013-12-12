@@ -100,7 +100,7 @@
         <property name="proxyTargetClass" value="true"></property>
         <property name="beanNames">
             <list>
-                <value>*Action</value>
+                <value>*ServiceImpl____</value>
             </list>
         </property>
         <property name="interceptorNames">

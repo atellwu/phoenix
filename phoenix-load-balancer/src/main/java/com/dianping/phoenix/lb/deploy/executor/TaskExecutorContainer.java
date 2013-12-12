@@ -1,6 +1,7 @@
 package com.dianping.phoenix.lb.deploy.executor;
 
 import com.dianping.phoenix.lb.deploy.bo.DeployTaskBo;
+import com.dianping.phoenix.lb.exception.BizException;
 
 public interface TaskExecutorContainer {
 
@@ -11,8 +12,9 @@ public interface TaskExecutorContainer {
 
     /**
      * 创建一个TaskExecutor，并且返回
+     * @throws BizException 
      */
-    TaskExecutor submitTaskExecutor(long taskId);
+    TaskExecutor submitTaskExecutor(long taskId) throws BizException;
 
     /**
      * 创建一个TaskExecutor，并且返回

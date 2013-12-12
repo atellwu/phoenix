@@ -4,23 +4,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * vs只记录结果，当作result来使用
+ * 
+ */
 public enum DeployVsStatus {
 
-    CREATED("新建的任务"), //创建完，选择了vs，未选择agent
+    READY("就绪"), //创建完，选择了vs，未选择agent
 
-    WAITING("已就绪，未执行"), //创建完，选择了vs和选择agent，可以被点击启动执行
+    //    WAITING("已就绪，未执行"), //创建完，选择了vs和选择agent，可以被点击启动执行
 
-    READY("即将执行"), //已准备好，等待executor调度 （只有这个状态可被执行）
+    //    READY("即将执行"), //已准备好，等待executor调度 （只有这个状态可被执行）
 
-    PROCESSING("正在执行"), //内存状态，不需要持久化
+    //    PROCESSING("正在执行"), //内存状态，不需要持久化
 
-    PAUSED("已停中"),
-
-    WARNING("执行完成(部分失败)"), // completed with partial failures
+    WARNING("执行完成(未完全成功)"), // completed with partial failures
 
     FAILED("执行失败"), // complete with all failed
-
-    CANCELLING("已被取消"),
 
     SUCCESS("执行成功"); // completed with all successful
 
@@ -39,8 +39,8 @@ public enum DeployVsStatus {
 
     private final static Set<DeployVsStatus> ERROR_STATUS_SET     = new HashSet<DeployVsStatus>();
     static {
-        COMPLETED_STATUS_SET.add(WARNING);
-        COMPLETED_STATUS_SET.add(FAILED);
+        ERROR_STATUS_SET.add(WARNING);
+        ERROR_STATUS_SET.add(FAILED);
     };
 
     public boolean isCompleted() {
@@ -49,14 +49,6 @@ public enum DeployVsStatus {
 
     public boolean isNotSuccess() {
         return ERROR_STATUS_SET.contains(this);
-    }
-
-    public boolean canPaused() {
-        return this == READY || this == PROCESSING;
-    }
-
-    public boolean canCancel() {
-        return this == READY || this == PROCESSING || this == PAUSED;
     }
 
     /**

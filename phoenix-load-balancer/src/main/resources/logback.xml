@@ -15,9 +15,7 @@
         </encoder>
     </appender>
 
-<!-- 
-    <logger name="java.sql" level="INFO"/>
- -->
+    <logger name="com.dianping.phoenix" level="INFO"/>
     <root level="ERROR">
         <appender-ref ref="console"/>
     </root>

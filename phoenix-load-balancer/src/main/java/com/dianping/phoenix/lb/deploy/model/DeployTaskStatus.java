@@ -4,23 +4,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * vs只记录结果，当作result来使用
+ * 
+ * @author atell
+ * 
+ */
 public enum DeployTaskStatus {
 
     CREATED("新建的任务"), //创建完，选择了vs，未选择agent
 
-    WAITING("已就绪，未执行"), //创建完，选择了vs和选择agent，可以被点击启动执行
+    //    WAITING("已就绪，未执行"), //创建完，选择了vs和选择agent，可以被点击启动执行
 
-    READY("即将执行"), //已准备好，等待executor调度 （只有这个状态可被执行）
+    READY("可执行"), //已准备好，可被执行
 
-    PROCESSING("正在执行"), //内存状态，不需要持久化
+    //    PROCESSING("正在执行"), //内存状态，不需要持久化
 
-    PAUSED("已暂停"),
+    //    PAUSED("已暂停"),
 
     WARNING("执行完成(部分失败)"), // completed with partial failures
 
     FAILED("执行失败"), // complete with all failed
 
-    CANCELLING("已被取消"),
+    CANCELLED("已被取消"),
 
     SUCCESS("执行成功"); // completed with all successful
 
@@ -55,12 +61,13 @@ public enum DeployTaskStatus {
         COMPLETED_STATUS_SET.add(WARNING);
         COMPLETED_STATUS_SET.add(FAILED);
         COMPLETED_STATUS_SET.add(SUCCESS);
+        COMPLETED_STATUS_SET.add(CANCELLED);
     };
 
     private final static Set<DeployTaskStatus> ERROR_STATUS_SET     = new HashSet<DeployTaskStatus>();
     static {
-        COMPLETED_STATUS_SET.add(WARNING);
-        COMPLETED_STATUS_SET.add(FAILED);
+        ERROR_STATUS_SET.add(WARNING);
+        ERROR_STATUS_SET.add(FAILED);
     };
 
     public boolean isCompleted() {
@@ -71,13 +78,13 @@ public enum DeployTaskStatus {
         return ERROR_STATUS_SET.contains(this);
     }
 
-    public boolean canPaused() {
-        return this == READY || this == PROCESSING;
-    }
-
-    public boolean canCancel() {
-        return this != SUCCESS;//非成功的任务，均可取消
-    }
+    //    public boolean canPaused() {
+    //        return this == READY || this == PROCESSING;
+    //    }
+    //
+    //    public boolean canCancel() {
+    //        return this != SUCCESS;//非成功的任务，均可取消
+    //    }
 
     /**
      * 根据子任务(vs任务)的状态，计算父亲的状态
@@ -110,6 +117,11 @@ public enum DeployTaskStatus {
 
     public String getDesc() {
         return desc;
+    }
+
+    public boolean canChangeTo(DeployTaskStatus taskStatus) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

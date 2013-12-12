@@ -34,18 +34,23 @@ public interface TaskExecutor {
      */
     void start();
 
-    /**
-     * 暂停运行（最小粒度是agent，暂停时，记录进度）
-     */
-    void pause();
+//    void pause();
 
-    /**
-     * 终止/取消运行
-     */
-    void cancle();
+    void stop();
 
+    //    /**
+    //     * 暂停运行（最小粒度是agent，暂停时，记录进度）
+    //     */
+    //    void pause();
 
-    void resume();
+    //    /**
+    //     * 终止/取消运行
+    //     */
+    //    void cancel();
+    //
+    //    void resume();
 
     DeployTaskBo getDeployTaskBo();
+
+    //    void retry();
 }

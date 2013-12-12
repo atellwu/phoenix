@@ -45,7 +45,10 @@ module
 												if ($scope.task.task.status == 'CREATED') {
 													$scope.canUpdate = true;
 												}
-												console.log($scope.canUpdate);
+												// 开始ajax论询获取task的状态
+												if (!$scope.canUpdate) {
+													$scope.needGetStatus = true;
+												}
 											} else {
 												app.alertError("获取失败: "
 														+ data.errorMessage);
@@ -55,25 +58,27 @@ module
 									app.appError("响应错误", data);
 								});
 					};
-					$scope.isContain = function(deployAgents, ip) {
-						return deployAgents[ip] != null;
+					$scope.isContain = function(deployAgentBos, ip) {
+						return deployAgentBos[ip] != null;
 					}
-					$scope.checkIp = function(deployAgents, ip) {
+					$scope.checkIp = function(deployAgentBos, ip) {
 						if (!$scope.canUpdate) {
 							return;
 						}
-						if (deployAgents[ip] != null) {
-							delete deployAgents[ip];
+						if (deployAgentBos[ip] != null) {
+							delete deployAgentBos[ip];
 						} else {
-							deployAgents[ip] = {
-								"ipAddress" : ip
+							deployAgentBos[ip] = {
+								"deployAgent" : {
+									"ipAddress" : ip
+								}
 							};
 						}
 					}
-					$scope.isContainAll = function(deployAgents, instances) {
+					$scope.isContainAll = function(deployAgentBos, instances) {
 						var isContainAll = true;
 						$.each(instances, function(j, instance) {
-							var contain = deployAgents[instance.ip] != null;
+							var contain = deployAgentBos[instance.ip] != null;
 							if (!contain) {
 								isContainAll = false;
 								return false;
@@ -85,22 +90,27 @@ module
 						var elem = angular.element(e.srcElement);
 						var checked = (elem.attr('checked'));
 						if (checked) {
-							deployVsBo.deployAgents = {};
+							deployVsBo.deployAgentBos = {};
 							var instances = deployVsBo.vs.instances;
 							$.each(instances, function(i, instance) {
-								deployVsBo.deployAgents[instance.ip] = {
-									"ipAddress" : instance.ip
+								deployVsBo.deployAgentBos[instance.ip] = {
+									"deployAgent" : {
+										"ipAddress" : instance.ip
+									}
 								};
 							});
 						} else {
-							deployVsBo.deployAgents = {};
+							deployVsBo.deployAgentBos = {};
 						}
 					}
-					$scope.getStatus = function(deployAgents, ip) {
-						var deployAgent = deployAgents[ip];
-						if (deployAgent != null) {
-							if (deployAgent.status != null) {
-								return deployAgent.status;
+					$scope.getAgent = function(deployAgentBos, ip) {
+						return deployAgentBos[ip];
+					}
+					$scope.getStatus = function(deployAgentBos, ip) {
+						var deployAgentBo = deployAgentBos[ip];
+						if (deployAgentBo != null) {
+							if (deployAgentBo.deployAgent.status != null) {
+								return deployAgentBo.deployAgent.status;
 							} else {
 								return "CREATED";
 							}
@@ -136,7 +146,6 @@ module
 									app.appError("响应错误", data);
 								});
 					};
-					$scope.isStarting = false;
 					$scope.updateAndStartTask = function() {
 						if (!$scope.canUpdate) {// 如果不可修改，则直接启动
 							$scope.startTask();
@@ -145,7 +154,7 @@ module
 						}
 					}
 					$scope.startTask = function() {
-						$scope.isStarting = true;
+						$scope.needGetStatus = true;
 						$http(
 								{
 									method : 'GET',
@@ -154,17 +163,30 @@ module
 								}).success(
 								function(data, status, headers, config) {
 									if (data.errorCode == 0) {
-										$scope.isStarting = true;
-										// 开始ajax论询获取task的状态
-										$scope.statusConsole();
 									} else {
-										$scope.isStarting = false;
-										app.alertError("启动失败: "
+										app.alertError("操作失败: "
 												+ data.errorMessage);
 									}
 								}).error(
 								function(data, status, headers, config) {
-									$scope.isStarting = false;
+									app.appError("响应错误", data);
+								});
+					}
+					$scope.stopTask = function() {
+						$http(
+								{
+									method : 'GET',
+									url : window.contextpath + '/deploy/task/'
+											+ $scope.task.task.id + '/stop'
+								}).success(
+								function(data, status, headers, config) {
+									if (data.errorCode == 0) {
+									} else {
+										app.alertError("操作失败: "
+												+ data.errorMessage);
+									}
+								}).error(
+								function(data, status, headers, config) {
 									app.appError("响应错误", data);
 								});
 					}
@@ -179,12 +201,42 @@ module
 										function(data, status, headers, config) {
 											if (data.errorCode == 0) {
 												$scope.task = data.task;
-												if (!($scope.task.status == 'SUCCESS'
-														&& $scope.task.status == 'FAILED' && $scope.task.status == 'DONE')) {
-													// 等待0.5秒，继续获取
-													setTimeout(
-															$scope.statusConsole,
-															1000);
+												// if
+												// ($scope.needGetStatus($scope.task.status))
+												// {
+												// // 等待1秒，继续获取
+												// setTimeout($scope.statusConsole,
+												// 1000);
+												// }
+												//
+												// 如果有agent处于'PROCESSING'状态，则console显示它。
+												$
+														.each(
+																$scope.task.deployVsBos,
+																function(
+																		vsName,
+																		deployVsBo) {
+																	$
+																			.each(
+																					deployVsBo.deployAgentBos,
+																					function(
+																							ip,
+																							deployAgentBo) {
+																						console
+																								.log(deployAgentBo);
+																						if (deployAgentBo.deployAgent.status == 'PROCESSING') {
+																							$scope.currentAgentOrVsOfLogView = deployAgentBo.deployAgent;
+																							return false;
+																						}
+																					});
+																});
+
+												$scope.showLog();
+
+												// 状态是成功，或停止，则不再获取状态
+												if ($scope.task.task.status == 'SUCCESS'
+														|| $scope.task.task.stateAction == 'STOP') {
+													$scope.needGetStatus = false;
 												}
 											} else {
 												app.alertError("获取失败: "
@@ -192,7 +244,34 @@ module
 											}
 										})
 								.error(function(data, status, headers, config) {
-									app.appError("响应错误", data);
+									$scope.needGetStatus = false;
 								});
 					};
+					$scope.showVsLog = function(deployVsBo) {
+						$scope.currentAgentOrVsOfLogView = deployVsBo.deployVs;
+						$scope.showLog();
+					}
+					$scope.showAgentLog = function(deployAgentBo) {
+						$scope.currentAgentOrVsOfLogView = deployAgentBo.deployAgent;
+						$scope.showLog();
+					}
+					$scope.showLog = function() {
+						if ($scope.currentAgentOrVsOfLogView) {
+							if ($scope.currentAgentOrVsOfLogView.rawLog) {
+								$('#console')
+										.text(
+												$scope.currentAgentOrVsOfLogView.rawLog);
+							} else {
+								$('#console')
+										.text(
+												$scope.currentAgentOrVsOfLogView.summaryLog);
+							}
+						}
+
+					}
+					setInterval(function() {
+						if ($scope.needGetStatus) {
+							$scope.statusConsole();
+						}
+					}, 1000);
 				});
