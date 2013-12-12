@@ -1,7 +1,9 @@
 package com.dianping.phoenix.deploy.internal;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.unidal.lookup.annotation.Inject;
 
@@ -101,21 +103,19 @@ public class DefaultDeployListener implements DeployListener {
 				DeploymentDetailsEntity.READSET_FULL);
 		DeployStatus status = DeployStatus.SUCCESS;
 		DeploymentDetails s = null;
-		boolean warn = false;
+
+		Set<Integer> statuses = new HashSet<Integer>();
 
 		for (DeploymentDetails details : list) {
 			if (!DeployConstant.SUMMARY.equals(details.getIpAddress())) {
-				if (details.getStatus() != AgentStatus.SUCCESS.getId()) {
-					status = DeployStatus.FAILED;
-				} else {
-					warn = true;
-				}
+				statuses.add(details.getStatus());
 			} else if (DeployConstant.SUMMARY.equals(details.getIpAddress())) {
 				s = details;
 			}
 		}
 
-		if (warn) {
+		if (statuses.contains(AgentStatus.FAILED.getId()) || statuses.contains(AgentStatus.CANCELLED.getId())
+				|| statuses.contains(AgentStatus.WARNING.getId()) || statuses.contains(AgentStatus.ABORTED.getId())) {
 			status = DeployStatus.WARNING;
 		}
 
@@ -131,9 +131,9 @@ public class DefaultDeployListener implements DeployListener {
 		s.setStatus(status.getId());
 		s.setRawLog(rawLog);
 
-		d.setKeyId(deployId);
-		d.setStatus(status.getId());
 		d.setEndDate(new Date());
+		d.setStatus(status.getId());
+		d.setKeyId(deployId);
 
 		m_deploymentDetailsDao.updateByPK(s, DeploymentDetailsEntity.UPDATESET_STATUS);
 		m_deploymentDao.updateByPK(d, DeploymentEntity.UPDATESET_STATUS);
@@ -143,6 +143,7 @@ public class DefaultDeployListener implements DeployListener {
 			model.setStatus(status.getName());
 		}
 	}
+
 	@Override
 	public void onDeployStart(int deployId) throws Exception {
 		DeployModel model = m_projectManager.findModel(deployId);

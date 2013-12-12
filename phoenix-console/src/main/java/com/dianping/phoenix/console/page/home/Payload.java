@@ -63,9 +63,25 @@ public class Payload implements ActionPayload<ConsolePage, Action> {
 	@FieldMeta("getdomain")
 	private String m_domaininfo;
 
+	// ****************** args for cross-domain start
+	@FieldMeta("product")
+	private String m_product;
+
+	@FieldMeta("domain")
+	private List<String> m_domains;
+	// ****************** args for cross-domain end
+
 	@Override
 	public Action getAction() {
 		return m_action;
+	}
+
+	public String getProduct() {
+		return m_product;
+	}
+
+	public List<String> getDomains() {
+		return m_domains;
 	}
 
 	public String getDomain() {
@@ -240,5 +256,13 @@ public class Payload implements ActionPayload<ConsolePage, Action> {
 
 	public void setDomaininfo(String domaininfo) {
 		m_domaininfo = domaininfo;
+	}
+
+	public void setDomains(List<String> domains) {
+		m_domains = domains;
+	}
+
+	public void setProduct(String product) {
+		m_product = product;
 	}
 }

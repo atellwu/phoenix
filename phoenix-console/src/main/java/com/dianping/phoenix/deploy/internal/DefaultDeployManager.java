@@ -110,11 +110,15 @@ public class DefaultDeployManager extends ContainerHolder implements DeployManag
 				e1.printStackTrace();
 			}
 			e.continueDeploy(deployId);
-			return true;
 		} else {
 			deployOld(deployId);
 		}
-		return false;
+		DeployModel model = m_projectManager.findModel(deployId);
+		if (model != null && !DeployStatus.SUCCESS.getName().equals(model.getStatus())
+				&& !DeployStatus.WARNING.getName().equals(model.getStatus())) {
+			model.setStatus(DeployStatus.DEPLOYING.getName());
+		}
+		return true;
 	}
 
 	@Override
