@@ -7,7 +7,7 @@
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <artifactId>phoenix-console</artifactId>
-   <name>phoenix-web</name>
+   <name>phoenix-console</name>
    <packaging>war</packaging>
    <dependencies>
       <dependency>
@@ -147,6 +147,22 @@
                </execution>
             </executions>
          </plugin>
+         <plugin>
+         	<groupId>org.apache.maven.plugins</groupId>
+         		<artifactId>maven-war-plugin</artifactId>
+         		<version>2.1.1</version>
+         		<executions>
+         			<execution>
+         				<phase>compile</phase>
+         					<goals>
+         						<goal>exploded</goal>
+         					</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<warName>phoenix-web-${parent.version}</warName>
+				</configuration>
+		  </plugin>
       </plugins>
    </build>
 </project>
