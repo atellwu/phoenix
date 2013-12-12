@@ -8,7 +8,7 @@
 <!-- http://www.qos.ch/shop/products/professionalSupport -->
 <!-- -->
 <configuration>
-    <appender name="main"
+    <appender name="file"
         class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>/data/applogs/phoenix-slb-admin/phoenix-slb-admin.log
         </File>
@@ -36,5 +36,6 @@
 
     <root level="ERROR">
         <appender-ref ref="console" />
+        <appender-ref ref="file" />
     </root>
 </configuration>
