@@ -120,8 +120,8 @@
 							<goal>plexus</goal>
 						</goals>
 						<configuration>
-							<className>null.build.ComponentsConfigurator</className>
-						</configuration>
+                            <className>com.dianping.phoenix.build.ComponentsConfigurator</className>
+                        </configuration>
 					</execution>
 				</executions>
 			</plugin>
