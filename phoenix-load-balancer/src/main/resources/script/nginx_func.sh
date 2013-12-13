@@ -1,4 +1,4 @@
 function nginx_check {
-	sudo -u root /etc/init.d/nginx -t -c $config
+	sudo -u root /usr/local/nginx/sbin/nginx -t -c $config
 }
 

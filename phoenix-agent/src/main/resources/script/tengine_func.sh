@@ -93,10 +93,10 @@ function copy_config {
 function reload_config {
 	if [ `pgrep nginx | wc -l` != 0 ]; then
 		log "reload tengine config"
-		sudo -u root /etc/init.d/nginx -s reload || { log_error "fail to reload tengine, exit code is $?"; exit 1; }
+		sudo -u root /etc/init.d/nginx reload || { log_error "fail to reload tengine, exit code is $?"; exit 1; }
 	else
 		log "start tengine"
-		sudo -u root /etc/init.d/nginx || { log_error "fail to start tengine, exit code is $?"; exit 1; }
+		sudo -u root /etc/init.d/nginx start || { log_error "fail to start tengine, exit code is $?"; exit 1; }
 	fi
 }
 
@@ -112,7 +112,7 @@ function dynamic_refresh_config {
 		fi
 	else
 		log "start tengine"
-		sudo -u root /etc/init.d/nginx || { log_error "fail to start tengine, exit code is $?"; exit 1; }
+		sudo -u root /etc/init.d/nginx start || { log_error "fail to start tengine, exit code is $?"; exit 1; }
 	fi
 }
 
