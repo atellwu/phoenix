@@ -130,7 +130,11 @@ public class DefaultAgentClient implements AgentClient {
             result.addRawLogs(sr.next(result));
         }
 
-        endWithSuccess();
+        if (result.getStatus() == DeployAgentStatus.SUCCESS) {
+            endWithSuccess();
+        } else {
+            endWithFail();
+        }
     }
 
     private boolean callAgentWithDynamicRefresh(ComparisionResult compareResult) throws MalformedURLException,
