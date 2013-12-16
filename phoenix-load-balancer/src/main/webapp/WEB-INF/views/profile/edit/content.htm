@@ -78,6 +78,10 @@
         <input ng-trim="true" ng-model="vs.dynamicAttributes[key]" type="text"> &nbsp;&nbsp;<a href="javascript:;"
           ng-click="removeDynamicAttribute(key)"><i class="icon-remove"></i></a>
       </div>
+      <div ng-show="getInputType(key) == 'TEXTAREA'" class="controls">
+        <textarea ng-trim="true" ng-model="vs.dynamicAttributes[key]" rows="5" type="textarea" ></textarea> &nbsp;&nbsp;<a href="javascript:;"
+          ng-click="removeDynamicAttribute(key)"><i class="icon-remove"></i></a>
+      </div>
     </div>
   </div>
 </div>

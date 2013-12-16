@@ -6,7 +6,7 @@ $nginx.properties($config.server.properties)
     
     location /{
         dp_domain $config.server.defaultPool;
-    
+
         set $hcv "-";
         if ( $http_cookie ~* "_hc.v=(\S+)(;.*|$)"){
             set $hcv $1;
@@ -16,6 +16,14 @@ $nginx.properties($config.server.properties)
         if ( $http_cookie ~* "dper=(\S+)(;.*|$)"){
             set $dper $1;
         }
+
+#foreach( $aspect in $config.server.aspects)
+#if($aspect.pointCut == 'BEFORE')
+#foreach( $directive in $aspect.directives)
+        $nginx.directive($directive)
+#end
+#end
+#end
 
 #foreach( $location in $config.server.locations)
         location $nginx.locationMatchOp($location.matchType) $location.pattern {
@@ -35,7 +43,15 @@ $nginx.properties($config.server.properties)
             proxy_pass                http://$dp_upstream;
             break;
         }
-        
+
+#foreach( $aspect in $config.server.aspects)
+#if($aspect.pointCut == 'AFTER')
+#foreach( $directive in $aspect.directives)
+        $nginx.directive($directive)
+#end
+#end
+#end
+
     }
 }
  

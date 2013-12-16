@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.dianping.phoenix.lb.model.entity.Aspect;
+import com.dianping.phoenix.lb.model.entity.Directive;
+
 /**
  * @author Leo Liang
  * 
@@ -20,6 +23,15 @@ public class NginxServer {
     private String              serverName;
     private Map<String, String> properties;
     private String              defaultPool;
+    private List<Aspect>        aspects   = new ArrayList<Aspect>();
+
+    public void addAspect(Aspect aspect) {
+        this.aspects.add(aspect);
+    }
+
+    public List<Aspect> getAspects() {
+        return aspects;
+    }
 
     public String getDefaultPool() {
         return defaultPool;
@@ -37,8 +49,7 @@ public class NginxServer {
     }
 
     /**
-     * @param properties
-     *            the properties to set
+     * @param properties the properties to set
      */
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
@@ -63,8 +74,7 @@ public class NginxServer {
     }
 
     /**
-     * @param listen
-     *            the listen to set
+     * @param listen the listen to set
      */
     public void setListen(int listen) {
         this.listen = listen;
@@ -78,8 +88,7 @@ public class NginxServer {
     }
 
     /**
-     * @param serverName
-     *            the serverName to set
+     * @param serverName the serverName to set
      */
     public void setServerName(String serverName) {
         this.serverName = serverName;
