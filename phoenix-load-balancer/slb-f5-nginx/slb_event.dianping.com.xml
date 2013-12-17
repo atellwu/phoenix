@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<slb-model-tree>
+    <virtualServer name="event.dianping.com" state="ENABLED"
+        availability="AVAILABLE" default-pool-name="Web.Web_X_Event"
+        domain="event.dianping.com" port="80" creation-date="2013-12-13 16:01:44"
+        last-modified-date="2013-12-13 16:12:34" version="3">
+        <instances>
+            <instance ip="10.2.8.14" />
+            <instance ip="10.2.8.34" />
+        </instances>
+        <locations>
+            <location match-type="prefix" pattern="/jvalidatecode.jpg"
+                case-sensitive="false">
+                <directive type="proxy_pass" pool-name="Web.Web_X_Account" />
+            </location>
+            <location match-type="prefix" pattern="/ajax/json/account/login"
+                case-sensitive="false">
+                <directive type="proxy_pass" pool-name="Web.Web_X_Account" />
+            </location>
+            <location match-type="prefix" pattern="/ajax/json/account/info"
+                case-sensitive="false">
+                <directive type="proxy_pass" pool-name="Web.Web_X_Account" />
+            </location>
+            <location match-type="prefix" pattern="/ajax/json/account/reg"
+                case-sensitive="false">
+                <directive type="proxy_pass" pool-name="Web.Web_X_Account" />
+            </location>
+            <location match-type="prefix" pattern="/activity"
+                case-sensitive="false">
+                <directive type="proxy_pass" pool-name="dp_event-service" />
+            </location>
+        </locations>
+    </virtualServer>
+</slb-model-tree>
