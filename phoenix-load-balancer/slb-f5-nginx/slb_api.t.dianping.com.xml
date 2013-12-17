@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<slb-model-tree>
+    <virtualServer name="api.t.dianping.com" state="ENABLED"
+        availability="AVAILABLE" default-pool-name="Web.TuanGou.API"
+        domain="api.t.dianping.com" port="80" creation-date="2013-12-13 16:01:44"
+        last-modified-date="2013-12-13 16:12:34" version="3">
+        <instances>
+            <instance ip="10.2.8.14" />
+            <instance ip="10.2.8.34" />
+        </instances>
+        <locations>
+            <location match-type="prefix" pattern="/n/"
+                case-sensitive="false">
+                <directive type="proxy_pass" pool-name="tuangou.api" />
+            </location>
+            <location match-type="prefix" pattern="/dp/"
+                case-sensitive="false">
+                <directive type="proxy_pass" pool-name="tuangou.api" />
+            </location>
+            <location match-type="prefix" pattern="/m/"
+                case-sensitive="false">
+                <directive type="proxy_pass" pool-name="tuangou.api" />
+            </location>
+        </locations>
+    </virtualServer>
+</slb-model-tree>

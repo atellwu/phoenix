@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<slb-model-tree>
+   <virtualServer name="event.t.dianping.com" state="ENABLED" availability="AVAILABLE" default-pool-name="tuan_tuangou-event" domain="event.t.dianping.com" port="80" creation-date="2013-12-13 16:01:44" last-modified-date="2013-12-13 16:12:34" version="3">
+      <instances>
+         <instance ip="10.2.8.14"/>
+         <instance ip="10.2.8.34"/>
+      </instances>
+      <locations>
+      </locations>
+   </virtualServer>
+</slb-model-tree>
