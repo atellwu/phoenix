@@ -11,7 +11,7 @@
         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath:spring/jdbc-mysql.properties</value>
+                <value>file:/data/appdatas/phoenix/slb/jdbc-mysql.properties</value>
             </list>
         </property>
     </bean>

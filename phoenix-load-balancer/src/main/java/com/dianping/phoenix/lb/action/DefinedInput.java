@@ -15,7 +15,7 @@ public class DefinedInput {
     private boolean      unique = false;
 
     public static enum InputType {
-        RADIO, CHECKBOX, TEXT, SELECT
+        RADIO, CHECKBOX, TEXT, SELECT,TEXTAREA
     }
 
     public String getName() {

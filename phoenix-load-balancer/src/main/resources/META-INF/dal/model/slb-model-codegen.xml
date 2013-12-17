@@ -43,15 +43,14 @@
     <attribute name="version" value-type="int" />
     <attribute name="access_log" value-type="String" />
     <entity-ref name="instance" type="list" names="instances" xml-indent="true" />
+    <entity-ref name="aspect" type="list" names="aspects" xml-indent="true" />
     <entity-ref name="location" type="list" names="locations" xml-indent="true" />
   </entity>
   <entity name="instance">
     <attribute name="ip" value-type="String" />
   </entity>
-  <entity name="location">
-    <attribute name="match-type" value-type="String" />
-    <attribute name="pattern" value-type="String" />
-    <attribute name="case-sensitive" value-type="boolean" />
+  <entity name="aspect">
+    <attribute name="point-cut" value-type="String" />
     <entity-ref name="directive" type="list" names="directives" />
   </entity>
   <entity name="directive">
@@ -65,6 +64,12 @@
     <attribute name="pool-name" value-type="String" />
     <attribute name="root-doc" value-type="String" />
     <attribute name="expires" value-type="String" />
+  </entity>
+  <entity name="location">
+    <attribute name="match-type" value-type="String" />
+    <attribute name="pattern" value-type="String" />
+    <attribute name="case-sensitive" value-type="boolean" />
+    <entity-ref name="directive" type="list" names="directives" />
   </entity>
 </model>
 
