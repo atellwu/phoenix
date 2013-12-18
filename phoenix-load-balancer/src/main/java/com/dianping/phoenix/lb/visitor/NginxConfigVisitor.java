@@ -62,13 +62,6 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
                 virtualServer.getDefaultPoolName(),
                 MessageUtils.getMessage(MessageID.VIRTUALSERVER_DEFAULTPOOL_NOT_EXISTS,
                         virtualServer.getDefaultPoolName()));
-        rewriteUpstreamNames(result.getName());
-    }
-
-    private void rewriteUpstreamNames(String suffix) {
-        for (NginxUpstream upstream : result.getUpstreams()) {
-            upstream.setName(PoolNameUtils.rewriteToPoolNamePrefix(suffix, upstream.getName()));
-        }
     }
 
     @Override
@@ -86,22 +79,20 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
             } else if (Constants.DIRECTIVE_PROXY_IFELSE.equals(directive.getType())) {
                 String content = StringUtils.trimToEmpty(directive.getDynamicAttribute("if-statement"));
                 if (content.startsWith(Constants.DIRECTIVE_PROXY_PASS + " ")) {
-                    setUpstreamsAsUsedFromProxyPassString(content, errorContent);
+                    String poolName = PoolNameUtils.extractPoolNameFromProxyPassString(content);
+                    if (StringUtils.isNotBlank(poolName)) {
+                        setUpstreamsAsUsed(poolName, errorContent);
+                    }
                 }
 
                 content = StringUtils.trimToEmpty(directive.getDynamicAttribute("else-statement"));
                 if (content.startsWith(Constants.DIRECTIVE_PROXY_PASS + " ")) {
-                    setUpstreamsAsUsedFromProxyPassString(content, errorContent);
+                    String poolName = PoolNameUtils.extractPoolNameFromProxyPassString(content);
+                    if (StringUtils.isNotBlank(poolName)) {
+                        setUpstreamsAsUsed(poolName, errorContent);
+                    }
                 }
             }
-        }
-    }
-
-    private void setUpstreamsAsUsedFromProxyPassString(String textContent, String errorContent) {
-        int poolNameStart = textContent.indexOf("http://");
-        if (poolNameStart >= 0) {
-            String poolName = textContent.substring(poolNameStart + "http://".length());
-            setUpstreamsAsUsed(poolName, errorContent);
         }
     }
 

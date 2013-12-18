@@ -47,10 +47,9 @@ public class NginxVelocityTools {
 
     public String rewriteProxyPassStringIfNeeded(String prefix, String text) {
         if (text.startsWith(Constants.DIRECTIVE_PROXY_PASS + " ")) {
-            int poolNameStart = text.indexOf("http://");
-            if (poolNameStart >= 0) {
-                String poolName = text.substring(poolNameStart + "http://".length());
-                return text.substring(0, poolNameStart) + "http://"
+            String poolName = PoolNameUtils.extractPoolNameFromProxyPassString(text);
+            if (StringUtils.isNotBlank(poolName)) {
+                return Constants.DIRECTIVE_PROXY_PASS + " http://"
                         + PoolNameUtils.rewriteToPoolNamePrefix(prefix, poolName);
             }
         }
@@ -95,7 +94,7 @@ public class NginxVelocityTools {
             context.put("directive", directive);
             if (Constants.DIRECTIVE_PROXY_PASS.equals(directive.getType())) {
                 context.put(
-                        "dp_domain",
+                        Constants.DIRECTIVE_DP_DOMAIN,
                         PoolNameUtils.rewriteToPoolNamePrefix(vsName,
                                 directive.getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME)));
             } else if (Constants.DIRECTIVE_PROXY_IFELSE.equals(directive.getType())) {
