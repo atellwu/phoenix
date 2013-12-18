@@ -3,7 +3,7 @@
     <virtualServer name="*.v.t.dianping.com" state="ENABLED"
         availability="AVAILABLE" default-pool-name="Web.TuanGou.VerifyCoupon"
         domain="*.v.t.dianping.com" port="80" creation-date="2013-12-13 16:01:44"
-        last-modified-date="2013-12-13 16:12:34" version="3">
+        last-modified-date="2013-12-13 16:12:34" version="1">
         <instances>
             <instance ip="10.2.8.14" />
             <instance ip="10.2.8.34" />
@@ -12,25 +12,25 @@
             <location match-type="prefix" pattern="/ivrverify/clearphone.aspx"
                 case-sensitive="false">
                 <directive type="rewrite" matches="^(.*).aspx(.*)$"
-                    flag="break" target-pattern="$1/$2" />
+                    flag="break" target-pattern="$1$2" />
                 <directive type="proxy_pass" pool-name="bc-tuangou-server" />
             </location>
             <location match-type="prefix"
                 pattern="/ivrverify/iswhitecaller.aspx" case-sensitive="false">
                 <directive type="rewrite" matches="^(.*).aspx(.*)$"
-                    flag="break" target-pattern="$1/$2" />
+                    flag="break" target-pattern="$1$2" />
                 <directive type="proxy_pass" pool-name="bc-tuangou-server" />
             </location>
             <location match-type="prefix"
                 pattern="/ivrverify/phoneauthcode.aspx" case-sensitive="false">
                 <directive type="rewrite" matches="^(.*).aspx(.*)$"
-                    flag="break" target-pattern="$1/$2" />
+                    flag="break" target-pattern="$1$2" />
                 <directive type="proxy_pass" pool-name="bc-tuangou-server" />
             </location>
             <location match-type="prefix"
                 pattern="/ivrverify/receiptverify.aspx" case-sensitive="false">
                 <directive type="rewrite" matches="^(.*).aspx(.*)$"
-                    flag="break" target-pattern="$1/$2" />
+                    flag="break" target-pattern="$1$2" />
                 <directive type="proxy_pass" pool-name="bc-tuangou-server" />
             </location>
             <location match-type="prefix" pattern="/ivrverify/getnewauthlist"

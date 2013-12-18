@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.dianping.phoenix.lb.constant.Constants;
 import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.model.entity.Aspect;
@@ -26,6 +28,7 @@ import com.dianping.phoenix.lb.model.nginx.NginxServer;
 import com.dianping.phoenix.lb.model.nginx.NginxUpstream;
 import com.dianping.phoenix.lb.model.nginx.NginxUpstreamServer;
 import com.dianping.phoenix.lb.utils.MessageUtils;
+import com.dianping.phoenix.lb.utils.PoolNameUtils;
 
 /**
  * @author Leo Liang
@@ -45,6 +48,7 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
 
     @Override
     public void visitVirtualServer(VirtualServer virtualServer) {
+        result.setName(virtualServer.getName());
         NginxServer server = new NginxServer();
         server.setProperties(virtualServer.getDynamicAttributes());
         server.setListen(virtualServer.getPort());
@@ -54,19 +58,61 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
 
         super.visitVirtualServer(virtualServer);
 
-        List<NginxUpstream> upstreams = result.getUpstream(virtualServer.getDefaultPoolName());
+        setUpstreamsAsUsed(
+                virtualServer.getDefaultPoolName(),
+                MessageUtils.getMessage(MessageID.VIRTUALSERVER_DEFAULTPOOL_NOT_EXISTS,
+                        virtualServer.getDefaultPoolName()));
+        rewriteUpstreamNames(result.getName());
+    }
 
-        if (upstreams == null || upstreams.isEmpty()) {
-            throw new RuntimeException(MessageUtils.getMessage(MessageID.VIRTUALSERVER_DEFAULTPOOL_NOT_EXISTS, virtualServer.getDefaultPoolName()));
-        }
-        for (NginxUpstream upstream : upstreams) {
-            upstream.setUsed(true);
+    private void rewriteUpstreamNames(String suffix) {
+        for (NginxUpstream upstream : result.getUpstreams()) {
+            upstream.setName(PoolNameUtils.rewriteToPoolNamePrefix(suffix, upstream.getName()));
         }
     }
 
     @Override
     public void visitAspect(Aspect aspect) {
         result.getServer().addAspect(aspect);
+        setUpstreamAsUsed(aspect.getDirectives(),
+                MessageUtils.getMessage(MessageID.PROXY_PASS_NO_POOL, "aspect " + aspect.getPointCut()));
+    }
+
+    private void setUpstreamAsUsed(List<Directive> directives, String errorContent) {
+        for (Directive directive : directives) {
+            if (Constants.DIRECTIVE_PROXY_PASS.equals(directive.getType())) {
+                setUpstreamsAsUsed(directive.getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME),
+                        errorContent);
+            } else if (Constants.DIRECTIVE_PROXY_IFELSE.equals(directive.getType())) {
+                String content = StringUtils.trimToEmpty(directive.getDynamicAttribute("if-statement"));
+                if (content.startsWith(Constants.DIRECTIVE_PROXY_PASS + " ")) {
+                    setUpstreamsAsUsedFromProxyPassString(content, errorContent);
+                }
+
+                content = StringUtils.trimToEmpty(directive.getDynamicAttribute("else-statement"));
+                if (content.startsWith(Constants.DIRECTIVE_PROXY_PASS + " ")) {
+                    setUpstreamsAsUsedFromProxyPassString(content, errorContent);
+                }
+            }
+        }
+    }
+
+    private void setUpstreamsAsUsedFromProxyPassString(String textContent, String errorContent) {
+        int poolNameStart = textContent.indexOf("http://");
+        if (poolNameStart >= 0) {
+            String poolName = textContent.substring(poolNameStart + "http://".length());
+            setUpstreamsAsUsed(poolName, errorContent);
+        }
+    }
+
+    private void setUpstreamsAsUsed(String poolName, String errorContent) {
+        List<NginxUpstream> upstreams = result.getUpstream(poolName);
+        if (upstreams == null || upstreams.isEmpty()) {
+            throw new RuntimeException(errorContent);
+        }
+        for (NginxUpstream upstream : upstreams) {
+            upstream.setUsed(true);
+        }
     }
 
     @Override
@@ -91,17 +137,10 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
         NginxLocation nginxLocation = new NginxLocation();
         nginxLocation.setMatchType(toNginxMatchType(location));
         nginxLocation.setPattern(location.getPattern());
+        setUpstreamAsUsed(location.getDirectives(),
+                MessageUtils.getMessage(MessageID.PROXY_PASS_NO_POOL, location.getPattern()));
         for (Directive directive : location.getDirectives()) {
             nginxLocation.addDirective(directive);
-            if (Constants.DIRECTIVE_PROXY_PASS.equals(directive.getType())) {
-                List<NginxUpstream> upstreams = result.getUpstream(directive.getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME));
-                if (upstreams == null || upstreams.isEmpty()) {
-                    throw new RuntimeException(MessageUtils.getMessage(MessageID.PROXY_PASS_NO_POOL, location.getPattern()));
-                }
-                for (NginxUpstream upstream : upstreams) {
-                    upstream.setUsed(true);
-                }
-            }
         }
 
         result.getServer().addLocations(nginxLocation);

@@ -293,8 +293,6 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
 
         for (Location location : virtualServer.getLocations()) {
 
-            boolean proxyPassExists = false;
-
             if (StringUtils.isBlank(location.getPattern())) {
                 ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_LOCATION_NO_PATTERN);
             }
@@ -311,13 +309,6 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
                 if (!TemplateManager.INSTANCE.availableFiles("directive").contains(directive.getType())) {
                     ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_DIRECTIVE_TYPE_NOT_SUPPORT,
                             directive.getType());
-                }
-                if (Constants.DIRECTIVE_PROXY_PASS.equals(directive.getType())) {
-                    if (!proxyPassExists) {
-                        proxyPassExists = true;
-                    } else {
-                        ExceptionUtils.throwBizException(MessageID.PROXY_PASS_MORE_THAN_ONE, location.getPattern());
-                    }
                 }
             }
 

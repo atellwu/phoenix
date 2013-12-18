@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.dianping.phoenix.lb.model.entity.Aspect;
-import com.dianping.phoenix.lb.model.entity.Directive;
 
 /**
  * @author Leo Liang
