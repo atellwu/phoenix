@@ -56,6 +56,29 @@
 			</requirements>
 		</component>
 		<component>
+			<role>com.dianping.phoenix.session.requestid.serverevent.ServerAddressManager</role>
+			<implementation>com.dianping.phoenix.session.requestid.serverevent.DefaultServerAddressManager</implementation>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.requestid.serverevent.SocketClientManager</role>
+			<implementation>com.dianping.phoenix.session.requestid.serverevent.DefaultSocketClientManager</implementation>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.requestid.serverevent.ServerEventPublisher</role>
+			<implementation>com.dianping.phoenix.session.requestid.serverevent.DefaultServerEventPublisher</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.session.requestid.serverevent.SocketClientManager</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.session.requestid.serverevent.ServerAddressManager</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.session.requestid.EventDelegateManager</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
 			<role>org.unidal.web.mvc.model.ModuleRegistry</role>
 			<implementation>org.unidal.web.mvc.model.ModuleRegistry</implementation>
 			<configuration>
