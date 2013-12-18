@@ -18,6 +18,7 @@ public class Constants {
     public static String   ENV_PRODUCT                    = "product";
     public static String   ENV_PPE                        = "ppe";
     public static String   DIRECTIVE_PROXY_PASS           = "proxy_pass";
+    public static String   DIRECTIVE_PROXY_IFELSE         = "ifelse";
     public static String   DIRECTIVE_PROXY_PASS_POOL_NAME = "pool-name";
 
     public static String   LOCATION_MATCHTYPE_PREFIX      = "prefix";

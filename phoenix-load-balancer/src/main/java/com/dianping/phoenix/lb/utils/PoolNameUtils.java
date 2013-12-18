@@ -8,7 +8,7 @@ package com.dianping.phoenix.lb.utils;
 
 /**
  * @author Leo Liang
- *
+ * 
  */
 public class PoolNameUtils {
     public static String getPoolNamePrefix(String poolName) {
@@ -18,5 +18,9 @@ public class PoolNameUtils {
         } else {
             return poolName;
         }
+    }
+
+    public static String rewriteToPoolNamePrefix(String vsName, String poolName) {
+        return vsName + "." + poolName;
     }
 }

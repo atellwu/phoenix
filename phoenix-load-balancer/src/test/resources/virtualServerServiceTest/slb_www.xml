@@ -9,6 +9,7 @@
         <aspects>
             <aspect point-cut="BEFORE">
                 <directive type="more_set_headers" value="'X-MyHeader1: 11111111'"/>
+                <directive type="ifelse" if-condition="$remote_addr = 124.131.180.74" if-statement="proxy_pass http://node"/>
             </aspect>
             <aspect point-cut="AFTER">
                 <directive type="more_set_headers" value="'X-MyHeader2: 222222'"/>
@@ -37,6 +38,9 @@
 			</location>
 			<location match-type="exact" pattern="/a">
 				<directive type="proxy_pass" pool-name="Web.Shop" />
+			</location>
+			<location match-type="exact" pattern="/b">
+				<directive type="ifelse" if-condition="$remote_addr = 124.131.180.74" if-statement="proxy_pass http://node2" />
 			</location>
 		</locations>
 	</virtualServer>

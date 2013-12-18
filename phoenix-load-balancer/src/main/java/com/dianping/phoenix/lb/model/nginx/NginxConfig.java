@@ -18,8 +18,17 @@ import com.dianping.phoenix.lb.utils.PoolNameUtils;
  * 
  */
 public class NginxConfig {
+    private String                           name;
     private NginxServer                      server;
     private Map<String, List<NginxUpstream>> upstreams = new HashMap<String, List<NginxUpstream>>();
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     /**
      * @return the servers

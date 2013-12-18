@@ -5,7 +5,7 @@ server {
 $nginx.properties($config.server.properties)
     
     location /{
-        dp_domain $config.server.defaultPool;
+        dp_domain $nginx.poolName($config.name,$config.server.defaultPool);
 
         set $hcv "-";
         if ( $http_cookie ~* "_hc.v=(\S+)(;.*|$)"){
@@ -20,7 +20,7 @@ $nginx.properties($config.server.properties)
 #foreach( $aspect in $config.server.aspects)
 #if($aspect.pointCut == 'BEFORE')
 #foreach( $directive in $aspect.directives)
-        $nginx.directive($directive)
+        $nginx.directive($config.name,$directive)
 #end
 #end
 #end
@@ -28,7 +28,7 @@ $nginx.properties($config.server.properties)
 #foreach( $location in $config.server.locations)
         location $nginx.locationMatchOp($location.matchType) $location.pattern {
 #foreach( $directive in $location.directives)
-            $nginx.directive($directive)
+            $nginx.directive($config.name,$directive)
 #end
         }
 
@@ -47,7 +47,7 @@ $nginx.properties($config.server.properties)
 #foreach( $aspect in $config.server.aspects)
 #if($aspect.pointCut == 'AFTER')
 #foreach( $directive in $aspect.directives)
-        $nginx.directive($directive)
+        $nginx.directive($config.name,$directive)
 #end
 #end
 #end

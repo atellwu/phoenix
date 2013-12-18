@@ -20,6 +20,7 @@ import com.dianping.phoenix.lb.model.entity.Directive;
 import com.dianping.phoenix.lb.model.entity.Strategy;
 import com.dianping.phoenix.lb.model.nginx.NginxLocation.MatchType;
 import com.dianping.phoenix.lb.model.nginx.NginxUpstreamServer;
+import com.dianping.phoenix.lb.utils.PoolNameUtils;
 
 /**
  * @author Leo Liang
@@ -42,6 +43,22 @@ public class NginxVelocityTools {
             default:
                 return "";
         }
+    }
+
+    public String rewriteProxyPassStringIfNeeded(String prefix, String text) {
+        if (text.startsWith(Constants.DIRECTIVE_PROXY_PASS + " ")) {
+            int poolNameStart = text.indexOf("http://");
+            if (poolNameStart >= 0) {
+                String poolName = text.substring(poolNameStart + "http://".length());
+                return text.substring(0, poolNameStart) + "http://"
+                        + PoolNameUtils.rewriteToPoolNamePrefix(prefix, poolName);
+            }
+        }
+        return text;
+    }
+
+    public String poolName(String prefix, String poolName) {
+        return PoolNameUtils.rewriteToPoolNamePrefix(prefix, poolName);
     }
 
     public String properties(Map<String, String> properties) {
@@ -71,13 +88,18 @@ public class NginxVelocityTools {
         }
     }
 
-    public String directive(Directive directive) {
+    public String directive(String vsName, Directive directive) {
         String template = getTemplate("directive", directive.getType());
         if (StringUtils.isNotBlank(template)) {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("directive", directive);
             if (Constants.DIRECTIVE_PROXY_PASS.equals(directive.getType())) {
-                context.put("dp_domain", directive.getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME));
+                context.put(
+                        "dp_domain",
+                        PoolNameUtils.rewriteToPoolNamePrefix(vsName,
+                                directive.getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME)));
+            } else if (Constants.DIRECTIVE_PROXY_IFELSE.equals(directive.getType())) {
+                context.put("vsName", vsName);
             }
             return VelocityEngineManager.INSTANCE.merge(template, context);
         } else {
