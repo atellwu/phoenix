@@ -1,4 +1,5 @@
 # gen-time: $nginx.nowTimeStamp()
+# vs-name : $config.name
 server {
     listen       $config.server.listen;
     server_name  $config.server.serverName;
@@ -57,7 +58,7 @@ $nginx.properties($config.server.properties)
  
 #foreach($upstream in $config.upstreams)
 #if($upstream.used)
-upstream $upstream.name {
+upstream $nginx.poolName($config.name,$upstream.name) {
     $nginx.lbStrategy($upstream.lbStrategy)
 #foreach($server in $upstream.servers)
     $nginx.upstreamServer($server, $upstream.lbStrategy)
