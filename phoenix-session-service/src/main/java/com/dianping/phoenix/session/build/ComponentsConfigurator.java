@@ -14,8 +14,14 @@ import com.dianping.phoenix.session.requestid.EventDelegateManager;
 import com.dianping.phoenix.session.requestid.EventProcessor;
 import com.dianping.phoenix.session.requestid.EventRecorder;
 import com.dianping.phoenix.session.requestid.FileSystemManager;
-import com.dianping.phoenix.session.requestid.RecordFileManager;
 import com.dianping.phoenix.session.requestid.FileUploader;
+import com.dianping.phoenix.session.requestid.RecordFileManager;
+import com.dianping.phoenix.session.requestid.serverevent.DefaultServerAddressManager;
+import com.dianping.phoenix.session.requestid.serverevent.DefaultServerEventPublisher;
+import com.dianping.phoenix.session.requestid.serverevent.DefaultSocketClientManager;
+import com.dianping.phoenix.session.requestid.serverevent.ServerAddressManager;
+import com.dianping.phoenix.session.requestid.serverevent.ServerEventPublisher;
+import com.dianping.phoenix.session.requestid.serverevent.SocketClientManager;
 
 public class ComponentsConfigurator extends AbstractResourceConfigurator {
 	public static void main(String[] args) {
@@ -39,6 +45,12 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 		      .req(EventDelegateManager.class));
 		all.add(C(Bootstrap.class) //
 		      .req(EventDelegateManager.class));
+		all.add(C(ServerAddressManager.class, DefaultServerAddressManager.class));
+		all.add(C(SocketClientManager.class, DefaultSocketClientManager.class));
+		all.add(C(ServerEventPublisher.class, DefaultServerEventPublisher.class) //
+				.req(SocketClientManager.class) //
+				.req(ServerAddressManager.class) //
+				.req(EventDelegateManager.class));
 
 		all.add(C(FileSystemManager.class) //
 		      .req(ConfigManager.class));
