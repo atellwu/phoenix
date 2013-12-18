@@ -134,6 +134,9 @@ public class RecordFileManager implements Initializable, LogEnabled {
 			if (!queueAndStream.file.renameTo(targetFile)) {
 				m_logger.error(String.format("Can not move %s to %s", queueAndStream.file.getAbsolutePath(),
 				      targetFile.getAbsolutePath()));
+			} else {
+				m_logger.info(String.format("Move %s to %s", queueAndStream.file.getAbsolutePath(),
+				      targetFile.getAbsolutePath()));
 			}
 		}
 
