@@ -24,10 +24,13 @@ public class JspViewer extends BaseJspViewer<ConsolePage, Action, Context, Model
 			return JspFile.OVERVIEW.getPath();
 		case DOMAININFO:
 			return JspFile.DOMAININFO.getPath();
+		case CROSSDOMAIN:
+			return JspFile.CROSSDOMAIN.getPath();
 		case ABOUT:
 			return JspFile.ABOUT.getPath();
+		default:
+			throw new RuntimeException("Unknown action: " + action);
 		}
 
-		throw new RuntimeException("Unknown action: " + action);
 	}
 }

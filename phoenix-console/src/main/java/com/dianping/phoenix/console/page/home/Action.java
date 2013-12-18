@@ -14,6 +14,10 @@ public enum Action implements org.unidal.web.mvc.Action {
 	OVERVIEW("overview"),
 
 	DOMAININFO("domaininfo"),
+	
+	CROSSDOMAIN("cross-domain"),
+	
+	CROSSDEPLOY("cross-deploy"),
 
 	ABOUT("about");
 

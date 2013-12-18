@@ -333,18 +333,18 @@ public class DefaultResourceManager extends ContainerHolder implements ResourceM
 
 	@Override
 	public List<Product> getFilteredProducts(Payload payload) {
-		Resource resource = new FilteredResourceBuilder("phoenix-agent".equals(payload.getType())
-				? new AgentFilterStrategy(getResource(), payload)
-				: new JarFilterStrategy(getResource(), payload)).getFilteredResource();
+		Resource resource = new FilteredResourceBuilder(
+				"phoenix-agent".equals(payload.getType()) ? new AgentFilterStrategy(getResource(), payload)
+						: new JarFilterStrategy(getResource(), payload)).getFilteredResource();
 
 		return new ArrayList<Product>(resource.getProducts().values());
 	}
 
 	@Override
 	public Domain getFilteredDomain(Payload payload, String name) {
-		Resource resource = new FilteredResourceBuilder("phoenix-agent".equals(payload.getType())
-				? new AgentFilterStrategy(getResource(), payload)
-				: new JarFilterStrategy(getResource(), payload)).getFilteredResource();
+		Resource resource = new FilteredResourceBuilder(
+				"phoenix-agent".equals(payload.getType()) ? new AgentFilterStrategy(getResource(), payload)
+						: new JarFilterStrategy(getResource(), payload)).getFilteredResource();
 
 		for (Product product : resource.getProducts().values()) {
 			if (product.getDomains().containsKey(name)) {
@@ -387,24 +387,26 @@ public class DefaultResourceManager extends ContainerHolder implements ResourceM
 	public void refreshHostInternally(AgentContext context) {
 		Host host = getDomain(context.getDomain()).getHosts().get(context.getHost());
 		switch (context.getWarType()) {
-			case KERNEL :
-				for (App app : host.getContainer().getApps()) {
-					if (context.getDomain().equals(app.getName())) {
-						if (app.getKernel() != null) {
-							app.getKernel().setVersion(context.getVersion());
-						} else {
-							Kernel kernel = new Kernel();
-							kernel.setVersion(context.getVersion());
-							app.setKernel(kernel);
-						}
+		case KERNEL:
+			for (App app : host.getContainer().getApps()) {
+				if (context.getDomain().equals(app.getName())) {
+					if (app.getKernel() != null) {
+						app.getKernel().setVersion(context.getVersion());
+					} else {
+						Kernel kernel = new Kernel();
+						kernel.setVersion(context.getVersion());
+						app.setKernel(kernel);
 					}
 				}
-				generateMetaInformation(getResource());
-				break;
-			case AGENT :
-				host.getPhoenixAgent().setVersion(context.getVersion());
-				generateMetaInformation(getResource());
-				break;
+			}
+			generateMetaInformation(getResource());
+			break;
+		case AGENT:
+			host.getPhoenixAgent().setVersion(context.getVersion());
+			generateMetaInformation(getResource());
+			break;
+		default:
+			break;
 		}
 	}
 }

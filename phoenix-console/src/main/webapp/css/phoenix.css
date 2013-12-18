@@ -120,3 +120,7 @@ tr.selected {
 	padding-top: 3px;
 	padding-bottom: 3px;
 }
+
+.borderless td {
+    border: none;
+}

@@ -15,6 +15,8 @@ public enum JspFile {
 
 	DOMAININFO("/jsp/console/overview_inner.jsp"),
 
+	CROSSDOMAIN("/jsp/console/cross_domain.jsp"),
+
 	DEPLOY("/jsp/console/deploy.jsp");
 
 	private String m_path;

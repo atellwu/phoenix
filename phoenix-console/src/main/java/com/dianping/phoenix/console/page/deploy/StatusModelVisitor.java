@@ -13,10 +13,10 @@ import com.dianping.phoenix.deploy.model.transform.BaseVisitor;
 class StatusModelVisitor extends BaseVisitor {
 	private DeployModel m_model;
 
-	private Map<String, Integer> m_map;
+	private Map<Integer, Map<String, Integer>> m_map;
 
-	public StatusModelVisitor(Map<String, Integer> map) {
-		m_map = map != null ? map : Collections.<String, Integer> emptyMap();
+	public StatusModelVisitor(Map<Integer, Map<String, Integer>> map) {
+		m_map = map != null ? map : Collections.<Integer, Map<String, Integer>> emptyMap();
 	}
 
 	private String escape(String str) {
@@ -60,7 +60,7 @@ class StatusModelVisitor extends BaseVisitor {
 		int progress = 0;
 
 		if (summary == null) { // it always has summary
-			Integer offset = m_map.get(DeployConstant.SUMMARY);
+			Integer offset = m_map.get(other.getId()).get(DeployConstant.SUMMARY);
 
 			summary = new HostModel(DeployConstant.SUMMARY);
 			summary.setOffset(offset == null ? 0 : offset);
@@ -92,7 +92,7 @@ class StatusModelVisitor extends BaseVisitor {
 		String ip = other.getIp();
 		List<SegmentModel> segments = other.getSegments();
 		int size = segments.size();
-		Integer index = m_map.get(ip);
+		Integer index = m_map.get(m_model.getId()).get(ip);
 		StringBuilder sb = new StringBuilder(1024);
 		int progress = 0;
 		String step = null;
