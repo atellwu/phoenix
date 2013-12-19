@@ -97,6 +97,10 @@ public class ConfigManager implements Initializable {
 	public int getRetryQueueSafeLength() {
 		return m_config.getRetryQueueSafeLength();
 	}
+	
+	public String getServerListUpdateUrl() {
+		return m_config.getServerListUpdateUrl();
+	}
 
 	@Override
 	public void initialize() throws InitializationException {

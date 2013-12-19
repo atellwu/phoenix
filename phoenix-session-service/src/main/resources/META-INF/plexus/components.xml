@@ -58,6 +58,11 @@
 		<component>
 			<role>com.dianping.phoenix.session.requestid.serverevent.ServerAddressManager</role>
 			<implementation>com.dianping.phoenix.session.requestid.serverevent.DefaultServerAddressManager</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.configure.ConfigManager</role>
+				</requirement>
+			</requirements>
 		</component>
 		<component>
 			<role>com.dianping.phoenix.session.requestid.serverevent.SocketClientManager</role>

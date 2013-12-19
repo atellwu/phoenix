@@ -16,6 +16,7 @@
     <element name="record-file-write-stream-multiply" value-type="int" />
     <element name="handler-task-threads" value-type="int" />
     <element name="handler-task-queue-capacity" value-type="int" />
+    <element name="server-list-update-url" value-type="String" />
     <entity-ref name="hdfs" />
   </entity>
   <entity name="hdfs">
