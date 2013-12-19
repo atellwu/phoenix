@@ -13,6 +13,8 @@ import com.dianping.phoenix.session.requestid.DefaultEventRecorder;
 import com.dianping.phoenix.session.requestid.EventDelegateManager;
 import com.dianping.phoenix.session.requestid.EventProcessor;
 import com.dianping.phoenix.session.requestid.EventRecorder;
+import com.dianping.phoenix.session.requestid.FileSystemManager;
+import com.dianping.phoenix.session.requestid.FileUploader;
 import com.dianping.phoenix.session.requestid.RecordFileManager;
 import com.dianping.phoenix.session.requestid.serverevent.DefaultServerAddressManager;
 import com.dianping.phoenix.session.requestid.serverevent.DefaultServerEventPublisher;
@@ -22,6 +24,10 @@ import com.dianping.phoenix.session.requestid.serverevent.ServerEventPublisher;
 import com.dianping.phoenix.session.requestid.serverevent.SocketClientManager;
 
 public class ComponentsConfigurator extends AbstractResourceConfigurator {
+	public static void main(String[] args) {
+		generatePlexusComponentsXmlFile(new ComponentsConfigurator());
+	}
+
 	@Override
 	public List<Component> defineComponents() {
 		List<Component> all = new ArrayList<Component>();
@@ -46,13 +52,14 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 				.req(ServerAddressManager.class) //
 				.req(EventDelegateManager.class));
 
+		all.add(C(FileSystemManager.class) //
+		      .req(ConfigManager.class));
+		all.add(C(FileUploader.class) //
+		      .req(ConfigManager.class, FileSystemManager.class));
+
 		// Please keep it as last
 		all.addAll(new WebComponentConfigurator().defineComponents());
 
 		return all;
-	}
-
-	public static void main(String[] args) {
-		generatePlexusComponentsXmlFile(new ComponentsConfigurator());
 	}
 }

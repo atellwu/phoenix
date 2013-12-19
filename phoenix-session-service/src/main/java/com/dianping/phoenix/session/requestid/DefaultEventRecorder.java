@@ -13,6 +13,7 @@ public class DefaultEventRecorder implements EventRecorder, LogEnabled {
 
 	@Inject
 	private RecordFileManager fileMgr;
+
 	private Logger m_logger;
 
 	@Override

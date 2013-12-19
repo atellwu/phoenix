@@ -50,7 +50,7 @@ public class RecordFileManagerTest extends ComponentTestCase {
 	@Test
 	public void shouldWriteToFile() throws Exception {
 		mgr.setConfig(new ConfigManager() {
-			
+
 			{
 				initialize();
 			}
@@ -85,7 +85,7 @@ public class RecordFileManagerTest extends ComponentTestCase {
 	@Test
 	public void shouldWriteToSameFile() throws Exception {
 		mgr.setConfig(new ConfigManager() {
-			
+
 			{
 				initialize();
 			}
@@ -126,7 +126,7 @@ public class RecordFileManagerTest extends ComponentTestCase {
 			{
 				initialize();
 			}
-			
+
 			@Override
 			public int getRecordFileWriteQueueScanInterval() {
 				return 100;
@@ -136,7 +136,7 @@ public class RecordFileManagerTest extends ComponentTestCase {
 			public int getRecordFileTimespan() {
 				return 1;
 			}
-			
+
 		});
 		mgr.start();
 
@@ -144,10 +144,8 @@ public class RecordFileManagerTest extends ComponentTestCase {
 		BlockingQueue<byte[]> queue1 = mgr.getWriteQueue(timestamp1);
 		String record1 = "1\t2\n";
 		queue1.offer(record1.getBytes("ascii"));
-		
-		Thread.sleep(10);
-		
-		long timestamp2 = System.currentTimeMillis();
+
+		long timestamp2 = System.currentTimeMillis() + 1000L;
 		BlockingQueue<byte[]> queue2 = mgr.getWriteQueue(timestamp2);
 		String record2 = "3\t4\n";
 		queue2.offer(record2.getBytes("ascii"));
@@ -162,12 +160,12 @@ public class RecordFileManagerTest extends ComponentTestCase {
 			if (actualContent1.equals(record1)) {
 				content1Equal = true;
 			}
-			
+
 			actualContent2 = IOUtils.toString(new FileInputStream(mgr.tsToFile(timestamp2)));
 			if (actualContent2.equals(record2)) {
 				content2Equal = true;
 			}
-			if(content1Equal && content2Equal) {
+			if (content1Equal && content2Equal) {
 				break;
 			}
 			Thread.sleep(100);
@@ -184,7 +182,7 @@ public class RecordFileManagerTest extends ComponentTestCase {
 			{
 				initialize();
 			}
-			
+
 			@Override
 			public int getRecordFileTimespan() {
 				return 1000;
