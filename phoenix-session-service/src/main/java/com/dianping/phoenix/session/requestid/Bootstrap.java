@@ -37,14 +37,13 @@ public class Bootstrap implements ServletContextListener {
 		try {
 			PlexusContainer container = ContainerLoader.getDefaultContainer();
 
-			RecordFileManager recMgr = container.lookup(RecordFileManager.class);
-			recMgr.start();
-
-			EventDelegateManager manager = container.lookup(EventDelegateManager.class);
-
-			m_processor = container.lookup(EventProcessor.class);
-			m_processor.start();
-
+			String configFileInConfig = sce.getServletContext().getInitParameter("configFile");
+			if (configFileInConfig != null) {
+				ConfigManager.setConfigFile(configFileInConfig);
+			}
+			
+			m_config = container.lookup(ConfigManager.class);
+			
 			int port = DEFAULT_PORT;
 			String portInConfig = sce.getServletContext().getInitParameter("port");
 			if (portInConfig != null) {
@@ -54,9 +53,16 @@ public class Bootstrap implements ServletContextListener {
 					e.printStackTrace();
 				}
 			}
-
-			m_config = container.lookup(ConfigManager.class);
 			m_config.setPort(port);
+			
+			RecordFileManager recMgr = container.lookup(RecordFileManager.class);
+			recMgr.start();
+
+			EventDelegateManager manager = container.lookup(EventDelegateManager.class);
+
+			m_processor = container.lookup(EventProcessor.class);
+			m_processor.start();
+
 
 			m_server = Sockets.forServer().listenOn(port).threads("RequestID", 0).start(manager.getIn());
 

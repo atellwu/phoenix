@@ -15,8 +15,9 @@ import com.dianping.phoenix.configure.entity.Property;
 import com.dianping.phoenix.configure.transform.DefaultSaxParser;
 
 public class ConfigManager implements Initializable {
+
 	@Inject
-	private String m_configFile = "/data/appdatas/phoenix/session-service/config.xml";
+	private static String m_configFile = "/data/appdatas/phoenix/session-service/config.xml";
 
 	private Config m_config;
 
@@ -51,7 +52,7 @@ public class ConfigManager implements Initializable {
 	public String getHdfsServerUri() {
 		return m_config.getHdfs().getServerUri();
 	}
-	
+
 	public int getHdfsUploadInterval() {
 		return m_config.getHdfs().getHdfsUploadInterval();
 	}
@@ -148,6 +149,10 @@ public class ConfigManager implements Initializable {
 
 	public void setPort(int port) {
 		m_port = port;
+	}
+
+	public static void setConfigFile(String configFile) {
+		m_configFile = configFile;
 	}
 
 }

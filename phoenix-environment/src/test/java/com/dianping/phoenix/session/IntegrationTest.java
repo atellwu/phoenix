@@ -48,7 +48,10 @@ public class IntegrationTest extends ComponentTestCase {
 		server.setHandler(webapp);
 
 		server.start();
-		server.join();
+		
+		System.in.read();
+		
+		System.exit(0);
 		
 	}
 
