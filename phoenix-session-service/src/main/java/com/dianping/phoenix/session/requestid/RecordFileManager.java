@@ -65,8 +65,6 @@ public class RecordFileManager implements Initializable, LogEnabled {
 	public void initialize() throws InitializationException {
 		this.m_writeQueueCache = new ConcurrentHashMap<Long, QueueAndOutputStream>();
 		m_ip = NetworkInterfaceManager.INSTANCE.getLocalHostAddress();
-
-		start();
 	}
 
 	// for unit test only

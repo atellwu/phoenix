@@ -14,6 +14,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
 
+import com.dianping.phoenix.session.server.ServerAddressManager;
+
 public class DefaultServerAddressManagerTest extends ComponentTestCase {
 
 	private DefaultServerAddressManager mgr;

@@ -16,7 +16,7 @@ import com.dianping.phoenix.configure.transform.DefaultSaxParser;
 
 public class ConfigManager implements Initializable {
 	@Inject
-	private String m_configFile = "/data/appdatas/phoenix/session.xml";
+	private String m_configFile = "/data/appdatas/phoenix/session-service/config.xml";
 
 	private Config m_config;
 
@@ -50,6 +50,10 @@ public class ConfigManager implements Initializable {
 
 	public String getHdfsServerUri() {
 		return m_config.getHdfs().getServerUri();
+	}
+	
+	public int getHdfsUploadInterval() {
+		return m_config.getHdfs().getHdfsUploadInterval();
 	}
 
 	public int getMaxL1CacheSize() {

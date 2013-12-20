@@ -1,4 +1,4 @@
-package com.dianping.phoenix.session.requestid.serverevent;
+package com.dianping.phoenix.session.server;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -16,13 +16,10 @@ import org.unidal.helper.Threads.Task;
 import org.unidal.lookup.annotation.Inject;
 
 import com.dianping.phoenix.session.RequestEvent;
-import com.dianping.phoenix.session.requestid.EventDelegateManager;
-import com.dianping.phoenix.session.requestid.serverevent.ServerAddressManager.AddressChangeListener;
+import com.dianping.phoenix.session.RequestEventDelegate;
+import com.dianping.phoenix.session.server.ServerAddressManager.AddressChangeListener;
 
-public class DefaultServerEventPublisher implements Initializable, LogEnabled, ServerEventPublisher {
-
-	@Inject
-	private EventDelegateManager m_eventMgr;
+public class DefaultEventPublisher implements Initializable, LogEnabled, EventPublisher {
 
 	@Inject
 	private ServerAddressManager m_addrMgr;
@@ -39,6 +36,8 @@ public class DefaultServerEventPublisher implements Initializable, LogEnabled, S
 	private AtomicBoolean m_serverListUpdated = new AtomicBoolean(false);
 
 	private AtomicReference<List<InetSocketAddress>> m_newAddrList = new AtomicReference<List<InetSocketAddress>>();
+
+	private RequestEventDelegate m_out;
 
 	@Override
 	public void enableLogging(Logger logger) {
@@ -68,11 +67,9 @@ public class DefaultServerEventPublisher implements Initializable, LogEnabled, S
 		m_addrMgr = addrMgr;
 	}
 
-	public void setEventMgr(EventDelegateManager eventMgr) {
-		m_eventMgr = eventMgr;
-	}
+	public void start(RequestEventDelegate delegate) {
 
-	public void start() {
+		m_out = delegate;
 
 		List<InetSocketAddress> addrList = m_addrMgr.getServerList(m_listener);
 		m_clientMgr.openClients(addrList);
@@ -116,8 +113,12 @@ public class DefaultServerEventPublisher implements Initializable, LogEnabled, S
 		public void run() {
 			try {
 				while (!m_stop.get()) {
-					RequestEvent event = m_eventMgr.getOut().take();
-					publish(event);
+					RequestEvent event = m_out.take();
+					try {
+						publish(event);
+					} catch (RuntimeException e) {
+						m_logger.error("Error publish event " + event.getRequestId(), e);
+					}
 				}
 			} catch (InterruptedException e) {
 				m_logger.info("Thread Interrupted, will exit");

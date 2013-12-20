@@ -1,10 +1,12 @@
 <config>
-	<hdfs local-base-dir="/data/appdatas/phoenix/bucket" server-uri="hdfs://10.1.77.86/user/cat/phoenix">
+	<hdfs local-base-dir="/data/appdatas/phoenix/bucket"
+		server-uri="hdfs://192.168.213.247/user/workcron/phoenix"
+		hdfs-upload-interval="300000">
 		<properties>
 			<property name="hadoop.security.authentication" value="kerberos" />
-			<property name="dfs.namenode.kerberos.principal" value="hadoop/test86.hadoop@DIANPING.COM" />
-			<property name="dfs.cat.kerberos.principal" value="cat@DIANPING.COM" />
-			<property name="dfs.cat.keytab.file" value="/data/appdatas/cat/cat.keytab" />
+			<property name="dfs.namenode.kerberos.principal" value="hadoop/cosmos03.beta@DIANPING.COM" />
+			<property name="dfs.cat.kerberos.principal" value="workcron@DIANPING.COM" />
+			<property name="dfs.cat.keytab.file" value="/data/appdatas/workcron/workcron.keytab" />
 			<property name="java.security.krb5.realm" value="DIANPING.COM" />
 			<property name="java.security.krb5.kdc" value="dev80.hadoop" />
 		</properties>
@@ -19,10 +21,14 @@
 	<record-file-write-queue-size>1000</record-file-write-queue-size>
 	<record-file-tmp-dir>target/record-tmp/</record-file-tmp-dir>
 	<record-file-target-dir>target/record-done/</record-file-target-dir>
-	<record-file-write-queue-scan-interval>1000</record-file-write-queue-scan-interval>
-	<record-file-write-stream-close-scan-interval>60000</record-file-write-stream-close-scan-interval>
-	<record-file-write-stream-multiply>3</record-file-write-stream-multiply>
+	<record-file-write-queue-scan-interval>1000
+	</record-file-write-queue-scan-interval>
+	<record-file-write-stream-close-scan-interval>60000
+	</record-file-write-stream-close-scan-interval>
+	<record-file-write-stream-multiply>3
+	</record-file-write-stream-multiply>
 	<handler-task-threads>2</handler-task-threads>
 	<handler-task-queue-capacity>1000</handler-task-queue-capacity>
-	<server-list-update-url>http://192.168.22.71/phoenix.txt</server-list-update-url>
+	<server-list-update-url>http://192.168.22.71/phoenix.txt
+	</server-list-update-url>
 </config>

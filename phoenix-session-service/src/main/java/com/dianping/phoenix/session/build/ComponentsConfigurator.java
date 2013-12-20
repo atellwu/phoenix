@@ -17,11 +17,11 @@ import com.dianping.phoenix.session.requestid.FileSystemManager;
 import com.dianping.phoenix.session.requestid.FileUploader;
 import com.dianping.phoenix.session.requestid.RecordFileManager;
 import com.dianping.phoenix.session.requestid.serverevent.DefaultServerAddressManager;
-import com.dianping.phoenix.session.requestid.serverevent.DefaultServerEventPublisher;
-import com.dianping.phoenix.session.requestid.serverevent.DefaultSocketClientManager;
-import com.dianping.phoenix.session.requestid.serverevent.ServerAddressManager;
-import com.dianping.phoenix.session.requestid.serverevent.ServerEventPublisher;
-import com.dianping.phoenix.session.requestid.serverevent.SocketClientManager;
+import com.dianping.phoenix.session.server.DefaultEventPublisher;
+import com.dianping.phoenix.session.server.DefaultSocketClientManager;
+import com.dianping.phoenix.session.server.EventPublisher;
+import com.dianping.phoenix.session.server.ServerAddressManager;
+import com.dianping.phoenix.session.server.SocketClientManager;
 
 public class ComponentsConfigurator extends AbstractResourceConfigurator {
 	public static void main(String[] args) {
@@ -45,12 +45,12 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 		      .req(EventDelegateManager.class));
 		all.add(C(Bootstrap.class));
 		all.add(C(ServerAddressManager.class, DefaultServerAddressManager.class) //
-				.req(ConfigManager.class));
-		all.add(C(SocketClientManager.class, DefaultSocketClientManager.class));
-		all.add(C(ServerEventPublisher.class, DefaultServerEventPublisher.class) //
-				.req(SocketClientManager.class) //
-				.req(ServerAddressManager.class) //
-				.req(EventDelegateManager.class));
+		      .req(ConfigManager.class));
+		all.add(C(SocketClientManager.class, DefaultSocketClientManager.class) //
+		      .config(E("m_strMode").value(SocketClientManager.Mode.Broadcast.toString())));
+		all.add(C(EventPublisher.class, DefaultEventPublisher.class) //
+		      .req(SocketClientManager.class) //
+		      .req(ServerAddressManager.class));
 
 		all.add(C(FileSystemManager.class) //
 		      .req(ConfigManager.class));

@@ -22,6 +22,7 @@
   <entity name="hdfs">
     <attribute name="local-base-dir" value-type="String" />
     <attribute name="server-uri" value-type="String" />
+    <attribute name="hdfs-upload-interval" value-type="int" />
     <entity-ref name="property" type="list" names="properties" xml-indent="true" />
   </entity>
   <entity name="property">

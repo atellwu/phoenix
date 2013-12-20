@@ -20,6 +20,8 @@
 	</entity>
 	<entity name="hdfs">
 		<attribute name="base-dir" value-type="String" default-value="/data/appdatas/phoenix/bucket"/>
+		<attribute name="server-uri" value-type="String" default-value="hdfs://192.168.213.247/user/cat/phoenix" />
+		<attribute name="hdfs-upload-interval" value-type="int" default-value="300000" primitive="true" />
 	</entity>
 </model>
 

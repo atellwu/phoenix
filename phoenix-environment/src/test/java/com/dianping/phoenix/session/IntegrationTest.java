@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.unidal.lookup.ComponentTestCase;
-import org.unidal.net.Sockets;
 
 public class IntegrationTest extends ComponentTestCase {
 
@@ -27,17 +26,17 @@ public class IntegrationTest extends ComponentTestCase {
 
 	}
 	
-	private RequestEventDelegate out;
+//	private RequestEventDelegate out;
 
 	@Before
 	public void before() throws Exception {
-		out = lookupById(RequestEventDelegate.class, "out");
+//		out = lookupById(RequestEventDelegate.class, "out");
 	}
 
 	@Test
 	public void test() throws Exception {
 		
-		Sockets.forClient().threads("RequestIDClient", 0).connectTo(7377, "127.0.0.1").start(out);
+//		Sockets.forClient().threads("RequestIDClient", 0).connectTo(7377, "127.0.0.1").start(out);
 
 		Server server = new Server(8080);
 

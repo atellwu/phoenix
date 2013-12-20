@@ -121,9 +121,12 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 				// request.setAttribute(PhoenixEnvironment.ENV, new PhoenixEnvironment());
 				requestId = generateRequestId();
 			}
+			
 
 			String phoenixId = getOrCreatePhoenixId(req, res);
 			PhoenixContext.getInstance().setGuid(phoenixId);
+			
+			req.setAttribute(PhoenixEnvironment.ENV, new PhoenixEnvironment(requestId, phoenixId));
 
 			// 将id放入ThreadLocal
 			if (requestId != null) {

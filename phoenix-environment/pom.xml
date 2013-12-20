@@ -15,6 +15,11 @@
 			<artifactId>foundation-service</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.2.3</version>
+		</dependency>
+		<dependency>
 			<groupId>org.unidal.framework</groupId>
 			<artifactId>test-framework</artifactId>
 			<scope>test</scope>
