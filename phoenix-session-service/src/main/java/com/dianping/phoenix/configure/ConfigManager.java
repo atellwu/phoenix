@@ -20,6 +20,8 @@ public class ConfigManager implements Initializable {
 
 	private Config m_config;
 
+	private int m_port;
+
 	public int getEventExpireTime() {
 		return m_config.getEventExpireTime();
 	}
@@ -62,6 +64,10 @@ public class ConfigManager implements Initializable {
 		return m_config.getMaxRetryCacheSize();
 	}
 
+	public int getPort() {
+		return m_port;
+	}
+
 	public File getRecordFileTargetDir() {
 		return new File(m_config.getRecordFileTargetDir());
 	}
@@ -97,13 +103,16 @@ public class ConfigManager implements Initializable {
 	public int getRetryQueueSafeLength() {
 		return m_config.getRetryQueueSafeLength();
 	}
-	
+
 	public String getServerListUpdateUrl() {
 		return m_config.getServerListUpdateUrl();
 	}
 
 	@Override
 	public void initialize() throws InitializationException {
+
+		m_configFile = System.getProperty("PHOENIX_SESSION_SERVICE_CONFIG_FILE", m_configFile);
+
 		try {
 			File file = new File(m_configFile);
 
@@ -132,4 +141,9 @@ public class ConfigManager implements Initializable {
 			recordFileTargetDir.mkdirs();
 		}
 	}
+
+	public void setPort(int port) {
+		m_port = port;
+	}
+
 }

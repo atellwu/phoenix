@@ -1,17 +1,17 @@
 package com.dianping.phoenix.session.requestid.serverevent;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -19,14 +19,15 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.unidal.helper.Threads;
+import org.unidal.helper.Files.IO;
 import org.unidal.helper.Threads.Task;
 import org.unidal.lookup.annotation.Inject;
+import org.unidal.lookup.util.StringUtils;
 
 import com.dianping.phoenix.configure.ConfigManager;
 import com.dianping.phoenix.session.util.NetworkUtil;
 
-public class DefaultServerAddressManager implements ServerAddressManager, Initializable, LogEnabled {
+public class DefaultServerAddressManager implements ServerAddressManager, Initializable, LogEnabled, Task {
 
 	private String m_serverString;
 
@@ -40,9 +41,11 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 	private List<AddressChangeListener> m_listeners = Collections
 	      .synchronizedList(new ArrayList<ServerAddressManager.AddressChangeListener>());
 
-	private Set<InetAddress> localIps = new HashSet<InetAddress>();
-	
-	private DefaultHttpClient hc = new DefaultHttpClient();
+	private Set<InetAddress> m_localIps = new HashSet<InetAddress>();
+
+	private DefaultHttpClient m_hc = new DefaultHttpClient();
+
+	private AtomicBoolean m_stop = new AtomicBoolean(false);
 
 	@Override
 	public void enableLogging(Logger logger) {
@@ -66,13 +69,13 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 	}
 
 	private String fetchFromFile(String reqUrl) throws IOException {
-		return IOUtils.toString(new InputStreamReader(new URL(reqUrl).openStream(), "utf-8"));
+		return IO.INSTANCE.readFrom(new URL(reqUrl).openStream(), "utf-8");
 	}
 
 	private String fetchFromHttp(String reqUrl) throws Exception {
 		HttpGet req = new HttpGet(reqUrl);
-		HttpResponse res = hc.execute(req);
-		return IOUtils.toString(res.getEntity().getContent());
+		HttpResponse res = m_hc.execute(req);
+		return IO.INSTANCE.readFrom(res.getEntity().getContent(), "utf-8");
 	}
 
 	List<InetAddress> getLocalIps() {
@@ -89,7 +92,8 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 
 	@Override
 	public void initialize() throws InitializationException {
-		localIps.addAll(getLocalIps());
+		m_localIps.addAll(getLocalIps());
+		m_logger.info("Local ips " + m_localIps);
 		updateServerList(fetchServerString(m_config.getServerListUpdateUrl()));
 	}
 
@@ -102,25 +106,31 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 	private boolean parseServerString(String newServerString, List<InetSocketAddress> newServerList) {
 		boolean success = true;
 
-		String[] servers = newServerString.split(",");
-		try {
-			for (int i = 0; i < servers.length; i++) {
-				String[] hostPort = servers[i].split(":");
-				String host = hostPort[0].trim();
-				if (!localIps.contains(InetAddress.getByName(host))) {
-					newServerList.add(new InetSocketAddress(host, Integer.parseInt(hostPort[1].trim())));
+		if (!StringUtils.isEmpty(newServerString)) {
+
+			String[] servers = newServerString.split(",");
+			try {
+				for (int i = 0; i < servers.length; i++) {
+					String[] hostPort = servers[i].split(":");
+					String host = hostPort[0].trim();
+					int port = Integer.parseInt(hostPort[1].trim());
+					if (!isThisServer(host, port)) {
+						newServerList.add(new InetSocketAddress(host, port));
+					}
 				}
+			} catch (Exception e) {
+				success = false;
+				m_logger.error(String.format("Invalid server list %s", newServerList), e);
 			}
-		} catch (Exception e) {
+		} else {
 			success = false;
-			m_logger.error(String.format("Invalid server list %s", newServerList));
 		}
 
 		return success;
 	}
 
-	public void start() {
-		Threads.forGroup("Phoenix").start(new UpdateTask());
+	private boolean isThisServer(String host, int port) throws UnknownHostException {
+		return m_localIps.contains(InetAddress.getByName(host)) && port == m_config.getPort();
 	}
 
 	void updateServerList(String newServerString) {
@@ -136,30 +146,27 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 		}
 	}
 
-	class UpdateTask implements Task {
+	@Override
+	public String getName() {
+		return getClass().getSimpleName();
+	}
 
-		@Override
-		public String getName() {
-			return getClass().getSimpleName();
-		}
-
-		@Override
-		public void run() {
-			while (true) {
-				updateServerList(fetchServerString(m_config.getServerListUpdateUrl()));
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
-					m_logger.info("Thread Interrupted, will exit");
-					break;
-				}
+	@Override
+	public void run() {
+		while (!m_stop.get()) {
+			updateServerList(fetchServerString(m_config.getServerListUpdateUrl()));
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				m_logger.info("Thread Interrupted, will exit");
+				break;
 			}
 		}
+	}
 
-		@Override
-		public void shutdown() {
-		}
-
+	@Override
+	public void shutdown() {
+		m_stop.set(true);
 	}
 
 }

@@ -137,7 +137,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 			}
 		}
 
-		if (!m_sendQ.offer(curEvent)) {
+		if (!m_sendQ.offer(cloneToServerEvent(curEvent))) {
 			m_logger.error(String.format("Send queue is full, can not send RequestEvent %s to other server", curEvent));
 		}
 	}
@@ -221,18 +221,18 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 		Threads.forGroup("Phoenix").shutdown();
 	}
 
-	private class DispatchTask implements Task {
-
-		private RequestEvent cloneToServerEvent(RequestEvent event) {
-			RequestEvent svrEvent = null;
-			try {
-				svrEvent = event.clone();
-			} catch (CloneNotSupportedException e) {
-				// won't happen
-			}
-			svrEvent.setHop(HOP_SERVER);
-			return svrEvent;
+	private RequestEvent cloneToServerEvent(RequestEvent event) {
+		RequestEvent svrEvent = null;
+		try {
+			svrEvent = event.clone();
+		} catch (CloneNotSupportedException e) {
+			// won't happen
 		}
+		svrEvent.setHop(HOP_SERVER);
+		return svrEvent;
+	}
+	
+	private class DispatchTask implements Task {
 
 		@Override
 		public String getName() {

@@ -50,6 +50,7 @@ public class IntegrationTest extends ComponentTestCase {
 
 		server.start();
 		server.join();
+		
 	}
 
 }

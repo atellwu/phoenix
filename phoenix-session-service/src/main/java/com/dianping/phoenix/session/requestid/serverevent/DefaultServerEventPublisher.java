@@ -29,9 +29,9 @@ public class DefaultServerEventPublisher implements Initializable, LogEnabled, S
 
 	@Inject
 	private SocketClientManager m_clientMgr;
-	
+
 	private AddressChangeListener m_listener;
-	
+
 	private AtomicBoolean m_stop = new AtomicBoolean(false);
 
 	private Logger m_logger;
@@ -73,10 +73,10 @@ public class DefaultServerEventPublisher implements Initializable, LogEnabled, S
 	}
 
 	public void start() {
-		
+
 		List<InetSocketAddress> addrList = m_addrMgr.getServerList(m_listener);
 		m_clientMgr.openClients(addrList);
-		
+
 		Threads.forGroup("Phoenix").start(new PublishTask());
 
 		Threads.forGroup("Phoenix").start(new ServerListUpdateTask());
@@ -85,7 +85,7 @@ public class DefaultServerEventPublisher implements Initializable, LogEnabled, S
 	void updateServerConnections(List<InetSocketAddress> newAddrList) {
 
 		Set<InetSocketAddress> currentClients = m_clientMgr.listClients();
-		
+
 		// open connection to newly added server
 		List<InetSocketAddress> clientsToOpen = new ArrayList<InetSocketAddress>();
 		for (InetSocketAddress newAddr : newAddrList) {
@@ -156,6 +156,7 @@ public class DefaultServerEventPublisher implements Initializable, LogEnabled, S
 
 		@Override
 		public void shutdown() {
+			m_stop.set(true);
 		}
 
 	}

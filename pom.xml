@@ -42,17 +42,17 @@
 			<dependency>
 				<groupId>org.unidal.framework</groupId>
 				<artifactId>foundation-service</artifactId>
-				<version>2.0.5</version>
+				<version>2.0.6</version>
 			</dependency>
 			<dependency>
 				<groupId>org.unidal.framework</groupId>
 				<artifactId>dal-jdbc</artifactId>
-				<version>2.0.5</version>
+				<version>2.0.6</version>
 			</dependency>
 			<dependency>
 				<groupId>org.unidal.framework</groupId>
 				<artifactId>web-framework</artifactId>
-				<version>2.0.5</version>
+				<version>2.0.6</version>
 			</dependency>
 			<dependency>
 				<groupId>org.unidal.framework</groupId>

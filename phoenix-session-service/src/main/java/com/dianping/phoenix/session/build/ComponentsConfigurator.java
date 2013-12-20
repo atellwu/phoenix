@@ -43,8 +43,7 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 		      .req(ConfigManager.class) //
 		      .req(EventRecorder.class) //
 		      .req(EventDelegateManager.class));
-		all.add(C(Bootstrap.class) //
-		      .req(EventDelegateManager.class));
+		all.add(C(Bootstrap.class));
 		all.add(C(ServerAddressManager.class, DefaultServerAddressManager.class) //
 				.req(ConfigManager.class));
 		all.add(C(SocketClientManager.class, DefaultSocketClientManager.class));

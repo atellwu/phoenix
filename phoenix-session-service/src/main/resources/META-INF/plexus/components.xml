@@ -49,11 +49,6 @@
 		<component>
 			<role>com.dianping.phoenix.session.requestid.Bootstrap</role>
 			<implementation>com.dianping.phoenix.session.requestid.Bootstrap</implementation>
-			<requirements>
-				<requirement>
-					<role>com.dianping.phoenix.session.requestid.EventDelegateManager</role>
-				</requirement>
-			</requirements>
 		</component>
 		<component>
 			<role>com.dianping.phoenix.session.requestid.serverevent.ServerAddressManager</role>

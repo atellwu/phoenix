@@ -9,12 +9,27 @@ import org.unidal.lookup.ContainerLoader;
 import org.unidal.net.Sockets;
 import org.unidal.net.Sockets.SocketServer;
 
+import com.dianping.phoenix.configure.ConfigManager;
+import com.dianping.phoenix.session.requestid.serverevent.DefaultServerAddressManager;
+import com.dianping.phoenix.session.requestid.serverevent.DefaultServerEventPublisher;
+import com.dianping.phoenix.session.requestid.serverevent.ServerAddressManager;
+import com.dianping.phoenix.session.requestid.serverevent.ServerEventPublisher;
+
 public class Bootstrap implements ServletContextListener {
+	
+	private final static int DEFAULT_PORT = 7377;
+	
 	private SocketServer m_server;
 
 	private EventProcessor m_processor;
 
 	private FileUploader m_uploader;
+
+	private DefaultServerAddressManager m_serverAddrMgr;
+
+	private DefaultServerEventPublisher m_serverEventPublisher;
+	
+	private ConfigManager m_config;
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -25,7 +40,26 @@ public class Bootstrap implements ServletContextListener {
 			m_processor = container.lookup(EventProcessor.class);
 			m_processor.start();
 
-			m_server = Sockets.forServer().listenOn(7377).threads("RequestID", 0).start(manager.getIn());
+			int port = DEFAULT_PORT;
+			String portInConfig = sce.getServletContext().getInitParameter("port");
+			if(portInConfig != null) {
+				try {
+					port = Integer.parseInt(portInConfig);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			m_config = container.lookup(ConfigManager.class);
+			m_config.setPort(port);
+			
+			m_server = Sockets.forServer().listenOn(port).threads("RequestID", 0).start(manager.getIn());
+
+			m_serverAddrMgr = (DefaultServerAddressManager) container.lookup(ServerAddressManager.class);
+			Threads.forGroup("Phoenix").start(m_serverAddrMgr);
+
+			m_serverEventPublisher = (DefaultServerEventPublisher) container.lookup(ServerEventPublisher.class);
+			m_serverEventPublisher.start();
 
 			m_uploader = container.lookup(FileUploader.class);
 			Threads.forGroup("Phoenix").start(m_uploader);
@@ -46,6 +80,10 @@ public class Bootstrap implements ServletContextListener {
 
 		if (m_uploader != null) {
 			m_uploader.shutdown();
+		}
+
+		if (m_serverAddrMgr != null) {
+			m_serverAddrMgr.shutdown();
 		}
 	}
 }
