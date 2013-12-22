@@ -1,1 +1,1 @@
-return $directive.getDynamicAttribute("response-code");
+return $directive.getDynamicAttribute("response-code")#if($directive.getDynamicAttribute("response-content")) "$directive.getDynamicAttribute("response-content")"#end;
