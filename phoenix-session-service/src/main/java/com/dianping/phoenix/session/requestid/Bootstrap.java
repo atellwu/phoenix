@@ -20,6 +20,8 @@ public class Bootstrap implements ServletContextListener {
 
 	private final static int DEFAULT_PORT = 7377;
 
+	public final static String DISABLE_HDFS = "PHOENIX_SESSION_SERVICE_DISABLE_HDFS";
+
 	private SocketServer m_server;
 
 	private EventProcessor m_processor;
@@ -41,9 +43,9 @@ public class Bootstrap implements ServletContextListener {
 			if (configFileInConfig != null) {
 				ConfigManager.setConfigFile(configFileInConfig);
 			}
-			
+
 			m_config = container.lookup(ConfigManager.class);
-			
+
 			int port = DEFAULT_PORT;
 			String portInConfig = sce.getServletContext().getInitParameter("port");
 			if (portInConfig != null) {
@@ -54,7 +56,7 @@ public class Bootstrap implements ServletContextListener {
 				}
 			}
 			m_config.setPort(port);
-			
+
 			RecordFileManager recMgr = container.lookup(RecordFileManager.class);
 			recMgr.start();
 
@@ -62,7 +64,6 @@ public class Bootstrap implements ServletContextListener {
 
 			m_processor = container.lookup(EventProcessor.class);
 			m_processor.start();
-
 
 			m_server = Sockets.forServer().listenOn(port).threads("RequestID", 0).start(manager.getIn());
 
@@ -73,8 +74,12 @@ public class Bootstrap implements ServletContextListener {
 			RequestEventDelegate eventSource = container.lookup(EventDelegateManager.class).getOut();
 			m_serverEventPublisher.start(eventSource);
 
-			m_uploader = container.lookup(FileUploader.class);
-			Threads.forGroup("Phoenix").start(m_uploader);
+			if (System.getProperty(DISABLE_HDFS) == null) {
+				m_uploader = container.lookup(FileUploader.class);
+				Threads.forGroup("Phoenix").start(m_uploader);
+			} else {
+				System.out.println("HDFS is disabled");
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error when starting up session service!", e);
 		}

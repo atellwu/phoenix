@@ -136,10 +136,6 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 				referEventNotFound(curEvent);
 			}
 		}
-
-		if (!m_sendQ.offer(cloneToServerEvent(curEvent))) {
-			m_logger.error(String.format("Send queue is full, can not send RequestEvent %s to other server", curEvent));
-		}
 	}
 
 	private void processServerEvent(RequestEvent curEvent) {
@@ -279,8 +275,14 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 							offerToHandlerTaskQueue(event.getRefererUrlDigest(), event);
 						}
 					}
-
-					offerToHandlerTaskQueue(event.getUrlDigest(), cloneToServerEvent(event));
+					
+					RequestEvent svrEvent = cloneToServerEvent(event);
+					
+					if (!m_sendQ.offer(svrEvent)) {
+						m_logger.error(String.format("Send queue is full, can not send RequestEvent %s to other server", svrEvent));
+					}
+					
+					offerToHandlerTaskQueue(event.getUrlDigest(), svrEvent);
 					break;
 
 				case HOP_SERVER:
