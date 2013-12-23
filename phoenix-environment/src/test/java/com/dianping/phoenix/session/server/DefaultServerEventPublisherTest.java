@@ -67,8 +67,6 @@ public class DefaultServerEventPublisherTest extends ComponentTestCase {
 
 			@Override
 			public void sendToClients(RequestEvent event) {
-				// TODO Auto-generated method stub
-
 			}
 
 			@Override
@@ -84,7 +82,6 @@ public class DefaultServerEventPublisherTest extends ComponentTestCase {
 
 			@Override
 			public void closeClients(List<InetSocketAddress> serverToClose) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -123,8 +120,6 @@ public class DefaultServerEventPublisherTest extends ComponentTestCase {
 
 			@Override
 			public void sendToClients(RequestEvent event) {
-				// TODO Auto-generated method stub
-
 			}
 
 			@Override
