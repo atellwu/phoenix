@@ -38,6 +38,8 @@ public class RecordFileManager implements Initializable, LogEnabled {
 	private String m_ip;
 
 	private Logger m_logger;
+	
+	public static final String PHOENIX_MODE = "PHOENIX_MODE";
 
 	@Override
 	public void enableLogging(Logger logger) {
@@ -198,8 +200,9 @@ public class RecordFileManager implements Initializable, LogEnabled {
 						} else {
 							try {
 								entry.getValue().out.write(buf);
-								// TODO remove flush
-								entry.getValue().out.flush();
+								if ("dev".equals(System.getProperty(PHOENIX_MODE))) {
+									entry.getValue().out.flush();
+								}
 							} catch (Exception e) {
 								m_logger.error(String.format("Error write record %s to file", new String(buf)), e);
 							}
