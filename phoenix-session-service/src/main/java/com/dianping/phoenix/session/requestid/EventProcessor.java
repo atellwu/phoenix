@@ -70,6 +70,48 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 		return retryCache.asMap();
 	}
 
+	private RequestEvent cloneToServerEvent(RequestEvent event) {
+		RequestEvent svrEvent = null;
+		try {
+			svrEvent = event.clone();
+		} catch (CloneNotSupportedException e) {
+			// won't happen
+		}
+		svrEvent.setHop(HOP_SERVER);
+		return svrEvent;
+	}
+
+	private void dispatchEvent(RequestEvent event) {
+		switch (event.getHop()) {
+		case HOP_CLIENT:
+			if (isEventExpired(event)) {
+				m_logger.info(String.format(
+				      "Receive expired RequestEvent %s from client, will not calculate refer request id", event));
+			} else {
+				if (event.getRefererUrlDigest() != null) {
+					offerToHandlerTaskQueue(event.getRefererUrlDigest(), event);
+				}
+			}
+
+			RequestEvent svrEvent = cloneToServerEvent(event);
+
+			if (!m_sendQ.offer(svrEvent)) {
+				m_logger.error(String.format("Send queue is full, can not send RequestEvent %s to other server", svrEvent));
+			}
+
+			offerToHandlerTaskQueue(event.getUrlDigest(), svrEvent);
+			break;
+
+		case HOP_SERVER:
+			offerToHandlerTaskQueue(event.getUrlDigest(), event);
+			break;
+
+		default:
+			m_logger.error(String.format("Unknown hop %d received, will ignore", event.getHop()));
+			break;
+		}
+	}
+
 	@Override
 	public void enableLogging(Logger logger) {
 		m_logger = logger;
@@ -111,6 +153,12 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 		return System.currentTimeMillis() > event.getTimestamp() + m_config.getEventExpireTime();
 	}
 
+	private void offerToHandlerTaskQueue(String digest, RequestEvent event) {
+		if (!m_handlerTaskQueues[slotForUrl(digest)].offer(event)) {
+			m_logger.warn(String.format("Handler task queue is full, will discad %s", event));
+		}
+	}
+
 	private void overrideEvent(RequestEvent curEvent, RequestEvent oldEvent) {
 		oldEvent.setHop(curEvent.getHop());
 		oldEvent.setRefererUrlDigest(curEvent.getRefererUrlDigest());
@@ -135,6 +183,22 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 			} else {
 				referEventNotFound(curEvent);
 			}
+		}
+	}
+
+	private void processEvent(RequestEvent event) {
+		switch (event.getHop()) {
+		case HOP_CLIENT:
+			processClientEvent(event);
+			break;
+
+		case HOP_SERVER:
+			processServerEvent(event);
+			break;
+
+		default:
+			m_logger.error(String.format("Unknown hop %d received, will ignore", event.getHop()));
+			break;
 		}
 	}
 
@@ -217,17 +281,6 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 		Threads.forGroup("Phoenix").shutdown();
 	}
 
-	private RequestEvent cloneToServerEvent(RequestEvent event) {
-		RequestEvent svrEvent = null;
-		try {
-			svrEvent = event.clone();
-		} catch (CloneNotSupportedException e) {
-			// won't happen
-		}
-		svrEvent.setHop(HOP_SERVER);
-		return svrEvent;
-	}
-	
 	private class DispatchTask implements Task {
 
 		@Override
@@ -239,12 +292,6 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 			return event.getRequestId() != null //
 			      && event.getUrlDigest() != null //
 			      && event.getPhoenixId() != null;
-		}
-
-		private void offerToHandlerTaskQueue(String digest, RequestEvent event) {
-			if (!m_handlerTaskQueues[slotForUrl(digest)].offer(event)) {
-				m_logger.warn(String.format("Handler task queue is full, will discad %s", event));
-			}
 		}
 
 		@Override
@@ -265,34 +312,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 					continue;
 				}
 
-				switch (event.getHop()) {
-				case HOP_CLIENT:
-					if (isEventExpired(event)) {
-						m_logger.info(String.format(
-						      "Receive expired RequestEvent %s from client, will not calculate refer request id", event));
-					} else {
-						if (event.getRefererUrlDigest() != null) {
-							offerToHandlerTaskQueue(event.getRefererUrlDigest(), event);
-						}
-					}
-					
-					RequestEvent svrEvent = cloneToServerEvent(event);
-					
-					if (!m_sendQ.offer(svrEvent)) {
-						m_logger.error(String.format("Send queue is full, can not send RequestEvent %s to other server", svrEvent));
-					}
-					
-					offerToHandlerTaskQueue(event.getUrlDigest(), svrEvent);
-					break;
-
-				case HOP_SERVER:
-					offerToHandlerTaskQueue(event.getUrlDigest(), event);
-					break;
-
-				default:
-					m_logger.error(String.format("Unknown hop %d received, will ignore", event.getHop()));
-					break;
-				}
+				dispatchEvent(event);
 			}
 		}
 
@@ -328,19 +348,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 
 				m_logger.info("Processing " + event.getRequestId());
 
-				switch (event.getHop()) {
-				case HOP_CLIENT:
-					processClientEvent(event);
-					break;
-
-				case HOP_SERVER:
-					processServerEvent(event);
-					break;
-
-				default:
-					m_logger.error(String.format("Unknown hop %d received, will ignore", event.getHop()));
-					break;
-				}
+				processEvent(event);
 			}
 		}
 
