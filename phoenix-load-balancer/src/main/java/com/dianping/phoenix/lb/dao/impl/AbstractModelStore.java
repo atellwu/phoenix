@@ -17,11 +17,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang.StringUtils;
 import org.xml.sax.SAXException;
 
 import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.dao.ModelStore;
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.entity.Aspect;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.Strategy;
@@ -75,6 +77,32 @@ public abstract class AbstractModelStore implements ModelStore {
         }
     }
 
+    @Override
+    public List<Aspect> listCommonAspects() {
+        baseConfigMeta.lock.readLock().lock();
+        try {
+            return slbModelTree.getAspects();
+        } finally {
+            baseConfigMeta.lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public Aspect findCommonAspect(String name) {
+        baseConfigMeta.lock.readLock().lock();
+        try {
+            for (Aspect aspect : slbModelTree.getAspects()) {
+                if (StringUtils.equalsIgnoreCase(name, aspect.getName())) {
+                    return aspect;
+                }
+            }
+
+            return null;
+        } finally {
+            baseConfigMeta.lock.readLock().unlock();
+        }
+    }
+
     public Strategy findStrategy(String name) {
         baseConfigMeta.lock.readLock().lock();
         try {
@@ -88,6 +116,40 @@ public abstract class AbstractModelStore implements ModelStore {
         // ignore concurrent issue, since it will introduce unnecessary
         // complexity
         return slbModelTree.findVirtualServer(name);
+    }
+
+    @Override
+    public void saveCommonAspects(List<Aspect> aspects) throws BizException {
+        if (aspects == null) {
+            return;
+        }
+
+        List<Aspect> originalAspects = null;
+        baseConfigMeta.lock.writeLock().lock();
+        try {
+            originalAspects = new ArrayList<Aspect>(baseConfigMeta.slbModelTree.getAspects());
+
+            baseConfigMeta.slbModelTree.getAspects().clear();
+            slbModelTree.getAspects().clear();
+
+            for (Aspect aspect : aspects) {
+                baseConfigMeta.slbModelTree.addAspect(aspect);
+                slbModelTree.getAspects().add(aspect);
+            }
+            save(baseConfigMeta.key, baseConfigMeta.slbModelTree);
+
+        } catch (Exception e) {
+            baseConfigMeta.slbModelTree.getAspects().clear();
+            slbModelTree.getAspects().clear();
+            for (Aspect aspect : originalAspects) {
+                baseConfigMeta.slbModelTree.addAspect(aspect);
+                slbModelTree.getAspects().add(aspect);
+            }
+
+            ExceptionUtils.logAndRethrowBizException(e, MessageID.COMMON_ASPECT_SAVE_FAIL);
+        } finally {
+            baseConfigMeta.lock.writeLock().unlock();
+        }
     }
 
     /*
@@ -310,7 +372,7 @@ public abstract class AbstractModelStore implements ModelStore {
     }
 
     @Override
-    public String tag(String name, int version, List<Pool> pools) throws BizException {
+    public String tag(String name, int version, List<Pool> pools, List<Aspect> commonAspects) throws BizException {
         ConfigMeta configFileEntry = virtualServerConfigFileMapping.get(name);
         if (configFileEntry != null) {
             configFileEntry.lock.writeLock().lock();
@@ -332,6 +394,13 @@ public abstract class AbstractModelStore implements ModelStore {
                 for (Pool pool : pools) {
                     tagSlbModelTree.addPool(pool);
                 }
+
+                if (commonAspects != null) {
+                    for (Aspect aspect : commonAspects) {
+                        tagSlbModelTree.addAspect(aspect);
+                    }
+                }
+
                 tagSlbModelTree.addVirtualServer(configFileEntry.slbModelTree.findVirtualServer(name));
 
                 return saveTag(configFileEntry.key, name, tagSlbModelTree);

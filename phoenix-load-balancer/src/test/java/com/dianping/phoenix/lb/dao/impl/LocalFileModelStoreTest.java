@@ -25,7 +25,9 @@ import org.xml.sax.SAXException;
 import com.dianping.phoenix.lb.constant.MessageID;
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.Availability;
+import com.dianping.phoenix.lb.model.PointCut;
 import com.dianping.phoenix.lb.model.State;
+import com.dianping.phoenix.lb.model.entity.Aspect;
 import com.dianping.phoenix.lb.model.entity.Directive;
 import com.dianping.phoenix.lb.model.entity.Instance;
 import com.dianping.phoenix.lb.model.entity.Location;
@@ -95,6 +97,14 @@ public class LocalFileModelStoreTest {
     }
 
     @Test
+    public void testListCommonAspectss() throws Exception {
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+
+        assertEquals(slbModelTree.getAspects(), store.listCommonAspects());
+    }
+
+    @Test
     public void testListPools() throws Exception {
         SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
                 .readFileToString(new File(baseDir, "slb_base.xml")));
@@ -116,6 +126,21 @@ public class LocalFileModelStoreTest {
                 .readFileToString(new File(baseDir, "slb_base.xml")));
         Pool expected = slbModelTree.findPool("Web.Tuangou");
         Assert.assertTrue(EqualsBuilder.reflectionEquals(expected, store.findPool("Web.Tuangou"), true));
+    }
+
+    @Test
+    public void testFindCommonAspect() throws Exception {
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        Aspect expected = null;
+        for (Aspect aspect : slbModelTree.getAspects()) {
+            if ("commonRequest".equalsIgnoreCase(aspect.getName())) {
+                expected = aspect;
+                break;
+            }
+        }
+
+        Assert.assertTrue(EqualsBuilder.reflectionEquals(expected, store.findCommonAspect("commonRequest"), true));
     }
 
     @Test
@@ -176,6 +201,37 @@ public class LocalFileModelStoreTest {
     }
 
     @Test
+    public void testSaveAspects() throws Exception {
+        List<Aspect> aspects = new ArrayList<Aspect>();
+        Aspect aspect1 = new Aspect();
+        aspect1.setName("t1");
+        aspect1.setPointCut(PointCut.BEFORE);
+        Directive d1 = new Directive();
+        d1.setType("t1");
+        aspect1.addDirective(d1);
+        aspects.add(aspect1);
+        Aspect aspect2 = new Aspect();
+        aspect2.setName("t2");
+        aspect2.setPointCut(PointCut.AFTER);
+        Directive d2 = new Directive();
+        d2.setType("t2");
+        aspect2.addDirective(d2);
+        aspects.add(aspect2);
+
+        store.saveCommonAspects(aspects);
+
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        slbModelTree.getAspects().clear();
+        slbModelTree.getAspects().addAll(aspects);
+        assertEquals(slbModelTree.getAspects(), store.listCommonAspects());
+
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+    }
+
+    @Test
     public void testUpdateStrategy() throws Exception {
         Strategy modifiedStrategy = new Strategy("uri-hash");
         modifiedStrategy.setType("hash");
@@ -228,6 +284,43 @@ public class LocalFileModelStoreTest {
         assertEquals(new ArrayList<Pool>(slbModelTree.getPools().values()), store.listPools());
         Assert.assertEquals(now, modifiedPool.getLastModifiedDate());
         Assert.assertEquals(expectedPool.getCreationDate(), modifiedPool.getCreationDate());
+
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+    }
+
+    @Test
+    public void testSaveAspectsRollback() throws Exception {
+        new File(tmpDir, "slb_base.xml").setWritable(false);
+        List<Aspect> aspects = new ArrayList<Aspect>();
+        Aspect aspect1 = new Aspect();
+        aspect1.setName("t1");
+        aspect1.setPointCut(PointCut.BEFORE);
+        Directive d1 = new Directive();
+        d1.setType("t1");
+        aspect1.addDirective(d1);
+        aspects.add(aspect1);
+        Aspect aspect2 = new Aspect();
+        aspect2.setName("t2");
+        aspect2.setPointCut(PointCut.AFTER);
+        Directive d2 = new Directive();
+        d2.setType("t2");
+        aspect2.addDirective(d2);
+        aspects.add(aspect2);
+
+        try {
+            store.saveCommonAspects(aspects);
+            Assert.fail();
+        } catch (BizException e) {
+            Assert.assertEquals(MessageID.COMMON_ASPECT_SAVE_FAIL, e.getMessageId());
+        } catch (Exception e) {
+            Assert.fail();
+        }
+
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        assertEquals(slbModelTree.getAspects(), store.listCommonAspects());
 
         assertEquals(slbModelTree, "slb_base.xml");
         assertRawFileNotChanged("slb_www.xml");
@@ -768,8 +861,8 @@ public class LocalFileModelStoreTest {
     @Test
     public void testTag() throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        store.tag("www", 1, store.listPools());
-        store.tag("www", 1, store.listPools());
+        store.tag("www", 1, store.listPools(), store.listCommonAspects());
+        store.tag("www", 1, store.listPools(), store.listCommonAspects());
         File tagFile = new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/slb_www.xml_1");
         File tagFile2 = new File(tmpDir, "tag/www/" + sdf.format(new Date()) + "/slb_www.xml_2");
         Assert.assertTrue(tagFile.exists());
@@ -777,6 +870,9 @@ public class LocalFileModelStoreTest {
         SlbModelTree expected = DefaultSaxParser.parse(FileUtils.readFileToString(new File(baseDir, "slb_www.xml")));
         for (Pool pool : store.listPools()) {
             expected.addPool(pool);
+        }
+        for (Aspect aspect : store.listCommonAspects()) {
+            expected.addAspect(aspect);
         }
         Assert.assertEquals(expected, DefaultSaxParser.parse(FileUtils.readFileToString(tagFile)));
         Assert.assertEquals(expected, DefaultSaxParser.parse(FileUtils.readFileToString(tagFile2)));
@@ -789,7 +885,7 @@ public class LocalFileModelStoreTest {
     @Test
     public void testTagVSNotExists() throws Exception {
         try {
-            store.tag("www2", 1, store.listPools());
+            store.tag("www2", 1, store.listPools(), store.listCommonAspects());
             Assert.fail();
         } catch (BizException e) {
             Assert.assertEquals(e.getMessageId(), MessageID.VIRTUALSERVER_NOT_EXISTS);
@@ -805,7 +901,7 @@ public class LocalFileModelStoreTest {
     @Test
     public void testTagConcurrentMod() throws Exception {
         try {
-            store.tag("www", 2, store.listPools());
+            store.tag("www", 2, store.listPools(), store.listCommonAspects());
             Assert.fail();
         } catch (BizException e) {
             Assert.assertEquals(MessageID.VIRTUALSERVER_CONCURRENT_MOD, e.getMessageId());
@@ -825,7 +921,7 @@ public class LocalFileModelStoreTest {
         FileUtils.forceMkdir(tagDir);
         tagDir.setWritable(false);
         try {
-            store.tag("www", 1, store.listPools());
+            store.tag("www", 1, store.listPools(), store.listCommonAspects());
             Assert.fail();
         } catch (BizException e) {
             Assert.assertEquals(e.getMessageId(), MessageID.VIRTUALSERVER_TAG_FAIL);
@@ -841,11 +937,11 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testListTagIds() throws Exception {
-        store.tag("www", 1, store.listPools());
-        store.tag("www", 1, store.listPools());
-        store.tag("tuangou", 1, store.listPools());
-        store.tag("tuangou", 1, store.listPools());
-        store.tag("tuangou", 1, store.listPools());
+        store.tag("www", 1, store.listPools(), store.listCommonAspects());
+        store.tag("www", 1, store.listPools(), store.listCommonAspects());
+        store.tag("tuangou", 1, store.listPools(), store.listCommonAspects());
+        store.tag("tuangou", 1, store.listPools(), store.listCommonAspects());
+        store.tag("tuangou", 1, store.listPools(), store.listCommonAspects());
 
         store = new LocalFileModelStoreImpl();
         store.setBaseDir(tmpDir.getAbsolutePath());
@@ -858,8 +954,8 @@ public class LocalFileModelStoreTest {
         Assert.assertArrayEquals(new String[] { "tuangou-3", "tuangou-2", "tuangou-1" },
                 tuangouTagIds.toArray(new String[0]));
 
-        store.tag("www", 1, store.listPools());
-        store.tag("tuangou", 1, store.listPools());
+        store.tag("www", 1, store.listPools(), store.listCommonAspects());
+        store.tag("tuangou", 1, store.listPools(), store.listCommonAspects());
 
         wwwTagIds = store.listTagIds("www");
         tuangouTagIds = store.listTagIds("tuangou");
@@ -902,7 +998,7 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testGetTag() throws Exception {
-        String tagId = store.tag("www", 1, store.listPools());
+        String tagId = store.tag("www", 1, store.listPools(), store.listCommonAspects());
 
         SlbModelTree tagSlbModelTree = store.getTag("www", tagId);
 
@@ -913,6 +1009,8 @@ public class LocalFileModelStoreTest {
             Assert.assertTrue(EqualsBuilder.reflectionEquals(expPool, tagSlbModelTree.findPool(expPool.getName()), true));
         }
 
+        assertEquals(store.listCommonAspects(), tagSlbModelTree.getAspects());
+
         assertRawFileNotChanged("slb_www.xml");
         assertRawFileNotChanged("slb_tuangou.xml");
         assertRawFileNotChanged("slb_base.xml");
@@ -920,8 +1018,8 @@ public class LocalFileModelStoreTest {
 
     @Test
     public void testFindPrevTagId() throws Exception {
-        String tag1 = store.tag("www", 1, store.listPools());
-        String tag2 = store.tag("www", 1, store.listPools());
+        String tag1 = store.tag("www", 1, store.listPools(), store.listCommonAspects());
+        String tag2 = store.tag("www", 1, store.listPools(), store.listCommonAspects());
 
         store = new LocalFileModelStoreImpl();
         store.setBaseDir(tmpDir.getAbsolutePath());
@@ -930,7 +1028,7 @@ public class LocalFileModelStoreTest {
         Assert.assertEquals(tag1, store.findPrevTagId("www", tag2));
         Assert.assertNull(store.findPrevTagId("www", tag1));
 
-        String tag3 = store.tag("www", 1, store.listPools());
+        String tag3 = store.tag("www", 1, store.listPools(), store.listCommonAspects());
         Assert.assertEquals(tag2, store.findPrevTagId("www", tag3));
         Assert.assertEquals(tag1, store.findPrevTagId("www", tag2));
         Assert.assertNull(store.findPrevTagId("www", tag1));
@@ -949,11 +1047,11 @@ public class LocalFileModelStoreTest {
         store.setBaseDir(tmpDir.getAbsolutePath());
         store.init();
 
-        store.tag("www", 1, store.listPools());
-        store.tag("www", 1, store.listPools());
-        store.tag("tuangou", 1, store.listPools());
-        store.tag("tuangou", 1, store.listPools());
-        store.tag("tuangou", 1, store.listPools());
+        store.tag("www", 1, store.listPools(), store.listCommonAspects());
+        store.tag("www", 1, store.listPools(), store.listCommonAspects());
+        store.tag("tuangou", 1, store.listPools(), store.listCommonAspects());
+        store.tag("tuangou", 1, store.listPools(), store.listCommonAspects());
+        store.tag("tuangou", 1, store.listPools(), store.listCommonAspects());
 
         List<String> wwwTagIds = store.listTagIds("www");
         List<String> tuangouTagIds = store.listTagIds("tuangou");
@@ -1010,7 +1108,7 @@ public class LocalFileModelStoreTest {
         store.setBaseDir(tmpDir.getAbsolutePath());
         store.init();
 
-        store.tag("www", 1, store.listPools());
+        store.tag("www", 1, store.listPools(), store.listCommonAspects());
 
         store.removeTag("www", "www-2");
         store.removeTag("www", "www-4");

@@ -147,7 +147,8 @@ public class VirtualServerAction extends MenuAction {
             VirtualServer virtualServer = JsonBinder.getNonNullBinder().fromJson(vsJson, VirtualServer.class);
 
             pools = poolService.listPools();
-            String nginxConfig = virtualServerService.generateNginxConfig(virtualServer, pools);
+            commonAspects = commonAspectService.listCommonAspects();
+            String nginxConfig = virtualServerService.generateNginxConfig(virtualServer, pools, commonAspects);
 
             dataMap.put("nginxConfig", nginxConfig);
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
@@ -171,7 +172,7 @@ public class VirtualServerAction extends MenuAction {
         try {
             Validate.notNull(virtualServerName);
             Validate.notNull(version);
-            dataMap.put("tagId", virtualServerService.tag(virtualServerName, version, pools));
+            dataMap.put("tagId", virtualServerService.tag(virtualServerName, version, pools, commonAspects));
 
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (BizException e) {
@@ -197,7 +198,7 @@ public class VirtualServerAction extends MenuAction {
                 System.out.println(vs);
                 VirtualServer virtualServer = virtualServerService.findVirtualServer(vs);
                 Validate.notNull(virtualServer, "vs(" + vs + ") not found.");
-                tagIds.add(virtualServerService.tag(vs, virtualServer.getVersion(), pools));
+                tagIds.add(virtualServerService.tag(vs, virtualServer.getVersion(), pools, commonAspects));
             }
         }
         vsListToTagStr = StringUtils.join(vsListToTag, ',');
@@ -221,7 +222,7 @@ public class VirtualServerAction extends MenuAction {
                 Map<String, VirtualServer> virtualServers0 = tree.getVirtualServers();
                 for (Entry<String, VirtualServer> entry : virtualServers0.entrySet()) {
                     VirtualServer virtualServer = entry.getValue();
-                    String config = virtualServerService.generateNginxConfig(virtualServer, poolList);
+                    String config = virtualServerService.generateNginxConfig(virtualServer, poolList, tree.getAspects());
                     dataMap.put("nginxConfig", config);
                     break;
                 }

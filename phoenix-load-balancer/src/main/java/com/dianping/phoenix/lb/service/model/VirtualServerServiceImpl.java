@@ -25,10 +25,12 @@ import com.dianping.phoenix.lb.PlexusComponentContainer;
 import com.dianping.phoenix.lb.configure.ConfigManager;
 import com.dianping.phoenix.lb.constant.Constants;
 import com.dianping.phoenix.lb.constant.MessageID;
+import com.dianping.phoenix.lb.dao.CommonAspectDao;
 import com.dianping.phoenix.lb.dao.PoolDao;
 import com.dianping.phoenix.lb.dao.StrategyDao;
 import com.dianping.phoenix.lb.dao.VirtualServerDao;
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.entity.Aspect;
 import com.dianping.phoenix.lb.model.entity.Directive;
 import com.dianping.phoenix.lb.model.entity.Location;
 import com.dianping.phoenix.lb.model.entity.Pool;
@@ -58,16 +60,19 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
     private NginxService     nginxService;
     private GitService       gitService;
     private ConfigManager    configManager;
+    private CommonAspectDao  commonAspectDao;
 
     @Autowired(required = true)
     public VirtualServerServiceImpl(VirtualServerDao virtualServerDao, StrategyDao strategyDao, PoolDao poolDao,
-            NginxService nginxService, GitService gitService) throws ComponentLookupException {
+            CommonAspectDao commonAspectDao, NginxService nginxService, GitService gitService)
+            throws ComponentLookupException {
         super();
         this.virtualServerDao = virtualServerDao;
         this.strategyDao = strategyDao;
         this.poolDao = poolDao;
         this.gitService = gitService;
         this.nginxService = nginxService;
+        this.commonAspectDao = commonAspectDao;
     }
 
     @PostConstruct
@@ -316,7 +321,8 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
     }
 
     @Override
-    public String generateNginxConfig(VirtualServer virtualServer, List<Pool> pools) throws BizException {
+    public String generateNginxConfig(VirtualServer virtualServer, List<Pool> pools, List<Aspect> commonAspects)
+            throws BizException {
 
         try {
             SlbModelTree tmpSlbModelTree = new SlbModelTree();
@@ -331,6 +337,16 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
             } else {
                 for (Pool pool : pools) {
                     tmpSlbModelTree.addPool(pool);
+                }
+            }
+
+            if (commonAspects == null) {
+                for (Aspect aspect : commonAspectDao.list()) {
+                    tmpSlbModelTree.addAspect(aspect);
+                }
+            } else {
+                for (Aspect aspect : commonAspects) {
+                    tmpSlbModelTree.addAspect(aspect);
                 }
             }
 
@@ -349,8 +365,8 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
     }
 
     @Override
-    public String tag(final String virtualServerName, final int virtualServerVersion, final List<Pool> pools)
-            throws BizException {
+    public String tag(final String virtualServerName, final int virtualServerVersion, final List<Pool> pools,
+            final List<Aspect> commonAspects) throws BizException {
         if (StringUtils.isBlank(virtualServerName)) {
             ExceptionUtils.throwBizException(MessageID.VIRTUALSERVER_NAME_EMPTY);
         }
@@ -367,13 +383,13 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
                                 MessageID.VIRTUALSERVER_CONCURRENT_MOD, virtualServerName);
                     }
 
-                    String nginxConfigContent = generateNginxConfig(virtualServer, pools);
+                    String nginxConfigContent = generateNginxConfig(virtualServer, pools, commonAspects);
                     NginxCheckResult nginxCheckResult = nginxService.checkConfig(nginxConfigContent);
                     if (!nginxCheckResult.isSucess()) {
                         ExceptionUtils.throwBizException(MessageID.NGINX_CHECK_EXCEPTION, nginxCheckResult.getMsg());
                     }
 
-                    String tagId = virtualServerDao.tag(virtualServerName, virtualServerVersion, pools);
+                    String tagId = virtualServerDao.tag(virtualServerName, virtualServerVersion, pools, commonAspects);
                     File serverConfFile = new File(
                             new File(configManager.getTengineConfigBaseDir(), virtualServerName),
                             configManager.getTengineConfigFileName());

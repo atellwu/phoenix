@@ -113,8 +113,10 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
                         if (fileName.endsWith(BASE_CONFIG_FILE_SUFFIX + XML_SUFFIX)) {
                             baseConfigMeta = new ConfigMeta(fileName, tmpSlbModelTree);
                         } else {
-                            for (Map.Entry<String, VirtualServer> entry : tmpSlbModelTree.getVirtualServers().entrySet()) {
-                                virtualServerConfigFileMapping.put(entry.getKey(), new ConfigMeta(fileName, tmpSlbModelTree));
+                            for (Map.Entry<String, VirtualServer> entry : tmpSlbModelTree.getVirtualServers()
+                                    .entrySet()) {
+                                virtualServerConfigFileMapping.put(entry.getKey(), new ConfigMeta(fileName,
+                                        tmpSlbModelTree));
                             }
                         }
 
@@ -146,7 +148,8 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
 
     private void saveToGit(File file, FileOP op) throws BizException {
         if (gitService != null) {
-            gitService.commitAllChanges(baseDir, String.format("%s file %s", op.name, StringUtils.removeStart(file.getAbsolutePath(), baseDir)));
+            gitService.commitAllChanges(baseDir,
+                    String.format("%s file %s", op.name, StringUtils.removeStart(file.getAbsolutePath(), baseDir)));
             gitService.push(configManager.getModelGitUrl(), baseDir);
         }
     }
@@ -180,7 +183,8 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
                         if (tagId != null) {
                             String xml = FileUtils.readFileToString(tag);
                             SlbModelTree tmpSlbModelTree = DefaultSaxParser.parse(xml);
-                            for (Map.Entry<String, VirtualServer> entry : tmpSlbModelTree.getVirtualServers().entrySet()) {
+                            for (Map.Entry<String, VirtualServer> entry : tmpSlbModelTree.getVirtualServers()
+                                    .entrySet()) {
                                 tagMetas.putIfAbsent(entry.getKey(), new AtomicInteger(0));
                                 if (tagMetas.get(entry.getKey()).intValue() < tagId) {
                                     tagMetas.get(entry.getKey()).set(tagId);

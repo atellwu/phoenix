@@ -3,6 +3,7 @@
   <entity name="slb-model-tree" root="true">
     <entity-ref name="strategy" type="list" names="strategies" xml-indent="true" />
     <entity-ref name="pool" type="list" names="pools" xml-indent="true" />
+    <entity-ref name="aspect" type="list" names="aspects" xml-indent="true" />
     <entity-ref name="virtualServer" type="list" names="virtualServers" />
   </entity>
   <entity name="strategy">
@@ -31,6 +32,24 @@
     <attribute name="state" value-type="String" />
     <attribute name="availability" value-type="String" />
   </entity>
+  <entity name="aspect">
+    <attribute name="name" value-type="String" />
+    <attribute name="point-cut" value-type="String" />
+    <attribute name="ref" value-type="String" />
+    <entity-ref name="directive" type="list" names="directives" />
+  </entity>
+  <entity name="directive">
+    <attribute name="type" value-type="String" />
+    <attribute name="matches" value-type="String" />
+    <attribute name="target-pattern" value-type="String" />
+    <attribute name="flag" value-type="String" />
+    <attribute name="response-code" value-type="int" />
+    <attribute name="path" value-type="String" />
+    <attribute name="format" value-type="String" />
+    <attribute name="pool-name" value-type="String" />
+    <attribute name="root-doc" value-type="String" />
+    <attribute name="expires" value-type="String" />
+  </entity>
   <entity name="virtualServer">
     <attribute name="name" value-type="String" />
     <attribute name="state" value-type="String" />
@@ -48,22 +67,6 @@
   </entity>
   <entity name="instance">
     <attribute name="ip" value-type="String" />
-  </entity>
-  <entity name="aspect">
-    <attribute name="point-cut" value-type="String" />
-    <entity-ref name="directive" type="list" names="directives" />
-  </entity>
-  <entity name="directive">
-    <attribute name="type" value-type="String" />
-    <attribute name="matches" value-type="String" />
-    <attribute name="target-pattern" value-type="String" />
-    <attribute name="flag" value-type="String" />
-    <attribute name="response-code" value-type="int" />
-    <attribute name="path" value-type="String" />
-    <attribute name="format" value-type="String" />
-    <attribute name="pool-name" value-type="String" />
-    <attribute name="root-doc" value-type="String" />
-    <attribute name="expires" value-type="String" />
   </entity>
   <entity name="location">
     <attribute name="match-type" value-type="String" />

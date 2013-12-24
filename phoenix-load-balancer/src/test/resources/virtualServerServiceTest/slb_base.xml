@@ -71,4 +71,12 @@
 				availability="AVAILABLE" />
 		</pool>
 	</pools>
+	<aspects>
+		<aspect name="commonRequest" point-cut="BEFORE">
+			<directive type="more_set_input_headers" value="'commonReq : 123'"/>
+		</aspect>
+		<aspect name="commonResponse" point-cut="AFTER">
+			<directive type="more_set_headers" value="'server : nginx'"/>
+		</aspect>
+	</aspects>
 </slb-model-tree>

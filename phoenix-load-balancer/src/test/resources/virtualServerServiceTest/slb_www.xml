@@ -7,6 +7,7 @@
 			<instance ip="10.2.1.4" />
 		</instances>
         <aspects>
+        	<aspect ref="commonRequest"/>
             <aspect point-cut="BEFORE">
                 <directive type="more_set_headers" value="'X-MyHeader1: 11111111'"/>
                 <directive type="ifelse" if-condition="$remote_addr = 124.131.180.74" if-statement="proxy_pass http://node"/>
@@ -14,6 +15,7 @@
             <aspect point-cut="AFTER">
                 <directive type="more_set_headers" value="'X-MyHeader2: 222222'"/>
             </aspect>
+            <aspect ref="commonResponse"/>
         </aspects>
 		<locations>
 			<location match-type="prefix" pattern="/download">

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.phoenix.lb.dao.ModelStore;
 import com.dianping.phoenix.lb.dao.VirtualServerDao;
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.entity.Aspect;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
@@ -59,8 +60,8 @@ public class VirtualServerDaoImpl extends AbstractDao implements VirtualServerDa
     }
 
     @Override
-    public String tag(String virtualServerName, int virtualServerVersion, List<Pool> pools) throws BizException {
-        return store.tag(virtualServerName, virtualServerVersion, pools);
+    public String tag(String virtualServerName, int virtualServerVersion, List<Pool> pools, List<Aspect> commonAspects) throws BizException {
+        return store.tag(virtualServerName, virtualServerVersion, pools, commonAspects);
     }
 
     @Override
