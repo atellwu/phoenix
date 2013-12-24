@@ -35,7 +35,8 @@ import com.dianping.phoenix.lb.utils.PoolNameUtils;
  * 
  */
 public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
-    private Map<String, Strategy> strategies = new HashMap<String, Strategy>();
+    private Map<String, Strategy> strategies    = new HashMap<String, Strategy>();
+    private Map<String, Aspect>   commonAspects = new HashMap<String, Aspect>();
 
     public NginxConfigVisitor() {
         result = new NginxConfig();
@@ -66,8 +67,23 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
 
     @Override
     public void visitAspect(Aspect aspect) {
-        result.getServer().addAspect(aspect);
-        setUpstreamAsUsed(aspect.getDirectives(),
+        if (StringUtils.isNotBlank(aspect.getName())) {
+            commonAspects.put(aspect.getName(), aspect);
+            return;
+        }
+
+        Aspect actualAspect = null;
+        if (StringUtils.isBlank(aspect.getRef())) {
+            actualAspect = aspect;
+        } else {
+            if (!commonAspects.containsKey(aspect.getRef())) {
+                throw new RuntimeException(MessageUtils.getMessage(MessageID.COMMON_ASPECT_SAVE_FAIL, aspect.getRef()));
+            } else {
+                actualAspect = commonAspects.get(aspect.getRef());
+            }
+        }
+        result.getServer().addAspect(actualAspect);
+        setUpstreamAsUsed(actualAspect.getDirectives(),
                 MessageUtils.getMessage(MessageID.PROXY_PASS_NO_POOL, "aspect " + aspect.getPointCut()));
     }
 

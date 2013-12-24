@@ -9,6 +9,7 @@ package com.dianping.phoenix.lb.dao;
 import java.util.List;
 
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.entity.Aspect;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.Strategy;
@@ -28,11 +29,15 @@ public interface ModelStore {
 
     public List<Pool> listPools();
 
+    public List<Aspect> listCommonAspects();
+
     public Strategy findStrategy(String name);
 
     public VirtualServer findVirtualServer(String name);
 
     public Pool findPool(String name);
+
+    public Aspect findCommonAspect(String name);
 
     public void updateOrCreateStrategy(String name, Strategy strategy) throws BizException;
 
@@ -42,13 +47,15 @@ public interface ModelStore {
 
     public void removePool(String name) throws BizException;
 
+    public void saveCommonAspects(List<Aspect> aspects) throws BizException;
+
     public void updateVirtualServer(String name, VirtualServer virtualServer) throws BizException;
 
     public void removeVirtualServer(String name) throws BizException;
 
     public void addVirtualServer(String name, VirtualServer virtualServer) throws BizException;
 
-    public String tag(String name, int version, List<Pool> pools) throws BizException;
+    public String tag(String name, int version, List<Pool> pools, List<Aspect> aspects) throws BizException;
 
     public SlbModelTree getTag(String name, String tagId) throws BizException;
 

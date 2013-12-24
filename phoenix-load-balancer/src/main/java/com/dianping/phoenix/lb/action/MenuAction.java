@@ -9,8 +9,10 @@ import javax.annotation.PostConstruct;
 import org.apache.struts2.ServletActionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.dianping.phoenix.lb.model.entity.Aspect;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
+import com.dianping.phoenix.lb.service.model.CommonAspectService;
 import com.dianping.phoenix.lb.service.model.PoolService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.opensymphony.xwork2.ActionSupport;
@@ -40,7 +42,12 @@ public abstract class MenuAction extends ActionSupport {
     @Autowired
     protected PoolService          poolService;
 
+    @Autowired
+    protected CommonAspectService  commonAspectService;
+
     protected List<Pool>           pools;
+
+    protected List<Aspect>         commonAspects;
 
     protected List<VirtualServer>  virtualServers;
 
@@ -74,6 +81,7 @@ public abstract class MenuAction extends ActionSupport {
         }
         virtualServers = virtualServerService.listVirtualServers();
         pools = poolService.listPools();
+        commonAspects = commonAspectService.listCommonAspects();
     }
 
     public Map<String, Object> getDataMap() {
@@ -83,7 +91,7 @@ public abstract class MenuAction extends ActionSupport {
     public List<Pool> getPools() {
         return pools;
     }
-
+    
     public List<VirtualServer> getVirtualServers() {
         return virtualServers;
     }

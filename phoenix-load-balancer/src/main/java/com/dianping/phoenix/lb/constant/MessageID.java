@@ -17,6 +17,12 @@ public enum MessageID {
     STRATEGY_SAVE_FAIL("strategy_save_fail"), //
     STRATEGY_NAME_EMPTY("strategy_name_empty"), //
     STRATEGY_TYPE_EMPTY("strategy_type_empty"), //
+
+    COMMON_ASPECT_SAVE_FAIL("common_aspect_save_fail"), //
+    COMMON_ASPECT_NOT_FOUND("common_aspect_not_found"), //
+    COMMON_ASPECT_NAME_EMPTY("common_aspect_name_empty"), //
+    COMMON_ASPECT_REF_NOT_EMPTY("common_aspect_ref_not_empty"), //
+    COMMON_ASPECT_POINTCUT_NULL("common_aspect_pointcut_null"), //
     //
     VIRTUALSERVER_ALREADY_EXISTS("vs_already_exists"), //
     VIRTUALSERVER_SAVE_FAIL("vs_save_fail"), //

@@ -13,9 +13,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.dianping.phoenix.lb.dao.CommonAspectDao;
 import com.dianping.phoenix.lb.dao.PoolDao;
 import com.dianping.phoenix.lb.dao.StrategyDao;
 import com.dianping.phoenix.lb.dao.VirtualServerDao;
+import com.dianping.phoenix.lb.dao.impl.CommonAspectDaoImpl;
 import com.dianping.phoenix.lb.dao.impl.LocalFileModelStoreImpl;
 import com.dianping.phoenix.lb.dao.impl.PoolDaoImpl;
 import com.dianping.phoenix.lb.dao.impl.StrategyDaoImpl;
@@ -34,6 +36,7 @@ public class VirtualServerServiceImplTest {
     private VirtualServerService    virtualServerService;
     private VirtualServerDao        virtualServerDao;
     private StrategyDao             strategyDao;
+    private CommonAspectDao         commonAspectDao;
     private PoolDao                 poolDao;
     private DefaultNginxServiceImpl nginxService;
     private DefaultGitServiceImpl   gitService;
@@ -54,13 +57,15 @@ public class VirtualServerServiceImplTest {
 
         strategyDao = new StrategyDaoImpl(store);
         poolDao = new PoolDaoImpl(store);
+        commonAspectDao = new CommonAspectDaoImpl(store);
+
         gitService = new DefaultGitServiceImpl();
         gitService.init();
         nginxService = new DefaultNginxServiceImpl();
         nginxService.init();
 
-        virtualServerService = new VirtualServerServiceImpl(virtualServerDao, strategyDao, poolDao, nginxService,
-                gitService);
+        virtualServerService = new VirtualServerServiceImpl(virtualServerDao, strategyDao, poolDao, commonAspectDao,
+                nginxService, gitService);
     }
 
     @After
@@ -73,6 +78,6 @@ public class VirtualServerServiceImplTest {
 
     @Test
     public void testNginxConf() throws Exception {
-        System.out.println(virtualServerService.generateNginxConfig(virtualServerDao.find("www"), null));
+        System.out.println(virtualServerService.generateNginxConfig(virtualServerDao.find("www"), null, null));
     }
 }
