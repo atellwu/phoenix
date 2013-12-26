@@ -16,7 +16,7 @@
 	<retry-queue-safe-length>1000</retry-queue-safe-length>
 	<max-l1-cache-size>100000</max-l1-cache-size>
 	<max-retry-cache-size>10000</max-retry-cache-size>
-	<max-l2-cache-size>1000</max-l2-cache-size>
+	<max-l2-cache-size>100</max-l2-cache-size>
 	<record-file-timespan>300000</record-file-timespan>
 	<record-file-write-queue-size>100000</record-file-write-queue-size>
 	<record-file-tmp-dir>target/record-tmp/</record-file-tmp-dir>

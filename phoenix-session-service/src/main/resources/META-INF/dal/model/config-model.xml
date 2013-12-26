@@ -6,7 +6,7 @@
 		<element name="retry-queue-safe-length" value-type="int" default-value="1000" primitive="true" />
 		<element name="max-l1-cache-size" value-type="int" default-value="100000" primitive="true" />
 		<element name="max-retry-cache-size" value-type="int" default-value="10000" primitive="true" />
-		<element name="max-l2-cache-size" value-type="int" default-value="1000" primitive="true" />
+		<element name="max-l2-cache-size" value-type="int" default-value="100" primitive="true" />
 		<element name="record-file-timespan" value-type="int" default-value="300000" primitive="true" />
 		<element name="record-file-write-queue-size" value-type="int" default-value="100000" primitive="true" />
 		<element name="record-file-tmp-dir" value-type="String" default-value="target/record-tmp/" />
