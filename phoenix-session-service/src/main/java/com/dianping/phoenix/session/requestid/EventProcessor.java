@@ -260,7 +260,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 	}
 
 	private int slotForUrl(String urlDigest) {
-		if (urlDigest != null) {
+		if (urlDigest != null && urlDigest.length() >= 1) {
 			return urlDigest.charAt(urlDigest.length() - 1) % m_handlerTaskQueues.length;
 		} else {
 			return 0;
