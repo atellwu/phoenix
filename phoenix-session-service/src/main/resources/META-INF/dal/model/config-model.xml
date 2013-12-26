@@ -4,18 +4,18 @@
 		<element name="event-expire-time" value-type="int" default-value="30000" primitive="true" />
 		<element name="retry-queue-clean-interval" value-type="int" default-value="1000" primitive="true" />
 		<element name="retry-queue-safe-length" value-type="int" default-value="1000" primitive="true" />
-		<element name="max-l1-cache-size" value-type="int" default-value="1000" primitive="true" />
-		<element name="max-retry-cache-size" value-type="int" default-value="1000" primitive="true" />
+		<element name="max-l1-cache-size" value-type="int" default-value="100000" primitive="true" />
+		<element name="max-retry-cache-size" value-type="int" default-value="10000" primitive="true" />
 		<element name="max-l2-cache-size" value-type="int" default-value="1000" primitive="true" />
 		<element name="record-file-timespan" value-type="int" default-value="300000" primitive="true" />
-		<element name="record-file-write-queue-size" value-type="int" default-value="1000" primitive="true" />
+		<element name="record-file-write-queue-size" value-type="int" default-value="100000" primitive="true" />
 		<element name="record-file-tmp-dir" value-type="String" default-value="target/record-tmp/" />
 		<element name="record-file-target-dir" value-type="String" default-value="target/record-done/" />
 		<element name="record-file-write-queue-scan-interval" value-type="int" default-value="1000" primitive="true" />
-		<element name="record-file-write-stream-close-scan-interval" value-type="int" default-value="60000" primitive="true" />
+		<element name="record-file-write-stream-close-scan-interval" value-type="int" default-value="5000" primitive="true" />
 		<element name="record-file-write-stream-multiply" value-type="int" default-value="3" primitive="true" />
 		<element name="handler-task-threads" value-type="int" default-value="2" primitive="true" />
-		<element name="handler-task-queue-capacity" value-type="int" default-value="1000" primitive="true" />
+		<element name="handler-task-queue-capacity" value-type="int" default-value="10000" primitive="true" />
 		<element name="server-list-update-url" value-type="String" default-value="http://192.168.22.71/phoenix.txt" />
 	</entity>
 	<entity name="hdfs">

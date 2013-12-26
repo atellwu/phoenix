@@ -21,7 +21,6 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.junit.Before;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;
@@ -36,9 +35,28 @@ import com.dianping.data.warehouse.MarinPrinter;
 public class IntegrationTest extends ComponentTestCase {
 
 	private DefaultHttpClient m_hc = new DefaultHttpClient();
+	
+	public static void main(String[] args) throws Exception {
+	   new IntegrationTest().startServer();
+   }
 
-	@Before
-	public void before() throws Exception {
+	public void startServer() throws Exception {
+		File baseDir = new File("../phoenix-session-service/target/record-done");
+		Files.forDir().delete(baseDir, true);
+		findDpLogFile().delete();
+
+		Server server = new Server(8080);
+
+		WebAppContext webapp = new WebAppContext();
+		webapp.setContextPath("/");
+		webapp.setDescriptor("src/test/webapp/WEB-INF/web.xml");
+		webapp.setResourceBase("src/test/webapp/p");
+		webapp.setClassLoader(this.getClass().getClassLoader());
+		server.setHandler(webapp);
+
+		server.start();
+		
+		System.in.read();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -59,7 +77,7 @@ public class IntegrationTest extends ComponentTestCase {
 		server.setHandler(webapp);
 
 		server.start();
-
+		
 		sendRequest("1", null);
 		sendRequest("2", "1");
 		sendRequest("3", "1");
@@ -129,7 +147,7 @@ public class IntegrationTest extends ComponentTestCase {
 		String recLine4 = recLines.get(3);
 		assertEquals(req5Id, recReqId(recLine4));
 		assertEquals(req4Id, recReferReqId(recLine4));
-
+		
 	}
 
 	private File findDpLogFile() {

@@ -82,33 +82,8 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 	}
 
 	private void dispatchEvent(RequestEvent event) {
-		switch (event.getHop()) {
-		case HOP_CLIENT:
-			if (isEventExpired(event)) {
-				m_logger.info(String.format(
-				      "Receive expired RequestEvent %s from client, will not calculate refer request id", event));
-			} else {
-				if (event.getRefererUrlDigest() != null) {
-					offerToHandlerTaskQueue(event.getRefererUrlDigest(), event);
-				}
-			}
-
-			RequestEvent svrEvent = cloneToServerEvent(event);
-
-			if (!m_sendQ.offer(svrEvent)) {
-				m_logger.error(String.format("Send queue is full, can not send RequestEvent %s to other server", svrEvent));
-			}
-
-			offerToHandlerTaskQueue(event.getUrlDigest(), svrEvent);
-			break;
-
-		case HOP_SERVER:
-			offerToHandlerTaskQueue(event.getUrlDigest(), event);
-			break;
-
-		default:
-			m_logger.error(String.format("Unknown hop %d received, will ignore", event.getHop()));
-			break;
+		if (!m_handlerTaskQueues[slotForEvent(event)].offer(event)) {
+			m_logger.warn(String.format("Handler task queue is full, will discad %s", event));
 		}
 	}
 
@@ -153,12 +128,6 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 		return System.currentTimeMillis() > event.getTimestamp() + m_config.getEventExpireTime();
 	}
 
-	private void offerToHandlerTaskQueue(String digest, RequestEvent event) {
-		if (!m_handlerTaskQueues[slotForUrl(digest)].offer(event)) {
-			m_logger.warn(String.format("Handler task queue is full, will discad %s", event));
-		}
-	}
-
 	private void overrideEvent(RequestEvent curEvent, RequestEvent oldEvent) {
 		oldEvent.setHop(curEvent.getHop());
 		oldEvent.setRefererUrlDigest(curEvent.getRefererUrlDigest());
@@ -168,22 +137,35 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 	}
 
 	private void processClientEvent(RequestEvent curEvent) {
-		String userId = curEvent.getPhoenixId();
-		String refererUrlDigest = curEvent.getRefererUrlDigest();
 
-		ConcurrentMap<String, RequestEvent> l2Cache = m_l1Cache.get(userId);
-		if (refererUrlDigest != null) {
-			if (l2Cache != null) {
-				RequestEvent referEvent = l2Cache.get(refererUrlDigest);
-				if (referEvent != null) {
-					referEventFound(curEvent, referEvent);
+		RequestEvent svrEvent = cloneToServerEvent(curEvent);
+		if (!m_sendQ.offer(svrEvent)) {
+			m_logger.error(String.format("Send queue is full, can not send RequestEvent %s to other server", svrEvent));
+		}
+		processServerEvent(svrEvent);
+
+		if (isEventExpired(curEvent)) {
+			m_logger.info(String.format(
+			      "Receive expired RequestEvent %s from client, will not calculate refer request id", curEvent));
+		} else {
+			String refererUrlDigest = curEvent.getRefererUrlDigest();
+			if (refererUrlDigest != null) {
+				String phoenixId = curEvent.getPhoenixId();
+				ConcurrentMap<String, RequestEvent> l2Cache = m_l1Cache.get(phoenixId);
+
+				if (l2Cache != null) {
+					RequestEvent referEvent = l2Cache.get(refererUrlDigest);
+					if (referEvent != null) {
+						referEventFound(curEvent, referEvent);
+					} else {
+						referEventNotFound(curEvent);
+					}
 				} else {
 					referEventNotFound(curEvent);
 				}
-			} else {
-				referEventNotFound(curEvent);
 			}
 		}
+
 	}
 
 	private void processEvent(RequestEvent event) {
@@ -222,7 +204,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 			if (oldEvent == null) {
 				l2Cache.put(urlDigest, curEvent);
 			} else {
-				if (curEvent.getTimestamp() > oldEvent.getTimestamp()) {
+				if (curEvent.getTimestamp() >= oldEvent.getTimestamp()) {
 					overrideEvent(curEvent, oldEvent);
 				} else {
 					m_logger.info(String.format("RequestEvent %s received after %s", curEvent, oldEvent));
@@ -233,10 +215,16 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 	}
 
 	private void referEventFound(RequestEvent curEvent, RequestEvent referEvent) {
+		boolean success = true;
 		try {
-			m_recorder.recordEvent(curEvent, referEvent);
+			success = m_recorder.recordEvent(curEvent, referEvent);
 		} catch (Exception e) {
-			m_logger.error(String.format("Can not record event %s refer to %s", curEvent, referEvent), e);
+			success = false;
+			m_logger.error(String.format("Error record event %s refer to %s", curEvent, referEvent), e);
+		}
+		
+		if (!success) {
+			m_logger.error(String.format("Fail to record event %s refer to %s", curEvent, referEvent));
 		}
 	}
 
@@ -259,9 +247,10 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 		m_recorder = recorder;
 	}
 
-	private int slotForUrl(String urlDigest) {
-		if (urlDigest != null && urlDigest.length() >= 1) {
-			return urlDigest.charAt(urlDigest.length() - 1) % m_handlerTaskQueues.length;
+	private int slotForEvent(RequestEvent event) {
+		String phoenixId = event.getPhoenixId();
+		if (phoenixId != null && phoenixId.length() >= 1) {
+			return phoenixId.charAt(phoenixId.length() - 1) % m_handlerTaskQueues.length;
 		} else {
 			return 0;
 		}

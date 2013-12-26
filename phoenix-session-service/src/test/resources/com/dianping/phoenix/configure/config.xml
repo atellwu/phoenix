@@ -14,21 +14,17 @@
 	<event-expire-time>30000</event-expire-time>
 	<retry-queue-clean-interval>1000</retry-queue-clean-interval>
 	<retry-queue-safe-length>1000</retry-queue-safe-length>
-	<max-l1-cache-size>1000</max-l1-cache-size>
-	<max-retry-cache-size>1000</max-retry-cache-size>
+	<max-l1-cache-size>100000</max-l1-cache-size>
+	<max-retry-cache-size>10000</max-retry-cache-size>
 	<max-l2-cache-size>1000</max-l2-cache-size>
 	<record-file-timespan>300000</record-file-timespan>
-	<record-file-write-queue-size>1000</record-file-write-queue-size>
+	<record-file-write-queue-size>100000</record-file-write-queue-size>
 	<record-file-tmp-dir>target/record-tmp/</record-file-tmp-dir>
 	<record-file-target-dir>target/record-done/</record-file-target-dir>
-	<record-file-write-queue-scan-interval>1000
-	</record-file-write-queue-scan-interval>
-	<record-file-write-stream-close-scan-interval>60000
-	</record-file-write-stream-close-scan-interval>
-	<record-file-write-stream-multiply>3
-	</record-file-write-stream-multiply>
+	<record-file-write-queue-scan-interval>1000</record-file-write-queue-scan-interval>
+	<record-file-write-stream-close-scan-interval>5000</record-file-write-stream-close-scan-interval>
+	<record-file-write-stream-multiply>3</record-file-write-stream-multiply>
 	<handler-task-threads>2</handler-task-threads>
-	<handler-task-queue-capacity>1000</handler-task-queue-capacity>
-	<server-list-update-url>http://192.168.22.71/phoenix.txt
-	</server-list-update-url>
+	<handler-task-queue-capacity>10000</handler-task-queue-capacity>
+	<server-list-update-url>http://192.168.22.71/phoenix.txt</server-list-update-url>
 </config>
