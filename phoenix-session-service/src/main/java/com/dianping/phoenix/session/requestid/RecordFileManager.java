@@ -109,13 +109,15 @@ public class RecordFileManager implements Initializable, LogEnabled {
 				for (Map.Entry<Long, QueueAndOutputStream> entry : m_writeQueueCache.entrySet()) {
 					long aliveTime = m_config.getRecordFileTimespan() * m_config.getRecordFileWriteStreamMultiply();
 					long startTimestamp = entry.getKey();
+					QueueAndOutputStream queueAndStream = entry.getValue();
 					if (System.currentTimeMillis() > startTimestamp + aliveTime) {
 						m_logger.info(String.format("Closing stream of %d", startTimestamp));
 						m_writeQueueCache.remove(entry.getKey());
-						QueueAndOutputStream queueAndStream = entry.getValue();
 
 						queueAndStream.close();
 						queueAndStream.moveTmpFileToTarget();
+					} else {
+						queueAndStream.flush();
 					}
 				}
 
@@ -159,6 +161,14 @@ public class RecordFileManager implements Initializable, LogEnabled {
 				this.out.close();
 			} catch (IOException e) {
 				m_logger.error(String.format("Error when closing file(%s)!", this.file), e);
+			}
+		}
+		
+		public void flush() {
+			try {
+				this.out.flush();
+			} catch (IOException e) {
+				m_logger.error(String.format("Error when flushing file(%s)!", this.file), e);
 			}
 		}
 
