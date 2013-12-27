@@ -9,6 +9,7 @@ import org.unidal.lookup.ContainerLoader;
 import org.unidal.net.Sockets;
 import org.unidal.net.Sockets.SocketServer;
 
+import com.dianping.cat.Cat;
 import com.dianping.phoenix.configure.ConfigManager;
 import com.dianping.phoenix.session.RequestEventDelegate;
 import com.dianping.phoenix.session.requestid.serverevent.DefaultServerAddressManager;
@@ -21,6 +22,8 @@ public class Bootstrap implements ServletContextListener {
 	private final static int DEFAULT_PORT = 7377;
 
 	public final static String DISABLE_HDFS = "PHOENIX_SESSION_SERVICE_DISABLE_HDFS";
+	
+	private final static String CAT_CONFIG = "/data/appdatas/cat/client.xml";
 
 	private SocketServer m_server;
 
@@ -37,6 +40,9 @@ public class Bootstrap implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
+			
+			Cat.initialize(CAT_CONFIG);
+			
 			PlexusContainer container = ContainerLoader.getDefaultContainer();
 
 			String configFileInConfig = sce.getServletContext().getInitParameter("configFile");
