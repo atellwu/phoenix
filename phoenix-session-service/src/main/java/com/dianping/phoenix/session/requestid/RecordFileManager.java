@@ -149,7 +149,7 @@ public class RecordFileManager implements Initializable, LogEnabled {
 			this.path = path;
 			this.file = new File(m_config.getRecordFileTmpDir(), path);
 
-			if(!this.file.getParentFile().mkdirs()) {
+			if(!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
 				throw new RuntimeException("Can not create directory " + file.getParentFile().getCanonicalPath());
 			}
 
