@@ -9,8 +9,8 @@
 		<element name="max-l2-cache-size" value-type="int" default-value="100" primitive="true" />
 		<element name="record-file-timespan" value-type="int" default-value="300000" primitive="true" />
 		<element name="record-file-write-queue-size" value-type="int" default-value="100000" primitive="true" />
-		<record-file-tmp-dir>/data/appdatas/phoenix/record-tmp/</record-file-tmp-dir>
-		<record-file-target-dir>/data/appdatas/phoenix/record-done/</record-file-target-dir>
+		<element name="record-file-tmp-dir" value-type="String" default-value="/data/appdatas/phoenix/record-tmp/" />
+		<element name="record-file-target-dir" value-type="String" default-value="/data/appdatas/phoenix/record-done/" />
 		<element name="record-file-write-queue-scan-interval" value-type="int" default-value="1000" primitive="true" />
 		<element name="record-file-write-stream-close-scan-interval" value-type="int" default-value="5000" primitive="true" />
 		<element name="record-file-write-stream-multiply" value-type="int" default-value="3" primitive="true" />
