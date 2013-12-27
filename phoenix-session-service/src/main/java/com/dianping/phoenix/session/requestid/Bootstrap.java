@@ -1,5 +1,7 @@
 package com.dianping.phoenix.session.requestid;
 
+import java.io.File;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -21,7 +23,7 @@ public class Bootstrap implements ServletContextListener {
 
 	public final static String DISABLE_HDFS = "PHOENIX_SESSION_SERVICE_DISABLE_HDFS";
 
-	private final static String CAT_CONFIG = "/data/appdatas/cat/client.xml";
+	private final static File CAT_CONFIG = new File("/data/appdatas/cat/client.xml");
 
 	private SocketServer m_server;
 
