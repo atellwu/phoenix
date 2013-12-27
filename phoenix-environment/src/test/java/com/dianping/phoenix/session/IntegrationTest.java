@@ -21,7 +21,6 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.unidal.helper.Files;
@@ -57,10 +56,12 @@ public class IntegrationTest extends ComponentTestCase {
 		server.start();
 		
 		System.in.read();
+		
+		System.exit(0);
 	}
 
 	@SuppressWarnings("unchecked")
-	@Test
+//	@Test
 	public void test() throws Exception {
 
 		File baseDir = new File("../phoenix-session-service/target/record-done");

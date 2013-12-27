@@ -1,27 +1,24 @@
 package com.dianping.phoenix.session.server;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.unidal.helper.Files.IO;
-import org.unidal.helper.Threads.Task;
 import org.unidal.lookup.util.StringUtils;
 
-public class DefaultServerAddressManager implements ServerAddressManager, Initializable, LogEnabled, Task {
+import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.ConfigChange;
+import com.dianping.lion.client.LionException;
 
-	private final static String SERVER_LIST_UPDATE_URL = "http://192.168.22.71/phoenix.txt";
+public class DefaultServerAddressManager implements ServerAddressManager, Initializable, LogEnabled {
+
+	public final static String LION_KEY_SERVER_ADDRESS = "session-service.server.address";
 
 	private String m_serverString;
 
@@ -32,39 +29,11 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 	private List<AddressChangeListener> m_listeners = Collections
 	      .synchronizedList(new ArrayList<ServerAddressManager.AddressChangeListener>());
 
-	private DefaultHttpClient m_hc = new DefaultHttpClient();
-
-	private AtomicBoolean m_stop = new AtomicBoolean(false);
+	private ConfigCache lion;
 
 	@Override
 	public void enableLogging(Logger logger) {
 		m_logger = logger;
-	}
-
-	String fetchServerString(String reqUrl) {
-		String serverString = null;
-		try {
-			if (reqUrl.startsWith("http://")) {
-				serverString = fetchFromHttp(reqUrl);
-			} else if (reqUrl.startsWith("file:/")) {
-				serverString = fetchFromFile(reqUrl);
-			} else {
-				throw new RuntimeException(String.format("Unknown type of url %s", reqUrl));
-			}
-		} catch (Exception e) {
-			m_logger.error(String.format("Error fetch server list from %s", reqUrl), e);
-		}
-		return serverString;
-	}
-
-	private String fetchFromFile(String reqUrl) throws IOException {
-		return IO.INSTANCE.readFrom(new URL(reqUrl).openStream(), "utf-8");
-	}
-
-	private String fetchFromHttp(String reqUrl) throws Exception {
-		HttpGet req = new HttpGet(reqUrl);
-		HttpResponse res = m_hc.execute(req);
-		return IO.INSTANCE.readFrom(res.getEntity().getContent(), "utf-8");
 	}
 
 	@Override
@@ -77,7 +46,36 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 
 	@Override
 	public void initialize() throws InitializationException {
-		updateServerList(fetchServerString(SERVER_LIST_UPDATE_URL));
+
+		try {
+			lion = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
+		} catch (LionException e) {
+			m_logger.error("Error initialize lion", e);
+			throw new RuntimeException(e);
+		}
+
+		String serverAddr = null;
+		try {
+			serverAddr = lion.getProperty(LION_KEY_SERVER_ADDRESS);
+			if (serverAddr == null) {
+				m_logger.error("Error get server address from lion");
+				serverAddr = "127.0.0.1:7377";
+			}
+			lion.addChange(new ConfigChange() {
+
+				@Override
+				public void onChange(String key, String value) {
+					if (LION_KEY_SERVER_ADDRESS.equals(key)) {
+						updateServerList(value);
+					}
+				}
+			});
+		} catch (LionException e) {
+			m_logger.error("Error get server address from lion", e);
+			throw new RuntimeException(e);
+		}
+
+		updateServerList(serverAddr);
 	}
 
 	private void notifyListeners() {
@@ -121,29 +119,6 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 				notifyListeners();
 			}
 		}
-	}
-
-	@Override
-	public String getName() {
-		return getClass().getSimpleName();
-	}
-
-	@Override
-	public void run() {
-		while (!m_stop.get()) {
-			updateServerList(fetchServerString(SERVER_LIST_UPDATE_URL));
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				m_logger.info("Thread Interrupted, will exit");
-				break;
-			}
-		}
-	}
-
-	@Override
-	public void shutdown() {
-		m_stop.set(true);
 	}
 
 }

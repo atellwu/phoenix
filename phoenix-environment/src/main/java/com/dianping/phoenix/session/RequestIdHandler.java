@@ -8,16 +8,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.unidal.helper.Threads;
 import org.unidal.lookup.ContainerHolder;
 import org.unidal.lookup.annotation.Inject;
 
 import com.dianping.phoenix.environment.PhoenixContext;
 import com.dianping.phoenix.servlet.PhoenixFilterContext;
 import com.dianping.phoenix.servlet.PhoenixFilterHandler;
-import com.dianping.phoenix.session.server.DefaultServerAddressManager;
 import com.dianping.phoenix.session.server.DefaultEventPublisher;
-import com.dianping.phoenix.session.server.ServerAddressManager;
 import com.dianping.phoenix.session.server.EventPublisher;
 
 public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHandler, Initializable {
@@ -81,9 +78,6 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 	@Override
 	public void initialize() throws InitializationException {
 		m_queue = lookupById(RequestEventDelegate.class, "out");
-		
-		DefaultServerAddressManager addrMgr = (DefaultServerAddressManager) lookup(ServerAddressManager.class);
-		Threads.forGroup("Phoenix").start(addrMgr);
 		
 		DefaultEventPublisher eventPublisher = (DefaultEventPublisher) lookup(EventPublisher.class);
 		eventPublisher.start(m_queue);

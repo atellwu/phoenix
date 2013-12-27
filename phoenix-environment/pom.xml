@@ -9,15 +9,27 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>phoenix-environment</artifactId>
 	<name>phoenix-environment</name>
+	
+	<properties>
+		<env>dev</env>
+	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.unidal.framework</groupId>
 			<artifactId>foundation-service</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.2.3</version>
+			<groupId>com.dianping.lion</groupId>
+			<artifactId>lion-client</artifactId>
+			<version>0.3.4.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.lion</groupId>
+			<artifactId>lion-${env}</artifactId>
+			<version>1.0.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.unidal.framework</groupId>
