@@ -40,7 +40,7 @@ public class IntegrationTest extends ComponentTestCase {
    }
 
 	public void startServer() throws Exception {
-		File baseDir = new File("../phoenix-session-service/target/record-done");
+		File baseDir = new File("/data/appdatas/phoenix/record-done/");
 		Files.forDir().delete(baseDir, true);
 		findDpLogFile().delete();
 
@@ -64,7 +64,7 @@ public class IntegrationTest extends ComponentTestCase {
 //	@Test
 	public void test() throws Exception {
 
-		File baseDir = new File("../phoenix-session-service/target/record-done");
+		File baseDir = new File("/data/appdatas/phoenix/record-done/");
 		Files.forDir().delete(baseDir, true);
 		findDpLogFile().delete();
 
