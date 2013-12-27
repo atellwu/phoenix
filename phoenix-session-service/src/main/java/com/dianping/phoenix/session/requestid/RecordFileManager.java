@@ -2,7 +2,6 @@ package com.dianping.phoenix.session.requestid;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -143,12 +142,14 @@ public class RecordFileManager implements Initializable, LogEnabled {
 
 		private String path;
 
-		public QueueAndOutputStream(BlockingQueue<byte[]> queue, String path) throws FileNotFoundException {
+		public QueueAndOutputStream(BlockingQueue<byte[]> queue, String path) throws IOException {
 			this.queue = queue;
 			this.path = path;
 			this.file = new File(m_config.getRecordFileTmpDir(), path);
 
-			this.file.getParentFile().mkdirs();
+			if(!this.file.getParentFile().mkdirs()) {
+				throw new RuntimeException("Can not create directory " + file.getParentFile().getCanonicalPath());
+			}
 
 			this.out = new BufferedOutputStream(new FileOutputStream(this.file, true));
 		}
