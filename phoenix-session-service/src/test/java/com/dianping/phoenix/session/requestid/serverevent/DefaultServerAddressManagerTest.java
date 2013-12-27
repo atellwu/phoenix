@@ -2,15 +2,12 @@ package com.dianping.phoenix.session.requestid.serverevent;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
 
@@ -50,27 +47,4 @@ public class DefaultServerAddressManagerTest extends ComponentTestCase {
 
 	}
 	
-	@Test
-	public void shouldGetUpdateFromFile() throws IOException {
-		File file = File.createTempFile("phoenix-session-server", "xxx");
-		String serverString = "10.1.1.1:1111,10.1.1.2:2222";
-		FileUtils.write(file, serverString);
-		
-		mgr = (DefaultServerAddressManager) lookup(ServerAddressManager.class);
-		
-		String actualServerString = mgr.fetchServerString("file://" + file.getCanonicalPath());
-		
-		assertEquals(serverString, actualServerString);
-	}
-	
-	public void shouldGetUpdateFromHttp() throws IOException {
-		String serverString = "10.1.1.1:1111,10.1.1.2:2222";
-		
-		mgr = (DefaultServerAddressManager) lookup(ServerAddressManager.class);
-		
-		String actualServerString = mgr.fetchServerString("http://192.168.22.71/phoenix.txt");
-		
-		assertEquals(serverString, actualServerString);
-	}
-
 }

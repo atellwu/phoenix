@@ -12,9 +12,7 @@ import org.unidal.net.Sockets.SocketServer;
 import com.dianping.cat.Cat;
 import com.dianping.phoenix.configure.ConfigManager;
 import com.dianping.phoenix.session.RequestEventDelegate;
-import com.dianping.phoenix.session.requestid.serverevent.DefaultServerAddressManager;
 import com.dianping.phoenix.session.server.DefaultEventPublisher;
-import com.dianping.phoenix.session.server.ServerAddressManager;
 import com.dianping.phoenix.session.server.EventPublisher;
 
 public class Bootstrap implements ServletContextListener {
@@ -22,7 +20,7 @@ public class Bootstrap implements ServletContextListener {
 	private final static int DEFAULT_PORT = 7377;
 
 	public final static String DISABLE_HDFS = "PHOENIX_SESSION_SERVICE_DISABLE_HDFS";
-	
+
 	private final static String CAT_CONFIG = "/data/appdatas/cat/client.xml";
 
 	private SocketServer m_server;
@@ -31,8 +29,6 @@ public class Bootstrap implements ServletContextListener {
 
 	private FileUploader m_uploader;
 
-	private DefaultServerAddressManager m_serverAddrMgr;
-
 	private DefaultEventPublisher m_serverEventPublisher;
 
 	private ConfigManager m_config;
@@ -40,9 +36,9 @@ public class Bootstrap implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
-			
+
 			Cat.initialize(CAT_CONFIG);
-			
+
 			PlexusContainer container = ContainerLoader.getDefaultContainer();
 
 			String configFileInConfig = sce.getServletContext().getInitParameter("configFile");
@@ -73,9 +69,6 @@ public class Bootstrap implements ServletContextListener {
 
 			m_server = Sockets.forServer().listenOn(port).threads("RequestID", 0).start(manager.getIn());
 
-			m_serverAddrMgr = (DefaultServerAddressManager) container.lookup(ServerAddressManager.class);
-			Threads.forGroup("Phoenix").start(m_serverAddrMgr);
-
 			m_serverEventPublisher = (DefaultEventPublisher) container.lookup(EventPublisher.class);
 			RequestEventDelegate eventSource = container.lookup(EventDelegateManager.class).getOut();
 			m_serverEventPublisher.start(eventSource);
@@ -105,8 +98,5 @@ public class Bootstrap implements ServletContextListener {
 			m_uploader.shutdown();
 		}
 
-		if (m_serverAddrMgr != null) {
-			m_serverAddrMgr.shutdown();
-		}
 	}
 }

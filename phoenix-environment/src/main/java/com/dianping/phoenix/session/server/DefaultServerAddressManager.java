@@ -47,35 +47,36 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 	@Override
 	public void initialize() throws InitializationException {
 
-		try {
-			lion = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
-		} catch (LionException e) {
-			m_logger.error("Error initialize lion", e);
-			throw new RuntimeException(e);
-		}
-
 		String serverAddr = null;
 		try {
-			serverAddr = lion.getProperty(LION_KEY_SERVER_ADDRESS);
-			if (serverAddr == null) {
-				m_logger.error("Error get server address from lion");
-				serverAddr = "127.0.0.1:7377";
-			}
-			lion.addChange(new ConfigChange() {
-
-				@Override
-				public void onChange(String key, String value) {
-					if (LION_KEY_SERVER_ADDRESS.equals(key)) {
-						updateServerList(value);
-					}
-				}
-			});
+			serverAddr = getConfigFromLion();
 		} catch (LionException e) {
-			m_logger.error("Error get server address from lion", e);
+			m_logger.error("Error get config from lion", e);
 			throw new RuntimeException(e);
 		}
 
 		updateServerList(serverAddr);
+	}
+
+	private String getConfigFromLion() throws LionException {
+		lion = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
+
+		String serverAddr = null;
+		serverAddr = lion.getProperty(LION_KEY_SERVER_ADDRESS);
+		if (serverAddr == null) {
+			m_logger.error("Error get server address from lion");
+			serverAddr = "127.0.0.1:7377";
+		}
+		lion.addChange(new ConfigChange() {
+
+			@Override
+			public void onChange(String key, String value) {
+				if (LION_KEY_SERVER_ADDRESS.equals(key)) {
+					updateServerList(value);
+				}
+			}
+		});
+		return serverAddr;
 	}
 
 	private void notifyListeners() {

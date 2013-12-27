@@ -1,34 +1,32 @@
 package com.dianping.phoenix.session.requestid.serverevent;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.unidal.helper.Files.IO;
-import org.unidal.helper.Threads.Task;
 import org.unidal.lookup.annotation.Inject;
 import org.unidal.lookup.util.StringUtils;
 
+import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.ConfigChange;
+import com.dianping.lion.client.LionException;
 import com.dianping.phoenix.configure.ConfigManager;
 import com.dianping.phoenix.session.server.ServerAddressManager;
 import com.dianping.phoenix.session.util.NetworkUtil;
 
-public class DefaultServerAddressManager implements ServerAddressManager, Initializable, LogEnabled, Task {
+public class DefaultServerAddressManager implements ServerAddressManager, Initializable, LogEnabled {
+	
+	public final static String LION_KEY_SERVER_ADDRESS = "session-service.server.address";
 
 	private String m_serverString;
 
@@ -43,40 +41,12 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 	      .synchronizedList(new ArrayList<ServerAddressManager.AddressChangeListener>());
 
 	private Set<InetAddress> m_localIps = new HashSet<InetAddress>();
-
-	private DefaultHttpClient m_hc = new DefaultHttpClient();
-
-	private AtomicBoolean m_stop = new AtomicBoolean(false);
+	
+	private ConfigCache lion;
 
 	@Override
 	public void enableLogging(Logger logger) {
 		m_logger = logger;
-	}
-
-	String fetchServerString(String reqUrl) {
-		String serverString = null;
-		try {
-			if (reqUrl.startsWith("http://")) {
-				serverString = fetchFromHttp(reqUrl);
-			} else if (reqUrl.startsWith("file:/")) {
-				serverString = fetchFromFile(reqUrl);
-			} else {
-				throw new RuntimeException(String.format("Unknown type of url %s", reqUrl));
-			}
-		} catch (Exception e) {
-			m_logger.error(String.format("Error fetch server list from %s", reqUrl), e);
-		}
-		return serverString;
-	}
-
-	private String fetchFromFile(String reqUrl) throws IOException {
-		return IO.INSTANCE.readFrom(new URL(reqUrl).openStream(), "utf-8");
-	}
-
-	private String fetchFromHttp(String reqUrl) throws Exception {
-		HttpGet req = new HttpGet(reqUrl);
-		HttpResponse res = m_hc.execute(req);
-		return IO.INSTANCE.readFrom(res.getEntity().getContent(), "utf-8");
 	}
 
 	List<InetAddress> getLocalIps() {
@@ -95,7 +65,38 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 	public void initialize() throws InitializationException {
 		m_localIps.addAll(getLocalIps());
 		m_logger.info("Local ips " + m_localIps);
-		updateServerList(fetchServerString(m_config.getServerListUpdateUrl()));
+		
+		String serverAddr = null;
+		try {
+			serverAddr = getConfigFromLion();
+		} catch (LionException e) {
+			m_logger.error("Error get config from lion", e);
+			throw new RuntimeException(e);
+		}
+
+		updateServerList(serverAddr);		
+		
+	}
+	
+	private String getConfigFromLion() throws LionException {
+		lion = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
+
+		String serverAddr = null;
+		serverAddr = lion.getProperty(LION_KEY_SERVER_ADDRESS);
+		if (serverAddr == null) {
+			m_logger.error("Error get server address from lion");
+			throw new RuntimeException("Can not get server address from lion");
+		}
+		lion.addChange(new ConfigChange() {
+
+			@Override
+			public void onChange(String key, String value) {
+				if (LION_KEY_SERVER_ADDRESS.equals(key)) {
+					updateServerList(value);
+				}
+			}
+		});
+		return serverAddr;
 	}
 
 	private void notifyListeners() {
@@ -145,29 +146,6 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 				notifyListeners();
 			}
 		}
-	}
-
-	@Override
-	public String getName() {
-		return getClass().getSimpleName();
-	}
-
-	@Override
-	public void run() {
-		while (!m_stop.get()) {
-			updateServerList(fetchServerString(m_config.getServerListUpdateUrl()));
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				m_logger.info("Thread Interrupted, will exit");
-				break;
-			}
-		}
-	}
-
-	@Override
-	public void shutdown() {
-		m_stop.set(true);
 	}
 
 }
