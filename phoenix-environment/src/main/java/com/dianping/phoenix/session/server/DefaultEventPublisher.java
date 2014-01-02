@@ -143,7 +143,11 @@ public class DefaultEventPublisher implements Initializable, LogEnabled, EventPu
 		public void run() {
 			while (!m_stop.get()) {
 				if (m_serverListUpdated.compareAndSet(true, false)) {
-					updateServerConnections(m_newAddrList.get());
+					try {
+						updateServerConnections(m_newAddrList.get());
+					} catch (Exception e) {
+						m_logger.error("Error update server connections", e);
+					}
 				} else {
 					try {
 						Thread.sleep(1000);
