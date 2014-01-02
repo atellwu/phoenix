@@ -154,6 +154,8 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 	}
 
 	private void setCookie(HttpServletResponse res, String cookieName, String cookieValue) {
-		res.addCookie(new Cookie(cookieName, cookieValue));
+		Cookie cookie = new Cookie(cookieName, cookieValue);
+		cookie.setPath("/");
+		res.addCookie(cookie);
 	}
 }
