@@ -27,7 +27,7 @@ $nginx.properties($config.server.properties)
 #end
 
 #foreach( $location in $config.server.locations)
-        location $nginx.locationMatchOp($location.matchType) $location.pattern {
+        location $nginx.locationMatchOp($location.matchType) $nginx.rewriteLocationIfNeeded($location.matchType, $location.pattern) {
 #foreach( $directive in $location.directives)
             $nginx.directive($config.name,$directive)
 #end
