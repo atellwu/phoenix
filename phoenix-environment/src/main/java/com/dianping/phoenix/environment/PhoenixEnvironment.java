@@ -8,7 +8,7 @@ package com.dianping.phoenix.environment;
  */
 public class PhoenixEnvironment {
 
-	public static final String ENV = "phoenix-env";
+	public static final String ENV = "phoenix";
 
 	private String m_requestId;
 
