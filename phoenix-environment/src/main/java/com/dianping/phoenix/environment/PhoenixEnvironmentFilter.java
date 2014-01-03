@@ -14,6 +14,9 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.unidal.lookup.logger.LoggerFactory;
 import org.unidal.net.Networks;
 
+import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.LionException;
 import com.dianping.phoenix.servlet.PhoenixFilterContext;
 import com.dianping.phoenix.servlet.PhoenixFilterHandler;
 
@@ -21,6 +24,8 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 	private final Logger m_logger = LoggerFactory.getLogger(PhoenixEnvironmentFilter.class);
 
 	public static final String PHOENIX_ID_COOKIE_NAME = "PHOENIX_ID";
+
+	public static final String LION_KEY_COOKIE_DOMAIN = "session-service.cookie.domain";
 
 	private final static char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
 
@@ -31,6 +36,8 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 	private AtomicInteger m_req_index = new AtomicInteger(0);
 
 	private AtomicInteger m_phoenix_id_index = new AtomicInteger(0);
+
+	private String m_cookieDomain;
 
 	private String bytesToHex(byte[] bytes) {
 		char[] hexChars = new char[bytes.length * 2];
@@ -121,11 +128,10 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 				// request.setAttribute(PhoenixEnvironment.ENV, new PhoenixEnvironment());
 				requestId = generateRequestId();
 			}
-			
 
 			String phoenixId = getOrCreatePhoenixId(req, res);
 			PhoenixContext.getInstance().setGuid(phoenixId);
-			
+
 			req.setAttribute(PhoenixEnvironment.ENV, new PhoenixEnvironment(requestId, phoenixId));
 
 			// 将id放入ThreadLocal
@@ -151,11 +157,33 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 	@Override
 	public void initialize() throws InitializationException {
 		m_ip = bytesToHex(Networks.forIp().getLocalAddress());
+		m_cookieDomain = readCookieDomain();
+	}
+
+	private String readCookieDomain() {
+		ConfigCache lion = null;
+		String domain = null;
+		
+		try {
+			lion = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
+			domain = lion.getProperty(LION_KEY_COOKIE_DOMAIN);
+		} catch (LionException e) {
+			m_logger.error("Error read cookie domain from lion", e);
+			throw new RuntimeException(e);
+		}
+
+		if (domain == null) {
+			throw new RuntimeException("Cookie domain from lion is null");
+		}
+
+		return domain;
+
 	}
 
 	private void setCookie(HttpServletResponse res, String cookieName, String cookieValue) {
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		cookie.setPath("/");
+		cookie.setDomain(m_cookieDomain);
 		res.addCookie(cookie);
 	}
 }
