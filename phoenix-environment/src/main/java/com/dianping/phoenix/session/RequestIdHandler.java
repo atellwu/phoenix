@@ -59,8 +59,14 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 	private String getUrlDigest(PhoenixFilterContext ctx) {
 		HttpServletRequest req = ctx.getHttpServletRequest();
 		String url = req.getRequestURL().toString();
+		String queryString = req.getQueryString();
+		
+		String fullUrl = url;
+		if (queryString != null) {
+			fullUrl = fullUrl + "?" + queryString;
+		}
 
-		return sha1(url);
+		return sha1(fullUrl);
 	}
 
 	@Override
@@ -72,13 +78,13 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 
 		// pass to next Phoenix filter handler or servlet filter
 		ctx.doFilter();
-		
+
 	}
 
 	@Override
 	public void initialize() throws InitializationException {
 		m_queue = lookupById(RequestEventDelegate.class, "out");
-		
+
 		DefaultEventPublisher eventPublisher = (DefaultEventPublisher) lookup(EventPublisher.class);
 		eventPublisher.start(m_queue);
 	}
