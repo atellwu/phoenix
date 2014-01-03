@@ -89,9 +89,6 @@ public class DefaultTaskExecutor implements TaskExecutor {
         public void run() {
             LOG.info("Task " + DefaultTaskExecutor.this.deployTaskBo.getTask().getName() + " begin.");
 
-            // 每次启动，都使用新的agentId
-            deployTaskBo.setAgentId(agentSequenceService.getAgentId());
-
             executor = Executors.newCachedThreadPool();
 
             //获取接下来要发布的vs和agent
@@ -160,7 +157,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
         //创建Agent执行者
         Map<String, AgentClient> agentClients = new HashMap<String, AgentClient>();
         for (DeployAgentBo deployAgentBo : deployAgentBos.values()) {
-            long agentId = deployTaskBo.getAgentId();
+            long agentId = agentSequenceService.getAgentId();
             String vsName = deployVsBo.getDeployVs().getVsName();
             String vsTag = deployVsBo.getDeployVs().getVsTag();
             String ip = deployAgentBo.getDeployAgent().getIpAddress();
