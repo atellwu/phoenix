@@ -12,6 +12,7 @@ import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.Aspect;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
+import com.dianping.phoenix.lb.model.entity.SlbPool;
 import com.dianping.phoenix.lb.model.entity.Strategy;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 
@@ -29,6 +30,8 @@ public interface ModelStore {
 
     public List<Pool> listPools();
 
+    public List<SlbPool> listSlbPools();
+
     public List<Aspect> listCommonAspects();
 
     public Strategy findStrategy(String name);
@@ -37,11 +40,17 @@ public interface ModelStore {
 
     public Pool findPool(String name);
 
+    public SlbPool findSlbPool(String name);
+
     public Aspect findCommonAspect(String name);
 
     public void updateOrCreateStrategy(String name, Strategy strategy) throws BizException;
 
     public void removeStrategy(String name) throws BizException;
+    
+    public void updateOrCreateSlbPool(String name, SlbPool slbPool) throws BizException;
+
+    public void removeSlbPool(String name) throws BizException;
 
     public void updateOrCreatePool(String name, Pool pool) throws BizException;
 

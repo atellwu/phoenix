@@ -79,4 +79,10 @@
 			<directive type="more_set_headers" value="'server : nginx'"/>
 		</aspect>
 	</aspects>
+	<slb-pools>
+		<slb-pool name="test-pool">
+			<instance ip="10.2.1.1" />
+			<instance ip="10.2.1.2" />
+		</slb-pool>
+	</slb-pools>
 </slb-model-tree>

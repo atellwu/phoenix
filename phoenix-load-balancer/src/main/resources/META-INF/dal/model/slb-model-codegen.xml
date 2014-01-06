@@ -4,6 +4,7 @@
     <entity-ref name="strategy" type="list" names="strategies" xml-indent="true" />
     <entity-ref name="pool" type="list" names="pools" xml-indent="true" />
     <entity-ref name="aspect" type="list" names="aspects" xml-indent="true" />
+    <entity-ref name="slb-pool" type="list" names="slb-pools" xml-indent="true" />
     <entity-ref name="virtualServer" type="list" names="virtualServers" />
   </entity>
   <entity name="strategy">
@@ -50,6 +51,13 @@
     <attribute name="root-doc" value-type="String" />
     <attribute name="expires" value-type="String" />
   </entity>
+  <entity name="slb-pool">
+    <attribute name="name" value-type="String" />
+    <entity-ref name="instance" type="list" names="instances" />
+  </entity>
+  <entity name="instance">
+    <attribute name="ip" value-type="String" />
+  </entity>
   <entity name="virtualServer">
     <attribute name="name" value-type="String" />
     <attribute name="state" value-type="String" />
@@ -61,12 +69,10 @@
     <attribute name="last-modified-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
     <attribute name="version" value-type="int" />
     <attribute name="access_log" value-type="String" />
-    <entity-ref name="instance" type="list" names="instances" xml-indent="true" />
+    <attribute name="group" value-type="String" />
+    <attribute name="slb-pool" value-type="String" />
     <entity-ref name="aspect" type="list" names="aspects" xml-indent="true" />
     <entity-ref name="location" type="list" names="locations" xml-indent="true" />
-  </entity>
-  <entity name="instance">
-    <attribute name="ip" value-type="String" />
   </entity>
   <entity name="location">
     <attribute name="match-type" value-type="String" />

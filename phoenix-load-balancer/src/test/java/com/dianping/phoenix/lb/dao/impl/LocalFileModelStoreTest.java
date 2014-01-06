@@ -34,6 +34,7 @@ import com.dianping.phoenix.lb.model.entity.Location;
 import com.dianping.phoenix.lb.model.entity.Member;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
+import com.dianping.phoenix.lb.model.entity.SlbPool;
 import com.dianping.phoenix.lb.model.entity.Strategy;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.model.transform.DefaultMerger;
@@ -97,6 +98,14 @@ public class LocalFileModelStoreTest {
     }
 
     @Test
+    public void testListSlbPools() throws Exception {
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+
+        assertEquals(new ArrayList<SlbPool>(slbModelTree.getSlbPools().values()), store.listSlbPools());
+    }
+
+    @Test
     public void testListCommonAspectss() throws Exception {
         SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
                 .readFileToString(new File(baseDir, "slb_base.xml")));
@@ -118,6 +127,16 @@ public class LocalFileModelStoreTest {
                 .readFileToString(new File(baseDir, "slb_base.xml")));
         Strategy expected = slbModelTree.findStrategy("uri-hash");
         Assert.assertTrue(EqualsBuilder.reflectionEquals(expected, store.findStrategy("uri-hash"), true));
+    }
+
+    @Test
+    public void testFindSlbPool() throws Exception {
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        SlbPool expected = slbModelTree.findSlbPool("test-pool");
+        Assert.assertTrue(EqualsBuilder.reflectionEquals(expected, store.findSlbPool("test-pool"), true));
+        expected = slbModelTree.findSlbPool("test-pool2");
+        Assert.assertTrue(EqualsBuilder.reflectionEquals(expected, store.findSlbPool("test-pool2"), true));
     }
 
     @Test
@@ -194,6 +213,27 @@ public class LocalFileModelStoreTest {
         assertEquals(new ArrayList<Pool>(slbModelTree.getPools().values()), store.listPools());
         Assert.assertNotNull(pool.getCreationDate());
         Assert.assertEquals(pool.getLastModifiedDate(), pool.getCreationDate());
+
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+    }
+
+    @Test
+    public void testAddSlbPool() throws Exception {
+        SlbPool slbPool = new SlbPool("ut-pool");
+
+        Instance instance = new Instance();
+        instance.setIp("1.1.1.1");
+        slbPool.addInstance(instance);
+        store.updateOrCreateSlbPool("ut-pool", slbPool);
+
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+
+        slbModelTree.addSlbPool(slbPool);
+
+        assertEquals(new ArrayList<SlbPool>(slbModelTree.getSlbPools().values()), store.listSlbPools());
 
         assertEquals(slbModelTree, "slb_base.xml");
         assertRawFileNotChanged("slb_www.xml");
@@ -291,6 +331,29 @@ public class LocalFileModelStoreTest {
     }
 
     @Test
+    public void testUpdateSlbPool() throws Exception {
+        SlbPool modifiedPool = new SlbPool("test-pool");
+        Instance instance = new Instance();
+        instance.setIp("2.2.2.2");
+        modifiedPool.addInstance(instance);
+
+        store.updateOrCreateSlbPool("test-pool", modifiedPool);
+
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+
+        SlbPool expectedPool = slbModelTree.findSlbPool("test-pool");
+        expectedPool.getInstances().clear();
+        expectedPool.addInstance(instance);
+
+        assertEquals(new ArrayList<SlbPool>(slbModelTree.getSlbPools().values()), store.listSlbPools());
+
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+    }
+
+    @Test
     public void testSaveAspectsRollback() throws Exception {
         new File(tmpDir, "slb_base.xml").setWritable(false);
         List<Aspect> aspects = new ArrayList<Aspect>();
@@ -356,6 +419,34 @@ public class LocalFileModelStoreTest {
     }
 
     @Test
+    public void testAddSlbPoolRollback() throws Exception {
+        new File(tmpDir, "slb_base.xml").setWritable(false);
+
+        SlbPool slbPool = new SlbPool("aaa");
+        Instance instance = new Instance();
+        instance.setIp("0.0.0.0");
+        slbPool.addInstance(instance);
+
+        try {
+            store.updateOrCreateSlbPool("aaa", slbPool);
+            Assert.fail();
+        } catch (BizException e) {
+            Assert.assertEquals(MessageID.SLBPOOL_SAVE_FAIL, e.getMessageId());
+        } catch (Exception e) {
+            Assert.fail();
+        }
+
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+
+        assertEquals(new ArrayList<SlbPool>(slbModelTree.getSlbPools().values()), store.listSlbPools());
+
+        assertRawFileNotChanged("slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+    }
+
+    @Test
     public void testUpdateStrategyRollback() throws Exception {
         new File(tmpDir, "slb_base.xml").setWritable(false);
 
@@ -383,6 +474,33 @@ public class LocalFileModelStoreTest {
         assertRawFileNotChanged("slb_tuangou.xml");
     }
 
+    public void testUpdateSlbPoolRollback() throws Exception {
+        new File(tmpDir, "slb_base.xml").setWritable(false);
+
+        SlbPool slbPool = new SlbPool("test-pool");
+        Instance instance = new Instance();
+        instance.setIp("0.0.0.0");
+        slbPool.addInstance(instance);
+
+        try {
+            store.updateOrCreateSlbPool("test-pool", slbPool);
+            Assert.fail();
+        } catch (BizException e) {
+            Assert.assertEquals(MessageID.SLBPOOL_SAVE_FAIL, e.getMessageId());
+        } catch (Exception e) {
+            Assert.fail();
+        }
+
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+
+        assertEquals(new ArrayList<SlbPool>(slbModelTree.getSlbPools().values()), store.listSlbPools());
+
+        assertRawFileNotChanged("slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+    }
+
     @Test
     public void testRemoveStrategy() throws Exception {
         store.removeStrategy("uri-hash");
@@ -392,6 +510,21 @@ public class LocalFileModelStoreTest {
         slbModelTree.removeStrategy("uri-hash");
 
         assertEquals(new ArrayList<Strategy>(slbModelTree.getStrategies().values()), store.listStrategies());
+
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+    }
+
+    @Test
+    public void testRemoveSlbPool() throws Exception {
+        store.removeSlbPool("test-pool");
+
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+        slbModelTree.removeSlbPool("test-pool");
+
+        assertEquals(new ArrayList<SlbPool>(slbModelTree.getSlbPools().values()), store.listSlbPools());
 
         assertEquals(slbModelTree, "slb_base.xml");
         assertRawFileNotChanged("slb_www.xml");
@@ -438,13 +571,34 @@ public class LocalFileModelStoreTest {
     }
 
     @Test
+    public void testRemoveSlbPoolRollback() throws Exception {
+        new File(tmpDir, "slb_base.xml").setWritable(false);
+
+        try {
+            store.removeSlbPool("test-pool");
+            Assert.fail();
+        } catch (BizException e) {
+            Assert.assertEquals(MessageID.SLBPOOL_SAVE_FAIL, e.getMessageId());
+        } catch (Exception e) {
+            Assert.fail();
+        }
+
+        SlbModelTree slbModelTree = DefaultSaxParser.parse(FileUtils
+                .readFileToString(new File(baseDir, "slb_base.xml")));
+
+        assertEquals(new ArrayList<SlbPool>(slbModelTree.getSlbPools().values()), store.listSlbPools());
+
+        assertEquals(slbModelTree, "slb_base.xml");
+        assertRawFileNotChanged("slb_base.xml");
+        assertRawFileNotChanged("slb_www.xml");
+        assertRawFileNotChanged("slb_tuangou.xml");
+    }
+
+    @Test
     public void testUpdateVirtualServer() throws Exception {
 
         VirtualServer newVirtualServer = DefaultSaxParser.parse(
                 FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))).findVirtualServer("www");
-        Instance newInstance = new Instance();
-        newInstance.setIp("10.1.2.5");
-        newVirtualServer.addInstance(newInstance);
         newVirtualServer.setAvailability(Availability.OFFLINE);
         newVirtualServer.setState(State.DISABLED);
         newVirtualServer.setDefaultPoolName("test-pool");
@@ -494,9 +648,6 @@ public class LocalFileModelStoreTest {
 
         VirtualServer newVirtualServer = DefaultSaxParser.parse(
                 FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))).findVirtualServer("www");
-        Instance newInstance = new Instance();
-        newInstance.setIp("10.1.2.5");
-        newVirtualServer.addInstance(newInstance);
         newVirtualServer.setAvailability(Availability.OFFLINE);
         newVirtualServer.setState(State.DISABLED);
         newVirtualServer.setDefaultPoolName("test-pool");
@@ -521,9 +672,6 @@ public class LocalFileModelStoreTest {
         // modify concurrent
         VirtualServer newVirtualServer1 = DefaultSaxParser.parse(
                 FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))).findVirtualServer("www");
-        Instance newInstance1 = new Instance();
-        newInstance1.setIp("10.1.2.5");
-        newVirtualServer1.addInstance(newInstance1);
         newVirtualServer1.setAvailability(Availability.OFFLINE);
         newVirtualServer1.setState(State.DISABLED);
         newVirtualServer1.setDefaultPoolName("test-pool1");
@@ -577,9 +725,6 @@ public class LocalFileModelStoreTest {
 
         VirtualServer newVirtualServer = DefaultSaxParser.parse(
                 FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))).findVirtualServer("www");
-        Instance newInstance = new Instance();
-        newInstance.setIp("10.1.2.5");
-        newVirtualServer.addInstance(newInstance);
         newVirtualServer.setAvailability(Availability.OFFLINE);
         newVirtualServer.setState(State.DISABLED);
         newVirtualServer.setDefaultPoolName("test-pool");
@@ -623,9 +768,6 @@ public class LocalFileModelStoreTest {
 
         VirtualServer newVirtualServer = DefaultSaxParser.parse(
                 FileUtils.readFileToString(new File(baseDir, "slb_www.xml"))).findVirtualServer("www");
-        Instance newInstance = new Instance();
-        newInstance.setIp("10.1.2.5");
-        newVirtualServer.addInstance(newInstance);
         newVirtualServer.setAvailability(Availability.OFFLINE);
         newVirtualServer.setState(State.DISABLED);
         newVirtualServer.setDefaultPoolName("test-pool");
@@ -665,9 +807,6 @@ public class LocalFileModelStoreTest {
     @Test
     public void testAddVirtualServer() throws Exception {
         VirtualServer newVirtualServer = new VirtualServer("testVs");
-        Instance newInstance = new Instance();
-        newInstance.setIp("10.1.2.5");
-        newVirtualServer.addInstance(newInstance);
         newVirtualServer.setAvailability(Availability.OFFLINE);
         newVirtualServer.setState(State.DISABLED);
         newVirtualServer.setDefaultPoolName("test-pool");
@@ -723,9 +862,6 @@ public class LocalFileModelStoreTest {
     @Test
     public void testAddVirtualServerExists() throws Exception {
         VirtualServer newVirtualServer = new VirtualServer("www");
-        Instance newInstance = new Instance();
-        newInstance.setIp("10.1.2.5");
-        newVirtualServer.addInstance(newInstance);
         newVirtualServer.setAvailability(Availability.OFFLINE);
         newVirtualServer.setState(State.DISABLED);
         newVirtualServer.setDefaultPoolName("test-pool");
@@ -770,9 +906,6 @@ public class LocalFileModelStoreTest {
         tmpDir.setWritable(false);
 
         VirtualServer newVirtualServer = new VirtualServer("test");
-        Instance newInstance = new Instance();
-        newInstance.setIp("10.1.2.5");
-        newVirtualServer.addInstance(newInstance);
         newVirtualServer.setAvailability(Availability.OFFLINE);
         newVirtualServer.setState(State.DISABLED);
         newVirtualServer.setDefaultPoolName("test-pool");

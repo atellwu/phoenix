@@ -1,10 +1,6 @@
 <slb-model-tree>
     <virtualServer name="www" state="ENABLED" availability="AVAILABLE" default-pool-name="Web.Index" domain="www.dianping.com"
-        port="80" creation-date="2013-10-15 16:40:00" last-modified-date="2013-10-15 16:40:00" version="1" access_log="logs/domain2.access.log  main">
-        <instances>
-            <instance ip="10.2.1.3" />
-            <instance ip="10.2.1.4" />
-        </instances>
+        port="80" creation-date="2013-10-15 16:40:00" last-modified-date="2013-10-15 16:40:00" version="1" access_log="logs/domain2.access.log  main" slb-pool="test-pool">
         <locations>
             <location match-type="prefix" pattern="/download">
                 <directive type="rewrite" matches="^(/download/.*)/media/(.*)\..*$" target-pattern="$1/mp3/$2.mp3" flag="break" />
