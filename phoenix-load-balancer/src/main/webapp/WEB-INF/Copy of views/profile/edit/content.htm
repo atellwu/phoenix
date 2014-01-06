@@ -1,0 +1,124 @@
+<div class="dropdown" style="float: right; margin-right: 45px">
+  <a class="dropdown-toggle" data-toggle="dropdown" href="#"> 增加自定义参数<b class="caret"></b></a>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+    <li ng-repeat="(key,definedParam) in propertiesDefinedInputs"><a ng-click="addDynamicAttribute(key)"
+      tabindex="-1" href="javascript:void(0)"><i class="icon-plus"></i> 添加 {{ key }}</a></li>
+    <li class="divider"></li>
+    <li><a tabindex="-1" href="javascript:app.openAddParamModal();"><i class="icon-pencil"></i> 自定义参数 </a></li>
+  </ul>
+</div>
+
+<div class="row">
+  <div class="span5">
+    <div class="control-group">
+      <label class="control-label">当前状态</label>
+      <div class="controls">
+        <label class="checkbox"> <span class="label label-important">{{ getVsState() }}</span>
+        </label>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">状态控制</label>
+      <div class="controls">
+        <label class="radio inline"> <input ng-model="vs.state" type="radio" value="ENABLED"> ENABLED
+        </label> <label class="radio inline"> <input ng-model="vs.state" type="radio" value="DISABLED"> DISABLED
+        </label> <label class="radio inline"> <input ng-model="vs.state" type="radio" value="FORCED_OFFLINE">
+          FORCED_OFFLINE
+        </label>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">可用性控制</label>
+      <div class="controls">
+      <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="AVAILABLE">
+          AVAILABLE
+        </label>
+        <label class="radio inline"> <input ng-model="vs.availability" type="radio" value="OFFLINE">
+          OFFLINE
+        </label> 
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="">域名</label>
+      <div class="controls">
+        <input ng-trim="true" type="text" ng-model="vs.domain" placeholder="输入站点的域名">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="inputEmail">端口</label>
+      <div class="controls">
+        <input ng-trim="true" type="text" ng-model="vs.port" placeholder="输入站点的端口号">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="">默认Pool名</label>
+      <div class="controls">
+        <select ng-model="vs.defaultPoolName" ng-options="pool.name as pool.name for pool in pools">
+          <option value="">-- 选择集群 --</option>
+        </select>
+      </div>
+    </div>
+    <div class="control-group">
+        <a style="float: right; margin-right: 0px" ng-click="addInstance();" href="javascript:;"><i class="icon-plus"></i> 添加</a>
+      <label class="control-label" for="">目标nginx机器ip</label>
+      <div class="controls" style="margin-bottom: 10px" ng-repeat="instance in vs.instances">
+        <input ng-trim="true" class="input-small" ng-model="instance.ip" type="text">&nbsp;&nbsp; <a
+          href="javascript:;" ng-click="removeInstance($index);"><i class="icon-remove"></i></a>
+      </div>
+    </div>
+  </div>
+  <div class="span6" style="margin-top: 0px; border-left: 1px solid #ddd;">
+    <div class="control-group" ng-repeat="(key, value) in vs.dynamicAttributes" ng-init="valueList = getValueList(key)">
+      <label class="control-label">{{ key }}</label>
+      <div ng-show="getInputType(key) == 'SELECT'" class="controls">
+        <select ng-init="vs.dynamicAttributes[key] = getInitSelectValue(vs.dynamicAttributes[key],valueList)" ng-model="vs.dynamicAttributes[key]" ng-options="value0 for value0 in valueList"></select> &nbsp;&nbsp;<a
+          href="javascript:;" ng-click="removeDynamicAttribute(key)""><i class="icon-remove"></i></a>
+      </div>
+      <div ng-show="getInputType(key) == 'TEXT'" class="controls">
+        <input ng-trim="true" ng-model="vs.dynamicAttributes[key]" type="text"> &nbsp;&nbsp;<a href="javascript:;"
+          ng-click="removeDynamicAttribute(key)"><i class="icon-remove"></i></a>
+      </div>
+      <div ng-show="getInputType(key) == 'TEXTAREA'" class="controls">
+        <textarea ng-trim="true" ng-model="vs.dynamicAttributes[key]" rows="5" type="textarea" ></textarea> &nbsp;&nbsp;<a href="javascript:;"
+          ng-click="removeDynamicAttribute(key)"><i class="icon-remove"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 输入key -->
+<div aria-hidden="true" role="dialog" class="modal hide" id="addParamModal" style="display: none;">
+  <div class="modal-header">
+    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+    <h3>添加自定义参数</h3>
+  </div>
+  <div class="modal-body">
+    <div id="addParamAlertDiv"></div>
+    <form class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label">参数名</label>
+        <div class="controls">
+          <div class="input-prepend">
+            <span class="add-on"></span><input ng-trim="true" id="addParamKey" ng-enter="addNewDynamicAttribute()" type="text"
+              class="input-small" placeholder="">
+          </div>
+          <span class="muted">（必填）</span>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">参数值</label>
+        <div class="controls">
+          <div class="input-prepend">
+            <span class="add-on"></span><input ng-trim="true" id="addParamValue" ng-enter="addNewDynamicAttribute()" type="text"
+              class="input-small" placeholder="">
+          </div>
+          <span class="muted">（可稍后再填）</span>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" ng-click="addNewDynamicAttribute()" class="btn btn-primary">确定</button>
+    <button type="button" data-dismiss="modal" class="btn">取消</button>
+  </div>
+</div>

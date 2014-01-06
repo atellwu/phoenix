@@ -18,7 +18,7 @@
     <constant name="struts.objectFactory"
         value="org.apache.struts2.spring.StrutsSpringObjectFactory" />
     <constant name="struts.patternMatcher" value="namedVariable" />
-    <constant name="struts.action.excludePattern" value="favicon.ico,.*/static/.*" />
+    <constant name="struts.action.excludePattern" value="favicon.ico,.*/static/.*,.*/assets/.*" />
 
     <constant name="struts.enable.SlashesInActionNames" value="true" />
     <constant name="struts.mapper.alwaysSelectFullNamespace"

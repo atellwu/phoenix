@@ -13,6 +13,10 @@ module.controller('VsController', function($scope, DataService, $resource,
 		var clazz = ($scope.selectedTab == tabName) ? 'active' : '';
 		return clazz;
 	};
+	$scope.isActiveTabPanel = function(tabName) {
+		var clazz = ($scope.selectedTab == tabName) ? 'tab-pane active' : 'tab-pane';
+		return clazz;
+	};
 	var vsChanged = false;
 	$scope.vs = null;
 	$scope.tags = [];
@@ -208,22 +212,12 @@ module.controller('VsController', function($scope, DataService, $resource,
 	};
 	var showPreviewModal = function(){
 		// 显示modal
-		var width = $(window).width();
 		var height = $(window).height();
-		var left = (width - 900) / 2;
-		var modal = $('#previewVirtualServerModal');
-		modal.css('height', height - 20);
-		modal.css('width', 900);
-		modal.css('top', 10);
-		if (left > 0) {
-			modal.css('left', left);
-			$('#previewVirtualServerModal>.modal-footer').css('left', left);
-		}
-		var modalBody = $('#previewVirtualServerModal>.modal-body');
-		modalBody.css('height', height - 170);
-		modalBody.css('max-height', height - 145);
+		var modalBody = $('#previewVirtualServerModal div.modal-body');
+		modalBody.css('height', height - 200);
 		window.nginxConfigEditor.setValue("");
 		$('#nginxConfigEditor').show();
+		$('#previewVirtualServerAlertDiv').html('');
 		$('#previewVirtualServerModal').modal('show');
 	};
 	// 离开页面时，对比一下vs是否发生了修改

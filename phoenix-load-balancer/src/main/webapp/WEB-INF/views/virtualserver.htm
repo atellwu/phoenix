@@ -1,51 +1,103 @@
-<div class="content" ng-init="editOrShow='${editOrShow}'" ng-app="MyApp" ng-controller="VsController" id="VsController">
-  <div class="header">
-    <div class="stats">#parse("common/vsStats.htm")</div>
-    <h1 class="page-title">
-      {{vs.name}}&nbsp;&nbsp;&nbsp;&nbsp;<span class="label label-warning" ng-show="newVs"><i
-        class=" icon-exclamation-sign"></i>&nbsp; 新建站点，请填写后保存。 </span>
-    </h1>
-  </div>
-  #parse("common/breadcrumb.htm")
-  <div class="container-fluid">
-    <div class="row-fluid" style="min-height: 500px;">
-      <a ng-show="editOrShow=='edit' && !newVs" ng-click="cancleEdit()" href="javascript:;"
-        style="float: right; margin-left: 20px; margin-top: 25px" class="btn">取消</a> <a
-        ng-show="editOrShow=='edit' && newVs" ng-href="${contextPath}/"
-        style="float: right; margin-left: 20px; margin-top: 25px" class="btn">取消</a>
-      <button ng-show="editOrShow=='edit'" ng-click="save()" style="float: right; margin-top: 25px"
-        class="btn btn-primary">保存</button>
-      <a ng-hide="editOrShow=='edit'" ng-click="edit()" href="javascript:;"
-        style="float: right; margin-right: 20px; margin-top: 25px" class=""> <i class="icon-edit"></i>&nbsp;编辑
-      </a>
-      <div style="margin: 0 auto; margin-top: 20px;" class="tabbable">
-        <ul ng-model="selectedTab" class="nav nav-pills">
-          <li ng-class="isActive('profile')"><a href="#profile" ng-click="selectedTab='profile'">&nbsp;基本配置&nbsp;</a></li>
-          <li ng-class="isActive('location')"><a href="#location" ng-click="selectedTab='location'">&nbsp;映射规则&nbsp;</a></li>
-          <li id="tagsUl" class="dropdown" style="margin-left: 20px; font-size: 12px;"><a href="#" class="dropdown-toggle"
-            data-toggle="dropdown">已创建的发布版本 <b class="caret"></b></a>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-              <li ng-repeat="tag in tags"><a ng-click="viewTag(tag)"
-                tabindex="-1" href="javascript:void(0)">{{ tag }} <i class="icon-ok-sign" ng-show="newTag==tag"> (刚刚新增的版本)</i></a></li>
-            </ul></li>
-          <li class="dropdown" style="margin-left: 20px; font-size: 12px;"><a href="#" class="dropdown-toggle"
-            data-toggle="dropdown">更多操作 <b class="caret"></b></a>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-              <li><a href="javascript:app.openRemoveVirtualServerModal();"><span style="color: #b94a48"
-                  class="number">删除站点</span></a></li>
-            </ul></li>
-        </ul>
-        <div id="alertMessageDiv" style="text-align: center;"></div>
-        <hr>
-        <div ng-switch on="selectedTab">
-          <form class="form-horizontal" style="margin-top: 30px;">
-            <div ng-switch-when="profile" ng-controller="ProfileController">#parse("/profile/${editOrShow}/content.htm")</div>
-            <div ng-switch-when="location" ng-controller="LocationController">#parse("/location/${editOrShow}/list.htm")</div>
-          </form>
+<div class="main-container-inner" ng-init="editOrShow='${editOrShow}'" ng-app="MyApp" ng-controller="VsController"
+  id="VsController">
+  #parse("common/sidebar.htm")
+  <div class="main-content">
+    #parse("common/breadcrumb.htm")
+    <div class="page-content">
+      <div class="page-header">
+        <!-- 预览/创建发布版本/发布 -->
+        <a class="btn btn-sm btn-pink" href="javascript:;" ng-click="preview()" title="预览当前生成的 nginx config 文件"> <i
+          class="icon-eye-open bigger-110"></i><span class="bigger-110 no-text-shadow">预览</span></a> <a
+          ng-show="editOrShow=='show'" class="btn btn-sm btn-primary" ng-hide="addingTag" href="javascript:;"
+          ng-click="addTag();" target="_blank"> <i class="icon-external-link bigger-110"></i><span
+          class="bigger-110 no-text-shadow">创建发布版本</span></a> <a class="btn btn-sm" ng-show="addingTag" href="javascript:;"
+          target="_blank"><i class="icon-spinner icon-spin orange bigger-125"></i><span
+          class="bigger-110 no-text-shadow"> 正在创建...</span></a> <a ng-show="editOrShow=='show'"
+          class="btn btn-sm btn-danger" ng-href="${contextPath}/deploy#showInfluencing:{{vs.name}}&{{tags[0]}}"
+          target="_blank"> <i class="icon-external-link bigger-110"></i><span class="bigger-110 no-text-shadow">发布</span></a>
+        <!-- 编辑/取消/保存 -->
+        <a ng-show="editOrShow=='edit' && !newVs" ng-click="cancleEdit()" href="javascript:;"
+          style="float: right; margin-left: 20px; margin-top: 0px" class="btn">取消</a> <a
+          ng-show="editOrShow=='edit' && newVs" ng-href="${contextPath}/"
+          style="float: right; margin-left: 20px; margin-top: 0px" class="btn">取消</a>
+        <button ng-show="editOrShow=='edit'" ng-click="save()" style="float: right; margin-top: 0px"
+          class="btn btn-primary">保存</button>
+        <a ng-hide="editOrShow=='edit'" ng-click="edit()" href="javascript:;"
+          style="float: right; margin-right: 20px; margin-top: 0px" class=""> <i class="icon-edit"></i>&nbsp;编辑
+        </a>
+        <!-- 已创建的版本 -->
+        <div class="btn-group" style="margin-left: 2%;">
+          <button data-toggle="dropdown" class="btn btn-xs dropdown-toggle">
+            已创建的发布版本 <i class="icon-angle-down icon-on-right"></i>
+          </button>
+          <ul class="dropdown-menu">
+            <li ng-repeat="tag in tags"><a ng-click="viewTag(tag)" tabindex="-1" href="javascript:void(0)">{{
+                tag }} <i class="icon-ok-sign" ng-show="newTag==tag"> (刚刚新增的版本)</i>
+            </a></li>
+          </ul>
+        </div>
+        <!-- 更多操作 -->
+        <div class="btn-group" style="margin-left: 10px;">
+          <button data-toggle="dropdown" class="btn btn-xs dropdown-toggle">
+            更多操作 <i class="icon-angle-down icon-on-right"></i>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="javascript:app.openRemoveVirtualServerModal();"><span style="color: #b94a48"
+                class="number">删除站点</span></a></li>
+          </ul>
         </div>
       </div>
-      <br />
+      <div id="alertMessageDiv" style="text-align: center;"></div>
+      <!-- /.page-header -->
+      <div class="tabbable tabs-left">
+        <ul ng-model="selectedTab" style="height: 30px;" class="nav nav-tabs">
+          <li ng-class="isActive('profile')"><a href="#profile" ng-click="selectedTab='profile'">&nbsp;基本配置&nbsp;</a></li>
+          <li ng-class="isActive('location')"><a href="#location" ng-click="selectedTab='location'">&nbsp;映射规则&nbsp;</a></li>
+        </ul>
+        <form class="form-horizontal" role="form">
+          <div class="tab-content" ng-switch on="selectedTab">
+            <div ng-class="isActiveTabPanel('profile')" ng-controller="ProfileController">#parse("/profile/${editOrShow}/content.htm")</div>
+            <div ng-class="isActiveTabPanel('location')" ng-controller="LocationController">#parse("/location/${editOrShow}/list.htm")</div>
+          </div>
+        </form>
+      </div>
     </div>
-    #parse("common/simplefooter.htm")
+    <!-- /.page-content -->
+  </div>
+  
+  <!-- 删除站点 -->
+<div aria-hidden="false" role="dialog" data-backdrop="true" class="bootbox modal" id="removeVirtualServerModal"
+  style="margin: 0 0 0 0;">
+  <div class="modal-dialog" style="width: 600px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+        <h4 class="modal-title">删除站点</h4>
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center;" class="alert alert-danger alert-block">
+            <span class="bigger-110">删除后将无法恢复，请谨慎操作！
+            </span>
+        </div>
+        <div id="removeVirtualServerAlertDiv"></div>
+        <form class="form-horizontal" onsubmit="return false;">
+          <div class="form-group">
+            <label class="col-sm-7 control-label no-padding-right" for="form-field-1"> 为确保无误，请输入该站点名： </label>
+            <div class="col-sm-3">
+              <input id="removeVirtualServerName" type="text" class="col-xs-10 col-sm-5"
+                ng-model="removeVirtualServerName" placeholder="">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" ng-hide="removeVirtualServerName==vs.name" disabled class="btn">确定</button>
+        <button type="button" ng-show="removeVirtualServerName==vs.name" ng-click="removeVirtualServer()"
+          class="btn btn-primary">确定</button>
+        <button type="button" data-dismiss="modal" class="btn">取消</button>
+      </div>
+    </div>
   </div>
 </div>
+</div>
+

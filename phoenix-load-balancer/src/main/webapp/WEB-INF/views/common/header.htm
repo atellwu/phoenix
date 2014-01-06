@@ -1,13 +1,41 @@
 <meta charset="utf-8">
-<title>软负载控制台 - 站点 ${virtualServerName}</title>
+<title>软负载管理中心 - 站点 ${virtualServerName}</title>
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="${contextPath}/static/css/bs.min.css">
-<link rel="stylesheet" href="${contextPath}/static/css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="${contextPath}/static/css/theme.css">
+
+<!-- basic styles -->
+<link href="${contextPath}/assets/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="${contextPath}/assets/css/font-awesome.min.css" />
+
 <!--[if IE 7]>
-<link rel="stylesheet" href="${contextPath}/static/css/font-awesome-ie7.min.css">
-<![endif]-->
+          <link rel="stylesheet" href="${contextPath}/assets/css/font-awesome-ie7.min.css" />
+        <![endif]-->
+<!-- page specific plugin styles -->
+
+<!-- fonts -->
+<link rel="stylesheet" href="${contextPath}/assets/css/ace-fonts.css" />
+
+<!-- ace styles -->
+<link rel="stylesheet" href="${contextPath}/assets/css/ace.min.css" />
+<link rel="stylesheet" href="${contextPath}/assets/css/ace-rtl.min.css" />
+<link rel="stylesheet" href="${contextPath}/assets/css/ace-skins.min.css" />
+
+<!--[if lte IE 8]>
+          <link rel="stylesheet" href="${contextPath}/assets/css/ace-ie.min.css" />
+        <![endif]-->
+
+<!-- inline styles related to this page -->
+
+<!-- ace settings handler -->
+<script src="${contextPath}/assets/js/ace-extra.min.js"></script>
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+        <script src="${contextPath}/assets/js/html5shiv.js"></script>
+        <script src="${contextPath}/assets/js/respond.min.js"></script>
+        <![endif]-->
+
+<!-- <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/theme.css">  -->
 <style type="text/css">
 #line-chart {
 	height: 300px;

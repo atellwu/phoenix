@@ -1,0 +1,146 @@
+#set($layout = "taskLayout.htm")
+<div class="row" style="padding: 20px 50px 0 50px;" ng-app="MyApp" ng-controller="TaskController" id="TaskController">
+  <span style="color: #0073ea; font-size: 14px">任务ID:{{task.task.id}} &nbsp;&nbsp; &nbsp; 任务名称:{{task.task.name}}
+    &nbsp;&nbsp; &nbsp; 任务状态:{{task.task.status}}</span>
+  <hr style="margin-top: 0px; margin-bottom: 5px">
+  <div id="alertMessageDiv" style="text-align: center;"></div>
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span6">
+        <div ng-repeat="deployVsBo in task.deployVsBos">
+          <table style="margin-top: 30px; margin-bottom: 5px;" class="table table-bordered table-condensed nohover">
+            <thead ng-click="showVsLog(deployVsBo)">
+              <tr>
+                <th width="60">站点名称</th>
+                <td width="100">{{ deployVsBo.deployVs.vsName }}</td>
+                <th width="60">发布版本</th>
+                <td width="120">{{ deployVsBo.deployVs.vsTag }}</td>
+                <th width="60">状态</th>
+                <td width="120">{{ deployVsBo.deployVs.status }}</td>
+              </tr>
+            </thead>
+          </table>
+          <table style="margin-top: 0px;" class="slb-datatable table table-bordered table-condensed lion">
+            <thead>
+              <tr>
+                <th width="20px"><input ng-disabled="!canUpdate" type="checkbox"
+                  ng-click="checkAllIp(deployVsBo,$event)"
+                  ng-checked="isContainAll(deployVsBo.deployAgentBos,deployVsBo.vs.instances)" /></th>
+                <th>IP</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-init="deployAgentBo = getAgent(deployVsBo.deployAgentBos,instance.ip)" ng-click="showAgentLog(deployAgentBo)" ng-repeat="instance in deployVsBo.vs.instances" class="my-progress-bar">
+                <td width="20px"><input ng-disabled="!canUpdate" type="checkbox"
+                  ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)"
+                  ng-checked="isContain(deployVsBo.deployAgentBos,instance.ip)"></td>
+                <td ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)">{{instance.ip}}</td>
+                <td style="width: 200px; padding-right: 10px;"
+                  ng-switch="deployAgentBo.deployAgent.status">
+                  <div ng-switch-when="CREATED" class="progress progress-success">
+                    <div style="width: 0%" class="bar"></div>
+                    <p style="left:80px;">未开始</p>
+                  </div>
+                  <div ng-switch-when="PROCESSING" class="progress progress-primary">
+                    <div style="width: {{deployAgentBo.processPct}}%" class="bar"></div>
+                    <p style="left:80px;">正在发布</p>
+                  </div>
+                  <div ng-switch-when="SUCCESS" class="progress progress-success">
+                    <div style="width: 100%" class="bar"></div>
+                    <p style="left:80px;">成功</p>
+                  </div>
+                  <div ng-switch-when="REJECTED" class="progress progress-danger">
+                    <div style="width: 100%" class="bar"></div>
+                    <p style="left:80px;">失败(被拒绝)</p>
+                  </div>
+                  <div ng-switch-when="FAILED" class="progress progress-danger">
+                    <div style="width: 100%" class="bar"></div>
+                    <p style="left:80px;">失败</p>
+                  </div>
+                  <div ng-switch-when="CANCELLED" class="progress progress-danger">
+                    <div style="width: 100%" class="bar"></div>
+                    <p style="left:80px;">被取消</p>
+                  </div>
+                  <div ng-switch-default></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="span6">
+        <button style="float: right; margin-bottom: 10px; margin-right: 0px;" type="button"
+          ng-click="updateAndStartTask()" ng-show="task.task.stateAction==null || task.task.stateAction=='STOP'"
+          class="btn btn-primary">启动任务</button>
+        <button type="button" style="float: right; margin-bottom: 10px; margin-right: 20px" ng-click="stopTask()"
+          class="btn btn-danger" ng-show="task.task.stateAction=='START'">停止任务</button>
+        <button type="button" style="float: right; margin-bottom: 10px; margin-right: 20px" ng-click="startTask()"
+          class="btn btn-danger" ng-show="task.task.stateAction=='PAUSE'">继续运行</button>
+        <span class="label" ng-show="task.task.stateAction" style="float: right; margin-top: 8px; margin-right: 20px;">运行状态：
+          {{ task.task.stateAction }}</span>
+        <div class="row-fluid">
+          <div class="span12 thumbnail">
+            <form class="form-inline">
+              <table class="table table-condensed lion nohover" style="margin: 0 0 0; border-bottom: 1px solid #DDD;">
+                <thead>
+                  <tr>
+                    <th colspan="3"><label class="help-inline" style="padding-left: 0px;"><strong
+                        style="color: #08C;">部署方式</strong></label></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td width="190"><label class="radio"><input ng-disabled="!canUpdate" type="radio"
+                        ng-model="task.task.agentBatch" value="ONE_BY_ONE"> 1->1->1 (每次一台)</label></td>
+                    <td width="190"><label class="radio"><input ng-disabled="!canUpdate" type="radio"
+                        ng-model="task.task.agentBatch" value="TWO_BY_TWO"> 1->2->2 (每次两台) </label></td>
+                    <td width="190"><label class="radio"><input ng-disabled="!canUpdate" type="radio"
+                        ng-model="task.task.agentBatch" value="THREE_BY_THREE"> 1->3->3 (每次三台) </label></td>
+                  </tr>
+                </tbody>
+              </table>
+              <table class="table table-condensed lion nohover" style="margin: 0 0 0; border-bottom: 1px solid #DDD;">
+                <thead>
+                  <tr>
+                    <th colspan="3"><label class="help-inline" style="padding-left: 0px;"><strong
+                        style="color: #08C;">错误处理</strong></label></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td width="180"><label class="radio"><input ng-disabled="!canUpdate" type="radio"
+                        ng-model="task.task.errorPolicy" value="FALL_THROUGH"> 跳过错误 </label></td>
+                    <td><label class="radio"><input ng-disabled="!canUpdate" type="radio"
+                        ng-model="task.task.errorPolicy" value="ABORT_ON_ERROR"> 中断发布</label></td>
+                  </tr>
+                </tbody>
+              </table>
+              <table class="table table-condensed lion nohover" style="margin: 0 0 0; border-bottom: 1px solid #DDD;">
+                <thead>
+                  <tr>
+                    <th colspan="3"><label class="help-inline" style="padding-left: 0px;"><strong
+                        style="color: #08C;">发布控制</strong></label></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td width="180"><label class="radio"><input ng-disabled="!canUpdate"
+                        ng:model="task.task.autoContinue" boolean-value="false" type="radio"> 手动控制</label></td>
+                    <td><label class="radio"><input ng-disabled="!canUpdate" type="radio"
+                        ng:model="task.task.autoContinue" boolean-value="true"> 发布间隔/秒: </label> <input
+                      ng-disabled="!canUpdate" class="input-mini" type="text" style="height: 12px"
+                      ng-model="task.task.deployInterval" ng-disabled="task.task.autoContinue=='false'"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </form>
+          </div>
+        </div>
+        <pre
+          style="cursor: text; margin-top: 20px; background-color: #3A1042; color: #FFFFFF; font-size: 12px; width: 100%; height: 420px; overflow-x: auto;"
+          id="console"></pre>
+      </div>
+    </div>
+  </div>
+</div>
