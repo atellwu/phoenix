@@ -33,7 +33,7 @@ public class NginxVelocityTools {
             case COMMON:
                 return "";
             case PREFIX:
-                return "^~";
+                return "~*";
             case REGEX_CASE_INSENSITIVE:
                 return "~*";
             case REGEX_CASE_SENSITIVE:
@@ -45,12 +45,18 @@ public class NginxVelocityTools {
         }
     }
 
+    public String rewriteLocationIfNeeded(MatchType matchType, String locationPattern) {
+        if (matchType == MatchType.PREFIX) {
+            return "^" + locationPattern.replaceAll("\\.", "\\\\.");
+        }
+        return locationPattern;
+    }
+
     public String rewriteProxyPassStringIfNeeded(String prefix, String text) {
         if (text.startsWith(Constants.DIRECTIVE_PROXY_PASS + " ")) {
             String poolName = PoolNameUtils.extractPoolNameFromProxyPassString(text);
             if (StringUtils.isNotBlank(poolName)) {
-                return Constants.DIRECTIVE_PROXY_PASS + " http://"
-                        + PoolNameUtils.rewriteToPoolNamePrefix(prefix, poolName);
+                return Constants.DIRECTIVE_PROXY_PASS + " http://" + PoolNameUtils.rewriteToPoolNamePrefix(prefix, poolName);
             }
         }
         return text;
@@ -93,10 +99,7 @@ public class NginxVelocityTools {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("directive", directive);
             if (Constants.DIRECTIVE_PROXY_PASS.equals(directive.getType())) {
-                context.put(
-                        Constants.DIRECTIVE_DP_DOMAIN,
-                        PoolNameUtils.rewriteToPoolNamePrefix(vsName,
-                                directive.getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME)));
+                context.put(Constants.DIRECTIVE_DP_DOMAIN, PoolNameUtils.rewriteToPoolNamePrefix(vsName, directive.getDynamicAttribute(Constants.DIRECTIVE_PROXY_PASS_POOL_NAME)));
             } else if (Constants.DIRECTIVE_PROXY_IFELSE.equals(directive.getType())) {
                 context.put("vsName", vsName);
             }
@@ -107,8 +110,7 @@ public class NginxVelocityTools {
     }
 
     public String upstreamServer(NginxUpstreamServer server, Strategy strategy) {
-        if (server.getMember().getAvailability() == Availability.AVAILABLE
-                && server.getMember().getState() == State.ENABLED) {
+        if (server.getMember().getAvailability() == Availability.AVAILABLE && server.getMember().getState() == State.ENABLED) {
             String template = getTemplate("upstream", "hash".equals(strategy.getType()) ? "default_hash" : "default");
             if (StringUtils.isNotBlank(template)) {
                 Map<String, Object> context = new HashMap<String, Object>();
@@ -127,4 +129,5 @@ public class NginxVelocityTools {
     private String getTemplate(String schema, String file) {
         return TemplateManager.INSTANCE.getTemplate(schema, file);
     }
+
 }

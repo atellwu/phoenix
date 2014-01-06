@@ -6,7 +6,7 @@ import com.dianping.phoenix.lb.deploy.model.DeployTask;
 
 public class DeployTaskBo {
 
-    private long                    agentId;
+//    private long                    agentId;
 
     private DeployTask              task;
 
@@ -28,12 +28,12 @@ public class DeployTaskBo {
         this.deployVsBos = deploymentBos;
     }
 
-    public long getAgentId() {
-        return agentId;
-    }
-
-    public void setAgentId(long agentId) {
-        this.agentId = agentId;
-    }
+//    public long getAgentId() {
+//        return agentId;
+//    }
+//
+//    public void setAgentId(long agentId) {
+//        this.agentId = agentId;
+//    }
 
 }
