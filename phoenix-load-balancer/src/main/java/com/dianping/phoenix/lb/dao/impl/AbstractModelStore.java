@@ -26,6 +26,7 @@ import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.Aspect;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
+import com.dianping.phoenix.lb.model.entity.SlbPool;
 import com.dianping.phoenix.lb.model.entity.Strategy;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
@@ -66,6 +67,16 @@ public abstract class AbstractModelStore implements ModelStore {
         // ignore concurrent issue, since it will introduce unnecessary
         // complexity
         return new ArrayList<VirtualServer>(slbModelTree.getVirtualServers().values());
+    }
+    
+    @Override
+    public List<SlbPool> listSlbPools() {
+        baseConfigMeta.lock.readLock().lock();
+        try {
+            return new ArrayList<SlbPool>(slbModelTree.getSlbPools().values());
+        } finally {
+            baseConfigMeta.lock.readLock().unlock();
+        }
     }
 
     public List<Strategy> listStrategies() {
@@ -111,6 +122,16 @@ public abstract class AbstractModelStore implements ModelStore {
             baseConfigMeta.lock.readLock().unlock();
         }
     }
+    
+    @Override
+    public SlbPool findSlbPool(String name) {
+        baseConfigMeta.lock.readLock().lock();
+        try {
+            return slbModelTree.findSlbPool(name);
+        } finally {
+            baseConfigMeta.lock.readLock().unlock();
+        }
+    }
 
     public VirtualServer findVirtualServer(String name) {
         // ignore concurrent issue, since it will introduce unnecessary
@@ -152,13 +173,34 @@ public abstract class AbstractModelStore implements ModelStore {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.dianping.phoenix.lb.dao.impl.ModelStore#updateOrCreateStrategy(java
-     * .lang.String, com.dianping.phoenix.lb.model.slbModelTree.entity.Strategy)
+    /* (non-Javadoc)
+     * @see com.dianping.phoenix.lb.dao.ModelStore#updateOrCreateSlbPool(java.lang.String, com.dianping.phoenix.lb.model.entity.SlbPool)
      */
+    @Override
+    public void updateOrCreateSlbPool(String name, SlbPool slbPool) throws BizException {
+        SlbPool originalSlbPool = null;
+        baseConfigMeta.lock.writeLock().lock();
+        try {
+            originalSlbPool = baseConfigMeta.slbModelTree.findSlbPool(name);
+
+            baseConfigMeta.slbModelTree.addSlbPool(slbPool);
+            slbModelTree.addSlbPool(slbPool);
+            save(baseConfigMeta.key, baseConfigMeta.slbModelTree);
+
+        } catch (Exception e) {
+            if (originalSlbPool == null) {
+                baseConfigMeta.slbModelTree.removeSlbPool(name);
+                slbModelTree.removeSlbPool(name);
+            } else {
+                baseConfigMeta.slbModelTree.addSlbPool(originalSlbPool);
+                slbModelTree.addSlbPool(originalSlbPool);
+            }
+            ExceptionUtils.logAndRethrowBizException(e, MessageID.SLBPOOL_SAVE_FAIL, name);
+        } finally {
+            baseConfigMeta.lock.writeLock().unlock();
+        }
+    }
+
     @Override
     public void updateOrCreateStrategy(String name, Strategy strategy) throws BizException {
         Strategy originalStrategy = null;
@@ -192,13 +234,6 @@ public abstract class AbstractModelStore implements ModelStore {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.dianping.phoenix.lb.dao.impl.ModelStore#removeStrategy(java.lang.
-     * String)
-     */
     @Override
     public void removeStrategy(String name) throws BizException {
         Strategy originalStrategy = null;
@@ -218,6 +253,30 @@ public abstract class AbstractModelStore implements ModelStore {
             baseConfigMeta.slbModelTree.addStrategy(originalStrategy);
             slbModelTree.addStrategy(originalStrategy);
             ExceptionUtils.logAndRethrowBizException(e, MessageID.STRATEGY_SAVE_FAIL, name);
+        } finally {
+            baseConfigMeta.lock.writeLock().unlock();
+        }
+    }
+    
+    @Override
+    public void removeSlbPool(String name) throws BizException {
+        SlbPool originalSlbPool = null;
+        baseConfigMeta.lock.writeLock().lock();
+        try {
+            originalSlbPool = baseConfigMeta.slbModelTree.findSlbPool(name);
+
+            if (originalSlbPool == null) {
+                return;
+            }
+
+            baseConfigMeta.slbModelTree.removeSlbPool(name);
+            slbModelTree.removeSlbPool(name);
+            save(baseConfigMeta.key, baseConfigMeta.slbModelTree);
+
+        } catch (Exception e) {
+            baseConfigMeta.slbModelTree.addSlbPool(originalSlbPool);
+            slbModelTree.addSlbPool(originalSlbPool);
+            ExceptionUtils.logAndRethrowBizException(e, MessageID.SLBPOOL_SAVE_FAIL, name);
         } finally {
             baseConfigMeta.lock.writeLock().unlock();
         }
