@@ -28,6 +28,7 @@
 		<entity-ref name="instance" type="list" names="instances" xml-indent="true" />
 		<entity-ref name="location" type="list" names="locations" xml-indent="true" />
 		<entity-ref name="aspect" type="list" names="aspects" xml-indent="true" />
+		<attribute name="group" value-type="String" default-value="default" />
 	</entity>
 	<entity name="pool">
 		<attribute name="name" value-type="String" key="true" />

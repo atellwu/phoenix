@@ -61,6 +61,7 @@
     <attribute name="last-modified-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
     <attribute name="version" value-type="int" />
     <attribute name="access_log" value-type="String" />
+    <attribute name="group" value-type="String" />
     <entity-ref name="instance" type="list" names="instances" xml-indent="true" />
     <entity-ref name="aspect" type="list" names="aspects" xml-indent="true" />
     <entity-ref name="location" type="list" names="locations" xml-indent="true" />
