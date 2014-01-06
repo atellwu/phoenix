@@ -30,6 +30,7 @@ import com.dianping.phoenix.lb.model.nginx.NginxUpstreamServer;
 import com.dianping.phoenix.lb.service.model.StrategyService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.dianping.phoenix.lb.utils.GsonUtils;
+import com.dianping.phoenix.lb.utils.PoolNameUtils;
 import com.dianping.phoenix.lb.velocity.TemplateManager;
 import com.dianping.phoenix.lb.velocity.VelocityEngineManager;
 import com.dianping.phoenix.lb.visitor.VirtualServerComparisionVisitor;
@@ -203,7 +204,8 @@ public class DefaultAgentClient implements AgentClient {
         List<Map<String, String>> postDataList = new ArrayList<Map<String, String>>();
         for (Pool pool : compareResult.getAddedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
-            postData.put("url", configManager.getNginxDynamicAddUpstreamUrlPattern(pool.getName()));
+            postData.put("url", configManager.getNginxDynamicAddUpstreamUrlPattern(PoolNameUtils
+                    .rewriteToPoolNamePrefix(vsName, pool.getName())));
             postData.put("method", "POST");
             postData.put("data", generateUpstreamContent(pool));
             postDataList.add(postData);
@@ -211,7 +213,8 @@ public class DefaultAgentClient implements AgentClient {
 
         for (Pool pool : compareResult.getModifiedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
-            postData.put("url", configManager.getNginxDynamicUpdateUpstreamUrlPattern(pool.getName()));
+            postData.put("url", configManager.getNginxDynamicUpdateUpstreamUrlPattern(PoolNameUtils
+                    .rewriteToPoolNamePrefix(vsName, pool.getName())));
             postData.put("method", "POST");
             postData.put("data", generateUpstreamContent(pool));
             postDataList.add(postData);
@@ -219,7 +222,8 @@ public class DefaultAgentClient implements AgentClient {
 
         for (Pool pool : compareResult.getDeletedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
-            postData.put("url", configManager.getNginxDynamicDeleteUpstreamUrlPattern(pool.getName()));
+            postData.put("url", configManager.getNginxDynamicDeleteUpstreamUrlPattern(PoolNameUtils
+                    .rewriteToPoolNamePrefix(vsName, pool.getName())));
             postData.put("method", "DELETE");
             postDataList.add(postData);
         }
