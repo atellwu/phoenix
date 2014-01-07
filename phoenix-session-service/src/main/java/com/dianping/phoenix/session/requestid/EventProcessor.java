@@ -15,6 +15,7 @@ import org.unidal.helper.Threads.Task;
 import org.unidal.lookup.ContainerHolder;
 import org.unidal.lookup.annotation.Inject;
 
+import com.dianping.cat.Cat;
 import com.dianping.phoenix.configure.ConfigManager;
 import com.dianping.phoenix.session.RequestEvent;
 import com.dianping.phoenix.session.RequestEventDelegate;
@@ -222,7 +223,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 			success = false;
 			m_logger.error(String.format("Error record event %s refer to %s", curEvent, referEvent), e);
 		}
-		
+
 		if (!success) {
 			m_logger.error(String.format("Fail to record event %s refer to %s", curEvent, referEvent));
 		}
@@ -285,6 +286,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 
 		@Override
 		public void run() {
+			int quantity = 0;
 			while (!m_stop.get()) {
 				RequestEvent event = null;
 				try {
@@ -299,6 +301,14 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 				if (!isValidEvent(event)) {
 					m_logger.warn(String.format("Invalid RequetEvent %s received, will ignore", event));
 					continue;
+				}
+
+				if (event.getHop() == HOP_CLIENT) {
+					quantity++;
+					if (quantity % 1000 == 0) {
+						Cat.logMetricForCount("RequestId", quantity);
+						quantity = 0;
+					}
 				}
 
 				dispatchEvent(event);
