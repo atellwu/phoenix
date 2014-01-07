@@ -56,20 +56,24 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 	}
 	$scope.addTaskModal = function() {
 		// 显示modal
-		var width = $(window).width();
 		var height = $(window).height();
-		var left = (width - 700) / 2;
-		var modal = $('#addTaskModal');
-		modal.css('height', height - 20);
-		modal.css('width', 700);
-		modal.css('top', 10);
-		if (left > 0) {
-			modal.css('left', left);
-			$('#addTaskModal>.modal-footer').css('left', left);
-		}
-		var modalBody = $('#addTaskModal>.modal-body');
-		modalBody.css('height', height - 170);
-		modalBody.css('max-height', height - 145);
+		var modalBody = $('#addTaskModal div.modal-body');
+		modalBody.css('height', height - 200);
+		
+//		var width = $(window).width();
+//		var height = $(window).height();
+//		var left = (width - 700) / 2;
+//		var modal = $('#addTaskModal');
+//		modal.css('height', height - 20);
+//		modal.css('width', 700);
+//		modal.css('top', 10);
+//		if (left > 0) {
+//			modal.css('left', left);
+//			$('#addTaskModal>.modal-footer').css('left', left);
+//		}
+//		var modalBody = $('#addTaskModal>.modal-body');
+//		modalBody.css('height', height - 170);
+//		modalBody.css('max-height', height - 145);
 		$('#addTaskModal').modal('show');
 		$('#addTaskModalInput').focus();
 	}
