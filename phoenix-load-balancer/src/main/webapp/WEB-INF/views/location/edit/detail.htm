@@ -1,15 +1,9 @@
 <div ng-show="locationEditing">
-  <a style="float: right; margin-right: 30px;" ng-trim="true" href="javascript:;" ng-click="switchLocationList();"> <i
-    class="icon-reply"></i> 返回规则列表
+  <a style="float: right; margin-right: 30px;" ng-trim="true" href="javascript:;" ng-click="switchLocationList();">
+    <i class="icon-reply"></i> 返回规则列表
   </a>
   <h5 style="margin-top: 30px">规则基本信息</h5>
   <form class="form-horizontal">
-  <!--   <div class="control-group">
-      <label class="control-label" for="">映射的集群名</label>
-      <div class="controls">
-        <select ng-model="locationEditing.domain" ng-options="pool.name as pool.name for pool in vs.pools"></select>
-      </div>
-    </div>  -->
     <div class="control-group">
       <label class="control-label">匹配类型</label>
       <div class="controls">
@@ -24,7 +18,8 @@
     <div class="control-group">
       <label class="control-label">路径/正则表达式</label>
       <div class="controls">
-        <input ng-model="locationEditing.pattern" ng-trim="true" ng-enter="addLocation()" type="text" class="input" placeholder="">
+        <input ng-model="locationEditing.pattern" ng-trim="true" ng-enter="addLocation()" type="text" class="input"
+          placeholder="">
       </div>
     </div>
     <div class="control-group">
@@ -67,15 +62,12 @@
               ng-init="input = inputs[name]">
               <label class="control-label" for="">{{ name }}</label>
               <div class="controls">
-                <input ng-trim="true" ng-show="input.inputType == 'TEXT'" ng-model="directive.dynamicAttributes[name]" type="text">
-                <select ng-show="input.inputType == 'SELECT'" ng-model="directive.dynamicAttributes[name]"
-                  ng-options="value0 for value0 in getValueList(input)">
+                <input ng-trim="true" ng-show="input.inputType == 'TEXT'" ng-model="directive.dynamicAttributes[name]"
+                  type="text"> <select ng-show="input.inputType == 'SELECT'"
+                  ng-model="directive.dynamicAttributes[name]" ng-options="value0 for value0 in getValueList(input)">
                   <option value="">-- 选择 --</option>
-                  </select>
-                  &nbsp;
-                <a style="margin-left: 10px;"
-                  href="javascript:void(0);" ng-click="removeDynamicAttribute(directive,name)"><i
-                  class="icon-remove"></i></a>
+                </select> &nbsp; <a style="margin-left: 10px;" href="javascript:void(0);"
+                  ng-click="removeDynamicAttribute(directive,name)"><i class="icon-remove"></i></a>
               </div>
             </div>
           </form>
@@ -86,48 +78,4 @@
       </tr>
     </tbody>
   </table>
-</div>
-
-<!-- 添加规则 -->
-<div aria-hidden="true" role="dialog" class="modal hide" id="addDirectiveModal" style="display: none;">
-  <div class="modal-header">
-    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-    <h3>添加新规则</h3>
-  </div>
-  <div class="modal-body">
-    <div id="addDirectiveAlertDiv"></div>
-    <form class="form-horizontal">
-      <div class="control-group">
-        <label class="control-label" for="">选择指令类型：</label>
-        <div class="controls">
-          <select id="addDirectiveType" ng-model="directiveToBeAdd.type"
-            ng-options="key as key for (key,directiveDefinedInput) in directiveDefinedInputs">
-            <option value="">-- 选择类型 --</option>
-            </select>
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button type="button" ng-click="addDirective()" class="btn btn-primary">确定</button>
-    <button type="button" data-dismiss="modal" class="btn">取消</button>
-  </div>
-</div>
-
-<!-- 确认删除directive的对话框 -->
-<div aria-hidden="true" data-backdrop="true" role="dialog" tabindex="-1" class="modal hide"
-  id="affirmRemoveDirectiveModal" style="display: none;">
-  <div class="modal-header">
-    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-    <h3>确认操作</h3>
-  </div>
-  <div class="modal-body">
-    <p style="text-align: center;">
-      <i class="icon-warning-sign"></i> 您是否确定要删除该指令（type为{{directiveToBeRemove.type}}) ？
-    </p>
-  </div>
-  <div class="modal-footer">
-    <button ng-click="removeDirective();" class="btn btn-primary">确定</button>
-    <button data-dismiss="modal" class="btn">取消</button>
-  </div>
 </div>
