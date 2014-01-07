@@ -41,6 +41,8 @@ module.controller('VsController', function($scope, DataService, $resource,
 					$scope.vs = data.virtualServer;
 					$scope.newVs = false;
 				}
+				//展现出来
+				$('#VsController > div.main-content').show();
 				// 开始监听vs的修改
 				$scope.$watch('vs', function(newValue, oldValue) {
 					if (newValue != oldValue) {

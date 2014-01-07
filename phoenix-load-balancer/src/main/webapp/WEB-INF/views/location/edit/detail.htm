@@ -4,9 +4,9 @@
   </a>
   <h5 style="margin-top: 30px">规则基本信息</h5>
   <form class="form-horizontal">
-    <div class="control-group">
-      <label class="control-label">匹配类型</label>
-      <div class="controls">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right">匹配类型</label>
+      <div class="col-sm-7">
         <select ng-model="locationEditing.matchType" ng-enter="addLocation()">
           <option value="prefix">prefix</option>
           <option value="regex">regex</option>
@@ -15,16 +15,16 @@
         </select>
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label">路径/正则表达式</label>
-      <div class="controls">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right">路径/正则表达式</label>
+      <div class="col-sm-7">
         <input ng-model="locationEditing.pattern" ng-trim="true" ng-enter="addLocation()" type="text" class="input"
           placeholder="">
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label"></label>
-      <div class="controls">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right"></label>
+      <div class="col-sm-7">
         <label class="checkbox inline"> <input ng-model="locationEditing.caseSensitive" type="checkbox">
           大小写敏感
         </label>
@@ -58,10 +58,10 @@
             </ul>
           </div>
           <form class="form-horizontal" style="margin: 0 auto; width: 80%">
-            <div class="control-group" ng-repeat="(name, value) in directive.dynamicAttributes"
+            <div class="form-group" ng-repeat="(name, value) in directive.dynamicAttributes"
               ng-init="input = inputs[name]">
-              <label class="control-label" for="">{{ name }}</label>
-              <div class="controls">
+              <label class="col-sm-4 control-label no-padding-right" for="">{{ name }}</label>
+              <div class="col-sm-7">
                 <input ng-trim="true" ng-show="input.inputType == 'TEXT'" ng-model="directive.dynamicAttributes[name]"
                   type="text"> <select ng-show="input.inputType == 'SELECT'"
                   ng-model="directive.dynamicAttributes[name]" ng-options="value0 for value0 in getValueList(input)">

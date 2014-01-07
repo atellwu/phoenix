@@ -1,9 +1,9 @@
 <div class="main-container-inner" ng-init="editOrShow='${editOrShow}'" ng-app="MyApp" ng-controller="VsController"
   id="VsController">
   #parse("common/sidebar.htm")
-  <div class="main-content">
+  <div class="main-content" style="display:none">
     #parse("common/breadcrumb.htm")
-    <div class="page-content">
+    <div class="page-content" >
       <div class="page-header">
         <!-- 预览/创建发布版本/发布 -->
         <a class="btn btn-sm btn-pink" href="javascript:;" ng-click="preview()" title="预览当前生成的 nginx config 文件"> <i
@@ -26,7 +26,7 @@
           style="float: right; margin-right: 20px; margin-top: 0px" class=""> <i class="icon-edit"></i>&nbsp;编辑
         </a>
         <!-- 已创建的版本 -->
-        <div class="btn-group" style="margin-left: 2%;">
+        <div id="tagsUl" class="btn-group" style="margin-left: 2%;">
           <button data-toggle="dropdown" class="btn btn-xs dropdown-toggle">
             已创建的发布版本 <i class="icon-angle-down icon-on-right"></i>
           </button>
@@ -56,8 +56,8 @@
         </ul>
         <form class="form-horizontal" role="form">
           <div class="tab-content" ng-switch on="selectedTab">
-            <div ng-class="isActiveTabPanel('profile')" ng-controller="ProfileController">#parse("/profile/${editOrShow}/content.htm")</div>
-            <div ng-class="isActiveTabPanel('location')" ng-controller="LocationController">#parse("/location/${editOrShow}/list.htm")</div>
+            <div ng-class="isActiveTabPanel('profile')" ng-controller="ProfileController">#parse("/profile/${editOrShow}/content.htm")#parse("profile/modals.htm")</div>
+            <div ng-class="isActiveTabPanel('location')" ng-controller="LocationController">#parse("/location/${editOrShow}/list.htm")#parse("location/modals.htm")</div>
           </div>
         </form>
       </div>
@@ -65,6 +65,6 @@
     <!-- /.page-content -->
   </div>
 
-     #parse("vs/vsModals.htm")
+     #parse("vs/modals.htm")
 </div>
 

@@ -4,9 +4,9 @@
   </a>
   <h5 style="margin-top: 30px">规则基本信息</h5>
   <form class="form-horizontal">
-    <div class="control-group">
-      <label class="control-label">匹配类型</label>
-      <div class="controls">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right">匹配类型</label>
+      <div class="col-sm-7">
         <select disabled ng-model="locationEditing.matchType" ng-enter="addLocation()">
           <option value="prefix">prefix</option>
           <option value="regex">regex</option>
@@ -15,23 +15,23 @@
         </select>
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label">路径/正则表达式</label>
-      <div class="controls">
-        <input disabled ng-model="locationEditing.pattern" ng-enter="addLocation()" type="text" class="input" placeholder="">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right">路径/正则表达式</label>
+      <div class="col-sm-7">
+        <input disabled ng-model="locationEditing.pattern" ng-enter="addLocation()" type="text" class="input"
+          placeholder="">
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label"></label>
-      <div class="controls">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right"></label>
+      <div class="col-sm-7">
         <label class="checkbox inline"> <input disabled ng-model="locationEditing.caseSensitive" type="checkbox">
           大小写敏感
         </label>
       </div>
     </div>
   </form>
-  <br>
-  </a>
+  <br> </a>
   <h5 style="margin-top: 0px; margin-bottom: 20px">指令列表</h5>
   <table class="table table-bordered" style="width: 100%">
     <thead>
@@ -44,8 +44,8 @@
       <tr ng-repeat="directive in locationEditing.directives" ng-init="inputs = getInputs(directive.type)"
         ng-model="switch">
         <td>{{directive.type}}</td>
-        <td><span ng-repeat="(name, value) in directive.dynamicAttributes"
-          ng-init="input = inputs[name]"> {{ name }}="{{directive.dynamicAttributes[name]}}" &nbsp;</span></td>
+        <td><span ng-repeat="(name, value) in directive.dynamicAttributes" ng-init="input = inputs[name]">
+            {{ name }}="{{directive.dynamicAttributes[name]}}" &nbsp;</span></td>
       </tr>
     </tbody>
   </table>
