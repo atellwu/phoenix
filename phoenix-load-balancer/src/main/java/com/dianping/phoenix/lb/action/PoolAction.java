@@ -25,9 +25,25 @@ public class PoolAction extends MenuAction {
 
     private static final long   serialVersionUID = -1084994778030229218L;
 
+    private static final String MENU             = "pool";
+
     private String              poolName;
 
     private Boolean             showInfluencing;
+
+    protected List<Pool>        pools;
+
+    public List<Pool> getPools() {
+        return pools;
+    }
+
+    public String index() {
+        if (pools.size() == 0) {
+            return "noneVs";
+        }
+        poolName = pools.get(0).getName();//重定向
+        return "redirect";
+    }
 
     public String get() throws Exception {
         try {
@@ -133,4 +149,10 @@ public class PoolAction extends MenuAction {
         this.showInfluencing = showInfluencing;
     }
 
+    @Override
+    public void validate() {
+        super.validate();
+        this.setMenu(MENU);
+        pools = poolService.listPools();
+    }
 }

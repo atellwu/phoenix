@@ -46,7 +46,7 @@
                 <param name="location">vs/${virtualServerName}</param>
             </result>
             <result name="none" type="velocity">
-                /none_vs.htm
+                /vs/none.htm
             </result>
         </action>
         <action name="vs/list" class="virtualServerAction"
@@ -86,7 +86,7 @@
         <action name="vs/{virtualServerName}/edit" class="virtualServerAction"
             method="edit">
             <result name="success" type="velocity">
-                /virtualserver.htm
+                /vs/virtualserver.htm
             </result>
         </action>
         <action name="vs/{virtualServerName}/deploy" class="virtualServerAction"
@@ -126,12 +126,18 @@
         <action name="vs/{virtualServerName}" class="virtualServerAction"
             method="show">
             <result name="success" type="velocity">
-                /virtualserver.htm
+                /vs/virtualserver.htm
             </result>
         </action>
 
-
-
+        <action name="pool" class="poolAction" method="index">
+            <result name="redirect" type="redirect">
+                <param name="location">pool/${poolName}</param>
+            </result>
+            <result name="none" type="velocity">
+                /pool/none.htm
+            </result>
+        </action>
         <action name="pool/{poolName}/save" class="poolAction"
             method="save">
             <result name="success" type="json">
@@ -156,12 +162,12 @@
         <action name="pool/{poolName}/edit" class="poolAction"
             method="edit">
             <result name="success" type="velocity">
-                /pool.htm
+                /pool/pool.htm
             </result>
         </action>
         <action name="pool/{poolName}" class="poolAction" method="show">
             <result name="success" type="velocity">
-                /pool.htm
+                /pool/pool.htm
             </result>
         </action>
 

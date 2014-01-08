@@ -10,8 +10,6 @@ import org.apache.struts2.ServletActionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.phoenix.lb.model.entity.Aspect;
-import com.dianping.phoenix.lb.model.entity.Pool;
-import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.service.model.CommonAspectService;
 import com.dianping.phoenix.lb.service.model.PoolService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
@@ -45,11 +43,10 @@ public abstract class MenuAction extends ActionSupport {
     @Autowired
     protected CommonAspectService  commonAspectService;
 
-    protected List<Pool>           pools;
-
     protected List<Aspect>         commonAspects;
 
-    protected List<VirtualServer>  virtualServers;
+    /** vs,pool,deploy */
+    private String                 menu;
 
     @PostConstruct
     public void init() {
@@ -79,21 +76,10 @@ public abstract class MenuAction extends ActionSupport {
         if (contextPath == null) {
             contextPath = ServletActionContext.getServletContext().getContextPath();
         }
-        virtualServers = virtualServerService.listVirtualServers();
-        pools = poolService.listPools();
-        commonAspects = commonAspectService.listCommonAspects();
     }
 
     public Map<String, Object> getDataMap() {
         return dataMap;
-    }
-
-    public List<Pool> getPools() {
-        return pools;
-    }
-    
-    public List<VirtualServer> getVirtualServers() {
-        return virtualServers;
     }
 
     public String getContextPath() {
@@ -102,6 +88,14 @@ public abstract class MenuAction extends ActionSupport {
 
     public String getEditOrShow() {
         return editOrShow;
+    }
+
+    public String getMenu() {
+        return menu;
+    }
+
+    public void setMenu(String menu) {
+        this.menu = menu;
     }
 
 }

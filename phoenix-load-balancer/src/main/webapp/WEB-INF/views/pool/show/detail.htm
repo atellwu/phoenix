@@ -1,25 +1,24 @@
 <div ng-show="pool">
-  <form class="form-horizontal" style="margin-top: 30px;">
-    <div class="control-group">
-      <label class="control-label">集群名</label>
-      <div class="controls">
-        <label class="checkbox"> <span>{{ pool.name }}</span>
-        </label>
+  <form class="form-horizontal" role="form">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right">集群名</label>
+      <div class="col-sm-7">
+        <input disabled class="" value="{{pool.name}}" type="text">
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label" for="inputPassword">负载均衡策略</label>
-      <div class="controls">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right" for="inputPassword">负载均衡策略</label>
+      <div class="col-sm-7">
         <select disabled class="span2" ng-model="pool.loadbalanceStrategyName"
           ng-options="item.name as item.name for item in strategies"></select>
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label" for="inputEmail">最小活动节点占比</label>
-      <div class="controls">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right" for="inputEmail">最小活动节点占比</label>
+      <div class="col-sm-7">
         <div class="input-append">
-          <input disabled class="" ng-model="pool.minAvailableMemberPercentage" type="text"
-            placeholder="输入1-100的数值"> <span class="add-on">%</span>
+          <input disabled class="" ng-model="pool.minAvailableMemberPercentage" type="text" placeholder="输入1-100的数值">
+          <span class="add-on">%</span>
         </div>
       </div>
     </div>
@@ -62,22 +61,4 @@
       </tbody>
     </table>
   </form>
-</div>
-
-<!-- 确认删除member的对话框 -->
-<div aria-hidden="true" data-backdrop="true" role="dialog" tabindex="-1" class="modal hide" id="affirmRemoveMemberModal"
-  style="display: none;">
-  <div class="modal-header">
-    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-    <h3>确认操作</h3>
-  </div>
-  <div class="modal-body">
-    <p style="text-align: center;">
-      <i class="icon-warning-sign"></i> 您是否确定要删除该节点 <span>{{memberToBeRemove.name}}</span> ？
-    </p>
-  </div>
-  <div class="modal-footer">
-    <button ng-click="removeMember();" class="btn btn-primary">确定</button>
-    <button data-dismiss="modal" class="btn">取消</button>
-  </div>
 </div>

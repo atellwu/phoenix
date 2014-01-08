@@ -24,6 +24,8 @@ module.controller('PoolController', function($scope, DataService, $resource,
 				}
 				// 如果需要显示受影响的vs，则显示
 				$scope.influencingVsList = data.influencingVsList;
+				// 展现出来
+				$('#PoolController > div.main-content').show();
 				// 开始监听pool的修改
 				$scope.$watch('pool', function(newValue, oldValue) {
 					if (newValue != oldValue) {
@@ -98,11 +100,10 @@ module.controller('PoolController', function($scope, DataService, $resource,
 	}
 	$scope.edit = function() {
 		window.location = window.contextpath + '/pool/' + $scope.pool.name
-				+ '/edit' + window.location.hash;
+				+ '/edit';
 	}
 	$scope.cancleEdit = function() {
-		window.location = window.contextpath + '/pool/' + $scope.pool.name
-				+ window.location.hash;
+		window.location = window.contextpath + '/pool/' + $scope.pool.name;
 	}
 	// 存活的member
 	$scope.getAliveMemberCount = function() {
@@ -129,42 +130,42 @@ module.controller('PoolController', function($scope, DataService, $resource,
 		$scope.pool.members.splice($scope.memberIndexToBeRemove, 1);
 		$('#affirmRemoveMemberModal').modal('hide');
 	}
-//	$scope.openUrl = null;
+	// $scope.openUrl = null;
 	$scope.addTagAndDeploy = function(influencingVsList) {
 		var param = new Object();
 		param.vsListToTag = influencingVsList;
 		var url = window.contextpath + '/vs/tag/addBatch?'
 				+ $.param(param, true);
 		window.open(url);
-//		if (!$scope.openUrl) {
-//			$http({
-//				method : 'POST',
-//				data : $.param(param, true),
-//				headers : {
-//					'Content-Type' : 'application/x-www-form-urlencoded'
-//				},
-//				url : window.contextpath + '/vs/tag/addBatch'
-//			}).success(
-//					function(data, status, headers, config) {
-//						if (data.errorCode == 0) {
-//							// $.each(data.tagIds, function(vsName,tagId) {
-//							// openUrl += vsName
-//							// });
-//							// var json = JSON.stringify(data.tagIds);
-//							// console.log(json);
-//							$scope.openUrl = window.contextpath
-//									+ '/deploy#showInfluencing:'
-//									+ influencingVsList.join();
-//							window.open($scope.openUrl);
-//						} else {
-//							app.alertError("创建失败: " + data.errorMessage);
-//						}
-//					}).error(function(data, status, headers, config) {
-//				app.appError("响应错误", data);
-//			});
-//		} else {
-//			window.open($scope.openUrl);
-//		}
+		// if (!$scope.openUrl) {
+		// $http({
+		// method : 'POST',
+		// data : $.param(param, true),
+		// headers : {
+		// 'Content-Type' : 'application/x-www-form-urlencoded'
+		// },
+		// url : window.contextpath + '/vs/tag/addBatch'
+		// }).success(
+		// function(data, status, headers, config) {
+		// if (data.errorCode == 0) {
+		// // $.each(data.tagIds, function(vsName,tagId) {
+		// // openUrl += vsName
+		// // });
+		// // var json = JSON.stringify(data.tagIds);
+		// // console.log(json);
+		// $scope.openUrl = window.contextpath
+		// + '/deploy#showInfluencing:'
+		// + influencingVsList.join();
+		// window.open($scope.openUrl);
+		// } else {
+		// app.alertError("创建失败: " + data.errorMessage);
+		// }
+		// }).error(function(data, status, headers, config) {
+		// app.appError("响应错误", data);
+		// });
+		// } else {
+		// window.open($scope.openUrl);
+		// }
 
 	}
 	// 离开页面时，对比一下pool是否发生了修改

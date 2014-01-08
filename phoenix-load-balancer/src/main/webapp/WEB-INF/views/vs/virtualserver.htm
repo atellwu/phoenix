@@ -1,9 +1,9 @@
 <div class="main-container-inner" ng-init="editOrShow='${editOrShow}'" ng-app="MyApp" ng-controller="VsController"
   id="VsController">
-  #parse("common/sidebar.htm")
-  <div class="main-content" style="display:none">
-    #parse("common/breadcrumb.htm")
-    <div class="page-content" >
+  #parse("vs/sidebar.htm")
+  <div class="main-content" style="display: none">
+    #parse("vs/breadcrumb.htm")
+    <div class="page-content">
       <div class="page-header">
         <!-- 预览/创建发布版本/发布 -->
         <a class="btn btn-sm btn-pink" href="javascript:;" ng-click="preview()" title="预览当前生成的 nginx config 文件"> <i
@@ -27,7 +27,7 @@
         </a>
         <!-- 已创建的版本 -->
         <div id="tagsUl" class="btn-group" style="margin-left: 2%;">
-          <button data-toggle="dropdown" class="btn btn-xs dropdown-toggle">
+          <button data-toggle="dropdown" class="btn btn-info btn-xs dropdown-toggle">
             已创建的发布版本 <i class="icon-angle-down icon-on-right"></i>
           </button>
           <ul class="dropdown-menu">
@@ -38,7 +38,7 @@
         </div>
         <!-- 更多操作 -->
         <div class="btn-group" style="margin-left: 10px;">
-          <button data-toggle="dropdown" class="btn btn-xs dropdown-toggle">
+          <button data-toggle="dropdown" class="btn btn-info btn-xs dropdown-toggle">
             更多操作 <i class="icon-angle-down icon-on-right"></i>
           </button>
           <ul class="dropdown-menu">
@@ -47,24 +47,28 @@
           </ul>
         </div>
       </div>
-      <div id="alertMessageDiv" style="text-align: center;"></div>
-      <!-- /.page-header -->
-      <div class="tabbable tabs-left">
-        <ul ng-model="selectedTab" style="height: 30px;" class="nav nav-tabs">
-          <li ng-class="isActive('profile')"><a href="#profile" ng-click="selectedTab='profile'">&nbsp;基本配置&nbsp;</a></li>
-          <li ng-class="isActive('location')"><a href="#location" ng-click="selectedTab='location'">&nbsp;映射规则&nbsp;</a></li>
-        </ul>
-        <form class="form-horizontal" role="form">
-          <div class="tab-content" ng-switch on="selectedTab">
-            <div ng-class="isActiveTabPanel('profile')" ng-controller="ProfileController">#parse("/profile/${editOrShow}/content.htm")#parse("profile/modals.htm")</div>
-            <div ng-class="isActiveTabPanel('location')" ng-controller="LocationController">#parse("/location/${editOrShow}/list.htm")#parse("location/modals.htm")</div>
-          </div>
-        </form>
+      <div class="row">
+        <div id="alertMessageDiv" style="text-align: center;"></div>
+        <!-- /.page-header -->
+        <div class="tabbable tabs-left">
+          <ul ng-model="selectedTab" style="height: 30px;" class="nav nav-tabs">
+            <li ng-class="isActive('profile')"><a href="#profile" ng-click="selectedTab='profile'"><i
+                class="blue icon-cogs bigger-120"></i>&nbsp;基本配置&nbsp;</a></li>
+            <li ng-class="isActive('location')"><a href="#location" ng-click="selectedTab='location'"><i
+                class="blue icon-exchange bigger-120"></i>&nbsp;映射规则&nbsp;</a></li>
+          </ul>
+          <form class="form-horizontal" role="form">
+            <div class="tab-content" ng-switch on="selectedTab">
+              <div ng-class="isActiveTabPanel('profile')" ng-controller="ProfileController">#parse("vs/profile/${editOrShow}/content.htm")#parse("vs/profile/modals.htm")</div>
+              <div ng-class="isActiveTabPanel('location')" ng-controller="LocationController">#parse("vs/location/${editOrShow}/list.htm")#parse("vs/location/modals.htm")</div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
     <!-- /.page-content -->
   </div>
 
-     #parse("vs/modals.htm")
+  #parse("vs/modals.htm")
 </div>
 

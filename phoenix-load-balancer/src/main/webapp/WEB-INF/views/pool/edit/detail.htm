@@ -1,24 +1,23 @@
 <div ng-show="pool">
-  <form class="form-horizontal" style="margin-top: 30px;">
-    <div class="control-group">
-      <label class="control-label">集群名</label>
-      <div class="controls">
-        <label class="checkbox"> <span>{{ pool.name }}</span>
-        </label>
+  <form class="form-horizontal" role="form">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right">集群名</label>
+      <div class="col-sm-7">
+        <input disabled class="" value="{{pool.name}}" type="text">
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label" for="inputPassword">负载均衡策略</label>
-      <div class="controls">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right" for="inputPassword">负载均衡策略</label>
+      <div class="col-sm-7">
         <select class="span2" ng-model="pool.loadbalanceStrategyName"
           ng-options="item.name as item.name for item in strategies">
           <option value="">-- 选择策略 --</option>
         </select>
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label" for="inputEmail">最小活动节点占比</label>
-      <div class="controls">
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right" for="inputEmail">最小活动节点占比</label>
+      <div class="col-sm-7">
         <div class="input-append">
           <input ng-trim="true" class="" ng-model="pool.minAvailableMemberPercentage" type="text"
             placeholder="输入1-100的数值"> <span class="add-on">%</span>
@@ -58,11 +57,11 @@
           </label> <label class="radio inline"> <input ng-model="member.state" type="radio" value="FORCED_OFFLINE">
               FORCED_OFFLINE
           </label></td>
-          <td><label class="radio inline"> <input ng-model="member.availability" type="radio" value="AVAILABLE">
-              AVAILABLE
-          </label><label class="radio inline"> <input ng-model="member.availability" type="radio"
-              value="OFFLINE"> OFFLINE
-          </label> </td>
+          <td><label class="radio inline"> <input ng-model="member.availability" type="radio"
+              value="AVAILABLE"> AVAILABLE
+          </label><label class="radio inline"> <input ng-model="member.availability" type="radio" value="OFFLINE">
+              OFFLINE
+          </label></td>
           <td><a href="javascript:void(0);" ng-click="affirmRemoveMemberModal($index);"><span
               class='removeIcon'></span> 删除 </a></td>
         </tr>

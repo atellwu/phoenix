@@ -6,11 +6,11 @@
 			}
 		</script>
   <ul class="breadcrumb">
-    <li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
-    <li class="active">站点：{{vs.name}}</li>
+    <li class="active">当前位置：集群 {{ pool.name }} #if(${editOrShow}=='edit') (编辑模式) #end &nbsp; <span
+      class="label label-warning" ng-show="newVs"><i class=" icon-exclamation-sign"></i>&nbsp; 新建站点，请填写后保存。 </span></li>
   </ul>
   <!-- .breadcrumb -->
-
+  <a style="position: absolute;right:200px;" href="javascript:app.openAddPoolModal();" class=""><i class="icon-plus"></i> 新增集群</a>
   <div class="nav-search" id="nav-search">
     <form class="form-search">
       <span class="input-icon"> <input type="text" placeholder="Search ..." class="nav-search-input"

@@ -1,0 +1,31 @@
+
+<script type="text/javascript" src="${contextPath}/static/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="${contextPath}/static/js/myangular-taskList.js?t=20130623"></script>
+<script type="text/javascript" src="${contextPath}/static/js/myangular-task.js?t=20130623"></script>
+
+<script type="text/javascript">
+	$("[rel=tooltip]").tooltip();
+	$(document).ready(
+			function() {
+				//$('table[slb-datatable]').dataTable();
+				var navtable = $("table.slb-datatable").dataTable({
+					"bFilter" : false,
+					"bInfo" : false,
+					"bLengthChange" : false,
+					"bPaginate" : false,
+					"aoColumns" : [ {
+						"bSortable" : false
+					}, null, {
+						"bSortable" : false
+					}, null, {
+						"bSortable" : false
+					}, null, {
+						"bSortable" : false
+					} ]
+				});
+				//navtable.fnSort([ [ 3, 'asc' ] ]);
+				angular.element($('#TaskController')).scope().getTask(
+						'${deployTaskId}');
+			});
+</script>
+

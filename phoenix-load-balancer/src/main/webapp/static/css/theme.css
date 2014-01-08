@@ -19,3 +19,7 @@ table.slb-datatable thead {
 div.modal h3, div.modal h4{
 	text-align: center;
 }
+
+div.alert{
+	text-align: center;
+}

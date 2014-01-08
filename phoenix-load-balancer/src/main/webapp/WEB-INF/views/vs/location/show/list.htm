@@ -1,10 +1,7 @@
 <span style="font-size: 12px;">所在位置：<a href="javascript:;" ng-click="switchLocationList();">所有规则</a> &nbsp;&nbsp;<span
   ng-show="locationEditing">/ &nbsp;&nbsp; 规则（{{locationEditing.pattern}}）</span>
 </span>
-<div ng-hide="locationEditing">
-  <a style="float: right; margin-right: 30px;" href="javascript:;" ng-click="openAddLocationModal()"> <i
-    class="icon-plus"></i> 添加新规则
-  </a>
+<div  ng-hide="locationEditing">
   <h5 style="margin-top: 30px">规则列表</h5>
   <table class="table table-bordered" style="width: 80%">
     <thead>
@@ -22,11 +19,12 @@
         <td>{{location.matchType}}</td>
         <!-- <td>{{location.domain}}</td>  -->
         <td><span ng-show="location.caseSensitive">是</span><span ng-hide="location.caseSensitive">否</span></td>
-        <td><a href="javascript:void(0);" ng-click="switchLocation($index);"><i class="icon-edit"></i> 详细 </a>&nbsp;&nbsp;<a
-          href="javascript:void(0);" ng-click="affirmRemoveLocationModal($index);">删除</a></td>
+        <td><a href="javascript:void(0);" ng-click="switchLocation($index);">
+            详细 </a></td>
       </tr>
     </tbody>
   </table>
 </div>
 
-#parse("location/${editOrShow}/detail.htm")
+#parse("vs/location/${editOrShow}/detail.htm")
+

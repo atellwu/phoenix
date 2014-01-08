@@ -24,14 +24,13 @@ import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
 import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.utils.JsonBinder;
-import com.opensymphony.xwork2.ActionSupport;
 
 /**
  * @author wukezhu
  */
 @Component("deployAction")
 @Scope("prototype")
-public class DeployAction extends ActionSupport {
+public class DeployAction extends MenuAction {
 
     private static final long     serialVersionUID      = -7250754630706893980L;
 
@@ -42,6 +41,8 @@ public class DeployAction extends ActionSupport {
     private static final int      ERRORCODE_PARAM_ERROR = -2;
 
     private static final int      ERRORCODE_INNER_ERROR = -1;
+
+    private static final String   MENU                  = "deploy";
 
     private Map<String, Object>   dataMap               = new HashMap<String, Object>();
 
@@ -235,27 +236,27 @@ public class DeployAction extends ActionSupport {
         return SUCCESS;
     }
 
-//    /**
-//     * 重试Task
-//     */
-//    public String retryDeployTask() {
-//        try {
-//            TaskExecutor taskExecutor = taskContainer.getTaskExecutor(deployTaskId);
-//            if (taskExecutor != null) {
-//                //                taskExecutor.retry();
-//            }
-//
-//            dataMap.put("errorCode", ERRORCODE_SUCCESS);
-//        } catch (IllegalArgumentException e) {
-//            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
-//            dataMap.put("errorMessage", e.getMessage());
-//        } catch (Exception e) {
-//            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
-//            dataMap.put("errorMessage", e.getMessage());
-//            LOG.error(e.getMessage(), e);
-//        }
-//        return SUCCESS;
-//    }
+    //    /**
+    //     * 重试Task
+    //     */
+    //    public String retryDeployTask() {
+    //        try {
+    //            TaskExecutor taskExecutor = taskContainer.getTaskExecutor(deployTaskId);
+    //            if (taskExecutor != null) {
+    //                //                taskExecutor.retry();
+    //            }
+    //
+    //            dataMap.put("errorCode", ERRORCODE_SUCCESS);
+    //        } catch (IllegalArgumentException e) {
+    //            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
+    //            dataMap.put("errorMessage", e.getMessage());
+    //        } catch (Exception e) {
+    //            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
+    //            dataMap.put("errorMessage", e.getMessage());
+    //            LOG.error(e.getMessage(), e);
+    //        }
+    //        return SUCCESS;
+    //    }
 
     public String getStatus() {
         try {
@@ -296,6 +297,7 @@ public class DeployAction extends ActionSupport {
         if (contextPath == null) {
             contextPath = ServletActionContext.getServletContext().getContextPath();
         }
+        this.setMenu(MENU);
     }
 
     public Map<String, Object> getDataMap() {

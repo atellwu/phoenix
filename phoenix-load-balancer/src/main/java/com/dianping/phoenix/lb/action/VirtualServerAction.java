@@ -27,27 +27,35 @@ import com.dianping.phoenix.lb.utils.JsonBinder;
 @Scope("prototype")
 public class VirtualServerAction extends MenuAction {
 
-    private static final int    MAX_TAG_NUM      = 10;
+    private static final int      MAX_TAG_NUM      = 10;
 
-    private static final Logger LOG              = LoggerFactory.getLogger(VirtualServerAction.class);
+    private static final Logger   LOG              = LoggerFactory.getLogger(VirtualServerAction.class);
 
-    private static final long   serialVersionUID = -1084994778030229218L;
+    private static final long     serialVersionUID = -1084994778030229218L;
 
-    private String              virtualServerName;
+    private static final String   MENU             = "vs";
 
-    private String              tagId;
+    private String                virtualServerName;
 
-    private Integer             version;
+    private String                tagId;
 
-    private List<String>        tags;
+    private Integer               version;
 
-    private List<VirtualServer> list;
+    private List<String>          tags;
 
-    private String[]            vsListToTag;
+    private List<VirtualServer>   list;
 
-    private String              vsListToTagStr;
+    private String[]              vsListToTag;
 
-    private String              tagIdsStr;
+    private String                vsListToTagStr;
+
+    private String                tagIdsStr;
+
+    protected List<VirtualServer> virtualServers;
+
+    public List<VirtualServer> getVirtualServers() {
+        return virtualServers;
+    }
 
     public String index() {
         if (virtualServers.size() == 0) {
@@ -146,7 +154,7 @@ public class VirtualServerAction extends MenuAction {
             }
             VirtualServer virtualServer = JsonBinder.getNonNullBinder().fromJson(vsJson, VirtualServer.class);
 
-            pools = poolService.listPools();
+            List<Pool> pools = poolService.listPools();
             commonAspects = commonAspectService.listCommonAspects();
             String nginxConfig = virtualServerService.generateNginxConfig(virtualServer, pools, commonAspects);
 
@@ -169,6 +177,7 @@ public class VirtualServerAction extends MenuAction {
     }
 
     public String addTag() throws Exception {
+        List<Pool> pools = poolService.listPools();
         try {
             Validate.notNull(virtualServerName);
             Validate.notNull(version);
@@ -191,7 +200,7 @@ public class VirtualServerAction extends MenuAction {
     }
 
     public String addBatchTag() throws Exception {
-        System.out.println(vsListToTag);
+        List<Pool> pools = poolService.listPools();
         List<String> tagIds = new ArrayList<String>();
         if (vsListToTag != null) {
             for (String vs : vsListToTag) {
@@ -351,6 +360,14 @@ public class VirtualServerAction extends MenuAction {
 
     public void setTagIdsStr(String tagIdsStr) {
         this.tagIdsStr = tagIdsStr;
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        this.setMenu(MENU);
+        virtualServers = virtualServerService.listVirtualServers();
+        commonAspects = commonAspectService.listCommonAspects();
     }
 
 }
