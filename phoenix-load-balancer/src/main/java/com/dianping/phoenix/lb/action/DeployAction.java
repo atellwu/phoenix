@@ -19,7 +19,6 @@ import com.dianping.phoenix.lb.deploy.bo.DeployTaskBo;
 import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo;
 import com.dianping.phoenix.lb.deploy.executor.TaskExecutor;
 import com.dianping.phoenix.lb.deploy.executor.TaskExecutorContainer;
-import com.dianping.phoenix.lb.deploy.model.DeployTask;
 import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
 import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
@@ -53,37 +52,15 @@ public class DeployAction extends MenuAction {
 
     private List<VirtualServer>   virtualServers;
 
-    private String                contextPath;
-
-    private int                   pageNum               = 1;
-
-    private List<DeployTask>      list;
-
-    private Paginator             paginator;
-
     private long                  deployTaskId;
 
     private DeployTaskBo          deployTaskBo;
-
-    //    /** 该pool影响到的vs自动弹出创建 */
-    //    private String                autoShowByPool;
 
     @Autowired
     private TaskExecutorContainer taskContainer;
 
     @PostConstruct
     public void init() {
-    }
-
-    /**
-     * 进入发布的页面，需要的参数是vsName列表
-     */
-    public String list() {
-        // 获取用户的历史重发记录
-        paginator = new Paginator();
-        list = deployTaskService.list(paginator, pageNum);
-
-        return SUCCESS;
     }
 
     /**
@@ -308,40 +285,12 @@ public class DeployAction extends MenuAction {
         return virtualServers;
     }
 
-    public String getContextPath() {
-        return contextPath;
-    }
-
     public String[] getVirtualServerNames() {
         return virtualServerNames;
     }
 
     public void setVirtualServerNames(String[] virtualServerNames) {
         this.virtualServerNames = virtualServerNames;
-    }
-
-    public int getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
-    }
-
-    public List<DeployTask> getList() {
-        return list;
-    }
-
-    public void setList(List<DeployTask> list) {
-        this.list = list;
-    }
-
-    public Paginator getPaginator() {
-        return paginator;
-    }
-
-    public void setPaginator(Paginator paginator) {
-        this.paginator = paginator;
     }
 
     public long getDeployTaskId() {

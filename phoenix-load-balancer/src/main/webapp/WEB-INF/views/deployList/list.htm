@@ -1,0 +1,38 @@
+<div class="main-container-inner" ng-app="MyApp" ng-controller="TaskListController"
+  id="TaskListController" style="">
+  #parse("deployList/sidebar.htm")
+  <div class="main-content">
+    #parse("deployList/breadcrumb.htm")
+    <div class="page-content">
+      <div class="page-header">
+        <a ng-click="addTaskModal()" href="javascript:void(0)" class="btn btn-sm btn-primary"> 创建任务 </a>
+      </div>
+      <div class="row">
+        <div id="alertMessageDiv" style="text-align: center;"></div>
+        <div class="table-responsive">
+          <table style="margin-top: 0px;width:90%;margin:0 auto;" class="table table-hover table-bordered" id="offerAdTable">
+            <thead>
+              <tr>
+                <th>任务名</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="adList">
+              #foreach($task in $list)
+              <tr>
+                <td>$task.name</td>
+                <td style=''>$task.status.desc</td>
+                <td><a href="${contextPath}/deploy/task/$task.id" target="_blank"><span
+                    class="label label-info">&nbsp; 查看任务 </span></a></td>
+              </tr>
+              #end
+            </tbody>
+          </table>
+        </div>
+        #parse("deployList/paginator.htm")
+      </div>
+    </div>
+  </div>
+  #parse("deployList/modals.htm")
+</div>

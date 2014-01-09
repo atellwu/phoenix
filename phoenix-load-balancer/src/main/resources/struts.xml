@@ -201,15 +201,15 @@
             </result>
         </action>
 
-        <action name="deploy" class="deployAction" method="list">
+        <action name="deploy" class="deployListAction" method="list">
             <result name="success" type="velocity">
-                /deploy/list.htm
+                /deployList/list.htm
             </result>
         </action>
-        <action name="deploy/list/{pageNum}" class="deployAction"
+        <action name="deploy/list/{pageNum}" class="deployListAction"
             method="list">
             <result name="success" type="velocity">
-                /deploy/list.htm
+                /deployList/list.htm
             </result>
         </action>
         <action name="deploy/task/add" class="deployAction"
