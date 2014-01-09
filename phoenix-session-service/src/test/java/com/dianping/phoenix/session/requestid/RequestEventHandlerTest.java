@@ -112,9 +112,9 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 			Thread.sleep(1);
 		}
 		Thread.sleep(100);
-		RequestEvent eventNow = handler.findEvent(uid, svrEventUrlDigest);
+		RequestEventEssential eventNow = handler.findEvent(uid, svrEventUrlDigest);
 
-		assertEquals(svrEvent2, eventNow);
+		assertEquals(svrEvent2.getRequestId(), eventNow.getRequestId());
 		assertEquals(1, handler.getL1Cache().get(uid).size());
 
 	}
@@ -131,9 +131,9 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 			Thread.sleep(1);
 		}
 		Thread.sleep(100);
-		RequestEvent eventNow = handler.findEvent(uid, svrEventUrlDigest);
+		RequestEventEssential eventNow = handler.findEvent(uid, svrEventUrlDigest);
 
-		assertEquals(svrEvent2, eventNow);
+		assertEquals(svrEvent2.getRequestId(), eventNow.getRequestId());
 		assertEquals(1, handler.getL1Cache().get(uid).size());
 
 	}
@@ -144,9 +144,9 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 		handler.setRecorder(new EventRecorder() {
 
 			@Override
-			public boolean recordEvent(RequestEvent curEvent, RequestEvent referToEvent) {
-				assertEquals(clientEventRTSvrEvent1, curEvent);
-				assertEquals(svrEvent2, referToEvent);
+			public boolean recordEvent(RequestEvent curEvent, RequestEventEssential referToEvent) {
+				assertEquals(clientEventRTSvrEvent1.getRequestId(), curEvent.getRequestId());
+				assertEquals(svrEvent2.getRequestId(), referToEvent.getRequestId());
 				latch.countDown();
 				return true;
 			}
@@ -166,9 +166,9 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 		handler.setRecorder(new EventRecorder() {
 
 			@Override
-			public boolean recordEvent(RequestEvent curEvent, RequestEvent referToEvent) {
-				assertEquals(clientEventRTClientEvent1, curEvent);
-				assertEquals(clientEvent1, referToEvent);
+			public boolean recordEvent(RequestEvent curEvent, RequestEventEssential referToEvent) {
+				assertEquals(clientEventRTClientEvent1.getRequestId(), curEvent.getRequestId());
+				assertEquals(clientEvent1.getRequestId(), referToEvent.getRequestId());
 				latch.countDown();
 				return true;
 			}
@@ -187,7 +187,7 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 		handler.setRecorder(new EventRecorder() {
 
 			@Override
-			public boolean recordEvent(RequestEvent curEvent, RequestEvent referToEvent) {
+			public boolean recordEvent(RequestEvent curEvent, RequestEventEssential referToEvent) {
 				assertEquals(clientEventRTNothing, curEvent);
 				assertEquals(clientEvent1, referToEvent);
 				latch.countDown();
@@ -208,9 +208,9 @@ public class RequestEventHandlerTest extends ComponentTestCase {
 		handler.setRecorder(new EventRecorder() {
 
 			@Override
-			public boolean recordEvent(RequestEvent curEvent, RequestEvent referToEvent) {
-				assertEquals(clientEventRTClientEvent1, curEvent);
-				assertEquals(clientEvent1, referToEvent);
+			public boolean recordEvent(RequestEvent curEvent, RequestEventEssential referToEvent) {
+				assertEquals(clientEventRTClientEvent1.getRequestId(), curEvent.getRequestId());
+				assertEquals(clientEvent1.getRequestId(), referToEvent.getRequestId());
 				latch.countDown();
 				return true;
 			}

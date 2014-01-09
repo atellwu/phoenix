@@ -6,6 +6,6 @@ import com.dianping.phoenix.session.RequestEvent;
 
 public interface EventRecorder {
 
-	boolean recordEvent(RequestEvent curEvent, RequestEvent referToEvent) throws IOException;
+	boolean recordEvent(RequestEvent curEvent, RequestEventEssential referToEvent) throws IOException;
 
 }

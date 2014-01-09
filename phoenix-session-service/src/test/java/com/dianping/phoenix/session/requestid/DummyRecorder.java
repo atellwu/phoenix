@@ -6,7 +6,7 @@ import com.dianping.phoenix.session.requestid.EventRecorder;
 public class DummyRecorder implements EventRecorder {
 
 	@Override
-	public boolean recordEvent(RequestEvent curEvent, RequestEvent referToEvent) {
+	public boolean recordEvent(RequestEvent curEvent, RequestEventEssential referToEvent) {
 		return true;
 	}
 

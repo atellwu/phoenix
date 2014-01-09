@@ -17,7 +17,7 @@ public class DefaultEventRecorder implements EventRecorder, LogEnabled {
 	private Logger m_logger;
 
 	@Override
-	public boolean recordEvent(RequestEvent curEvent, RequestEvent referToEvent) throws IOException {
+	public boolean recordEvent(RequestEvent curEvent, RequestEventEssential referToEvent) throws IOException {
 		BlockingQueue<byte[]> writeQ = fileMgr.getWriteQueue(curEvent.getTimestamp());
 		m_logger.info(String.format("Found requestid %s refer to request id %s", curEvent.getRequestId(),
 		      referToEvent.getRequestId()));
