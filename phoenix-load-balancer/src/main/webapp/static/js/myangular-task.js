@@ -42,6 +42,9 @@ module
 										function(data, status, headers, config) {
 											if (data.errorCode == 0) {
 												$scope.task = data.task;
+												//展现出来
+												$('#TaskController > div.main-content').show();
+
 												if ($scope.task.task.status == 'CREATED') {
 													$scope.canUpdate = true;
 												}
