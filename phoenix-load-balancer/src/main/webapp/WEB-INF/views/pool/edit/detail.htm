@@ -37,7 +37,6 @@
           <th>权重</th>
           <th>最大失败次数</th>
           <th>失败超时时间</th>
-          <th>状态</th>
           <th style="width: 130px;">状态控制</th>
           <th style="">操作</th>
         </tr>
@@ -56,11 +55,6 @@
               DISABLED
           </label> <label class="radio inline"> <input ng-model="member.state" type="radio" value="FORCED_OFFLINE">
               FORCED_OFFLINE
-          </label></td>
-          <td><label class="radio inline"> <input ng-model="member.availability" type="radio"
-              value="AVAILABLE"> AVAILABLE
-          </label><label class="radio inline"> <input ng-model="member.availability" type="radio" value="OFFLINE">
-              OFFLINE
           </label></td>
           <td><a href="javascript:void(0);" ng-click="affirmRemoveMemberModal($index);"><span
               class='removeIcon'></span> 删除 </a></td>
