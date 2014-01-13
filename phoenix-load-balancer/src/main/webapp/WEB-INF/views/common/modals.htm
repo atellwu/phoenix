@@ -1,3 +1,37 @@
+<!-- 添加nginx集群 -->
+<div aria-hidden="false" role="dialog" data-backdrop="true" class="bootbox modal" id="addSlbPoolModal"
+  style="margin: 0 0 0 0;">
+  <div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+        <h4 class="modal-title">添加新集群</h4>
+      </div>
+      <div class="modal-body">
+        <div class="bootbox-body">
+          <h6 style="text-align: center;">此处填写新集群名称</h6>
+          <div id="addSlbPoolAlertDiv"></div>
+          <form class="form-horizontal" onsubmit="return false;">
+            <div class="form-group">
+              <label class="col-sm-4 control-label no-padding-right">集群名</label>
+              <div class="col-sm-7">
+                <div class="input-prepend">
+                  <span class="add-on"></span><input id="addSlbPoolName" onkeyup="if(event.keyCode==13)app.addPool()"
+                    type="text" class="" placeholder="">
+                </div>
+                <span class="muted">（必填）</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button data-bb-handler="confirm" type="button" onclick="app.addSlbPool()" class="btn btn-primary">确定</button>
+        <button type="button" data-dismiss="modal" class="btn">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- 添加集群 -->
 <div aria-hidden="false" role="dialog" data-backdrop="true" class="bootbox modal" id="addPoolModal"
   style="margin: 0 0 0 0;">

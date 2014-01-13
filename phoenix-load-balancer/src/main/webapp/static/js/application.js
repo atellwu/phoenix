@@ -17,6 +17,11 @@
 			$('#addPoolModal').modal('show');
 			$('#addPoolName').focus();
 		},
+		"openAddSlbPoolModal" : function() {
+			$('#addSlbPoolName').val('');
+			$('#addSlbPoolModal').modal('show');
+			$('#addSlbPoolName').focus();
+		},
 		"openRemoveVirtualServerModal" : function() {
 			$('#removeVirtualServerAlertDiv').html('');
 			$('#removeVirtualServerName').val('');
@@ -28,6 +33,12 @@
 			$('#removePoolName').val('');
 			$('#removePoolModal').modal('show');
 			$('#removePoolName').focus();
+		},
+		"openRemoveSlbPoolModal" : function() {
+			$('#removeSlbPoolAlertDiv').html('');
+			$('#removeSlbPoolName').val('');
+			$('#removeSlbPoolModal').modal('show');
+			$('#removeSlbPoolName').focus();
 		},
 		"addVirtualServer" : function() {
 			var addVirtualServerName = $('#addVirtualServerName').val();
@@ -46,6 +57,15 @@
 				return;
 			}
 			w.location = w.contextpath + "/pool/" + addPoolName + '/edit';
+		},
+		"addSlbPool" : function() {
+			var addPoolName = $('#addSlbPoolName').val();
+			if (addPoolName == null
+					|| addPoolName.trim() == '') {
+				app.alertError('集群名称不能为空！', 'addSlbPoolAlertDiv');
+				return;
+			}
+			w.location = w.contextpath + "/slbPool/" + addPoolName + '/edit';
 		},
 		"backPool" : function() {
 			$('div[pool]').hide();

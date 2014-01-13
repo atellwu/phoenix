@@ -172,20 +172,61 @@
         </action>
 
 
+        <action name="slbPool" class="slbPoolAction" method="index">
+            <result name="redirect" type="redirect">
+                <param name="location">slbPool/${slbPoolName}</param>
+            </result>
+            <result name="none" type="velocity">
+                /slbPool/none.htm
+            </result>
+        </action>
+        <action name="slbPool/{slbPoolName}/save" class="slbPoolAction"
+            method="save">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="slbPool/{slbPoolName}/get" class="slbPoolAction"
+            method="get">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="slbPool/{slbPoolName}/remove" class="slbPoolAction"
+            method="remove">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="slbPool/{slbPoolName}/edit" class="slbPoolAction"
+            method="edit">
+            <result name="success" type="velocity">
+                /slbPool/slbPool.htm
+            </result>
+        </action>
+        <action name="slbPool/{slbPoolName}" class="slbPoolAction"
+            method="show">
+            <result name="success" type="velocity">
+                /slbPool/slbPool.htm
+            </result>
+        </action>
+
+
         <action name="base/propertiesDefinedInputs" class="definedInputAction">
             <result name="success" type="json">
                 <param name="root">propertiesDefinedInputs</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-
         <action name="base/directiveDefinedInputs" class="definedInputAction">
             <result name="success" type="json">
                 <param name="root">directiveDefinedInputs</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-
         <action name="base/listStrategies" class="strategyAction"
             method="listStrategies">
             <result name="success" type="json">
@@ -193,13 +234,19 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-
         <action name="base/listPools" class="poolAction" method="listPools">
             <result name="success" type="json">
                 <param name="root">pools</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
+         <action name="base/listSlbPools" class="slbPoolAction" method="listSlbPools">
+            <result name="success" type="json">
+                <param name="root">slbPools</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+
 
         <action name="deploy" class="deployListAction" method="list">
             <result name="success" type="velocity">
