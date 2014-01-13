@@ -60,12 +60,12 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 		var modalBody = $('#addTaskModal div.modal-body');
 		modalBody.css('height', height - 200);
 		
-//		var width = $(window).width();
+		var width = $(window).width();
 //		var height = $(window).height();
 //		var left = (width - 700) / 2;
 //		var modal = $('#addTaskModal');
 //		modal.css('height', height - 20);
-//		modal.css('width', 700);
+//		modalBody.css('width', 700);
 //		modal.css('top', 10);
 //		if (left > 0) {
 //			modal.css('left', left);
