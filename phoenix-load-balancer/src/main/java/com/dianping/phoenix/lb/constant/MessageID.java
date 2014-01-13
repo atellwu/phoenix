@@ -13,10 +13,16 @@ package com.dianping.phoenix.lb.constant;
 public enum MessageID {
     POOL_SAVE_FAIL("pool_save_fail"), //
     POOL_NAME_EMPTY("pool_name_empty"), //
+    
+    SLBPOOL_NAME_EMPTY("slbpool_name_empty"), //
 
     STRATEGY_SAVE_FAIL("strategy_save_fail"), //
     STRATEGY_NAME_EMPTY("strategy_name_empty"), //
     STRATEGY_TYPE_EMPTY("strategy_type_empty"), //
+
+    SLBPOOL_SAVE_FAIL("slbpool_save_fail"), //
+    SLBPOOL_NO_MEMBER("slbpool_no_member"), //
+    SLBPOOL_MEMBER_NO_IP("slbpool_member_no_ip"), //
 
     COMMON_ASPECT_SAVE_FAIL("common_aspect_save_fail"), //
     COMMON_ASPECT_NOT_FOUND("common_aspect_not_found"), //

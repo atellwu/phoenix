@@ -3,7 +3,12 @@
 	<entity name="slb-model-tree" root="true">
 		<entity-ref name="strategy" type="map" names="strategies" xml-indent="true" method-find-or-create="true" />
 		<entity-ref name="virtualServer" type="map" names="virtualServers" method-find-or-create="true" />
+		<entity-ref name="slb-pool" type="map" names="slb-pools" xml-indent="true" method-find-or-create="true" />
 		<entity-ref name="pool" type="map" names="pools" xml-indent="true" method-find-or-create="true" />
+	</entity>
+	<entity name="slb-pool">
+		<attribute name="name" value-type="String" key="true" />
+		<entity-ref name="instance" type="list" names="instances" />
 	</entity>
 	<entity name="strategy" dynamic-attributes="true">
 		<attribute name="name" value-type="String" key="true" />
@@ -25,9 +30,10 @@
 		<attribute name="creation-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
 		<attribute name="last-modified-date" value-type="Date" format="yyyy-MM-dd HH:mm:ss" />
 		<attribute name="version" value-type="int" primitive="true" default-value="1" />
-		<entity-ref name="instance" type="list" names="instances" xml-indent="true" />
+		<attribute name="slb-pool" value-type="String" />
 		<entity-ref name="location" type="list" names="locations" xml-indent="true" />
 		<entity-ref name="aspect" type="list" names="aspects" xml-indent="true" />
+		<attribute name="group" value-type="String" default-value="default" />
 	</entity>
 	<entity name="pool">
 		<attribute name="name" value-type="String" key="true" />
@@ -59,8 +65,8 @@
 		<entity-ref name="directive" type="list" names="directives" />
 	</entity>
 	<entity name="aspect">
-		<attribute name="name" value-type="String" default-value=""/>
-		<attribute name="ref" value-type="String" default-value=""/>
+		<attribute name="name" value-type="String" default-value="" />
+		<attribute name="ref" value-type="String" default-value="" />
 		<attribute name="point-cut" value-type="com.dianping.phoenix.lb.model.PointCut" enum="true"
 			default-value="com.dianping.phoenix.lb.model.PointCut.BEFORE" />
 		<entity-ref name="directive" type="list" names="directives" />
