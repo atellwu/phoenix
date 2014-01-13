@@ -181,17 +181,11 @@ public class LocalFileModelStoreImpl extends AbstractModelStore implements Model
                         String fileName = tag.getName();
                         Integer tagId = extractTagIdInt(vsName, fileName);
                         if (tagId != null) {
-                            String xml = FileUtils.readFileToString(tag);
-                            SlbModelTree tmpSlbModelTree = DefaultSaxParser.parse(xml);
-                            for (Map.Entry<String, VirtualServer> entry : tmpSlbModelTree.getVirtualServers()
-                                    .entrySet()) {
-                                tagMetas.putIfAbsent(entry.getKey(), new AtomicInteger(0));
-                                if (tagMetas.get(entry.getKey()).intValue() < tagId) {
-                                    tagMetas.get(entry.getKey()).set(tagId);
-                                }
+                            tagMetas.putIfAbsent(vsName, new AtomicInteger(0));
+                            if (tagMetas.get(vsName).intValue() < tagId) {
+                                tagMetas.get(vsName).set(tagId);
                             }
                         }
-
                     }
                 }
 
