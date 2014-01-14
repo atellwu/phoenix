@@ -11,6 +11,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.struts2.ServletActionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,8 @@ import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
+import com.dianping.phoenix.lb.service.model.PoolService;
+import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.dianping.phoenix.lb.utils.JsonBinder;
 
 /**
@@ -27,31 +30,37 @@ import com.dianping.phoenix.lb.utils.JsonBinder;
 @Scope("prototype")
 public class VirtualServerAction extends MenuAction {
 
-    private static final int      MAX_TAG_NUM      = 10;
+    private static final int       MAX_TAG_NUM      = 10;
 
-    private static final Logger   LOG              = LoggerFactory.getLogger(VirtualServerAction.class);
+    private static final Logger    LOG              = LoggerFactory.getLogger(VirtualServerAction.class);
 
-    private static final long     serialVersionUID = -1084994778030229218L;
+    private static final long      serialVersionUID = -1084994778030229218L;
 
-    private static final String   MENU             = "vs";
+    private static final String    MENU             = "vs";
 
-    private String                virtualServerName;
+    private String                 virtualServerName;
 
-    private String                tagId;
+    private String                 tagId;
 
-    private Integer               version;
+    private Integer                version;
 
-    private List<String>          tags;
+    private List<String>           tags;
 
-    private List<VirtualServer>   list;
+    private List<VirtualServer>    list;
 
-    private String[]              vsListToTag;
+    private String[]               vsListToTag;
 
-    private String                vsListToTagStr;
+    private String                 vsListToTagStr;
 
-    private String                tagIdsStr;
+    private String                 tagIdsStr;
 
-    protected List<VirtualServer> virtualServers;
+    protected List<VirtualServer>  virtualServers;
+
+    @Autowired
+    protected PoolService          poolService;
+
+    @Autowired
+    protected VirtualServerService virtualServerService;
 
     public List<VirtualServer> getVirtualServers() {
         return virtualServers;

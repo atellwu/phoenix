@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.phoenix.lb.model.entity.Aspect;
 import com.dianping.phoenix.lb.service.model.CommonAspectService;
-import com.dianping.phoenix.lb.service.model.PoolService;
-import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.opensymphony.xwork2.ActionSupport;
 
 /**
@@ -20,33 +18,27 @@ import com.opensymphony.xwork2.ActionSupport;
  */
 public abstract class MenuAction extends ActionSupport {
 
-    public static final int        ERRORCODE_SUCCESS     = 0;
+    public static final int       ERRORCODE_SUCCESS     = 0;
 
-    public static final int        ERRORCODE_PARAM_ERROR = -2;
+    public static final int       ERRORCODE_PARAM_ERROR = -2;
 
-    public static final int        ERRORCODE_INNER_ERROR = -1;
+    public static final int       ERRORCODE_INNER_ERROR = -1;
 
-    private static final long      serialVersionUID      = -1084994778030229218L;
+    private static final long     serialVersionUID      = -1084994778030229218L;
 
-    protected Map<String, Object>  dataMap               = new HashMap<String, Object>();
+    protected Map<String, Object> dataMap               = new HashMap<String, Object>();
 
-    protected String               contextPath;
+    protected String              contextPath;
 
-    protected String               editOrShow            = "show";
-
-    @Autowired
-    protected VirtualServerService virtualServerService;
+    protected String              editOrShow            = "show";
 
     @Autowired
-    protected PoolService          poolService;
+    protected CommonAspectService commonAspectService;
 
-    @Autowired
-    protected CommonAspectService  commonAspectService;
-
-    protected List<Aspect>         commonAspects;
+    protected List<Aspect>        commonAspects;
 
     /** vs,pool,deploy */
-    private String                 menu;
+    private String                menu;
 
     @PostConstruct
     public void init() {

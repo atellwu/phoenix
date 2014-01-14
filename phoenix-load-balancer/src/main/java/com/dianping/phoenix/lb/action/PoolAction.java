@@ -7,11 +7,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.exception.BizException;
 import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.service.model.PoolService;
+import com.dianping.phoenix.lb.service.model.VirtualServerService;
 import com.dianping.phoenix.lb.utils.JsonBinder;
 
 /**
@@ -21,17 +24,23 @@ import com.dianping.phoenix.lb.utils.JsonBinder;
 @Scope("prototype")
 public class PoolAction extends MenuAction {
 
-    private static final Logger LOG              = LoggerFactory.getLogger(PoolAction.class);
+    private static final Logger    LOG              = LoggerFactory.getLogger(PoolAction.class);
 
-    private static final long   serialVersionUID = -1084994778030229218L;
+    private static final long      serialVersionUID = -1084994778030229218L;
 
-    private static final String MENU             = "pool";
+    private static final String    MENU             = "pool";
 
-    private String              poolName;
+    private String                 poolName;
 
-    private Boolean             showInfluencing;
+    private Boolean                showInfluencing;
 
-    protected List<Pool>        pools;
+    protected List<Pool>           pools;
+
+    @Autowired
+    protected PoolService          poolService;
+
+    @Autowired
+    protected VirtualServerService virtualServerService;
 
     public List<Pool> getPools() {
         return pools;

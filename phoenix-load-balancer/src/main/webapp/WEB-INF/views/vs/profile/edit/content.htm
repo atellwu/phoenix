@@ -40,13 +40,12 @@
         </select>
       </div>
     </div>
-    <a style="float: right; margin-right: 0px" ng-click="addInstance();" href="javascript:;"><i class="icon-plus"></i>
-      添加</a>
     <div class="form-group">
-      <label class="col-sm-3 control-label no-padding-right" for="">目标nginx机器ip</label>
-      <div class="col-sm-9" style="margin-bottom: 10px" ng-repeat="instance in vs.instances">
-        <input ng-trim="true" class="input" ng-model="instance.ip" type="text">&nbsp;&nbsp; <a
-          href="javascript:;" ng-click="removeInstance($index);"><i class="icon-remove"></i></a>
+      <label class="col-sm-3 control-label no-padding-right" for="">目标Nginx集群</label>
+      <div class="col-sm-9">
+        <select ng-model="vs.slbPool" ng-options="slbPool.name as slbPool.name for slbPool in slbPools">
+          <option value="">-- 选择Nginx集群 --</option>
+        </select>
       </div>
     </div>
   </div>

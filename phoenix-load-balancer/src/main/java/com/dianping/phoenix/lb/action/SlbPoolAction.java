@@ -42,6 +42,10 @@ public class SlbPoolAction extends MenuAction {
         return slbPools;
     }
 
+    public String listSlbPools() {
+        return SUCCESS;
+    }
+
     public String index() {
         if (slbPools.size() == 0) {
             return "noneVs";

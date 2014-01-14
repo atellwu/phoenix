@@ -14,9 +14,18 @@ module.controller('SlbPoolController', function($scope, DataService, $resource,
 			url : url
 		}).success(function(data, status, headers, config) {
 			if (data.errorCode == 0) {
-				if (data.slbPool == null) {// 新建slbPool
+				if (data.slbPool == null) {
+					// 新建slbPool
 					$scope.slbPool = new Object();
 					$scope.slbPool.name = slbPoolName;
+					var instance = new Object();
+					var instances = $scope.slbPool.instances;
+					if (!instances) {
+						instances = [];
+						$scope.slbPool.instances = instances;
+					}
+					instances.push(instance);
+
 					$scope.newSlbPool = true;
 				} else {
 					$scope.slbPool = data.slbPool;
@@ -41,11 +50,13 @@ module.controller('SlbPoolController', function($scope, DataService, $resource,
 	};
 	// 保存
 	$scope.save = function() {
-		$http({
-			method : 'POST',
-			data : $scope.slbPool,
-			url : window.contextpath + '/slbPool/' + $scope.slbPool.name + '/save'
-		}).success(
+		$http(
+				{
+					method : 'POST',
+					data : $scope.slbPool,
+					url : window.contextpath + '/slbPool/'
+							+ $scope.slbPool.name + '/save'
+				}).success(
 				function(data, status, headers, config) {
 					if (data.errorCode == 0) {
 						app.alertSuccess("保存成功！ 即将刷新页面...");
@@ -63,11 +74,13 @@ module.controller('SlbPoolController', function($scope, DataService, $resource,
 	};
 	// 删除
 	$scope.removeSlbPool = function() {
-		$http({
-			method : 'POST',
-			data : $scope.slbPool,
-			url : window.contextpath + '/slbPool/' + $scope.slbPool.name + '/remove'
-		}).success(
+		$http(
+				{
+					method : 'POST',
+					data : $scope.slbPool,
+					url : window.contextpath + '/slbPool/'
+							+ $scope.slbPool.name + '/remove'
+				}).success(
 				function(data, status, headers, config) {
 					if (data.errorCode == 0) {
 						app.alertSuccess("删除成功！ 即将刷新页面...",
@@ -99,11 +112,12 @@ module.controller('SlbPoolController', function($scope, DataService, $resource,
 		return re;
 	}
 	$scope.edit = function() {
-		window.location = window.contextpath + '/slbPool/' + $scope.slbPool.name
-				+ '/edit';
+		window.location = window.contextpath + '/slbPool/'
+				+ $scope.slbPool.name + '/edit';
 	}
 	$scope.cancleEdit = function() {
-		window.location = window.contextpath + '/slbPool/' + $scope.slbPool.name;
+		window.location = window.contextpath + '/slbPool/'
+				+ $scope.slbPool.name;
 	}
 	// 存活的instance
 	$scope.getAliveInstanceCount = function() {
@@ -112,8 +126,6 @@ module.controller('SlbPoolController', function($scope, DataService, $resource,
 	// instance增删
 	$scope.addInstance = function() {
 		var instance = new Object();
-		instance.state = 'ENABLED';
-		instance.availability = 'AVAILABLE';
 		var instances = $scope.slbPool.instances;
 		if (!instances) {
 			instances = [];

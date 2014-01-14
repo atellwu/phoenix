@@ -38,6 +38,10 @@ module.factory('DataService', function($resource) {
 	var Pools = $resource(window.contextpath + '/base/listPools');
 	model.pools = Pools.query(function() {
 	});
+	
+	var SlbPools = $resource(window.contextpath + '/base/listSlbPools');
+	model.slbPools = SlbPools.query(function() {
+	});
 
 	// list tag的resource
 //	model.Tags = $resource(window.contextpath + '/vs/:vsName0/tag/list');
