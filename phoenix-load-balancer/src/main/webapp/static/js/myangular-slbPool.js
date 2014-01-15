@@ -1,6 +1,6 @@
 module.controller('SlbPoolController', function($scope, DataService, $resource,
 		$http) {
-	$scope.strategies = DataService.strategies;
+	$scope.strategies = DataService.getStrategies();
 	var slbPoolChanged = false;
 	$scope.slbPool = null;
 	$scope.getSlbPool = function(slbPoolName) {

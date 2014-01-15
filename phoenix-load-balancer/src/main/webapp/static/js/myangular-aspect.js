@@ -2,7 +2,18 @@ module
 		.controller(
 				'AspectController',
 				function($scope, DataService, $resource, $http) {
-					$scope.aspects = DataService.aspects;
+					var Aspects = $resource(window.contextpath
+							+ '/base/listAspects');
+					$scope.aspects = Aspects.query(function() {
+						//展现出来
+						$('#AspectController > div.main-content').show();
+						// 开始监听pool的修改
+						$scope.$watch('aspects', function(newValue, oldValue) {
+							if (newValue != oldValue) {
+								aspectChanged = true;
+							}
+						}, true);
+					});
 					// aspect视图切换
 					$scope.aspectEditing = null;
 					$scope.switchAspect = function(index) {
@@ -17,6 +28,7 @@ module
 					$scope.cancleEdit = function() {
 						window.location = window.contextpath + '/aspect';
 					}
+					var aspectChanged = false;
 					// 保存
 					$scope.save = function() {
 						$http({
@@ -48,6 +60,7 @@ module
 					// aspect增删
 					$scope.openAddAspectModal = function() {
 						$scope.aspectToBeAdd = new Object();
+						$scope.aspectToBeAdd.pointCut = "BEFORE";
 						$('#addAspectModal').modal('show');
 						$('#addAspectName').focus();
 					};
@@ -70,7 +83,7 @@ module
 						$('#affirmRemoveAspectModal').modal('hide');
 					}
 					// directive增删
-					$scope.directiveDefinedInputs = DataService.directiveDefinedInputs;
+					$scope.directiveDefinedInputs = DataService.getDirectiveDefinedInputs();
 					$scope.getInputs = function(type) {
 						return $scope.directiveDefinedInputs[type];
 					}
@@ -132,6 +145,13 @@ module
 						delete directive.dynamicAttributes[name];
 					}
 					// pool-name选择
-					$scope.pools = DataService.pools;
+					$scope.pools = DataService.getPools();
 
+					// 离开页面时，对比一下vs是否发生了修改
+					var onunload = function() {
+						if (aspectChanged) {
+							return "您的修改尚未保存，现在离开将丢失所有修改";
+						}
+					}
+					window.onbeforeunload = onunload;
 				});

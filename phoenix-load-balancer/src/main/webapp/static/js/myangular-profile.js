@@ -5,7 +5,7 @@ module.controller('ProfileController', function($scope, DataService, $resource,
 		return '待询问jinhua';
 	}
 	// 动态参数的管理
-	$scope.propertiesDefinedInputs = DataService.propertiesDefinedInputs;
+	$scope.propertiesDefinedInputs = DataService.getPropertiesDefinedInputs();
 	$scope.addDynamicAttribute = function(key, value) {
 		if (key == null || key.trim() == '') {
 			app.alertError("参数名不能为空！", "addParamAlertDiv");
@@ -56,7 +56,7 @@ module.controller('ProfileController', function($scope, DataService, $resource,
 		$scope.vs.instances.push(instance);
 	}
 	//默认pool选择
-	$scope.pools = DataService.pools;
+	$scope.pools = DataService.getPools();
 	//默认pool选择
-	$scope.slbPools = DataService.slbPools;
+	$scope.slbPools = DataService.getSlbPools();
 });

@@ -1,6 +1,6 @@
 module.controller('PoolController', function($scope, DataService, $resource,
 		$http) {
-	$scope.strategies = DataService.strategies;
+	$scope.strategies = DataService.getStrategies();
 	var poolChanged = false;
 	$scope.pool = null;
 	$scope.getPool = function(poolName) {

@@ -43,7 +43,7 @@ module
 						$('#affirmRemoveLocationModal').modal('hide');
 					}
 					// directive增删
-					$scope.directiveDefinedInputs = DataService.directiveDefinedInputs;
+					$scope.directiveDefinedInputs = DataService.getDirectiveDefinedInputs();
 					$scope.getInputs = function(type) {
 						return $scope.directiveDefinedInputs[type];
 					}
@@ -105,6 +105,6 @@ module
 						delete directive.dynamicAttributes[name];
 					}
 					//pool-name选择
-					$scope.pools = DataService.pools;
+					$scope.pools = DataService.getPools();
 
 				});
