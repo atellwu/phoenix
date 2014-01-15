@@ -214,6 +214,30 @@
             </result>
         </action>
 
+        <action name="aspect" class="aspectAction" method="index">
+            <result name="success" type="velocity">
+                /aspect/index.htm
+            </result>
+        </action>
+        <action name="aspect/save" class="aspectAction" method="save">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="aspect/get" class="aspectAction" method="get">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="aspect/edit" class="aspectAction"
+            method="edit">
+            <result name="success" type="velocity">
+                /aspect/index.htm
+            </result>
+        </action>
+
 
         <action name="base/propertiesDefinedInputs" class="definedInputAction">
             <result name="success" type="json">
@@ -240,9 +264,17 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-         <action name="base/listSlbPools" class="slbPoolAction" method="listSlbPools">
+        <action name="base/listSlbPools" class="slbPoolAction"
+            method="listSlbPools">
             <result name="success" type="json">
                 <param name="root">slbPools</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="base/listAspects" class="aspectAction"
+            method="list">
+            <result name="success" type="json">
+                <param name="root">aspects</param>
                 <param name="encoding">UTF-8</param>
             </result>
         </action>

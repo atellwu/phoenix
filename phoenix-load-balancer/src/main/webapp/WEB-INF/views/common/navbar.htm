@@ -19,14 +19,18 @@
           <i class="icon-cloud  align-top bigger-125 icon-on-right"></i> 集群管理
         </button>
       </a>
-      <a href="${contextPath}/deploy" class="navbar-brand">
-        <button class="btn #if(${menu}=='deployList')btn-purple #else btn-info#end btn-xs">
-          <i class="icon-cloud-upload align-top bigger-125 icon-on-right"></i> 发布管理
-        </button>
-      </a>
       <a href="${contextPath}/slbPool" class="navbar-brand">
         <button class="btn #if(${menu}=='slbPool')btn-purple #else btn-info#end btn-xs">
           <i class="icon-laptop align-top bigger-125 icon-on-right"></i> Nginx管理
+        </button>
+      </a>
+       <a href="${contextPath}/aspect" class="navbar-brand">
+        <button class="btn #if(${menu}=='aspect')btn-purple #else btn-info#end btn-xs">
+          <i class="icon-laptop align-top bigger-125 icon-on-right"></i> 公共规则管理
+        </button>
+      </a> <a href="${contextPath}/deploy" class="navbar-brand">
+        <button class="btn #if(${menu}=='deployList')btn-purple #else btn-info#end btn-xs">
+          <i class="icon-cloud-upload align-top bigger-125 icon-on-right"></i> 发布管理
         </button>
       </a>
       <!-- /.brand -->

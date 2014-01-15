@@ -24,6 +24,11 @@
 			<directive />
 			<directive />
 		</aspect>
+        <location match-type="prefix" pattern="/download">
+                <directive type="rewrite" matches="^(/download/.*)/media/(.*)\..*$" target-pattern="$1/mp3/$2.mp3" flag="break" />
+                <directive type="rewrite" matches="^(/download/.*)/audio/(.*)\..*$" target-pattern="$1/mp3/$2.ra" flag="last" />
+                <directive type="return" response-code="403" />
+        </location>
 	</aspects>
 	<slb-pools>
 		<slb-pool name="ppe-slb-pool">

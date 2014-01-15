@@ -42,6 +42,10 @@ module.factory('DataService', function($resource) {
 	var SlbPools = $resource(window.contextpath + '/base/listSlbPools');
 	model.slbPools = SlbPools.query(function() {
 	});
+	
+	var Aspects = $resource(window.contextpath + '/base/listAspects');
+	model.aspects = Aspects.query(function() {
+	});
 
 	// list tag的resource
 //	model.Tags = $resource(window.contextpath + '/vs/:vsName0/tag/list');

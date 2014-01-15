@@ -23,3 +23,20 @@ div.modal h3,div.modal h4 {
 div.alert {
 	text-align: center;
 }
+
+th{
+	text-align: center;
+	vertical-align: middle;
+}
+
+tr{
+	text-align: center;
+	vertical-align: middle;
+}
+
+.page-content{
+	padding-left: 30px;
+	min-height:500px;
+}
+
+page-content
