@@ -29,6 +29,8 @@ module.controller('VsController', function($scope, DataService, $resource,
 				if (data.virtualServer == null) {// 新建vs
 					$scope.vs = new Object();
 					$scope.vs.name = vsName;
+					$scope.vs.domain = '.dianping.com';
+					$scope.vs.port = 80;
 					$scope.vs.dynamicAttributes = new Object();
 					$scope.vs.instances = [];
 					$scope.vs.instances.push(new Object());
@@ -36,6 +38,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 					$scope.vs.state = 'ENABLED';
 					$scope.vs.availability = 'AVAILABLE';
 					$scope.vs.locations = [];
+					$scope.vs.aspects = [];
 					$scope.newVs = true;
 				} else {
 					$scope.vs = data.virtualServer;

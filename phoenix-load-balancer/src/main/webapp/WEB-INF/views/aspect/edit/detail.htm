@@ -61,7 +61,7 @@
             </div>
           </form>
         </td>
-        <td><a href="javascript:void(0);" ng-click="switch=(switch+1)%2"><i ng-hide="switch" class="icon-edit"></i><i
+        <td ng-init="switch=1"><a href="javascript:void(0);" ng-click="switch=(switch+1)%2"><i ng-hide="switch" class="icon-edit"></i><i
             ng-show="switch" class="icon-reply"></i></a>&nbsp;<a style="margin-left: 10px;" href="javascript:void(0);"
           ng-click="affirmRemoveDirectiveModal($index)"><i class="icon-remove"></i></a></td>
       </tr>

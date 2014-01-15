@@ -1,5 +1,17 @@
 module.controller('ProfileController', function($scope, DataService, $resource,
 		$http) {
+	// 默认pool选择
+	$scope.pools = DataService.getPools(function() {
+		// if ($scope.pools.length > 0) {
+		// $scope.vs.defaultPoolName = $scope.pools[0];
+		// }
+	});
+	// 默认pool选择
+	$scope.slbPools = DataService.getSlbPools(function() {
+		// if ($scope.slbPools.length > 0) {
+		// $scope.vs.slbPool = $scope.slbPools[0];
+		// }
+	});
 	// 计算状态
 	$scope.getVsState = function() {
 		return '待询问jinhua';
@@ -55,8 +67,4 @@ module.controller('ProfileController', function($scope, DataService, $resource,
 		instance.ip = '';
 		$scope.vs.instances.push(instance);
 	}
-	//默认pool选择
-	$scope.pools = DataService.getPools();
-	//默认pool选择
-	$scope.slbPools = DataService.getSlbPools();
 });

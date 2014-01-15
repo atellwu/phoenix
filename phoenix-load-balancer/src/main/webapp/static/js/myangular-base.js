@@ -21,62 +21,58 @@ module.directive('ngEnter', function() {
 module.factory('DataService', function($resource) {
 	var model = {};
 
-//	var PropertiesDefinedInputs = $resource(window.contextpath
-//			+ '/base/propertiesDefinedInputs');
-//	model.propertiesDefinedInputs = PropertiesDefinedInputs.get(function() {
-//	});
-	var PropertiesDefinedInputs = $resource(window.contextpath + '/base/propertiesDefinedInputs');
-	model.getPropertiesDefinedInputs = function() {
-		model.propertiesDefinedInputs = PropertiesDefinedInputs.get(function() {
-		});
+	// var PropertiesDefinedInputs = $resource(window.contextpath
+	// + '/base/propertiesDefinedInputs');
+	// model.propertiesDefinedInputs = PropertiesDefinedInputs.get(function() {
+	// });
+	var PropertiesDefinedInputs = $resource(window.contextpath
+			+ '/base/propertiesDefinedInputs');
+	model.getPropertiesDefinedInputs = function(func) {
+		model.propertiesDefinedInputs = PropertiesDefinedInputs.get(func);
 		return model.propertiesDefinedInputs;
 	};
 
-//	var DirectiveDefinedInputs = $resource(window.contextpath
-//			+ '/base/directiveDefinedInputs');
-//	model.directiveDefinedInputs = DirectiveDefinedInputs.get(function() {
-//	});
-	var DirectiveDefinedInputs = $resource(window.contextpath + '/base/directiveDefinedInputs');
-	model.getDirectiveDefinedInputs = function() {
-		model.directiveDefinedInputs = DirectiveDefinedInputs.get(function() {
-		});
+	// var DirectiveDefinedInputs = $resource(window.contextpath
+	// + '/base/directiveDefinedInputs');
+	// model.directiveDefinedInputs = DirectiveDefinedInputs.get(function() {
+	// });
+	var DirectiveDefinedInputs = $resource(window.contextpath
+			+ '/base/directiveDefinedInputs');
+	model.getDirectiveDefinedInputs = function(func) {
+		model.directiveDefinedInputs = DirectiveDefinedInputs.get(func);
 		return model.directiveDefinedInputs;
 	};
 
-//	var Strategies = $resource(window.contextpath + '/base/listStrategies');
-//	model.strategies = Strategies.query(function() {
-//	});
+	// var Strategies = $resource(window.contextpath + '/base/listStrategies');
+	// model.strategies = Strategies.query(function() {
+	// });
 	var Strategies = $resource(window.contextpath + '/base/listStrategies');
-	model.getStrategies = function() {
-		model.strategies = Strategies.query(function() {
-		});
+	model.getStrategies = function(func) {
+		model.strategies = Strategies.query(func);
 		return model.strategies;
 	};
 
-//	var Pools = $resource(window.contextpath + '/base/listPools');
-//	model.pools = Pools.query(function() {
-//	});
+	// var Pools = $resource(window.contextpath + '/base/listPools');
+	// model.pools = Pools.query(function() {
+	// });
 	var Pools = $resource(window.contextpath + '/base/listPools');
-	model.getPools = function() {
-		model.pools = Pools.query(function() {
-		});
+	model.getPools = function(func) {
+		model.pools = Pools.query(func);
 		return model.pools;
 	};
 
 	var SlbPools = $resource(window.contextpath + '/base/listSlbPools');
-	model.getSlbPools = function() {
-		model.slbPools = SlbPools.query(function() {
-		});
+	model.getSlbPools = function(func) {
+		model.slbPools = SlbPools.query(func);
 		return model.slbPools;
 	};
 
-//	var Aspects = $resource(window.contextpath + '/base/listAspects');
-//	model.aspects = Aspects.query(function() {
-//	});
+	// var Aspects = $resource(window.contextpath + '/base/listAspects');
+	// model.aspects = Aspects.query(function() {
+	// });
 	var Aspects = $resource(window.contextpath + '/base/listAspects');
-	model.getAspects = function() {
-		model.aspects = Aspects.query(function() {
-		});
+	model.getAspects = function(func) {
+		model.aspects = Aspects.query(func);
 		return model.aspects;
 	};
 

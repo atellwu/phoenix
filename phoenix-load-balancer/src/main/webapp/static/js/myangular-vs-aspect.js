@@ -55,6 +55,7 @@ module
 					// directive增删
 					$scope.directiveDefinedInputs = DataService
 							.getDirectiveDefinedInputs();
+
 					$scope.getInputs = function(type) {
 						return $scope.directiveDefinedInputs[type];
 					}
@@ -74,6 +75,9 @@ module
 					$scope.openAddDirectiveModal = function() {
 						$scope.directiveToBeAdd = new Object();
 						$scope.directiveToBeAdd.dynamicAttributes = {};
+						for (first in $scope.directiveDefinedInputs)
+							break;
+						$scope.directiveToBeAdd.type = first;
 						$('#addAspectDirectiveModal').modal('show');
 						$('#addAspectDirectiveType').focus();
 					};

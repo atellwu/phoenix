@@ -5,7 +5,7 @@ module
 					var Aspects = $resource(window.contextpath
 							+ '/base/listAspects');
 					$scope.aspects = Aspects.query(function() {
-						//展现出来
+						// 展现出来
 						$('#AspectController > div.main-content').show();
 						// 开始监听pool的修改
 						$scope.$watch('aspects', function(newValue, oldValue) {
@@ -83,7 +83,8 @@ module
 						$('#affirmRemoveAspectModal').modal('hide');
 					}
 					// directive增删
-					$scope.directiveDefinedInputs = DataService.getDirectiveDefinedInputs();
+					$scope.directiveDefinedInputs = DataService
+							.getDirectiveDefinedInputs();
 					$scope.getInputs = function(type) {
 						return $scope.directiveDefinedInputs[type];
 					}
@@ -103,6 +104,9 @@ module
 					$scope.openAddDirectiveModal = function() {
 						$scope.directiveToBeAdd = new Object();
 						$scope.directiveToBeAdd.dynamicAttributes = {};
+						for (first in $scope.directiveDefinedInputs)
+							break;
+						$scope.directiveToBeAdd.type = first;
 						$('#addDirectiveModal').modal('show');
 						$('#addDirectiveType').focus();
 					};

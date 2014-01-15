@@ -17,6 +17,10 @@ module.controller('PoolController', function($scope, DataService, $resource,
 				if (data.pool == null) {// 新建pool
 					$scope.pool = new Object();
 					$scope.pool.name = poolName;
+					$scope.pool.minAvailableMemberPercentage = 50;
+					if ($scope.strategies) {
+						$scope.pool.loadbalanceStrategyName = $scope.strategies[0].name;
+					}
 					$scope.newPool = true;
 				} else {
 					$scope.pool = data.pool;
@@ -114,6 +118,10 @@ module.controller('PoolController', function($scope, DataService, $resource,
 		var member = new Object();
 		member.state = 'ENABLED';
 		member.availability = 'AVAILABLE';
+		member.port = 8080;
+		member.weight = 2;
+		member.maxFails = 2;
+		member.failTimeout = '30s';
 		var members = $scope.pool.members;
 		if (!members) {
 			members = [];
