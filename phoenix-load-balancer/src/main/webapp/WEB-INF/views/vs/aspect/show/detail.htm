@@ -1,50 +1,36 @@
-<div ng-show="locationEditing">
-  <a style="float: right; margin-right: 30px;" ng-trim="true" href="javascript:;" ng-click="switchLocationList();">
-    <i class="icon-reply"></i> 返回规则列表
+<div ng-show="aspectEditing">
+  <a style="float: right; margin-right: 30px;" ng-trim="true" href="javascript:;" ng-click="switchAspectList();"> <i
+    class="icon-reply"></i> 返回公共规则列表
   </a>
-  <h5 style="margin-top: 30px">规则基本信息</h5>
+  <h5 style="margin-top: 30px">公共规则基本信息</h5>
   <form class="form-horizontal">
     <div class="form-group">
-      <label class="col-sm-4 control-label no-padding-right">匹配类型</label>
+      <label class="col-sm-4 control-label no-padding-right">规则名称</label>
       <div class="col-sm-7">
-        <select ng-model="locationEditing.matchType" ng-enter="addLocation()">
-          <option value="prefix">prefix</option>
-          <option value="regex">regex</option>
-          <option value="common">common</option>
-          <option value="exact">exact</option>
+        <input ng-model="aspectEditing.name" disabled type="text" class="input" placeholder="">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-4 control-label no-padding-right">类型</label>
+      <div class="col-sm-7">
+        <select disabled ng-model="aspectEditing.pointCut">
+          <option value="BEFORE">前置规则</option>
+          <option value="AFTER">后置规则</option>
         </select>
       </div>
     </div>
-    <div class="form-group">
-      <label class="col-sm-4 control-label no-padding-right">路径/正则表达式</label>
-      <div class="col-sm-7">
-        <input ng-model="locationEditing.pattern" ng-trim="true" ng-enter="addLocation()" type="text" class="input"
-          placeholder="">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="col-sm-4 control-label no-padding-right"></label>
-      <div class="col-sm-7">
-        <label class="checkbox inline"> <input ng-model="locationEditing.caseSensitive" type="checkbox">
-          大小写敏感
-        </label>
-      </div>
-    </div>
   </form>
-  <br> <a style="float: right; margin-right: 30px;" ng-click="openAddDirectiveModal();" href="javascript:;"> <i
-    class="icon-plus"></i> 添加新指令
-  </a>
+  <br>
   <h5 style="margin-top: 0px; margin-bottom: 20px">指令列表</h5>
   <table class="table table-bordered" style="width: 100%">
     <thead>
       <tr>
         <th>指令类型</th>
         <th>指令详细参数</th>
-        <th style="width: 130px;">操作</th>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="directive in locationEditing.directives" ng-init="inputs = getInputs(directive.type)"
+      <tr ng-repeat="directive in aspectEditing.directives" ng-init="inputs = getInputs(directive.type)"
         ng-model="switch">
         <td>{{directive.type}}</td>
         <td ng-hide="switch"><span ng-repeat="(name, value) in directive.dynamicAttributes"
@@ -72,9 +58,6 @@
             </div>
           </form>
         </td>
-        <td ng-init="switch=1"><a href="javascript:void(0);" ng-click="switch=(switch+1)%2"><i ng-hide="switch"
-            class="icon-edit"></i><i ng-show="switch" class="icon-reply"></i></a>&nbsp;<a style="margin-left: 10px;"
-          href="javascript:void(0);" ng-click="affirmRemoveDirectiveModal($index)"><i class="icon-remove"></i></a></td>
       </tr>
     </tbody>
   </table>

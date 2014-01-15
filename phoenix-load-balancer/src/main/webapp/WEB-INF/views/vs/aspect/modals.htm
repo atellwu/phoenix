@@ -1,8 +1,6 @@
-
-
 <!-- 确认删除directive的对话框 -->
 <div aria-hidden="false" role="dialog" data-backdrop="false" tabindex="-1" class="bootbox modal"
-  id="affirmRemoveDirectiveModal" style="margin: 0 0 0 0;">
+  id="affirmRemoveAspectDirectiveModal" style="margin: 0 0 0 0;">
   <div class="modal-dialog" style="width: 600px;">
     <div class="modal-content">
       <div class="modal-header">
@@ -24,9 +22,8 @@
   </div>
 </div>
 
-
 <!-- 添加新指令 -->
-<div aria-hidden="false" role="dialog" data-backdrop="false" class="bootbox modal" id="addDirectiveModal"
+<div aria-hidden="false" role="dialog" data-backdrop="false" class="bootbox modal" id="addAspectDirectiveModal"
   style="margin: 0 0 0 0;">
   <div class="modal-dialog" style="width: 600px;">
     <div class="modal-content">
@@ -36,12 +33,12 @@
       </div>
       <div class="modal-body">
         <div class="bootbox-body">
-          <div id="addDirectiveAlertDiv"></div>
+          <div id="addAspectDirectiveAlertDiv"></div>
           <form class="form-horizontal">
             <div class="form-group">
               <label class="col-sm-4 control-label no-padding-right" for="">选择指令类型：</label>
               <div class="col-sm-7">
-                <select id="addDirectiveType" ng-model="directiveToBeAdd.type"
+                <select id="addAspectDirectiveType" ng-model="directiveToBeAdd.type"
                   ng-options="key as key for (key,directiveDefinedInput) in directiveDefinedInputs">
                   <option value="">-- 选择类型 --</option>
                 </select>
@@ -58,61 +55,81 @@
   </div>
 </div>
 
-<!-- 添加规则 -->
-<div aria-hidden="false" role="dialog" data-backdrop="false" class="bootbox modal bootbox-confirm " id="addLocationModal"
+<!-- aspect  添加规则 -->
+<div aria-hidden="false" role="dialog" data-backdrop="false" class="bootbox modal bootbox-confirm " id="addAspectModal"
   style="margin: 0 0 0 0;">
   <div class="modal-dialog" style="width: 600px;">
     <div class="modal-content">
       <div class="modal-header">
         <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
-        <h4 class="modal-title">添加新规则</h4>
+        <h3 class="modal-title">添加新规则</h3>
       </div>
       <div class="modal-body">
         <div class="bootbox-body">
-          <h6 style="text-align: center;">此处填写基本的信息，详细规则的信息，可以在添加规则后，点击"编辑"进行详细补充。</h6>
-          <br>
-          <div id="addLocationAlertDiv"></div>
+          <div id="addAspectAlertDiv"></div>
           <form class="form-horizontal">
             <div class="form-group">
-              <label class="col-sm-4 control-label no-padding-right">匹配类型</label>
+              <label class="col-sm-4 control-label no-padding-right">规则名</label>
               <div class="col-sm-7">
-                <select ng-model="locationToBeAdd.matchType" ng-enter="addLocation()">
-                  <option value="prefix">prefix</option>
-                  <option value="regex">regex</option>
-                  <option value="common">common</option>
-                  <option value="exact">exact</option>
+                <input id="addAspectName" ng-trim="true" ng-model="aspectToBeAdd.name" ng-enter="addAspect()"
+                  type="text" class="input" placeholder="">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-4 control-label no-padding-right">类型</label>
+              <div class="col-sm-7">
+                <select ng-model="aspectToBeAdd.pointCut" ng-enter="addAspect()">
+                  <option value="BEFORE">前置规则</option>
+                  <option value="AFTER">后置规则</option>
                 </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-4 control-label no-padding-right">路径/正则表达式</label>
-              <div class="col-sm-7">
-                <input id="addLocationPatternInput" ng-trim="true" ng-model="locationToBeAdd.pattern"
-                  ng-enter="addLocation()" type="text" class="input" placeholder="">
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-4 control-label no-padding-right"></label>
-              <div class="col-sm-7">
-                <label class="checkbox inline"> <input ng-model="locationToBeAdd.caseSensitive" type="checkbox">
-                  大小写敏感
-                </label>
               </div>
             </div>
           </form>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" ng-click="addLocation()" class="btn btn-primary">确定</button>
+        <button type="button" ng-click="addAspect()" class="btn btn-primary">确定</button>
         <button type="button" data-dismiss="modal" class="btn">取消</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- 确认对话框 -->
+<!-- aspect ref 添加规则 -->
 <div aria-hidden="false" role="dialog" data-backdrop="false" class="bootbox modal bootbox-confirm "
-  id="affirmRemoveLocationModal" style="margin: 0 0 0 0;">
+  id="addRefAspectModal" style="margin: 0 0 0 0;">
+  <div class="modal-dialog" style="width: 600px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+        <h3 class="modal-title">添加预设规则</h3>
+      </div>
+      <div class="modal-body">
+        <div class="bootbox-body">
+          <div id="addRefAspectAlertDiv"></div>
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-4 control-label no-padding-right">规则名</label>
+              <div class="col-sm-7">
+                <select ng-model="aspectToBeAdd.ref" ng-options="aspect.name as aspect.name for aspect in aspects">
+                  <option value="">-- 选择规则 --</option>
+                </select>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" ng-click="addRefAspect()" class="btn btn-primary">确定</button>
+        <button type="button" data-dismiss="modal" class="btn">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- aspect 确认对话框 -->
+<div aria-hidden="false" role="dialog" data-backdrop="false" class="bootbox modal bootbox-confirm "
+  id="affirmRemoveAspectModal" style="margin: 0 0 0 0;">
   <div class="modal-dialog" style="width: 500px;">
     <div class="modal-content">
       <div class="modal-header">
@@ -121,15 +138,20 @@
       </div>
       <div class="modal-body">
         <div class="bootbox-body">
-          <p style="text-align: center;">
-            <i class="icon-warning-sign"></i> 您是否确定要删除该规则（路径/正则表达式为
-            <code>{{locationToBeRemove.pattern}}</code>
-            ） ？
+          <p ng-show="aspectToBeRemove.name!=''" style="text-align: center;">
+            <i class="icon-warning-sign"></i> 您是否确定要删除该自定义规则
+            <code>{{aspectToBeRemove.name}}</code>
+             ？
+          </p>
+          <p ng-show="aspectToBeRemove.name==''" style="text-align: center;">
+            <i class="icon-warning-sign"></i> 您是否确定要删除引用该预设规则
+            <code>{{aspectToBeRemove.ref}}</code>
+             ？ 
           </p>
         </div>
       </div>
       <div class="modal-footer">
-        <button data-bb-handler="confirm" type="button" ng-click="removeLocation();" class="btn btn-primary">确定</button>
+        <button data-bb-handler="confirm" type="button" ng-click="removeAspect();" class="btn btn-primary">确定</button>
         <button type="button" data-dismiss="modal" class="btn">取消</button>
       </div>
     </div>

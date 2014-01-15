@@ -16,7 +16,7 @@ module
 						$scope.locationToBeAdd.caseSensitive = true;
 						$scope.locationToBeAdd.matchType = 'prefix';
 						$('#addLocationModal').modal('show');
-						$('#addLocationName').focus();
+						$('#addLocationPatternInput').focus();
 					};
 					$scope.addLocation = function() {
 						var matchType = $scope.locationToBeAdd.matchType;

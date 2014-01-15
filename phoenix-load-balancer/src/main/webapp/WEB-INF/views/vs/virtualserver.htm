@@ -56,11 +56,14 @@
                 class="blue icon-cogs bigger-120"></i>&nbsp;基本配置&nbsp;</a></li>
             <li ng-class="isActive('location')"><a href="#location" ng-click="selectedTab='location'"><i
                 class="blue icon-exchange bigger-120"></i>&nbsp;映射规则&nbsp;</a></li>
+            <li ng-class="isActive('aspect')"><a href="#aspect" ng-click="selectedTab='aspect'"><i
+                class="blue icon-dashboard bigger-120"></i>&nbsp;公共规则&nbsp;</a></li>
           </ul>
           <form class="form-horizontal" role="form">
             <div class="tab-content" ng-switch on="selectedTab">
               <div ng-class="isActiveTabPanel('profile')" ng-controller="ProfileController">#parse("vs/profile/${editOrShow}/content.htm")#parse("vs/profile/modals.htm")</div>
               <div ng-class="isActiveTabPanel('location')" ng-controller="LocationController">#parse("vs/location/${editOrShow}/list.htm")#parse("vs/location/modals.htm")</div>
+              <div ng-class="isActiveTabPanel('aspect')" ng-controller="VsAspectController">#parse("vs/aspect/${editOrShow}/list.htm")#parse("vs/aspect/modals.htm")</div>
             </div>
           </form>
         </div>

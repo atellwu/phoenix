@@ -5,7 +5,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 	var hash = window.location.hash;
 	if (hash.length > 1) {// 去掉#号
 		hash = hash.substring(1);
-		if (hash == 'profile' || hash == 'pool' || hash == 'location') {
+		if (hash == 'profile' || hash == 'aspect' || hash == 'location') {
 			$scope.selectedTab = hash;
 		}
 	}
