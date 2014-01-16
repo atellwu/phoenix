@@ -1,9 +1,10 @@
 package com.dianping.phoenix.lb.deploy.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -178,7 +179,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
     }
 
     private Map<String, DeployVsBo> convertDeployVssToMap(List<DeployVsBo> deployVsBos) {
-        Map<String, DeployVsBo> map = new HashMap<String, DeployVsBo>();
+        Map<String, DeployVsBo> map = new LinkedHashMap<String, DeployVsBo>();
         if (deployVsBos != null) {
             for (DeployVsBo deployVsBo : deployVsBos) {
                 String vsName = deployVsBo.getVs().getName();
@@ -189,7 +190,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
     }
 
     private Map<String, DeployAgentBo> convertDetailsToMap(List<DeployAgent> deployAgents) {
-        Map<String, DeployAgentBo> map = new HashMap<String, DeployAgentBo>();
+        Map<String, DeployAgentBo> map = new LinkedHashMap<String, DeployAgentBo>();
         for (DeployAgent deployAgent : deployAgents) {
             String ip = deployAgent.getIpAddress();
             map.put(ip, new DeployAgentBo(deployAgent));
@@ -209,6 +210,8 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         task.setDeployInterval(2);
         task.setErrorPolicy(ErrorPolicy.ABORT_ON_ERROR);
         deployTaskMapper.insert(task);
+
+        Collections.sort(newTaskInfo.getSelectedVsAndTags());
 
         for (VsAndTag vsAndTag : newTaskInfo.getSelectedVsAndTags()) {
             DeployVs deployVs = new DeployVs();

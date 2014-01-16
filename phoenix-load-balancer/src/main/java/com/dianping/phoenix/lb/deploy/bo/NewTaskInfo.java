@@ -16,7 +16,6 @@ public class NewTaskInfo {
         this.taskName = taskName;
     }
 
-
     public List<VsAndTag> getSelectedVsAndTags() {
         return selectedVsAndTags;
     }
@@ -25,8 +24,7 @@ public class NewTaskInfo {
         this.selectedVsAndTags = selectedVsAndTags;
     }
 
-
-    public static class VsAndTag {
+    public static class VsAndTag implements Comparable<VsAndTag> {
         private String vsName;
         private String tag;
 
@@ -49,6 +47,11 @@ public class NewTaskInfo {
         @Override
         public String toString() {
             return "VsAndTag [vsName=" + vsName + ", tag=" + tag + "]";
+        }
+
+        @Override
+        public int compareTo(VsAndTag o) {
+            return vsName.compareTo(o.vsName);
         }
 
     }

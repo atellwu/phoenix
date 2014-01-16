@@ -42,8 +42,10 @@ module
 										function(data, status, headers, config) {
 											if (data.errorCode == 0) {
 												$scope.task = data.task;
-												//展现出来
-												$('#TaskController > div.main-content').show();
+												// 展现出来
+												$(
+														'#TaskController > div.main-content')
+														.show();
 
 												if ($scope.task.task.status == 'CREATED') {
 													$scope.canUpdate = true;
@@ -89,23 +91,47 @@ module
 						});
 						return isContainAll;
 					}
-					$scope.checkAllIp = function(deployVsBo, e) {
-						var elem = angular.element(e.srcElement);
-						var checked = (elem.attr('checked'));
-						if (checked) {
-							deployVsBo.deployAgentBos = {};
-							var instances = deployVsBo.slbPool.instances;
-							$.each(instances, function(i, instance) {
-								deployVsBo.deployAgentBos[instance.ip] = {
-									"deployAgent" : {
-										"ipAddress" : instance.ip
-									}
-								};
-							});
-						} else {
-							deployVsBo.deployAgentBos = {};
-						}
+					$scope.checkAllIp = function(deployVsBo) {
+						deployVsBo.deployAgentBos = {};
+						var instances = deployVsBo.slbPool.instances;
+						$.each(instances, function(i, instance) {
+							deployVsBo.deployAgentBos[instance.ip] = {
+								"deployAgent" : {
+									"ipAddress" : instance.ip
+								}
+							};
+						});
 					}
+					$scope.uncheckAllIp = function(deployVsBo) {
+						deployVsBo.deployAgentBos = {};
+					}
+					$scope.batchCheckAllIp = function() {
+						$
+								.each(
+										$scope.task.deployVsBos,
+										function(i, deployVsBo) {
+											deployVsBo.deployAgentBos = {};
+											var instances = deployVsBo.slbPool.instances;
+											$
+													.each(
+															instances,
+															function(i,
+																	instance) {
+																deployVsBo.deployAgentBos[instance.ip] = {
+																	"deployAgent" : {
+																		"ipAddress" : instance.ip
+																	}
+																};
+															});
+										});
+					}
+					$scope.batchUncheckAllIp = function() {
+						$.each($scope.task.deployVsBos,
+								function(i, deployVsBo) {
+									deployVsBo.deployAgentBos = {};
+								});
+					}
+
 					$scope.getAgent = function(deployAgentBos, ip) {
 						return deployAgentBos[ip];
 					}
@@ -251,12 +277,16 @@ module
 								});
 					};
 					$scope.showVsLog = function(deployVsBo) {
-						$scope.currentAgentOrVsOfLogView = deployVsBo.deployVs;
-						$scope.showLog();
+						if (deployVsBo) {
+							$scope.currentAgentOrVsOfLogView = deployVsBo.deployVs;
+							$scope.showLog();
+						}
 					}
 					$scope.showAgentLog = function(deployAgentBo) {
-						$scope.currentAgentOrVsOfLogView = deployAgentBo.deployAgent;
-						$scope.showLog();
+						if (deployAgentBo) {
+							$scope.currentAgentOrVsOfLogView = deployAgentBo.deployAgent;
+							$scope.showLog();
+						}
 					}
 					$scope.showLog = function() {
 						if ($scope.currentAgentOrVsOfLogView) {
@@ -264,7 +294,7 @@ module
 								$('#console')
 										.text(
 												$scope.currentAgentOrVsOfLogView.rawLog);
-							} else {
+							} else if ($scope.currentAgentOrVsOfLogView.summaryLog) {
 								$('#console')
 										.text(
 												$scope.currentAgentOrVsOfLogView.summaryLog);
@@ -276,5 +306,5 @@ module
 						if ($scope.needGetStatus) {
 							$scope.statusConsole();
 						}
-					}, 1000);
+					}, 600);
 				});

@@ -1,7 +1,7 @@
 package com.dianping.phoenix.lb.deploy.executor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -132,7 +132,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     private Map<String, DeployAgentBo> nextReadyDeployAgents(DeployVsBo deployVsBo, int n) {
-        Map<String, DeployAgentBo> re = new HashMap<String, DeployAgentBo>();
+        Map<String, DeployAgentBo> re = new LinkedHashMap<String, DeployAgentBo>();
         Map<String, DeployAgentBo> deployAgentBos = deployVsBo.getDeployAgentBos();
         Set<String> hostNameSet = deployAgentBos.keySet();
         //顺序遍历agent,获取到第一个需要执行的agent。
@@ -155,7 +155,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private void execute(DeployVsBo deployVsBo, Map<String, DeployAgentBo> deployAgentBos) throws InterruptedException {
         //创建Agent执行者
-        Map<String, AgentClient> agentClients = new HashMap<String, AgentClient>();
+        Map<String, AgentClient> agentClients = new LinkedHashMap<String, AgentClient>();
         for (DeployAgentBo deployAgentBo : deployAgentBos.values()) {
             long agentId = agentSequenceService.getAgentId();
             String vsName = deployVsBo.getDeployVs().getVsName();
@@ -410,38 +410,38 @@ public class DefaultTaskExecutor implements TaskExecutor {
         }
     }
 
-//    @Override
-//    public void pause() {
-//        if (actionLock.tryLock()) {
-//            try {
-//                LOG.info("Task " + DefaultTaskExecutor.this.deployTaskBo.getTask().getName() + " pause().");
-//
-//                if (taskThread.isAlive()) {
-//                    //终止agent线程
-//                    executor.shutdown();
-//                    try {
-//                        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
-//                    } catch (InterruptedException e1) {
-//                    }
-//
-//                    //终止主线程
-//                    taskThread.interrupt();
-//                    while (taskThread.isAlive()) {
-//                        try {
-//                            taskThread.join();
-//                        } catch (InterruptedException e) {
-//                        }
-//                    }
-//
-//                    DefaultTaskExecutor.this.deployTaskBo.getTask().setStateAction(StateAction.PAUSE);
-//                    deployTaskService.updateDeployTaskStateAction(DefaultTaskExecutor.this.deployTaskBo.getTask());
-//                }
-//
-//            } finally {
-//                actionLock.unlock();
-//            }
-//        }
-//    }
+    //    @Override
+    //    public void pause() {
+    //        if (actionLock.tryLock()) {
+    //            try {
+    //                LOG.info("Task " + DefaultTaskExecutor.this.deployTaskBo.getTask().getName() + " pause().");
+    //
+    //                if (taskThread.isAlive()) {
+    //                    //终止agent线程
+    //                    executor.shutdown();
+    //                    try {
+    //                        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
+    //                    } catch (InterruptedException e1) {
+    //                    }
+    //
+    //                    //终止主线程
+    //                    taskThread.interrupt();
+    //                    while (taskThread.isAlive()) {
+    //                        try {
+    //                            taskThread.join();
+    //                        } catch (InterruptedException e) {
+    //                        }
+    //                    }
+    //
+    //                    DefaultTaskExecutor.this.deployTaskBo.getTask().setStateAction(StateAction.PAUSE);
+    //                    deployTaskService.updateDeployTaskStateAction(DefaultTaskExecutor.this.deployTaskBo.getTask());
+    //                }
+    //
+    //            } finally {
+    //                actionLock.unlock();
+    //            }
+    //        }
+    //    }
 
     @Override
     public void stop() {
