@@ -10,8 +10,10 @@
           默认分组 </span> <b class="arrow icon-angle-down"></b>
     </a>
       <ul class="submenu" style="display: block;">
-        <li class="#if($menu == 'deploy')active #end"><a href="${contextPath}/deploy"><i
-            class="icon-globe"></i> 发布列表 </a></li>
+         <li class="#if($menu == 'deployList')active #end"><a href="${contextPath}/deploy"><i class="icon-globe"></i>
+            发布列表 </a></li>
+        <li class="#if($menu == 'batchTag')active #end"><a href="${contextPath}/deploy/batchTag"><i class="icon-globe"></i>
+            批量创建发布版本 </a></li>
       </ul></li>
   </ul>
   <!-- /.nav-list -->

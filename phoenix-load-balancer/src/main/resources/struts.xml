@@ -231,8 +231,7 @@
                 <param name="encoding">UTF-8</param>
             </result>
         </action>
-        <action name="aspect/edit" class="aspectAction"
-            method="edit">
+        <action name="aspect/edit" class="aspectAction" method="edit">
             <result name="success" type="velocity">
                 /aspect/index.htm
             </result>
@@ -283,6 +282,12 @@
         <action name="deploy" class="deployListAction" method="list">
             <result name="success" type="velocity">
                 /deployList/list.htm
+            </result>
+        </action>
+        <action name="deploy/batchTag" class="batchTagAction"
+            method="index">
+            <result name="success" type="velocity">
+                /batchTag/index.htm
             </result>
         </action>
         <action name="deploy/list/{pageNum}" class="deployListAction"
