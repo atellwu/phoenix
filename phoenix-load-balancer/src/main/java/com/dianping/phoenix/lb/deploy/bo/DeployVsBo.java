@@ -3,6 +3,7 @@ package com.dianping.phoenix.lb.deploy.bo;
 import java.util.Map;
 
 import com.dianping.phoenix.lb.deploy.model.DeployVs;
+import com.dianping.phoenix.lb.model.entity.SlbPool;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 
 public class DeployVsBo {
@@ -12,6 +13,8 @@ public class DeployVsBo {
     private Map<String, DeployAgentBo> deployAgentBos;
 
     private VirtualServer              vs;
+
+    private SlbPool                    slbPool;
 
     public DeployVs getDeployVs() {
         return deployVs;
@@ -35,6 +38,14 @@ public class DeployVsBo {
 
     public void setVs(VirtualServer vs) {
         this.vs = vs;
+    }
+
+    public SlbPool getSlbPool() {
+        return slbPool;
+    }
+
+    public void setSlbPool(SlbPool slbPool) {
+        this.slbPool = slbPool;
     }
 
 }

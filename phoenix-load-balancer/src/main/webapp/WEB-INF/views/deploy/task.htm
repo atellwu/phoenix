@@ -41,14 +41,14 @@
                     <tr>
                       <th width="20px"><input ng-disabled="!canUpdate" type="checkbox"
                         ng-click="checkAllIp(deployVsBo,$event)"
-                        ng-checked="isContainAll(deployVsBo.deployAgentBos,deployVsBo.vs.instances)" /></th>
+                        ng-checked="isContainAll(deployVsBo.deployAgentBos,deployVsBo.slbPool.instances)" /></th>
                       <th>IP</th>
                       <th>状态</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr ng-init="deployAgentBo = getAgent(deployVsBo.deployAgentBos,instance.ip)"
-                      ng-click="showAgentLog(deployAgentBo)" ng-repeat="instance in deployVsBo.vs.instances"
+                      ng-click="showAgentLog(deployAgentBo)" ng-repeat="instance in deployVsBo.slbPool.instances"
                       class="my-progress-bar">
                       <td width="20px"><input ng-disabled="!canUpdate" type="checkbox"
                         ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)"

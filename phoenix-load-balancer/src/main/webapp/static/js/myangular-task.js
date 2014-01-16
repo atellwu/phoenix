@@ -94,7 +94,7 @@ module
 						var checked = (elem.attr('checked'));
 						if (checked) {
 							deployVsBo.deployAgentBos = {};
-							var instances = deployVsBo.vs.instances;
+							var instances = deployVsBo.slbPool.instances;
 							$.each(instances, function(i, instance) {
 								deployVsBo.deployAgentBos[instance.ip] = {
 									"deployAgent" : {

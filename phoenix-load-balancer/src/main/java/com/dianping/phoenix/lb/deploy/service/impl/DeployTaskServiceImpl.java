@@ -27,6 +27,7 @@ import com.dianping.phoenix.lb.deploy.bo.NewTaskInfo.VsAndTag;
 import com.dianping.phoenix.lb.deploy.dao.DeployAgentMapper;
 import com.dianping.phoenix.lb.deploy.dao.DeployTaskMapper;
 import com.dianping.phoenix.lb.deploy.dao.DeployVsMapper;
+import com.dianping.phoenix.lb.deploy.model.AgentBatch;
 import com.dianping.phoenix.lb.deploy.model.DeployAgent;
 import com.dianping.phoenix.lb.deploy.model.DeployAgentExample;
 import com.dianping.phoenix.lb.deploy.model.DeployAgentStatus;
@@ -36,10 +37,13 @@ import com.dianping.phoenix.lb.deploy.model.DeployTaskStatus;
 import com.dianping.phoenix.lb.deploy.model.DeployVs;
 import com.dianping.phoenix.lb.deploy.model.DeployVsExample;
 import com.dianping.phoenix.lb.deploy.model.DeployVsStatus;
+import com.dianping.phoenix.lb.deploy.model.ErrorPolicy;
 import com.dianping.phoenix.lb.deploy.model.StateAction;
 import com.dianping.phoenix.lb.deploy.service.DeployTaskService;
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.entity.SlbPool;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
+import com.dianping.phoenix.lb.service.model.SlbPoolService;
 import com.dianping.phoenix.lb.service.model.VirtualServerService;
 
 @Service
@@ -61,6 +65,9 @@ public class DeployTaskServiceImpl implements DeployTaskService {
 
     @Autowired
     private VirtualServerService virtualServerService;
+
+    @Autowired
+    private SlbPoolService       slbPoolService;
 
     private int                  MAX_PAGE_NUM = 50;
 
@@ -161,6 +168,8 @@ public class DeployTaskServiceImpl implements DeployTaskService {
 
             deployVsBo.setDeployVs(deployVs);
             deployVsBo.setVs(vs);
+            SlbPool slbPool = slbPoolService.findSlbPool(vs.getSlbPool());
+            deployVsBo.setSlbPool(slbPool);
             deployVsBo.setDeployAgentBos(convertDetailsToMap(deployAgents));
 
             deployVsBos.add(deployVsBo);
@@ -195,6 +204,10 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         task.setName(newTaskInfo.getTaskName());
         task.setLastModifiedDate(new Date());
         task.setStatus(DeployTaskStatus.CREATED);
+        task.setAutoContinue(true);
+        task.setAgentBatch(AgentBatch.TWO_BY_TWO);
+        task.setDeployInterval(2);
+        task.setErrorPolicy(ErrorPolicy.ABORT_ON_ERROR);
         deployTaskMapper.insert(task);
 
         for (VsAndTag vsAndTag : newTaskInfo.getSelectedVsAndTags()) {

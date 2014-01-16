@@ -20,21 +20,13 @@ module.directive('ngEnter', function() {
 
 module.controller('TaskListController', function($scope, $resource, $http) {
 	$scope.newTask = {};
-	$scope.newTask.selectedVsAndTags = [ {
-		"vsName" : "",
-		"tag" : ""
-	} ];
+	$scope.newTask.taskName = '未命名任务';
 	$scope.vsList = [];
-	$http({
-		method : 'GET',
-		url : window.contextpath + '/vs/list'
-	}).success(function(data, status, headers, config) {
-		$scope.vsList = data;
-	}).error(function(data, status, headers, config) {
-		app.appError("响应错误", data);
-	});
+	$scope.groups = {};
+
 	$scope.vs2Tags = {};// vs和tag的cache
-	$scope.getTags = function(vsName) {
+	$scope.getTags = function(vs) {
+		var vsName = vs.name;
 		if (vsName == null || vsName.trim() == ""
 				|| $scope.vs2Tags[vsName] != null) {
 			return;
@@ -44,40 +36,92 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 			url : window.contextpath + '/vs/' + vsName + '/tag/list'
 		}).success(function(data, status, headers, config) {
 			$scope.vs2Tags[vsName] = data;
+			if (data.length > 0) {
+				// data[0];
+				vs.selectedTag = data[0];
+			}
 		}).error(function(data, status, headers, config) {
 			app.appError("响应错误", data);
 		});
 	}
-	$scope.addVsAndTag = function() {
-		$scope.newTask.selectedVsAndTags.push({
-			"vsName" : "",
-			"tag" : ""
+
+	$http({
+		method : 'GET',
+		url : window.contextpath + '/vs/list'
+	}).success(function(data, status, headers, config) {
+		$scope.vsList = data;
+		// 将所有vs分group
+		$.each($scope.vsList, function(i, vs) {
+			var groupName = vs.group;
+			if (!groupName) {
+				groupName = 'default';
+			}
+			var group = $scope.groups[groupName];
+			if (!group) {
+				group = new Object();
+				group.name = groupName;
+				group.vsList = [];
+				$scope.groups[groupName] = group;
+			}
+			group.vsList.push(vs);
+		});
+		// 初始化table
+		setTimeout(function() {
+			$.each($scope.groups, function(groupName, group) {
+				console.log(groupName);
+				$('#groupTable_' + groupName).dataTable({
+					"bPaginate" : false,
+					"bLengthChange" : false,
+					"bInfo" : false,
+					"aoColumns" : [ {
+						"bSortable" : false
+					}, null, {
+						"bSortable" : false
+					} ],
+					"aaSorting" : [ [ 1, 'asc' ] ]
+				});
+				// $('#groupTable_' + groupName).dataTable();
+				// var oTable1 = $('#aaa').dataTable();
+
+			});
+		}, 500);
+
+	}).error(function(data, status, headers, config) {
+		app.appError("响应错误", data);
+	});
+
+	$scope.check = function(vs) {
+		if (vs.selected) {
+			vs.selected = false;
+		} else {
+			vs.selected = true;
+			$scope.getTags(vs)
+		}
+	}
+	$scope.checkAll = function(group) {
+		$.each(group.vsList, function(i, vs) {
+			vs.selected = true;
+			$scope.getTags(vs);
 		});
 	}
-	$scope.addTaskModal = function() {
-		// 显示modal
-		var height = $(window).height();
-		var modalBody = $('#addTaskModal div.modal-body');
-		modalBody.css('height', height - 200);
-		
-		var width = $(window).width();
-//		var height = $(window).height();
-//		var left = (width - 700) / 2;
-//		var modal = $('#addTaskModal');
-//		modal.css('height', height - 20);
-//		modalBody.css('width', 700);
-//		modal.css('top', 10);
-//		if (left > 0) {
-//			modal.css('left', left);
-//			$('#addTaskModal>.modal-footer').css('left', left);
-//		}
-//		var modalBody = $('#addTaskModal>.modal-body');
-//		modalBody.css('height', height - 170);
-//		modalBody.css('max-height', height - 145);
-		$('#addTaskModal').modal('show');
-		$('#addTaskModalInput').focus();
+	$scope.uncheckAll = function(group) {
+		$.each(group.vsList, function(i, vs) {
+			vs.selected = false;
+		});
 	}
+
 	$scope.addTask = function() {
+		// 遍历一次，将已经勾选的，加到newTask.selectedVsAndTags
+		$scope.newTask.selectedVsAndTags = [];
+		$.each($scope.vsList, function(i, vs) {
+			if (vs.selected == true) {
+				$scope.newTask.selectedVsAndTags.push({
+					"vsName" : vs.name,
+					"tag" : vs.selectedTag
+				});
+			}
+		});
+
 		$http({
 			method : 'POST',
 			data : $scope.newTask,
@@ -101,28 +145,37 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 	// 如果地址栏含有“#showInfluencing:vs,vs”，则显示
 	var hash = '' + window.location.hash;
 	if (app.startWith(hash, '#showInfluencing:')) {
+		// 解析url
 		hash = hash.substring(17);
 		var vsNamesStr = hash;
 		var tagIdsStr = null;
-		if (hash.indexOf('&')>0) {
+		if (hash.indexOf('&') > 0) {
 			var hashSplit = hash.split('&');
 			vsNamesStr = hashSplit[0];
 			tagIdsStr = hashSplit[1];
 		}
-		//
 		var vsNames = vsNamesStr.split(',');
 		var tags = null;
 		if (tagIdsStr != null) {
 			tags = tagIdsStr.split(',');
 		}
+		// 设置$scope.newTask
+		$scope.newTask.taskName = "修改pool后的批量发布：" + vsNamesStr;
 		$scope.newTask.selectedVsAndTags = [];
-		$.each(vsNames, function(i, vsName) {
-			$scope.getTags(vsName);
-			$scope.newTask.selectedVsAndTags.push({
-				"vsName" : vsName,
-				"tag" : (tags != null) ? tags[i] : ""
+		setTimeout(function() {
+			$.each(vsNames, function(i, vsName) {
+				$.each($scope.vsList, function(i, vs) {
+					if (vs.name == vsName) {
+						console.log(vs.name);
+						vs.selected = true;
+						$scope.getTags(vs);
+						vs.selectedTag = (tags != null) ? tags[i] : "";
+					}
+				});
 			});
-		});
-		$scope.addTaskModal();
+		}, 1000);
+		// 展开创建页面
+		$scope.creating = true;
 	}
+
 });
