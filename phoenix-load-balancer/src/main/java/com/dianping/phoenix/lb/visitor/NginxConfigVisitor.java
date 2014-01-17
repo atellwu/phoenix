@@ -19,6 +19,8 @@ import com.dianping.phoenix.lb.model.entity.Directive;
 import com.dianping.phoenix.lb.model.entity.Location;
 import com.dianping.phoenix.lb.model.entity.Member;
 import com.dianping.phoenix.lb.model.entity.Pool;
+import com.dianping.phoenix.lb.model.entity.SlbModelTree;
+import com.dianping.phoenix.lb.model.entity.SlbPool;
 import com.dianping.phoenix.lb.model.entity.Strategy;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
 import com.dianping.phoenix.lb.model.nginx.NginxConfig;
@@ -40,6 +42,29 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
 
     public NginxConfigVisitor() {
         result = new NginxConfig();
+    }
+    
+    @Override
+    public void visitSlbModelTree(SlbModelTree slbModelTree) {
+       for (Strategy strategy : slbModelTree.getStrategies().values()) {
+          visitStrategy(strategy);
+       }
+
+       for (Pool pool : slbModelTree.getPools().values()) {
+          visitPool(pool);
+       }
+
+       for (Aspect aspect : slbModelTree.getAspects()) {
+          visitCommonAspect(aspect);
+       }
+
+       for (SlbPool slbPool : slbModelTree.getSlbPools().values()) {
+          visitSlbPool(slbPool);
+       }
+
+       for (VirtualServer virtualServer : slbModelTree.getVirtualServers().values()) {
+          visitVirtualServer(virtualServer);
+       }
     }
 
     @Override
@@ -64,14 +89,13 @@ public class NginxConfigVisitor extends AbstractVisitor<NginxConfig> {
                 MessageUtils.getMessage(MessageID.VIRTUALSERVER_DEFAULTPOOL_NOT_EXISTS,
                         virtualServer.getDefaultPoolName()));
     }
+    
+    public void visitCommonAspect(Aspect aspect) {
+        commonAspects.put(aspect.getName(), aspect);
+    }
 
     @Override
     public void visitAspect(Aspect aspect) {
-        if (StringUtils.isNotBlank(aspect.getName())) {
-            commonAspects.put(aspect.getName(), aspect);
-            return;
-        }
-
         Aspect actualAspect = null;
         if (StringUtils.isBlank(aspect.getRef())) {
             actualAspect = aspect;

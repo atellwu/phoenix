@@ -4,16 +4,16 @@
     #parse("deploy/breadcrumb.htm")
     <div class="page-content">
       <div class="page-header">
-        <button ng-show="canUpdate" class="btn btn-minier btn-primary" ng-click="batchCheckAllIp()">
+        <button ng-show="canUpdate && !allChecked" class="btn btn-minier btn-primary" ng-click="batchCheckAllIp()">
           <i class="icon icon-check"></i> 全选
         </button>
-        <button ng-show="canUpdate" class="btn btn-minier btn-danger" ng-click="batchUncheckAllIp()">
+        <button ng-show="canUpdate && allChecked" class="btn btn-minier btn-danger" ng-click="batchUncheckAllIp()">
           <i class="icon icon-check-empty"></i> 清空
         </button>
-        <button class="btn btn-minier btn-primary" ng-click="batchUnCollapse()">
+        <button ng-show="allCollapse" style="margin-right: 20px;" class="btn btn-minier btn-primary" ng-click="batchUnCollapse()">
           <i class="icon-angle-down"></i> 展开
         </button>
-        <button style="margin-right: 20px;" class="btn btn-minier btn-danger" ng-click="batchCollapse()">
+        <button ng-hide="allCollapse" style="margin-right: 20px;" class="btn btn-minier btn-danger" ng-click="batchCollapse()">
           <i class="icon-angle-up"></i> 收起
         </button>
         <b>任务ID：</b><span>{{task.task.id}}</span> &nbsp;&nbsp; &nbsp; <b>任务名称：</b> <span>{{task.task.name}}</span>
@@ -60,9 +60,10 @@
                         <table style="margin-top: 0px;" class="slb-datatable table table-bordered table-condensed lion">
                           <thead>
                             <tr>
-                              <th><button ng-show="canUpdate" class="btn btn-minier btn-primary"
+                              <th>
+                               <button ng-show="canUpdate && !deployVsBo.checkAllIp" class="btn btn-minier btn-primary"
                                   ng-click="checkAllIp(deployVsBo)">全选</button>
-                                <button ng-show="canUpdate" class="btn btn-minier btn-danger"
+                                <button ng-show="canUpdate && deployVsBo.checkAllIp" class="btn btn-minier btn-danger"
                                   ng-click="uncheckAllIp(deployVsBo)">清空</button></th>
                               <th>IP</th>
                               <th>状态</th>
@@ -73,7 +74,7 @@
                             <tr ng-init="deployAgentBo = getAgent(deployVsBo.deployAgentBos,instance.ip)"
                               ng-click="showAgentLog(deployAgentBo)"
                               ng-repeat="instance in deployVsBo.slbPool.instances" class="my-progress-bar">
-                              <td width="70px"><input ng-disabled="!canUpdate" type="checkbox"
+                              <td width="30px"><input ng-disabled="!canUpdate" type="checkbox"
                                 ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)"
                                 ng-checked="isContain(deployVsBo.deployAgentBos,instance.ip)"></td>
                               <td width="130px" ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)">{{instance.ip}}</td>

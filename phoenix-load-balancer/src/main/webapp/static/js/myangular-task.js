@@ -30,6 +30,10 @@ module
 				function($scope, $resource, $http) {
 					$scope.task = null;
 					$scope.canUpdate = false;
+					
+					//check and collapse
+					$scope.allCollapse = false;
+					$scope.allChecked = false;
 
 					// log
 					$scope.autoSwitchLogView = true;
@@ -109,9 +113,11 @@ module
 								}
 							};
 						});
+						deployVsBo.checkAllIp = true;
 					}
 					$scope.uncheckAllIp = function(deployVsBo) {
 						deployVsBo.deployAgentBos = {};
+						deployVsBo.checkAllIp = false;
 					}
 					$scope.batchCheckAllIp = function() {
 						$
@@ -132,27 +138,24 @@ module
 																};
 															});
 										});
+						$scope.allChecked = true;
 					}
 					$scope.batchUncheckAllIp = function() {
 						$.each($scope.task.deployVsBos,
 								function(i, deployVsBo) {
 									deployVsBo.deployAgentBos = {};
 								});
+						$scope.allChecked = false;
 					}
 					$scope.batchUnCollapse = function() {
 						$(".panel-collapse").collapse('show');
 						$(".accordion-toggle").removeClass('collapsed');
-
-						$.each($scope.task.deployVsBos,
-								function(i, deployVsBo) {
-								});
+						$scope.allCollapse = false;
 					}
 					$scope.batchCollapse = function() {
 						$(".panel-collapse").collapse('hide');
 						$(".accordion-toggle").addClass('collapsed');
-						$.each($scope.task.deployVsBos,
-								function(i, deployVsBo) {
-								});
+						$scope.allCollapse = true;
 					}
 
 					$scope.getAgent = function(deployAgentBos, ip) {
@@ -208,6 +211,7 @@ module
 					$scope.startTask = function() {
 						$scope.needGetStatus = true;
 						$scope.autoSwitchLogView = true;
+						$scope.batchCollapse();
 						$http(
 								{
 									method : 'GET',
@@ -283,7 +287,9 @@ module
 																							if ($scope.autoSwitchLogView) {
 																								console
 																										.log('switch log auto');
-//																								$scope.currentAgentOrVsOfLogView = deployVsBo.deployVs;
+																								// $scope.currentAgentOrVsOfLogView
+																								// =
+																								// deployVsBo.deployVs;
 																								$scope.currentLogView.type = 'vs';
 																								$scope.currentLogView.vsName = vsName;
 																							}
@@ -351,7 +357,8 @@ module
 												if ($scope.currentLogView.vsName == vsName) {
 													$('#console')
 															.text(
-																	deployVsBo.deployVs.summaryLog);
+																	deployVsBo.deployVs.summaryLog != null ? deployVsBo.deployVs.summaryLog
+																			: "");
 													breakFor = false;
 												}
 											} else {
@@ -364,7 +371,8 @@ module
 																		$(
 																				'#console')
 																				.text(
-																						deployAgentBo.deployAgent.rawLog);
+																						deployAgentBo.deployAgent.rawLog != null ? deployAgentBo.deployAgent.rawLog
+																								: "");
 																		breakFor = false;
 																	}
 																	return breakFor;
