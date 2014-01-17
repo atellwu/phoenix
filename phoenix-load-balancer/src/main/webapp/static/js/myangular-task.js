@@ -30,8 +30,8 @@ module
 				function($scope, $resource, $http) {
 					$scope.task = null;
 					$scope.canUpdate = false;
-					
-					//check and collapse
+
+					// check and collapse
 					$scope.allCollapse = false;
 					$scope.allChecked = false;
 
@@ -259,14 +259,6 @@ module
 										function(data, status, headers, config) {
 											if (data.errorCode == 0) {
 												$scope.task = data.task;
-												// if
-												// ($scope.needGetStatus($scope.task.status))
-												// {
-												// // 等待1秒，继续获取
-												// setTimeout($scope.statusConsole,
-												// 1000);
-												// }
-												//
 												// 如果有agent处于'PROCESSING'状态，则console显示它。
 												$
 														.each(
@@ -381,20 +373,6 @@ module
 
 											return breakFor;
 										});
-						// if ($scope.currentAgentOrVsOfLogView) {
-						// if ($scope.currentAgentOrVsOfLogView.rawLog) {
-						// $('#console')
-						// .text(
-						// $scope.currentAgentOrVsOfLogView.rawLog);
-						// } else if
-						// ($scope.currentAgentOrVsOfLogView.summaryLog) {
-						// $('#console')
-						// .text(
-						// $scope.currentAgentOrVsOfLogView.summaryLog);
-						// } else {
-						// $('#console').text('');
-						// }
-						// }
 					}
 					setInterval(function() {
 						if ($scope.needGetStatus) {

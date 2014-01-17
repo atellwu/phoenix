@@ -207,7 +207,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         task.setStatus(DeployTaskStatus.CREATED);
         task.setAutoContinue(true);
         task.setAgentBatch(AgentBatch.TWO_BY_TWO);
-        task.setDeployInterval(2);
+        task.setDeployInterval(1);
         task.setErrorPolicy(ErrorPolicy.ABORT_ON_ERROR);
         deployTaskMapper.insert(task);
 

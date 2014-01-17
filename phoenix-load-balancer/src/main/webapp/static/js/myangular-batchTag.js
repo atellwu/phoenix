@@ -110,10 +110,12 @@ module.controller('BatchTagController', function($scope, $resource, $http) {
 		$.each(group.vsList, function(i, vs) {
 			vs.selected = true;
 		});
+		group.checkAll = true;
 	}
 	$scope.uncheckAll = function(group) {
 		$.each(group.vsList, function(i, vs) {
 			vs.selected = false;
 		});
+		group.checkAll = false;
 	}
 });

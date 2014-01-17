@@ -10,10 +10,12 @@
         <button ng-show="canUpdate && allChecked" class="btn btn-minier btn-danger" ng-click="batchUncheckAllIp()">
           <i class="icon icon-check-empty"></i> 清空
         </button>
-        <button ng-show="allCollapse" style="margin-right: 20px;" class="btn btn-minier btn-primary" ng-click="batchUnCollapse()">
+        <button ng-show="allCollapse" style="margin-right: 20px;" class="btn btn-minier btn-primary"
+          ng-click="batchUnCollapse()">
           <i class="icon-angle-down"></i> 展开
         </button>
-        <button ng-hide="allCollapse" style="margin-right: 20px;" class="btn btn-minier btn-danger" ng-click="batchCollapse()">
+        <button ng-hide="allCollapse" style="margin-right: 20px;" class="btn btn-minier btn-danger"
+          ng-click="batchCollapse()">
           <i class="icon-angle-up"></i> 收起
         </button>
         <b>任务ID：</b><span>{{task.task.id}}</span> &nbsp;&nbsp; &nbsp; <b>任务名称：</b> <span>{{task.task.name}}</span>
@@ -39,6 +41,7 @@
                   Log <i ng-show="currentLogView.vsName == deployVsBo.deployVs.vsName"
                     class="icon-arrow-right icon-on-right"></i>
                 </button>
+                {{ deployVsBo.deployVs.summlog }}
                 <div id="accordion_{{ deployVsBo.deployVs.vsName }}" class="accordion-style1 panel-group">
                   <div class="panel panel-default">
                     <div class="panel-heading">
@@ -61,10 +64,11 @@
                           <thead>
                             <tr>
                               <th>
-                               <button ng-show="canUpdate && !deployVsBo.checkAllIp" class="btn btn-minier btn-primary"
+                                <button ng-show="canUpdate && !deployVsBo.checkAllIp" class="btn btn-minier btn-primary"
                                   ng-click="checkAllIp(deployVsBo)">全选</button>
                                 <button ng-show="canUpdate && deployVsBo.checkAllIp" class="btn btn-minier btn-danger"
-                                  ng-click="uncheckAllIp(deployVsBo)">清空</button></th>
+                                  ng-click="uncheckAllIp(deployVsBo)">清空</button>
+                              </th>
                               <th>IP</th>
                               <th>状态</th>
                               <th ng-show="!canUpdate">操作</th>
@@ -74,9 +78,10 @@
                             <tr ng-init="deployAgentBo = getAgent(deployVsBo.deployAgentBos,instance.ip)"
                               ng-click="showAgentLog(deployAgentBo)"
                               ng-repeat="instance in deployVsBo.slbPool.instances" class="my-progress-bar">
-                              <td width="30px"><input ng-disabled="!canUpdate" type="checkbox"
-                                ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)"
-                                ng-checked="isContain(deployVsBo.deployAgentBos,instance.ip)"></td>
+                              <td width="30px"><label><input ng-disabled="!canUpdate" type="checkbox"
+                                  class="ace" ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)"
+                                  ng-checked="isContain(deployVsBo.deployAgentBos,instance.ip)"><span
+                                  class="lbl"></span> </label></td>
                               <td width="130px" ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)">{{instance.ip}}</td>
                               <td style="width: 200px; padding-right: 10px;"
                                 ng-switch="deployAgentBo.deployAgent.status">
@@ -185,8 +190,7 @@
               </div>
               <label style="margin-top: 20px;" class="inline"> <small class="muted">自动切换日志:</small> <input
                 id="id-button-borders" ng-model="autoSwitchLogView" checked="checked" type="checkbox"
-                class="ace ace-switch ace-switch-5"> <span
-                class="lbl"></span>
+                class="ace ace-switch ace-switch-5"> <span class="lbl"></span>
               </label>
               <pre
                 style="cursor: text; margin-top: 5px; background-color: #3A1042; color: #FFFFFF; font-size: 12px; width: 100%; height: 520px; overflow-x: auto;"

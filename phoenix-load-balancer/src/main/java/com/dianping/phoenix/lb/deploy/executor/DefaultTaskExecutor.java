@@ -204,11 +204,18 @@ public class DefaultTaskExecutor implements TaskExecutor {
         String summaryLog = deployVs.getSummaryLog();
 
         StringBuilder sb = new StringBuilder(summaryLog != null ? summaryLog : "");
-        sb.append('[').append(timeStamp).append("] ").append(line).append('\n');
+        sb.append("\n[").append(timeStamp).append("] ").append(line);
 
-        deployVs.setSummaryLog(sb.toString());
+        deployVs.setSummaryLog(sb.toString());//mybatis会trim字符串，故前后到\n会被去除
 
         deployTaskService.updateDeployVsSummaryLog(deployVs);
+    }
+
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder("");
+        sb.append('[').append("] ").append("xx").append(".\n");
+        System.out.print(sb.toString().trim());
+        System.out.print(sb.toString().trim());
     }
 
     /**

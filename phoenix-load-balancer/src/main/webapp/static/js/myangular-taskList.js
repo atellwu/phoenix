@@ -37,7 +37,6 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 		}).success(function(data, status, headers, config) {
 			$scope.vs2Tags[vsName] = data;
 			if (data.length > 0) {
-				// data[0];
 				vs.selectedTag = data[0];
 			}
 		}).error(function(data, status, headers, config) {
@@ -80,8 +79,6 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 					} ],
 					"aaSorting" : [ [ 1, 'asc' ] ]
 				});
-				// $('#groupTable_' + groupName).dataTable();
-				// var oTable1 = $('#aaa').dataTable();
 
 			});
 		}, 500);
@@ -103,11 +100,13 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 			vs.selected = true;
 			$scope.getTags(vs);
 		});
+		group.checkAll = true;
 	}
 	$scope.uncheckAll = function(group) {
 		$.each(group.vsList, function(i, vs) {
 			vs.selected = false;
 		});
+		group.checkAll = false;
 	}
 
 	$scope.addTask = function() {
