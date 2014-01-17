@@ -30,7 +30,14 @@ module
 				function($scope, $resource, $http) {
 					$scope.task = null;
 					$scope.canUpdate = false;
-					$scope.switchLogViewManually = false;
+
+					// log
+					$scope.autoSwitchLogView = true;
+					$scope.currentLogView = {};
+					$scope.currentLogView.type = 'vs';
+					$scope.currentLogView.vsName = null;
+					$scope.currentLogView.agentId = null;
+
 					$scope.getTask = function(taskId) {
 						// 获取task
 						$http(
@@ -200,7 +207,7 @@ module
 					}
 					$scope.startTask = function() {
 						$scope.needGetStatus = true;
-						$scope.switchLogViewManually = false;
+						$scope.autoSwitchLogView = true;
 						$http(
 								{
 									method : 'GET',
@@ -273,10 +280,12 @@ module
 																						if (deployAgentBo.deployAgent.status == 'PROCESSING') {
 																							// 找到哪个vs正在运行
 																							// 切换日志
-																							if (!$scope.switchLogViewManually) {
+																							if ($scope.autoSwitchLogView) {
 																								console
 																										.log('switch log auto');
-																								$scope.currentAgentOrVsOfLogView = deployVsBo.deployVs;
+//																								$scope.currentAgentOrVsOfLogView = deployVsBo.deployVs;
+																								$scope.currentLogView.type = 'vs';
+																								$scope.currentLogView.vsName = vsName;
 																							}
 																							// 显示运行的图标
 																							deployVsBo.isRunning = true;
@@ -311,33 +320,73 @@ module
 					};
 					$scope.showVsLog = function(deployVsBo) {
 						if (deployVsBo) {
-							$scope.switchLogViewManually = true;
-							$scope.currentAgentOrVsOfLogView = deployVsBo.deployVs;
+							$scope.autoSwitchLogView = false;
+							$scope.currentLogView.type = 'vs';
+							$scope.currentLogView.vsName = deployVsBo.deployVs.vsName;
+							$scope.currentLogView.agentId = null;
+							// $scope.currentAgentOrVsOfLogView =
+							// deployVsBo.deployVs;
 							$scope.showLog();
 						}
 					}
 					$scope.showAgentLog = function(deployAgentBo) {
 						if (deployAgentBo) {
-							$scope.switchLogViewManually = true;
-							$scope.currentAgentOrVsOfLogView = deployAgentBo.deployAgent;
+							$scope.autoSwitchLogView = false;
+							$scope.currentLogView.type = 'agent';
+							$scope.currentLogView.vsName = null;
+							$scope.currentLogView.agentId = deployAgentBo.deployAgent.id;
+							// $scope.currentAgentOrVsOfLogView =
+							// deployAgentBo.deployAgent;
 							$scope.showLog();
 						}
 					}
-					$scope.showLog = function() {
-						if ($scope.currentAgentOrVsOfLogView) {
-							if ($scope.currentAgentOrVsOfLogView.rawLog) {
-								$('#console')
-										.text(
-												$scope.currentAgentOrVsOfLogView.rawLog);
-							} else if ($scope.currentAgentOrVsOfLogView.summaryLog) {
-								$('#console')
-										.text(
-												$scope.currentAgentOrVsOfLogView.summaryLog);
-							} else {
-								$('#console').text('');
-							}
-						}
 
+					$scope.showLog = function() {
+						$
+								.each(
+										$scope.task.deployVsBos,
+										function(vsName, deployVsBo) {
+											var breakFor = true;
+											if ($scope.currentLogView.type == 'vs') {
+												if ($scope.currentLogView.vsName == vsName) {
+													$('#console')
+															.text(
+																	deployVsBo.deployVs.summaryLog);
+													breakFor = false;
+												}
+											} else {
+												$
+														.each(
+																deployVsBo.deployAgentBos,
+																function(ip,
+																		deployAgentBo) {
+																	if ($scope.currentLogView.agentId == deployAgentBo.deployAgent.id) {
+																		$(
+																				'#console')
+																				.text(
+																						deployAgentBo.deployAgent.rawLog);
+																		breakFor = false;
+																	}
+																	return breakFor;
+																});
+											}
+
+											return breakFor;
+										});
+						// if ($scope.currentAgentOrVsOfLogView) {
+						// if ($scope.currentAgentOrVsOfLogView.rawLog) {
+						// $('#console')
+						// .text(
+						// $scope.currentAgentOrVsOfLogView.rawLog);
+						// } else if
+						// ($scope.currentAgentOrVsOfLogView.summaryLog) {
+						// $('#console')
+						// .text(
+						// $scope.currentAgentOrVsOfLogView.summaryLog);
+						// } else {
+						// $('#console').text('');
+						// }
+						// }
 					}
 					setInterval(function() {
 						if ($scope.needGetStatus) {
