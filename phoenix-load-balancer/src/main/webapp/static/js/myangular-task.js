@@ -131,6 +131,21 @@ module
 									deployVsBo.deployAgentBos = {};
 								});
 					}
+					$scope.batchUnCollapse = function() {
+						$(".panel-collapse").collapse('show');
+						$(".accordion-toggle").removeClass('collapsed');
+						
+						$.each($scope.task.deployVsBos,
+								function(i, deployVsBo) {
+								});
+					}
+					$scope.batchCollapse = function() {
+						$(".panel-collapse").collapse('hide');
+						$(".accordion-toggle").addClass('collapsed');
+						$.each($scope.task.deployVsBos,
+								function(i, deployVsBo) {
+								});
+					}
 
 					$scope.getAgent = function(deployAgentBos, ip) {
 						return deployAgentBos[ip];

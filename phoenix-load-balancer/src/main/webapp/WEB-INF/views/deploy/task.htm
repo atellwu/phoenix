@@ -4,10 +4,14 @@
     #parse("deploy/breadcrumb.htm")
     <div class="page-content">
       <div class="page-header">
-        <button ng-show="canUpdate" class="btn btn-minier btn-primary" ng-click="batchCheckAllIp()">批量全选</button>
-        <button style="margin-right: 20px;" ng-show="canUpdate" class="btn btn-minier btn-danger" ng-click="batchUncheckAllIp()">批量清空</button>
-        <b>任务ID：</b><span>{{task.task.id}}</span> &nbsp;&nbsp; &nbsp; <b>任务名称：</b>
-        <span>{{task.task.name}}</span> &nbsp;&nbsp; &nbsp; <b>任务状态：</b><span>{{task.task.status}}</span>
+        <button ng-show="canUpdate" class="btn btn-minier btn-primary" ng-click="batchCheckAllIp()"><i class="icon icon-check"></i> 全选</button>
+        <button ng-show="canUpdate" class="btn btn-minier btn-danger"
+          ng-click="batchUncheckAllIp()"><i class="icon icon-check-empty"></i> 清空</button>
+        <button ng-show="canUpdate" class="btn btn-minier btn-primary" ng-click="batchUnCollapse()"><i class="icon-angle-down"></i> 展开</button>
+        <button style="margin-right: 20px;" ng-show="canUpdate" class="btn btn-minier btn-danger"
+          ng-click="batchCollapse()"><i class="icon-angle-up"></i> 收起</button>
+        <b>任务ID：</b><span>{{task.task.id}}</span> &nbsp;&nbsp; &nbsp; <b>任务名称：</b> <span>{{task.task.name}}</span>
+        &nbsp;&nbsp; &nbsp; <b>任务状态：</b><span>{{task.task.status}}</span>
         <button style="float: right; margin-bottom: 10px; margin-right: 0px;" type="button"
           ng-click="updateAndStartTask()" ng-show="task.task.stateAction==null || task.task.stateAction=='STOP'"
           class="btn btn-primary btn-sm">启动任务</button>
@@ -24,74 +28,85 @@
           <div class="row">
             <div class="col-sm-6">
               <div ng-repeat="deployVsBo in task.deployVsBos">
-                <table style="margin-bottom: 5px;" class="table table-bordered table-condensed nohover">
-                  <thead ng-click="showVsLog(deployVsBo)">
-                    <tr>
-                      <th width="70">站点</th>
-                      <th width="140">{{ deployVsBo.deployVs.vsName }}</th>
-                      <th width="70">版本</th>
-                      <th width="140">{{ deployVsBo.deployVs.vsTag }}</th>
-                      <th width="50">状态</th>
-                      <th width="70">{{ deployVsBo.deployVs.status }}</th>
-                    </tr>
-                  </thead>
-                </table>
-                <table style="margin-top: 0px;" class="slb-datatable table table-bordered table-condensed lion">
-                  <thead>
-                    <tr>
-                      <th><button ng-show="canUpdate" class="btn btn-minier btn-primary"
-                          ng-click="checkAllIp(deployVsBo)">全选</button>
-                        <button ng-show="canUpdate" class="btn btn-minier btn-danger"
-                          ng-click="uncheckAllIp(deployVsBo)">清空</button></th>
-                      <th>IP</th>
-                      <th>状态</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr ng-init="deployAgentBo = getAgent(deployVsBo.deployAgentBos,instance.ip)"
-                      ng-click="showAgentLog(deployAgentBo)" ng-repeat="instance in deployVsBo.slbPool.instances"
-                      class="my-progress-bar">
-                      <td width="70px"><input ng-disabled="!canUpdate" type="checkbox"
-                        ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)"
-                        ng-checked="isContain(deployVsBo.deployAgentBos,instance.ip)"></td>
-                      <td width="130px" ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)">{{instance.ip}}</td>
-                      <td style="width: 200px; padding-right: 10px;" ng-switch="deployAgentBo.deployAgent.status">
-                        <div ng-switch-when="CREATED" class="progress">
-                          <div style="width: 0%" class="progress-bar"></div>
-                          <p style="left: 40%;">未开始</p>
-                        </div>
-                        <div ng-switch-when="PROCESSING" class="progress">
-                          <div style="width: {{deployAgentBo.processPct" class="progress-bar progress-bar-primary"></div>
-                          <p style="left: 35%;">正在发布</p>
-                        </div>
-                        <div ng-switch-when="SUCCESS" class="progress">
-                          <div style="width: 100%" class="progress-bar progress-bar-success"></div>
-                          <p style="left: 40%;">成功</p>
-                        </div>
-                        <div ng-switch-when="REJECTED" class="progress">
-                          <div style="width: 100%" class="progress-bar progress-bar-danger"></div>
-                          <p style="left: 30%;">失败(被拒绝)</p>
-                        </div>
-                        <div ng-switch-when="FAILED" class="progress">
-                          <div style="width: 100%" class="progress-bar progress-bar-danger"></div>
-                          <p style="left: 40%;">失败</p>
-                        </div>
-                        <div ng-switch-when="CANCELLED" class="progress">
-                          <div style="width: 100%" class="progress-bar progress-bar-danger"></div>
-                          <p style="left: 38%;">被取消</p>
-                        </div>
-                        <div ng-switch-default></div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div id="accordion_{{ deployVsBo.deployVs.vsName }}" class="accordion-style1 panel-group">
+                  <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <h4 class="panel-title">
+                        <a class="accordion-toggle" data-toggle="collapse"
+                          data-parent="#accordion_{{ deployVsBo.deployVs.vsName }}"
+                          href="#collapse_{{ deployVsBo.deployVs.vsName }}"> <i class="bigger-110 icon-angle-down"
+                          data-icon-hide="icon-angle-down" data-icon-show="icon-angle-right"></i> <span
+                          style="margin-left: 10px; font-size: 16px"><i class="icon icon-globe"></i> 站点 {{
+                            deployVsBo.deployVs.vsName }}</span>&nbsp;&nbsp; ( <span>版本</span> <span>{{
+                            deployVsBo.deployVs.vsTag }}</span> ) <span style="float: right">状态 {{
+                            deployVsBo.deployVs.status }}</span>
+                        </a>
+                      </h4>
+                    </div>
+                    <div class="panel-collapse in" id="collapse_{{ deployVsBo.deployVs.vsName }}" style="height: auto;">
+                      <div class="panel-body">
+                        <table style="margin-top: 0px;" class="slb-datatable table table-bordered table-condensed lion">
+                          <thead>
+                            <tr>
+                              <th><button ng-show="canUpdate" class="btn btn-minier btn-primary"
+                                  ng-click="checkAllIp(deployVsBo)">全选</button>
+                                <button ng-show="canUpdate" class="btn btn-minier btn-danger"
+                                  ng-click="uncheckAllIp(deployVsBo)">清空</button></th>
+                              <th>IP</th>
+                              <th>状态</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-init="deployAgentBo = getAgent(deployVsBo.deployAgentBos,instance.ip)"
+                              ng-click="showAgentLog(deployAgentBo)"
+                              ng-repeat="instance in deployVsBo.slbPool.instances" class="my-progress-bar">
+                              <td width="70px"><input ng-disabled="!canUpdate" type="checkbox"
+                                ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)"
+                                ng-checked="isContain(deployVsBo.deployAgentBos,instance.ip)"></td>
+                              <td width="130px" ng-click="checkIp(deployVsBo.deployAgentBos,instance.ip)">{{instance.ip}}</td>
+                              <td style="width: 200px; padding-right: 10px;"
+                                ng-switch="deployAgentBo.deployAgent.status">
+                                <div ng-switch-when="CREATED" class="progress">
+                                  <div style="width: 0%" class="progress-bar"></div>
+                                  <p style="left: 40%;">未开始</p>
+                                </div>
+                                <div ng-switch-when="PROCESSING" class="progress">
+                                  <div style="width: {{deployAgentBo.processPct"
+                                    class="progress-bar progress-bar-primary"></div>
+                                  <p style="left: 35%;">正在发布</p>
+                                </div>
+                                <div ng-switch-when="SUCCESS" class="progress">
+                                  <div style="width: 100%" class="progress-bar progress-bar-success"></div>
+                                  <p style="left: 40%;">成功</p>
+                                </div>
+                                <div ng-switch-when="REJECTED" class="progress">
+                                  <div style="width: 100%" class="progress-bar progress-bar-danger"></div>
+                                  <p style="left: 30%;">失败(被拒绝)</p>
+                                </div>
+                                <div ng-switch-when="FAILED" class="progress">
+                                  <div style="width: 100%" class="progress-bar progress-bar-danger"></div>
+                                  <p style="left: 40%;">失败</p>
+                                </div>
+                                <div ng-switch-when="CANCELLED" class="progress">
+                                  <div style="width: 100%" class="progress-bar progress-bar-danger"></div>
+                                  <p style="left: 38%;">被取消</p>
+                                </div>
+                                <div ng-switch-default></div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="col-sm-6">
               <div class="row">
-                <div class="span12 thumbnail">
-                  <form class="form-inline">
-                    <table class="table table-condensed lion nohover"
+                <div class="span12 ">
+                  <form class="form-inline" style="width: 100%; margin: 0 auto">
+                    <table class="table table-condensed lion nohover table-bordered"
                       style="margin: 0 0 0; border-bottom: 1px solid #DDD;">
                       <thead>
                         <tr>
@@ -110,7 +125,7 @@
                         </tr>
                       </tbody>
                     </table>
-                    <table class="table table-condensed lion nohover"
+                    <table class="table table-condensed lion nohover table-bordered"
                       style="margin: 0 0 0; border-bottom: 1px solid #DDD;">
                       <thead>
                         <tr>
@@ -127,7 +142,7 @@
                         </tr>
                       </tbody>
                     </table>
-                    <table class="table table-condensed lion nohover"
+                    <table class="table table-condensed lion nohover table-bordered"
                       style="margin: 0 0 0; border-bottom: 1px solid #DDD;">
                       <thead>
                         <tr>
@@ -150,7 +165,7 @@
                 </div>
               </div>
               <pre
-                style="cursor: text; margin-top: 20px; background-color: #3A1042; color: #FFFFFF; font-size: 12px; width: 100%; height: 420px; overflow-x: auto;"
+                style="cursor: text; margin-top: 20px; background-color: #3A1042; color: #FFFFFF; font-size: 12px; width: 100%; height: 520px; overflow-x: auto;"
                 id="console"></pre>
             </div>
           </div>
