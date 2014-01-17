@@ -30,6 +30,7 @@ module
 				function($scope, $resource, $http) {
 					$scope.task = null;
 					$scope.canUpdate = false;
+					$scope.switchLogViewManually = false;
 					$scope.getTask = function(taskId) {
 						// 获取task
 						$http(
@@ -134,7 +135,7 @@ module
 					$scope.batchUnCollapse = function() {
 						$(".panel-collapse").collapse('show');
 						$(".accordion-toggle").removeClass('collapsed');
-						
+
 						$.each($scope.task.deployVsBos,
 								function(i, deployVsBo) {
 								});
@@ -199,6 +200,7 @@ module
 					}
 					$scope.startTask = function() {
 						$scope.needGetStatus = true;
+						$scope.switchLogViewManually = false;
 						$http(
 								{
 									method : 'GET',
@@ -207,6 +209,7 @@ module
 								}).success(
 								function(data, status, headers, config) {
 									if (data.errorCode == 0) {
+										$scope.needGetStatus = true;
 									} else {
 										app.alertError("操作失败: "
 												+ data.errorMessage);
@@ -260,27 +263,42 @@ module
 																function(
 																		vsName,
 																		deployVsBo) {
+																	var breakFor = true;
 																	$
 																			.each(
 																					deployVsBo.deployAgentBos,
 																					function(
 																							ip,
 																							deployAgentBo) {
-																						console
-																								.log(deployAgentBo);
 																						if (deployAgentBo.deployAgent.status == 'PROCESSING') {
-																							$scope.currentAgentOrVsOfLogView = deployAgentBo.deployAgent;
-																							return false;
+																							// 找到哪个vs正在运行
+																							// 切换日志
+																							if (!$scope.switchLogViewManually) {
+																								console
+																										.log('switch log auto');
+																								$scope.currentAgentOrVsOfLogView = deployVsBo.deployVs;
+																							}
+																							// 显示运行的图标
+																							deployVsBo.isRunning = true;
+																							breakFor = false;
+																							return breakFor;
 																						}
 																					});
+																	return breakFor;
 																});
 
 												$scope.showLog();
 
-												// 状态是成功，或停止，则不再获取状态
+												// 状态是成功，或停止，则不再获取状态(延迟停止，以免启动时状态还是STOP，造成错误停止)
 												if ($scope.task.task.status == 'SUCCESS'
 														|| $scope.task.task.stateAction == 'STOP') {
-													$scope.needGetStatus = false;
+													setTimeout(
+															function() {
+																if ($scope.task.task.status == 'SUCCESS'
+																		|| $scope.task.task.stateAction == 'STOP') {
+																	$scope.needGetStatus = false;
+																}
+															}, 10000);
 												}
 											} else {
 												app.alertError("获取失败: "
@@ -288,17 +306,19 @@ module
 											}
 										})
 								.error(function(data, status, headers, config) {
-									$scope.needGetStatus = false;
+									$scope.needGetStatus = false;// 发生网络错误
 								});
 					};
 					$scope.showVsLog = function(deployVsBo) {
 						if (deployVsBo) {
+							$scope.switchLogViewManually = true;
 							$scope.currentAgentOrVsOfLogView = deployVsBo.deployVs;
 							$scope.showLog();
 						}
 					}
 					$scope.showAgentLog = function(deployAgentBo) {
 						if (deployAgentBo) {
+							$scope.switchLogViewManually = true;
 							$scope.currentAgentOrVsOfLogView = deployAgentBo.deployAgent;
 							$scope.showLog();
 						}
@@ -313,6 +333,8 @@ module
 								$('#console')
 										.text(
 												$scope.currentAgentOrVsOfLogView.summaryLog);
+							} else {
+								$('#console').text('');
 							}
 						}
 

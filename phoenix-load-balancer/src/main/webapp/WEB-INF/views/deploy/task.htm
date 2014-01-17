@@ -4,12 +4,18 @@
     #parse("deploy/breadcrumb.htm")
     <div class="page-content">
       <div class="page-header">
-        <button ng-show="canUpdate" class="btn btn-minier btn-primary" ng-click="batchCheckAllIp()"><i class="icon icon-check"></i> 全选</button>
-        <button ng-show="canUpdate" class="btn btn-minier btn-danger"
-          ng-click="batchUncheckAllIp()"><i class="icon icon-check-empty"></i> 清空</button>
-        <button ng-show="canUpdate" class="btn btn-minier btn-primary" ng-click="batchUnCollapse()"><i class="icon-angle-down"></i> 展开</button>
-        <button style="margin-right: 20px;" ng-show="canUpdate" class="btn btn-minier btn-danger"
-          ng-click="batchCollapse()"><i class="icon-angle-up"></i> 收起</button>
+        <button ng-show="canUpdate" class="btn btn-minier btn-primary" ng-click="batchCheckAllIp()">
+          <i class="icon icon-check"></i> 全选
+        </button>
+        <button ng-show="canUpdate" class="btn btn-minier btn-danger" ng-click="batchUncheckAllIp()">
+          <i class="icon icon-check-empty"></i> 清空
+        </button>
+        <button class="btn btn-minier btn-primary" ng-click="batchUnCollapse()">
+          <i class="icon-angle-down"></i> 展开
+        </button>
+        <button style="margin-right: 20px;" class="btn btn-minier btn-danger" ng-click="batchCollapse()">
+          <i class="icon-angle-up"></i> 收起
+        </button>
         <b>任务ID：</b><span>{{task.task.id}}</span> &nbsp;&nbsp; &nbsp; <b>任务名称：</b> <span>{{task.task.name}}</span>
         &nbsp;&nbsp; &nbsp; <b>任务状态：</b><span>{{task.task.status}}</span>
         <button style="float: right; margin-bottom: 10px; margin-right: 0px;" type="button"
@@ -27,7 +33,11 @@
         <div class="col-xs-12">
           <div class="row">
             <div class="col-sm-6">
-              <div ng-repeat="deployVsBo in task.deployVsBos">
+              <div ng-repeat="deployVsBo in task.deployVsBos" style="margin-bottom: 20px; position: relative;">
+                <button ng-show="!canUpdate" style="position: absolute; z-index: 999; right: 5px; top: 5px;" ng-click="showVsLog(deployVsBo)">
+                  Log <i ng-show="currentAgentOrVsOfLogView.vsName == deployVsBo.deployVs.vsName"
+                    class="icon-arrow-right icon-on-right"></i>
+                </button>
                 <div id="accordion_{{ deployVsBo.deployVs.vsName }}" class="accordion-style1 panel-group">
                   <div class="panel panel-default">
                     <div class="panel-heading">
@@ -38,8 +48,9 @@
                           data-icon-hide="icon-angle-down" data-icon-show="icon-angle-right"></i> <span
                           style="margin-left: 10px; font-size: 16px"><i class="icon icon-globe"></i> 站点 {{
                             deployVsBo.deployVs.vsName }}</span>&nbsp;&nbsp; ( <span>版本</span> <span>{{
-                            deployVsBo.deployVs.vsTag }}</span> ) <span style="float: right">状态 {{
-                            deployVsBo.deployVs.status }}</span>
+                            deployVsBo.deployVs.vsTag }}</span> ) <span style="float: right; margin-right: 70px"><i
+                            ng-show="deployVsBo.isRunning" class="icon-spinner icon-spin orange bigger-125"></i>&nbsp;&nbsp;
+                            状态 {{ deployVsBo.deployVs.status }}</span>
                         </a>
                       </h4>
                     </div>
@@ -54,6 +65,7 @@
                                   ng-click="uncheckAllIp(deployVsBo)">清空</button></th>
                               <th>IP</th>
                               <th>状态</th>
+                              <th ng-show="!canUpdate">操作</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -93,6 +105,10 @@
                                 </div>
                                 <div ng-switch-default></div>
                               </td>
+                              <td ng-show="!canUpdate"><button class="btn btn-minier btn-white" style="" ng-click="showAgentLog(deployAgentBo)">
+                                  Log <i ng-show="currentAgentOrVsOfLogView.id == deployAgentBo.deployAgent.id"
+                                    class="icon-arrow-right icon-on-right"></i>
+                                </button></td>
                             </tr>
                           </tbody>
                         </table>
