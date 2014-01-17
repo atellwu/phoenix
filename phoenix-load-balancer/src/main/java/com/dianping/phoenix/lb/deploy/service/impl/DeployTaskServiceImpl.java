@@ -199,7 +199,7 @@ public class DeployTaskServiceImpl implements DeployTaskService {
     }
 
     @Override
-    public void addTask(NewTaskInfo newTaskInfo) {
+    public long addTask(NewTaskInfo newTaskInfo) {
         validate(newTaskInfo);
         DeployTask task = new DeployTask();
         task.setName(newTaskInfo.getTaskName());
@@ -210,6 +210,8 @@ public class DeployTaskServiceImpl implements DeployTaskService {
         task.setDeployInterval(1);
         task.setErrorPolicy(ErrorPolicy.ABORT_ON_ERROR);
         deployTaskMapper.insert(task);
+
+        long id = task.getId();
 
         Collections.sort(newTaskInfo.getSelectedVsAndTags());
 
@@ -222,6 +224,8 @@ public class DeployTaskServiceImpl implements DeployTaskService {
             deployVs.setLastModifiedDate(new Date());
             deployVsMapper.insertSelective(deployVs);
         }
+
+        return id;
     }
 
     private void validate(NewTaskInfo newTaskInfo) {

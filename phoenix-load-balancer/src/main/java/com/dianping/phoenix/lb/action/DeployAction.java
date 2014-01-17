@@ -103,8 +103,9 @@ public class DeployAction extends MenuAction {
             }
             NewTaskInfo newTaskInfo = JsonBinder.getNonNullBinder().fromJson(taskJson, NewTaskInfo.class);
 
-            deployTaskService.addTask(newTaskInfo);
+            long taskId = deployTaskService.addTask(newTaskInfo);
 
+            dataMap.put("taskId", taskId);
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);

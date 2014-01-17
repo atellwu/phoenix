@@ -32,8 +32,9 @@ public interface DeployTaskService {
     /**
      * 创建任务<br>
      * 参数是：填写的task名称，所选择的vs名/tag名列表。
+     * @return 
      */
-    void addTask(NewTaskInfo newTaskInfo);
+    long addTask(NewTaskInfo newTaskInfo);
 
     /**
      * 点击开始任务后，ajax首先更新task。(更新完初始化页面的显示，开始论询显示各个DeployTask的状态)<br>

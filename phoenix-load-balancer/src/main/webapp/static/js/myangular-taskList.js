@@ -131,7 +131,8 @@ module.controller('TaskListController', function($scope, $resource, $http) {
 						app.alertSuccess("保存成功！ 即将刷新页面...", "addTaskAlertDiv");
 						vsChanged = false;// 保存成功，修改标识重置
 						setTimeout(function() {
-							window.location = window.contextpath + '/deploy';
+							window.location = window.contextpath + '/deploy/task/'
+									+ data.taskId;
 						}, 700);
 					} else {
 						app.alertError("保存失败: " + data.errorMessage,
