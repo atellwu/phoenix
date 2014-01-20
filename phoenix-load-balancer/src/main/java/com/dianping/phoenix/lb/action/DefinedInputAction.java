@@ -37,7 +37,6 @@ public class DefinedInputAction extends ActionSupport {
 
     @Override
     public String execute() throws Exception {
-        LOG.info("execute");
         return SUCCESS;
     }
 

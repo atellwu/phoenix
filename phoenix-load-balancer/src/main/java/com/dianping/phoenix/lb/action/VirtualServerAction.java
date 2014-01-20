@@ -79,7 +79,6 @@ public class VirtualServerAction extends MenuAction {
             //获取vs
             VirtualServer virtualServer = virtualServerService.findVirtualServer(virtualServerName);
             dataMap.put("virtualServer", virtualServer);
-            LOG.info("execute");
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
