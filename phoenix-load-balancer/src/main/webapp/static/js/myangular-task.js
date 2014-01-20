@@ -157,6 +157,10 @@ module
 						$(".accordion-toggle").addClass('collapsed');
 						$scope.allCollapse = true;
 					}
+					$scope.replaceDot2Underline = function(str){
+						console.log("replace:"+str);
+						return str.replace(/\./g, '_');
+					}
 
 					$scope.getAgent = function(deployAgentBos, ip) {
 						return deployAgentBos[ip];
@@ -211,7 +215,7 @@ module
 					$scope.startTask = function() {
 						$scope.needGetStatus = true;
 						$scope.autoSwitchLogView = true;
-						$scope.batchCollapse();
+//						$scope.batchCollapse();
 						$http(
 								{
 									method : 'GET',

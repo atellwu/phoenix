@@ -50,8 +50,7 @@ public class DefaultAgentClient implements AgentClient {
     private static final String  RESP_MSG_OK   = "ok";
     private static final String  FIRST_VERSION = "firstV";
 
-    public DefaultAgentClient(long deployId, String vsName, String tag, String ip,
-            VirtualServerService virtualServerService, StrategyService strategyService, ConfigManager configManager) {
+    public DefaultAgentClient(long deployId, String vsName, String tag, String ip, VirtualServerService virtualServerService, StrategyService strategyService, ConfigManager configManager) {
         super();
         this.deployId = deployId;
         this.vsName = vsName;
@@ -66,8 +65,7 @@ public class DefaultAgentClient implements AgentClient {
     @Override
     public void execute() {
         result.setStatus(DeployAgentStatus.PROCESSING);
-        result.logInfo(String.format("Deploying phoenix-slb config(%s) to host(%s) for deploy(%s) of vs(%s)  ... ",
-                tag, ip, deployId, vsName));
+        result.logInfo(String.format("Deploying phoenix-slb config(%s) to host(%s) for deploy(%s) of vs(%s)  ... ", tag, ip, deployId, vsName));
 
         String currentWorkingVersion = getAgentConfigVersion();
         if (StringUtils.isNotBlank(currentWorkingVersion)) {
@@ -77,8 +75,7 @@ public class DefaultAgentClient implements AgentClient {
                 }
 
                 if (!FIRST_VERSION.equals(currentWorkingVersion)) {
-                    SlbModelTree currentWorkingSlbModelTree = virtualServerService.findTagById(vsName,
-                            currentWorkingVersion);
+                    SlbModelTree currentWorkingSlbModelTree = virtualServerService.findTagById(vsName, currentWorkingVersion);
                     SlbModelTree deployingSlbModelTree = virtualServerService.findTagById(vsName, tag);
 
                     if (!versionExists(currentWorkingVersion, currentWorkingSlbModelTree)) {
@@ -89,8 +86,8 @@ public class DefaultAgentClient implements AgentClient {
                         return;
                     }
 
-                    VirtualServerComparisionVisitor comparisionVisitor = new VirtualServerComparisionVisitor(
-                            currentWorkingSlbModelTree.findVirtualServer(vsName), currentWorkingSlbModelTree.getPools());
+                    VirtualServerComparisionVisitor comparisionVisitor = new VirtualServerComparisionVisitor(currentWorkingSlbModelTree.findVirtualServer(vsName),
+                            currentWorkingSlbModelTree.getPools());
                     deployingSlbModelTree.accept(comparisionVisitor);
                     ComparisionResult compareResult = comparisionVisitor.getVisitorResult();
 
@@ -124,8 +121,7 @@ public class DefaultAgentClient implements AgentClient {
     private void readLog() throws IOException {
         result.logInfo(String.format("Getting status from host(%s) for deploy(%s) ... ", ip, deployId));
 
-        AgentReader sr = new AgentReader(new PhoenixInputStreamReader(configManager.getDeployLogUrl(ip, deployId),
-                configManager.getDeployConnectTimeout(), configManager.getDeployGetlogRetrycount()));
+        AgentReader sr = new AgentReader(new PhoenixInputStreamReader(configManager.getDeployLogUrl(ip, deployId), configManager.getDeployConnectTimeout(), configManager.getDeployGetlogRetrycount()));
 
         while (sr.hasNext()) {
             result.addRawLogs(sr.next(result));
@@ -138,11 +134,9 @@ public class DefaultAgentClient implements AgentClient {
         }
     }
 
-    private boolean callAgentWithDynamicRefresh(ComparisionResult compareResult) throws MalformedURLException,
-            BizException, IOException, ProtocolException, UnsupportedEncodingException {
+    private boolean callAgentWithDynamicRefresh(ComparisionResult compareResult) throws MalformedURLException, BizException, IOException, ProtocolException, UnsupportedEncodingException {
         result.logInfo("No need to reload nginx, switch to dynamic refresh strategy");
-        URL deployUrl = new URL(configManager.getDeployWithDynamicRefreshUrl(ip, deployId, vsName,
-                configManager.getTengineConfigFileName(), tag));
+        URL deployUrl = new URL(configManager.getDeployWithDynamicRefreshUrl(ip, deployId, vsName, configManager.getTengineConfigFileName(), tag));
 
         String postData = genDynamicRefreshPostData(compareResult);
         result.logInfo(String.format("Deploy url is %s, post data is %s", deployUrl, postData));
@@ -161,8 +155,7 @@ public class DefaultAgentClient implements AgentClient {
     private boolean checkAgentResponse(HttpURLConnection conn) throws IOException {
         Response response = DefaultJsonParser.parse(IOUtils.toString(conn.getInputStream()));
         if (!RESP_MSG_OK.equals(response.getStatus())) {
-            result.logError(String.format("Failed to deploy (status: %s, error msg: %s)", response.getStatus(),
-                    response.getMessage()));
+            result.logError(String.format("Failed to deploy (status: %s, error msg: %s)", response.getStatus(), response.getMessage()));
             endWithFail();
             return false;
         }
@@ -172,8 +165,7 @@ public class DefaultAgentClient implements AgentClient {
 
     private boolean callAgentWithReload() throws MalformedURLException, IOException {
         result.logInfo("Need to reload nginx");
-        URL deployUrl = new URL(configManager.getDeployWithReloadUrl(ip, deployId, vsName,
-                configManager.getTengineConfigFileName(), tag));
+        URL deployUrl = new URL(configManager.getDeployWithReloadUrl(ip, deployId, vsName, configManager.getTengineConfigFileName(), tag));
         result.logInfo(String.format("Deploy url is %s", deployUrl));
         HttpURLConnection conn = (HttpURLConnection) deployUrl.openConnection();
         conn.setConnectTimeout(configManager.getDeployConnectTimeout());
@@ -192,8 +184,7 @@ public class DefaultAgentClient implements AgentClient {
 
     private boolean sameVersion(String currentWorkingVersion) {
         if (currentWorkingVersion.equals(tag)) {
-            result.logInfo(String.format("Config of vs(%s) for host(%s) is already version %s, no need to redeploy",
-                    vsName, ip, tag));
+            result.logInfo(String.format("Config of vs(%s) for host(%s) is already version %s, no need to redeploy", vsName, ip, tag));
             endWithSuccess();
             return true;
         }
@@ -204,8 +195,7 @@ public class DefaultAgentClient implements AgentClient {
         List<Map<String, String>> postDataList = new ArrayList<Map<String, String>>();
         for (Pool pool : compareResult.getAddedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
-            postData.put("url", configManager.getNginxDynamicAddUpstreamUrlPattern(PoolNameUtils
-                    .rewriteToPoolNamePrefix(vsName, pool.getName())));
+            postData.put("url", configManager.getNginxDynamicAddUpstreamUrlPattern(PoolNameUtils.rewriteToPoolNamePrefix(vsName, pool.getName())));
             postData.put("method", "POST");
             postData.put("data", generateUpstreamContent(pool));
             postDataList.add(postData);
@@ -213,8 +203,7 @@ public class DefaultAgentClient implements AgentClient {
 
         for (Pool pool : compareResult.getModifiedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
-            postData.put("url", configManager.getNginxDynamicUpdateUpstreamUrlPattern(PoolNameUtils
-                    .rewriteToPoolNamePrefix(vsName, pool.getName())));
+            postData.put("url", configManager.getNginxDynamicUpdateUpstreamUrlPattern(PoolNameUtils.rewriteToPoolNamePrefix(vsName, pool.getName())));
             postData.put("method", "POST");
             postData.put("data", generateUpstreamContent(pool));
             postDataList.add(postData);
@@ -222,8 +211,7 @@ public class DefaultAgentClient implements AgentClient {
 
         for (Pool pool : compareResult.getDeletedPools()) {
             Map<String, String> postData = new HashMap<String, String>();
-            postData.put("url", configManager.getNginxDynamicDeleteUpstreamUrlPattern(PoolNameUtils
-                    .rewriteToPoolNamePrefix(vsName, pool.getName())));
+            postData.put("url", configManager.getNginxDynamicDeleteUpstreamUrlPattern(PoolNameUtils.rewriteToPoolNamePrefix(vsName, pool.getName())));
             postData.put("method", "DELETE");
             postDataList.add(postData);
         }
@@ -241,8 +229,7 @@ public class DefaultAgentClient implements AgentClient {
             nginxUpstreamServers.add(server);
         }
         context.put("servers", nginxUpstreamServers);
-        return VelocityEngineManager.INSTANCE.merge(
-                TemplateManager.INSTANCE.getTemplate("upstream", "dynamic_upstream"), context);
+        return VelocityEngineManager.INSTANCE.merge(TemplateManager.INSTANCE.getTemplate("upstream", "dynamic_upstream"), context);
     }
 
     private void endWithSuccess() {
@@ -258,8 +245,7 @@ public class DefaultAgentClient implements AgentClient {
     private String getAgentConfigVersion() {
         try {
             URL versionUrl = new URL(configManager.getAgentTengineConfigVersionUrl(ip, vsName));
-            result.logInfo(String.format("Fetching version of current working config through url %s",
-                    versionUrl.toString()));
+            result.logInfo(String.format("Fetching version of current working config through url %s", versionUrl.toString()));
 
             HttpURLConnection connection = (HttpURLConnection) versionUrl.openConnection();
             connection.setConnectTimeout(configManager.getDeployConnectTimeout());
@@ -273,7 +259,12 @@ public class DefaultAgentClient implements AgentClient {
             if (RESP_MSG_OK.equals(response.getStatus()) && StringUtils.isNotBlank(response.getMessage())) {
                 String version = StringUtils.trim(response.getMessage());
                 result.logInfo(String.format("Version fetched, current working config version is %s", version));
-                return version;
+                try {
+                    virtualServerService.findTagById(vsName, version);
+                    return version;
+                } catch (Exception e) {
+                    return FIRST_VERSION;
+                }
             } else {
                 if ("Unknown version".equals(response.getMessage())) {
                     result.logInfo(String.format("Vs(%s) is the first deployment for host(%s)", this.vsName, this.ip));

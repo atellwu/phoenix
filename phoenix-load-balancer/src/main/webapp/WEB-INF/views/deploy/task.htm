@@ -48,17 +48,20 @@
                       <h4 class="panel-title">
                         <a class="accordion-toggle" data-toggle="collapse"
                           data-parent="#accordion_{{ deployVsBo.deployVs.vsName }}"
-                          href="#collapse_{{ deployVsBo.deployVs.vsName }}"> <i class="bigger-110 icon-angle-down"
-                          data-icon-hide="icon-angle-down" data-icon-show="icon-angle-right"></i> <span
-                          style="margin-left: 10px; font-size: 16px"><i class="icon icon-globe"></i> 站点 {{
-                            deployVsBo.deployVs.vsName }}</span>&nbsp;&nbsp; ( <span>版本</span> <span>{{
-                            deployVsBo.deployVs.vsTag }}</span> ) <span style="float: right; margin-right: 70px"><i
+                          href="#collapse_{{ replaceDot2Underline(deployVsBo.deployVs.vsName) }}"> <i class="bigger-110 icon-angle-down"
+                          data-icon-hide="icon-angle-down" data-icon-show="icon-angle-right"></i> 
+                          <span style="margin-left: 10px; font-size: 16px"><i class="icon icon-globe"></i> 站点 {{
+                            deployVsBo.deployVs.vsName }}</span>
+                            <span style="float: right; margin-right: 70px"><i
                             ng-show="deployVsBo.isRunning" class="icon-spinner icon-spin orange bigger-125"></i>&nbsp;&nbsp;
                             状态 {{ deployVsBo.deployVs.status }}</span>
+                            <br>
+                             <span style="line-height: 20px;font-size:10px;margin-left:38px;font-weight: normal;">版本：{{
+                            deployVsBo.deployVs.vsTag }}</span> 
                         </a>
                       </h4>
                     </div>
-                    <div class="panel-collapse in" id="collapse_{{ deployVsBo.deployVs.vsName }}" style="height: auto;">
+                    <div class="panel-collapse in" id="collapse_{{ replaceDot2Underline(deployVsBo.deployVs.vsName) }}" style="height: auto;">
                       <div class="panel-body">
                         <table style="margin-top: 0px;" class="slb-datatable table table-bordered table-condensed lion">
                           <thead>

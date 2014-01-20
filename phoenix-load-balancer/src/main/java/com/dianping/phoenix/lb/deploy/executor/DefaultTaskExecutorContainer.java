@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ import com.dianping.phoenix.lb.service.model.VirtualServerService;
 
 @Service
 public class DefaultTaskExecutorContainer implements TaskExecutorContainer {
+
+    private static final Logger                   LOG       = LoggerFactory.getLogger(DefaultTaskExecutorContainer.class);
 
     private ConcurrentHashMap<Long, TaskExecutor> container = new ConcurrentHashMap<Long, TaskExecutor>();
 
@@ -42,18 +46,22 @@ public class DefaultTaskExecutorContainer implements TaskExecutorContainer {
     public void init() throws ComponentLookupException, BizException {
         configManager = PlexusComponentContainer.INSTANCE.lookup(ConfigManager.class);
         //获取数据库中，状态为READY的task，将其启动起来
-        List<DeployTaskBo> list = deployTaskService.getTasksByStateAction(StateAction.START);
-        if (list != null && list.size() > 0) {
-            for (DeployTaskBo deployTaskBo : list) {
-                TaskExecutor taskExecutor = this.submitTaskExecutor(deployTaskBo);
-                taskExecutor.start();
+        try {
+            List<DeployTaskBo> list = deployTaskService.getTasksByStateAction(StateAction.START);
+            if (list != null && list.size() > 0) {
+                for (DeployTaskBo deployTaskBo : list) {
+                    TaskExecutor taskExecutor = this.submitTaskExecutor(deployTaskBo);
+                    taskExecutor.start();
+                }
             }
-        }
-        list = deployTaskService.getTasksByStateAction(StateAction.PAUSE);
-        if (list != null && list.size() > 0) {
-            for (DeployTaskBo deployTaskBo : list) {
-                this.submitTaskExecutor(deployTaskBo);
+            list = deployTaskService.getTasksByStateAction(StateAction.PAUSE);
+            if (list != null && list.size() > 0) {
+                for (DeployTaskBo deployTaskBo : list) {
+                    this.submitTaskExecutor(deployTaskBo);
+                }
             }
+        } catch (RuntimeException e) {
+            LOG.warn("Error when init Task, just ignore it. Somebody should start it manually.", e);
         }
     }
 
