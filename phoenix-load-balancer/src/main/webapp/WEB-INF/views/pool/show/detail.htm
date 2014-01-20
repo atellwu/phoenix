@@ -38,10 +38,10 @@
       </thead>
       <tbody>
         <tr ng-repeat="member in pool.members">
-          <td><input disabled class="input-small" ng-model="member.name" type="text"></td>
-          <td><input disabled class="input-small" ng-model="member.ip" type="text"></td>
+          <td><input class="input" disabled class="input-small" ng-model="member.name" type="text"></td>
+          <td><input class="input" disabled class="input-small" ng-model="member.ip" type="text"></td>
           <td><input disabled class="input-mini" ng-model="member.port" type="text"></td>
-          <td><input disabled class="input-mini" ng-model="member.weight" type="text"></td>
+          <td><inputdisabled class="input-mini" ng-model="member.weight" type="text"></td>
           <td><input disabled class="input-mini" ng-model="member.maxFails" type="text"></td>
           <td><input disabled class="input-mini" ng-model="member.failTimeout" type="text"></td>
           <td><label class="radio inline"> <input disabled ng-model="member.state" type="radio"
