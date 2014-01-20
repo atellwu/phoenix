@@ -123,8 +123,8 @@
 		},
 		"alertErrorModal" : function(title, errorMsg) {
 			// 显示错误消息
-			$('#errorMsg > div[class="modal-header"] > h3').text(title);
-			$('#errorMsg > div[class="modal-body"] > p').text(errorMsg);
+			$('#errorMsg div[class="modal-header"] > h3').text(title);
+			$('#errorMsg div[class="modal-body"] > p').text(errorMsg);
 			$('#errorMsg').modal('show');
 		},
 		"endWith" : function(s, endStr) {
