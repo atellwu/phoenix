@@ -155,18 +155,22 @@
   </div>
 </div>
 <!-- 错误消息弹出框 -->
-<div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" class="modal" id="errorMsg"
-  style="display: none;">
-  <div class="modal-header">
-    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">
-      <i class="icon-remove"></i>
-    </button>
-    <h3></h3>
-  </div>
-  <div class="modal-body">
-    <p style="text-align: center"></p>
-  </div>
-  <div class="modal-footer">
-    <button data-dismiss="modal" class="btn btn-info">关闭</button>
+<div aria-hidden="false" role="dialog" data-backdrop="true" class="bootbox modal" id="errorMsg" style="margin: 0 0 0 0;">
+  <div class="modal-dialog" style="width: 600px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button aria-hidden="true" data-dismiss="modal" class="close" type="button">
+          <i class="icon-remove"></i>
+        </button>
+        <h3></h3>
+      </div>
+      <div class="modal-body">
+        <p style="text-align: center"></p>
+      </div>
+      <div class="modal-footer">
+        <button data-dismiss="modal" class="btn btn-info">关闭</button>
+      </div>
+    </div>
   </div>
 </div>
+
