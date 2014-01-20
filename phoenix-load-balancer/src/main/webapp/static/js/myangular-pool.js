@@ -118,10 +118,10 @@ module.controller('PoolController', function($scope, DataService, $resource,
 		var member = new Object();
 		member.state = 'ENABLED';
 		member.availability = 'AVAILABLE';
-		member.port = 8080;
-		member.weight = 2;
-		member.maxFails = 2;
-		member.failTimeout = '30s';
+		member.port = 80;
+		member.weight = 1;
+		member.maxFails = 3;
+		member.failTimeout = '2s';
 		var members = $scope.pool.members;
 		if (!members) {
 			members = [];
