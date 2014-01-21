@@ -26,7 +26,7 @@
           ng-click="affirmRemoveAspectModal($index);">删除</a></td>
         <td ng-show="aspect.ref">引用自预设规则：<span class="label label-info">{{aspect.ref}}</span></td>
         <td ng-show="aspect.ref">{{displayPointCut(getPointCut(aspect.ref))}}</td>
-        <td ng-show="aspect.ref"><a ng-href="http://localhost:8080/aspect#{{aspect.ref}}" target="_blank"> 查看该预设规则 </a>&nbsp;&nbsp;<a href="javascript:void(0);"
+        <td ng-show="aspect.ref"><a ng-href="${contextPath}/aspect#{{aspect.ref}}" target="_blank"> 查看该预设规则 </a>&nbsp;&nbsp;<a href="javascript:void(0);"
           ng-click="affirmRemoveAspectModal($index);">删除</a></td>
       </tr>
     </tbody>
