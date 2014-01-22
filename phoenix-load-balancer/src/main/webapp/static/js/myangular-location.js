@@ -6,6 +6,9 @@ module
 					$scope.locationEditing = null;
 					$scope.switchLocation = function(index) {
 						$scope.locationEditing = $scope.vs.locations[index];
+						$('html, body').animate({
+							scrollTop : 0
+						}, 100);
 					};
 					$scope.switchLocationList = function() {
 						$scope.locationEditing = null;

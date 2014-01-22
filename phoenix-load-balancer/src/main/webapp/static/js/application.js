@@ -214,3 +214,9 @@
 $(document).ready(function() {
 
 });
+
+/** 长度超过多少就截断，并加省略号 */
+String.prototype.trunc = String.prototype.trunc ||
+function(n){
+    return this.length>n ? this.substr(0,n-3)+'...' : this;
+};
