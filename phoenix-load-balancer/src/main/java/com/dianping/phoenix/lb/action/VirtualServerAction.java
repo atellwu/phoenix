@@ -106,11 +106,9 @@ public class VirtualServerAction extends MenuAction {
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Bussiness Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
@@ -138,11 +136,9 @@ public class VirtualServerAction extends MenuAction {
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Bussiness Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
@@ -162,11 +158,9 @@ public class VirtualServerAction extends MenuAction {
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Bussiness Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
@@ -192,11 +186,9 @@ public class VirtualServerAction extends MenuAction {
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Bussiness Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
@@ -220,7 +212,6 @@ public class VirtualServerAction extends MenuAction {
         } catch (IllegalArgumentException e) {
             dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
             dataMap.put("errorMessage", e.getMessage());
-            //            LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
             dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
             dataMap.put("errorMessage", e.getMessage());
