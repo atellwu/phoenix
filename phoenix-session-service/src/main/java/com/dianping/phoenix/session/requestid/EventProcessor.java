@@ -296,7 +296,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 					return;
 				}
 
-				m_logger.info("Receiving " + event);
+//				m_logger.info("Receiving " + event);
 
 				if (!isValidEvent(event)) {
 					m_logger.warn(String.format("Invalid RequetEvent %s received, will ignore", event));
@@ -345,7 +345,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 					return;
 				}
 
-				m_logger.info("Processing " + event.getRequestId());
+//				m_logger.info("Processing " + event.getRequestId());
 
 				processEvent(event);
 			}
