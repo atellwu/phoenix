@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.struts2.ServletActionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,18 +37,6 @@ public abstract class MenuAction extends ActionSupport {
 
     /** vs,pool,deploy */
     private String                menu;
-
-    @PostConstruct
-    public void init() {
-    }
-
-    public String listVirtualServers() {
-        return SUCCESS;
-    }
-
-    public String listPools() {
-        return SUCCESS;
-    }
 
     public String show() {
         editOrShow = "show";

@@ -43,10 +43,12 @@ public class SlbPoolAction extends MenuAction {
     }
 
     public String listSlbPools() {
+        slbPools = slbPoolService.listSlbPools();
         return SUCCESS;
     }
 
     public String index() {
+        slbPools = slbPoolService.listSlbPools();
         if (slbPools.size() == 0) {
             return "noneVs";
         }
@@ -154,6 +156,5 @@ public class SlbPoolAction extends MenuAction {
     public void validate() {
         super.validate();
         this.setMenu(MENU);
-        slbPools = slbPoolService.listSlbPools();
     }
 }

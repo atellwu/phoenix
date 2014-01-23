@@ -55,6 +55,11 @@ public class PoolAction extends MenuAction {
         return "redirect";
     }
 
+    public String listPools() {
+        pools = poolService.listPools();
+        return SUCCESS;
+    }
+
     public String get() throws Exception {
         try {
             //获取pool
