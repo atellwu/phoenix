@@ -47,6 +47,7 @@ public class PoolAction extends MenuAction {
     }
 
     public String index() {
+        pools = poolService.listPools();
         if (pools.size() == 0) {
             return "noneVs";
         }
@@ -162,6 +163,5 @@ public class PoolAction extends MenuAction {
     public void validate() {
         super.validate();
         this.setMenu(MENU);
-        pools = poolService.listPools();
     }
 }
