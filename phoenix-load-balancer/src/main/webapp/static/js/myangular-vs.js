@@ -18,6 +18,14 @@ module.controller('VsController', function($scope, DataService, $resource,
 				: 'tab-pane';
 		return clazz;
 	};
+	$scope.isActive4Boolean = function(tabName) {
+		var re = ($scope.selectedTab == tabName) ? true : false;
+		setTimeout(function() {
+			$scope.show_inited = true;
+			$(".chosen-select").chosen();
+		}, 1000);//由于angularjs加载option也是延迟的，所以这个操作得更迟才行。
+		return re;
+	};
 	var vsChanged = false;
 	$scope.vs = null;
 	$scope.tags = [];
