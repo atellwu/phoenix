@@ -67,7 +67,7 @@ public enum MessageID {
     
     NGINX_CHECK_EXCEPTION("nginx_check_exception"),//
 
-    ;
+    GROUP_NAME_DEFAULT("group_name_default");
 
     private String messageId;
 

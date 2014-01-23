@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import com.dianping.phoenix.lb.dao.PoolDao;
 import com.dianping.phoenix.lb.dao.StrategyDao;
 import com.dianping.phoenix.lb.dao.VirtualServerDao;
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.VirtualServerGroup;
 import com.dianping.phoenix.lb.model.entity.Aspect;
 import com.dianping.phoenix.lb.model.entity.Directive;
 import com.dianping.phoenix.lb.model.entity.Location;
@@ -42,6 +44,7 @@ import com.dianping.phoenix.lb.service.GitService;
 import com.dianping.phoenix.lb.service.NginxService;
 import com.dianping.phoenix.lb.service.NginxService.NginxCheckResult;
 import com.dianping.phoenix.lb.utils.ExceptionUtils;
+import com.dianping.phoenix.lb.utils.MessageUtils;
 import com.dianping.phoenix.lb.utils.PoolNameUtils;
 import com.dianping.phoenix.lb.velocity.TemplateManager;
 import com.dianping.phoenix.lb.velocity.VelocityEngineManager;
@@ -164,6 +167,27 @@ public class VirtualServerServiceImpl extends ConcurrentControlServiceTemplate i
         } catch (BizException e) {
             return null;
         }
+    }
+
+    @Override
+    public Map<String, VirtualServerGroup> listGroups() {
+        Map<String, VirtualServerGroup> groups = new LinkedHashMap<String, VirtualServerGroup>();
+        List<VirtualServer> vsList = this.listVirtualServers();
+        for (VirtualServer vs : vsList) {
+            String name = vs.getGroup();
+            if (StringUtils.isBlank(name)) {
+                name = MessageUtils.getMessage(MessageID.GROUP_NAME_DEFAULT);
+            }
+            VirtualServerGroup group = groups.get(name);
+            if (group == null) {
+                group = new VirtualServerGroup();
+                group.setName(name);
+                group.setVirtualServers(new ArrayList<VirtualServer>());
+                groups.put(name, group);
+            }
+            group.getVirtualServers().add(vs);
+        }
+        return groups;
     }
 
     /*

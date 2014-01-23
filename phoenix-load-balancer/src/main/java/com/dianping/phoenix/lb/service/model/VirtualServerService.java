@@ -7,8 +7,10 @@
 package com.dianping.phoenix.lb.service.model;
 
 import java.util.List;
+import java.util.Map;
 
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.VirtualServerGroup;
 import com.dianping.phoenix.lb.model.entity.Aspect;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
@@ -46,4 +48,6 @@ public interface VirtualServerService {
     List<String> listTag(String virtualServerName, int maxNum) throws BizException;
 
     List<String> findVirtualServerByPool(String poolName) throws BizException;
+
+    Map<String, VirtualServerGroup> listGroups();
 }

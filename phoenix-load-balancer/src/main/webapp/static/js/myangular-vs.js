@@ -14,7 +14,8 @@ module.controller('VsController', function($scope, DataService, $resource,
 		return clazz;
 	};
 	$scope.isActiveTabPanel = function(tabName) {
-		var clazz = ($scope.selectedTab == tabName) ? 'tab-pane active' : 'tab-pane';
+		var clazz = ($scope.selectedTab == tabName) ? 'tab-pane active'
+				: 'tab-pane';
 		return clazz;
 	};
 	var vsChanged = false;
@@ -44,7 +45,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 					$scope.vs = data.virtualServer;
 					$scope.newVs = false;
 				}
-				//展现出来
+				// 展现出来
 				$('#VsController > div.main-content').show();
 				// 开始监听vs的修改
 				$scope.$watch('vs', function(newValue, oldValue) {
@@ -168,7 +169,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 	$scope.addTag = function() {
 		app.clearAlertMessage();
 		app.alertProgress();
-		$scope.addingTag  = true;
+		$scope.addingTag = true;
 		var param = new Object();
 		// param.virtualServerName = $scope.vs.name;
 		param.version = $scope.vs.version;
@@ -180,7 +181,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 			},
 			url : window.contextpath + '/vs/' + $scope.vs.name + '/tag/add'
 		}).success(function(data, status, headers, config) {
-			$scope.addingTag  = false;
+			$scope.addingTag = false;
 			if (data.errorCode == 0) {
 				app.alertSuccess("创建发布版本成功！点击“已创建的发布版本”可查看。");
 				$('#tagsUl').addClass('open');
@@ -190,7 +191,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 				app.alertError("创建失败: " + data.errorMessage);
 			}
 		}).error(function(data, status, headers, config) {
-			$scope.addingTag  = false;
+			$scope.addingTag = false;
 			app.appError("响应错误", data);
 		});
 	};
@@ -215,7 +216,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 			app.appError("响应错误", data);
 		});
 	};
-	var showPreviewModal = function(){
+	var showPreviewModal = function() {
 		// 显示modal
 		var height = $(window).height();
 		var modalBody = $('#previewVirtualServerModal div.modal-body');
@@ -225,6 +226,27 @@ module.controller('VsController', function($scope, DataService, $resource,
 		$('#previewVirtualServerAlertDiv').html('');
 		$('#previewVirtualServerModal').modal('show');
 	};
+
+	// search
+	$http({
+		method : 'GET',
+		url : window.contextpath + '/vs/list'
+	}).success(function(data, status, headers, config) {
+		var vsNameList = [];
+		$.each(data, function(i, vs) {
+			vsNameList.push(vs.name);
+		});
+		$("#vs-search-nav").typeahead({
+			source : vsNameList,
+			updater : function(c) {
+				window.location = window.contextpath + "/vs/" + c;
+				return c;
+			}
+		})
+	}).error(function(data, status, headers, config) {
+//		app.appError("响应错误", data);
+	});
+
 	// 离开页面时，对比一下vs是否发生了修改
 	var onunload = function() {
 		if (vsChanged) {

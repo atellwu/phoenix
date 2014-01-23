@@ -7,14 +7,15 @@
 		</script>
 
   <ul class="nav nav-list">
+    #foreach($group in $groups)
     <li class="open"><a href="#" class="dropdown-toggle"> <i class="icon-desktop"></i> <span class="menu-text">
-          默认分组 </span> <b class="arrow icon-angle-down"></b>
+          $group.name </span> <b class="arrow icon-angle-down"></b>
     </a>
       <ul class="submenu" style="display: block;">
-        #foreach($virtualServer in $virtualServers)
+        #foreach($virtualServer in $group.virtualServers)
         <li class="#if($virtualServer.name == $virtualServerName)active #end"><a
           href="${contextPath}/vs/$virtualServer.name"><i class="icon-globe"></i> $virtualServer.name </a></li> #end
-      </ul></li>
+      </ul></li> #end
   </ul>
   <!-- /.nav-list -->
 

@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.dianping.phoenix.lb.exception.BizException;
+import com.dianping.phoenix.lb.model.VirtualServerGroup;
 import com.dianping.phoenix.lb.model.entity.Pool;
 import com.dianping.phoenix.lb.model.entity.SlbModelTree;
 import com.dianping.phoenix.lb.model.entity.VirtualServer;
@@ -30,48 +31,70 @@ import com.dianping.phoenix.lb.utils.JsonBinder;
 @Scope("prototype")
 public class VirtualServerAction extends MenuAction {
 
-    private static final int       MAX_TAG_NUM      = 10;
+    private static final int                  MAX_TAG_NUM      = 10;
 
-    private static final Logger    LOG              = LoggerFactory.getLogger(VirtualServerAction.class);
+    private static final Logger               LOG              = LoggerFactory.getLogger(VirtualServerAction.class);
 
-    private static final long      serialVersionUID = -1084994778030229218L;
+    private static final long                 serialVersionUID = -1084994778030229218L;
 
-    private static final String    MENU             = "vs";
+    private static final String               MENU             = "vs";
 
-    private String                 virtualServerName;
+    private String                            virtualServerName;
 
-    private String                 tagId;
+    private String                            tagId;
 
-    private Integer                version;
+    private Integer                           version;
 
-    private List<String>           tags;
+    private List<String>                      tags;
 
-    private List<VirtualServer>    list;
+    private List<VirtualServer>               list;
 
-    private String[]               vsListToTag;
+    private String[]                          vsListToTag;
 
-    private String                 vsListToTagStr;
+    private String                            vsListToTagStr;
 
-    private String                 tagIdsStr;
+    private String                            tagIdsStr;
 
-    protected List<VirtualServer>  virtualServers;
-
-    @Autowired
-    protected PoolService          poolService;
+    protected Map<String, VirtualServerGroup> groups;
 
     @Autowired
-    protected VirtualServerService virtualServerService;
+    protected PoolService                     poolService;
 
-    public List<VirtualServer> getVirtualServers() {
-        return virtualServers;
-    }
+    @Autowired
+    protected VirtualServerService            virtualServerService;
 
     public String index() {
-        if (virtualServers.size() == 0) {
+        groups = virtualServerService.listGroups();
+        VirtualServer vs = null;
+        for (VirtualServerGroup group : groups.values()) {
+            List<VirtualServer> vsList = group.getVirtualServers();
+            if (vsList != null) {
+                for (VirtualServer item : vsList) {
+                    vs = item;
+                    break;
+                }
+            }
+            if (vs != null) {
+                break;
+            }
+        }
+        if (vs == null) {
             return "noneVs";
         }
-        virtualServerName = virtualServers.get(0).getName();//重定向
+        virtualServerName = vs.getName();//重定向
         return "redirect";
+    }
+
+    public String show() {
+        groups = virtualServerService.listGroups();
+        editOrShow = "show";
+        return SUCCESS;
+    }
+
+    public String edit() {
+        groups = virtualServerService.listGroups();
+        editOrShow = "edit";
+        return SUCCESS;
     }
 
     public String get() throws Exception {
@@ -110,7 +133,6 @@ public class VirtualServerAction extends MenuAction {
                 virtualServerService.modifyVirtualServer(virtualServerName, virtualServer);
             } else {
                 virtualServerService.addVirtualServer(virtualServerName, virtualServer);
-                virtualServers = virtualServerService.listVirtualServers();//重新更新list
             }
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (BizException e) {
@@ -136,7 +158,6 @@ public class VirtualServerAction extends MenuAction {
                 throw new IllegalArgumentException("不存在该站点：" + virtualServerName);
             }
             virtualServerService.deleteVirtualServer(virtualServerName);
-            virtualServers = virtualServerService.listVirtualServers();//重新更新list
             dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (BizException e) {
             dataMap.put("errorCode", e.getMessageId());
@@ -186,6 +207,7 @@ public class VirtualServerAction extends MenuAction {
 
     public String addTag() throws Exception {
         List<Pool> pools = poolService.listPools();
+        commonAspects = commonAspectService.listCommonAspects();
         try {
             Validate.notNull(virtualServerName);
             Validate.notNull(version);
@@ -210,6 +232,7 @@ public class VirtualServerAction extends MenuAction {
     public String addBatchTag() throws Exception {
         List<Pool> pools = poolService.listPools();
         List<String> tagIds = new ArrayList<String>();
+        commonAspects = commonAspectService.listCommonAspects();
         if (vsListToTag != null) {
             for (String vs : vsListToTag) {
                 System.out.println(vs);
@@ -265,20 +288,12 @@ public class VirtualServerAction extends MenuAction {
     public String listTags() throws Exception {
         try {
             tags = virtualServerService.listTag(virtualServerName, MAX_TAG_NUM);
-            //            dataMap.put("tags", tags);
 
-            dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (BizException e) {
-            dataMap.put("errorCode", e.getMessageId());
-            dataMap.put("errorMessage", e.getMessage());
             LOG.error("Bussiness Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
-            dataMap.put("errorMessage", e.getMessage());
             LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
-            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
-            dataMap.put("errorMessage", e.getMessage());
             LOG.error(e.getMessage(), e);
         }
         return SUCCESS;
@@ -288,14 +303,9 @@ public class VirtualServerAction extends MenuAction {
         try {
             list = virtualServerService.listVirtualServers();
 
-            dataMap.put("errorCode", ERRORCODE_SUCCESS);
         } catch (IllegalArgumentException e) {
-            dataMap.put("errorCode", ERRORCODE_PARAM_ERROR);
-            dataMap.put("errorMessage", e.getMessage());
             LOG.error("Param Error: " + e.getMessage());
         } catch (Exception e) {
-            dataMap.put("errorCode", ERRORCODE_INNER_ERROR);
-            dataMap.put("errorMessage", e.getMessage());
             LOG.error(e.getMessage(), e);
         }
         return SUCCESS;
@@ -374,8 +384,14 @@ public class VirtualServerAction extends MenuAction {
     public void validate() {
         super.validate();
         this.setMenu(MENU);
-        virtualServers = virtualServerService.listVirtualServers();
-        commonAspects = commonAspectService.listCommonAspects();
+    }
+
+    public Map<String, VirtualServerGroup> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Map<String, VirtualServerGroup> groups) {
+        this.groups = groups;
     }
 
 }
