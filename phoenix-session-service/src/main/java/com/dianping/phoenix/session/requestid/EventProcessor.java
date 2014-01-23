@@ -370,7 +370,7 @@ public class EventProcessor extends ContainerHolder implements Initializable, Lo
 						RequestEvent event = entry.getValue();
 
 						if (System.currentTimeMillis() > event.getTimestamp() + m_config.getEventExpireTime()) {
-							m_logger.warn(String.format("RequestEvent %s is expired", event));
+//							m_logger.warn(String.format("RequestEvent %s is expired", event));
 							m_retryCache.remove(entry.getKey());
 						}
 					}
