@@ -63,7 +63,7 @@
               <label class="col-sm-4 control-label no-padding-right" for="">{{ name }}</label>
               <div class="col-sm-7">
                 <input ng-trim="true" ng-show="input.inputType == 'TEXT'" ng-model="directive.dynamicAttributes[name]"
-                  type="text"> <select ng-show="input.inputType == 'SELECT'"
+                  type="text"> <select style="width:200px" ng-class="{'chosen-select':(input.name == 'pool-name')}" ng-show="input.inputType == 'SELECT'"
                   ng-model="directive.dynamicAttributes[name]" ng-options="value0 for value0 in getValueList(input)">
                   <option value="">-- 选择 --</option>
                 </select> &nbsp; <a style="margin-left: 10px;" href="javascript:void(0);"

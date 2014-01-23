@@ -61,9 +61,9 @@
           </ul>
           <form class="form-horizontal" role="form">
             <div class="tab-content" ng-switch on="selectedTab">
-              <div ng-class="isActiveTabPanel('profile')" ng-controller="ProfileController">#parse("vs/profile/${editOrShow}/content.htm")#parse("vs/profile/modals.htm")</div>
-              <div ng-class="isActiveTabPanel('location')" ng-controller="LocationController">#parse("vs/location/${editOrShow}/list.htm")#parse("vs/location/modals.htm")</div>
-              <div ng-class="isActiveTabPanel('aspect')" ng-controller="VsAspectController">#parse("vs/aspect/${editOrShow}/list.htm")#parse("vs/aspect/modals.htm")</div>
+              <div style="min-height:400px;" ng-class="isActiveTabPanel('profile')" ng-controller="ProfileController">#parse("vs/profile/${editOrShow}/content.htm")#parse("vs/profile/modals.htm")</div>
+              <div style="min-height:400px;" ng-class="isActiveTabPanel('location')" ng-controller="LocationController">#parse("vs/location/${editOrShow}/list.htm")#parse("vs/location/modals.htm")</div>
+              <div style="min-height:400px;" ng-class="isActiveTabPanel('aspect')" ng-controller="VsAspectController">#parse("vs/aspect/${editOrShow}/list.htm")#parse("vs/aspect/modals.htm")</div>
             </div>
           </form>
         </div>

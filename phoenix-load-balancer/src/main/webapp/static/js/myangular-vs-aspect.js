@@ -68,6 +68,10 @@ module
 							for ( var i = 0; i < $scope.pools.length; i++) {
 								list.push($scope.pools[i].name);
 							}
+							//唤醒chosen-select
+							setTimeout(function() {
+								$(".chosen-select").chosen();
+							}, 1500);//由于angularjs加载option也是延迟的，所以这个操作得更迟才行。
 							return list;
 						}
 						return input.valueList;
