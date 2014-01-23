@@ -39,10 +39,24 @@ public class AspectAction extends MenuAction {
     }
 
     public String list() {
+        aspects = aspectService.listCommonAspects();
         return SUCCESS;
     }
 
     public String index() {
+        aspects = aspectService.listCommonAspects();
+        return SUCCESS;
+    }
+
+    public String show() {
+        aspects = aspectService.listCommonAspects();
+        editOrShow = "show";
+        return SUCCESS;
+    }
+
+    public String edit() {
+        aspects = aspectService.listCommonAspects();
+        editOrShow = "edit";
         return SUCCESS;
     }
 
@@ -76,6 +90,5 @@ public class AspectAction extends MenuAction {
     public void validate() {
         super.validate();
         this.setMenu(MENU);
-        aspects = aspectService.listCommonAspects();
     }
 }

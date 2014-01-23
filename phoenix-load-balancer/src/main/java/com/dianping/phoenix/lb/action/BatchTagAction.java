@@ -1,7 +1,5 @@
 package com.dianping.phoenix.lb.action;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.struts2.ServletActionContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -17,14 +15,6 @@ public class BatchTagAction extends MenuAction {
 
     private static final String MENU             = "batchTag";
 
-    private String[]            virtualServerNames;
-
-    @PostConstruct
-    public void init() {
-    }
-
-    /**
-     */
     public String index() {
         return SUCCESS;
     }
@@ -36,14 +26,6 @@ public class BatchTagAction extends MenuAction {
             contextPath = ServletActionContext.getServletContext().getContextPath();
         }
         this.setMenu(MENU);
-    }
-
-    public String[] getVirtualServerNames() {
-        return virtualServerNames;
-    }
-
-    public void setVirtualServerNames(String[] virtualServerNames) {
-        this.virtualServerNames = virtualServerNames;
     }
 
 }

@@ -42,6 +42,18 @@ public class SlbPoolAction extends MenuAction {
         return slbPools;
     }
 
+    public String show() {
+        slbPools = slbPoolService.listSlbPools();
+        editOrShow = "show";
+        return SUCCESS;
+    }
+
+    public String edit() {
+        slbPools = slbPoolService.listSlbPools();
+        editOrShow = "edit";
+        return SUCCESS;
+    }
+
     public String listSlbPools() {
         slbPools = slbPoolService.listSlbPools();
         return SUCCESS;

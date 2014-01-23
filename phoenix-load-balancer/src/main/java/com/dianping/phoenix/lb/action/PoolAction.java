@@ -42,6 +42,18 @@ public class PoolAction extends MenuAction {
     @Autowired
     protected VirtualServerService virtualServerService;
 
+    public String show() {
+        pools = poolService.listPools();
+        editOrShow = "show";
+        return SUCCESS;
+    }
+
+    public String edit() {
+        pools = poolService.listPools();
+        editOrShow = "edit";
+        return SUCCESS;
+    }
+
     public List<Pool> getPools() {
         return pools;
     }

@@ -38,16 +38,6 @@ public abstract class MenuAction extends ActionSupport {
     /** vs,pool,deploy */
     private String                menu;
 
-    public String show() {
-        editOrShow = "show";
-        return SUCCESS;
-    }
-
-    public String edit() {
-        editOrShow = "edit";
-        return SUCCESS;
-    }
-
     @Override
     public void validate() {
         super.validate();
