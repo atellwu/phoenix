@@ -31,6 +31,8 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 
 	public static final String ID = "phoenix-env";
 
+	public static final String REQUEST_HEADER_NAME = "send_http_request_id";
+
 	private String m_ip;
 
 	private AtomicInteger m_req_index = new AtomicInteger(0);
@@ -113,9 +115,10 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 		HttpServletRequest req = ctx.getHttpServletRequest();
 		HttpServletResponse res = ctx.getHttpServletResponse();
 
+		String requestId = null;
 		try {
 			// 从request中或去id
-			String requestId = req.getHeader(PhoenixContext.MOBILE_REQUEST_ID);
+			requestId = req.getHeader(PhoenixContext.MOBILE_REQUEST_ID);
 			String referRequestId = null;
 
 			if (requestId != null) {// 如果存在requestId，则说明是移动api的web端
@@ -149,6 +152,9 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 		try {
 			ctx.doFilter();
 		} finally {
+			if (requestId != null) {
+				res.setHeader(REQUEST_HEADER_NAME, requestId);
+			}
 			// 清除ThreadLocal
 			PhoenixContext.getInstance().clear();
 		}
@@ -163,7 +169,7 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 	private String readCookieDomain() {
 		ConfigCache lion = null;
 		String domain = null;
-		
+
 		try {
 			lion = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
 			domain = lion.getProperty(LION_KEY_COOKIE_DOMAIN);
