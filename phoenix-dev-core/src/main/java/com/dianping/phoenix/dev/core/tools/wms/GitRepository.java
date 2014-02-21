@@ -26,7 +26,7 @@ public class GitRepository extends Repository {
     }
 
     public GitRepository(String repoUrl) {
-    	this(repoUrl, "master");
+    	this(repoUrl, System.getProperty("branch", "master"));
     }
     
     public GitRepository(String repoUrl, String branch) {
