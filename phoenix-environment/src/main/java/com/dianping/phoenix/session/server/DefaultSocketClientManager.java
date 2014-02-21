@@ -45,12 +45,10 @@ public class DefaultSocketClientManager extends ContainerHolder implements Socke
 	public void sendToClients(RequestEvent event) {
 		if (m_mode == Mode.Broadcast) {
 			for (Map.Entry<InetSocketAddress, SocketClient> entry : m_addrMap.entrySet()) {
-				m_logger.info(String.format("Send %s to client %s", event.getRequestId(), entry.getKey()));
 				RequestEventDelegate delegate = (RequestEventDelegate) entry.getValue().getMessageDelegate();
 				delegate.offer(event);
 			}
 		} else {
-			m_logger.info(String.format("Send %s to single client", event.getRequestId()));
 			m_singleDelegate.offer(event);
 		}
 	}
