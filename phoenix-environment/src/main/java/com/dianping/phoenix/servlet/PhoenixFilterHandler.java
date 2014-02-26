@@ -10,9 +10,9 @@ public interface PhoenixFilterHandler {
 	 * 
 	 * @return position value.
 	 *         <ul>
-	 *         <li>positive value means this filter will be put to the head of the chain;</li>
-	 *         <li>0 means it will be appended to the middle of the chain</li>
-	 *         <li>negative value means it will be put to the end of the chain</li>
+	 *         <li>positive value means this filter will be prepended to the head of the chain;</li>
+	 *         <li>0 means it will be put in the middle of the chain</li>
+	 *         <li>negative value means it will be appended to the end of the chain</li>
 	 *         </ul>
 	 */
 	public int getOrder();

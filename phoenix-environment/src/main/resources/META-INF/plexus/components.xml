@@ -1,6 +1,14 @@
 <plexus>
 	<components>
 		<component>
+			<role>com.dianping.phoenix.context.Environment</role>
+			<implementation>com.dianping.phoenix.context.DefaultEnvironment</implementation>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.log.LogInitializer</role>
+			<implementation>com.dianping.phoenix.log.LogInitializer</implementation>
+		</component>
+		<component>
 			<role>com.dianping.phoenix.servlet.PhoenixFilterHandler</role>
 			<role-hint>request-id</role-hint>
 			<implementation>com.dianping.phoenix.session.RequestIdHandler</implementation>

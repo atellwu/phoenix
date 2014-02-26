@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<liger next-instance-id="1004">
+   <role id="platform" layer="platform">
+      <service id="pc">
+         <instance name="default" lane="tuangou">
+            <property key="101">true</property>
+            <property key="104">true</property>
+         </instance>
+         <instance name="default" start="2013-12-10 00:00:00" end="2023-12-25 23:59:59">
+            <property key="102">true</property>
+         </instance>
+         <instance name="default" lane="membercard" start="2013-12-10 00:00:00" end="2013-12-25 23:59:59">
+            <property key="101">false</property>
+         </instance>
+         <instance name="default" lane="membercard" start="2013-12-26 00:00:00">
+            <property key="101">true</property>
+         </instance>
+         <archetype>
+            <property key="101">false</property>
+            <property key="102">false</property>
+            <property key="104">false</property>
+         </archetype>
+      </service>
+   </role>
+   <role id="infrastructure" layer="infrastructure">
+      <service id="liger">
+         <instance name="permutation">
+            <property key="pc">lane@required,start@start-date,end@end-date</property>
+         </instance>
+         <instance name="layer">
+            <property key="order">application,service,platform,infrastructure</property>
+         </instance>
+      </service>
+   </role>
+</liger>
