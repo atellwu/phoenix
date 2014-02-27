@@ -5,21 +5,9 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
 
-import com.dianping.liger.Liger;
-import com.dianping.liger.config.ConfigContext;
-import com.dianping.liger.config.ConfigEnvironment;
-import com.dianping.liger.config.model.entity.LigerModel;
-import com.dianping.liger.config.model.transform.DefaultSaxParser;
-import com.dianping.liger.repository.git.GitRepositoryBuilder;
-import com.dianping.phoenix.config.liger.LigerConfigContext;
-import com.dianping.phoenix.config.liger.LigerConfigEnvironment;
-import com.dianping.phoenix.config.liger.LigerConfigServiceProvider;
-import com.dianping.phoenix.context.ContextManager;
-import com.dianping.phoenix.context.Environment;
-
 public class ConfigTest extends ComponentTestCase {
 	@Test
-	public void testConfig() throws Exception {
+	public void testMock() throws Exception {
 		defineComponent(ConfigServiceProvider.class, MockMemoryProvider.class);
 
 		ConfigService config = ConfigServiceFactory.getConfig();
@@ -31,29 +19,6 @@ public class ConfigTest extends ComponentTestCase {
 		Assert.assertEquals(1.0f, config.getFloat("float", 0));
 		Assert.assertEquals(1.0d, config.getDouble("double", 0));
 		Assert.assertEquals(1392817680000L, config.getDate("date", "yyyy-MM-dd HH:mm:ss", null).getTime());
-	}
-
-	@Test
-	public void testLiger() throws Exception {
-		defineComponent(ConfigServiceProvider.class, LigerConfigServiceProvider.class);
-		defineComponent(ConfigContext.class, LigerConfigContext.class);
-		defineComponent(ConfigEnvironment.class, LigerConfigEnvironment.class) //
-		      .req(Environment.class);
-
-		GitRepositoryBuilder builder = lookup(GitRepositoryBuilder.class);
-		LigerModel model = DefaultSaxParser.parse(getClass().getResourceAsStream("liger.xml"));
-		String ligerHome = "target/liger";
-
-		builder.buildClientRepository(ligerHome, model, "test resource");
-
-		Liger.initialize(ligerHome, null);
-		ContextManager.getEnvironment().setAttribute("lane", "membercard");
-
-		// try with Liger
-		ConfigService cs = ConfigServiceFactory.getConfig();
-
-		Assert.assertEquals("true", cs.getString("pc[default].101", null));
-		Assert.assertEquals("false", cs.getString("pc[default].104", null));
 	}
 
 	public static class MockMemoryProvider implements ConfigServiceProvider {

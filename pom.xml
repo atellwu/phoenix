@@ -27,6 +27,7 @@
 				<module>phoenix-byteman</module>
 				<module>phoenix-load-balancer</module>
 				<module>phoenix-environment</module>
+				<module>phoenix-service</module>
 				<module>phoenix-session-service</module>
 			</modules>
 		</profile>
