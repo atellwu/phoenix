@@ -60,7 +60,7 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 		HttpServletRequest req = ctx.getHttpServletRequest();
 		String url = req.getRequestURL().toString();
 		String queryString = req.getQueryString();
-		
+
 		String fullUrl = url;
 		if (queryString != null) {
 			fullUrl = fullUrl + "?" + queryString;
@@ -71,10 +71,16 @@ public class RequestIdHandler extends ContainerHolder implements PhoenixFilterHa
 
 	@Override
 	public void handle(PhoenixFilterContext ctx) throws IOException, ServletException {
-		RequestEvent event = buildEvent(ctx);
 
-		// put in queue in order to transfer it to remote session server asynchronously
-		m_queue.offer(event);
+		if (PhoenixContext.getInstance().getReferRequestId() == null) {
+
+			RequestEvent event = buildEvent(ctx);
+
+			if (event.getRefererUrlDigest() != null) {
+				// put in queue in order to transfer it to remote session server asynchronously
+				m_queue.offer(event);
+			}
+		}
 
 		// pass to next Phoenix filter handler or servlet filter
 		ctx.doFilter();
