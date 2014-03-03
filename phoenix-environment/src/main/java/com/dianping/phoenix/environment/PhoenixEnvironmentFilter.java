@@ -33,6 +33,8 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 
 	public static final String REQUEST_HEADER_NAME = "send_http_request_id";
 
+	public static final String REFER_REQUEST_HEADER_NAME = "send_http_refer_request_id";
+
 	private String m_ip;
 
 	private AtomicInteger m_req_index = new AtomicInteger(0);
@@ -50,6 +52,28 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 			hexChars[j * 2 + 1] = HEX_DIGITS[v & 0x0F];
 		}
 		return new String(hexChars);
+	}
+
+	private IdHolder findOrCreateIdFromRequest(HttpServletRequest req, HttpServletResponse res) {
+		IdHolder idHolder = new IdHolder();
+		String requestId = null;
+		String referRequestId = null;
+
+		if (mobileHeaderPresent(req)) {
+			requestId = req.getHeader(PhoenixContext.MOBILE_REQUEST_ID);
+			referRequestId = req.getHeader(PhoenixContext.MOBILE_REFER_REQUEST_ID);
+		} else {
+			requestId = generateRequestId();
+			referRequestId = PhoenixContext.getInstance().getReferRequestId();
+		}
+
+		String phoenixId = getOrCreatePhoenixId(req, res);
+
+		idHolder.setPhoenixId(phoenixId);
+		idHolder.setReferRequestId(referRequestId);
+		idHolder.setRequestId(requestId);
+
+		return idHolder;
 	}
 
 	private String generatePhoenixId() {
@@ -115,41 +139,23 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 		HttpServletRequest req = ctx.getHttpServletRequest();
 		HttpServletResponse res = ctx.getHttpServletResponse();
 
-		String requestId = null;
+		IdHolder idHolder = null;
 		try {
-			requestId = req.getHeader(PhoenixContext.MOBILE_REQUEST_ID);
-			String referRequestId = null;
+			idHolder = findOrCreateIdFromRequest(req, res);
 
-			if (requestId != null) {
-				referRequestId = req.getHeader(PhoenixContext.MOBILE_REFER_REQUEST_ID);
-			} else {
-				requestId = generateRequestId();
-			}
+			setToPhoenixContext(req, idHolder);
 
-			String phoenixId = getOrCreatePhoenixId(req, res);
-			PhoenixContext.getInstance().setGuid(phoenixId);
-
-			// for decorator service
-			req.setAttribute(PhoenixEnvironment.ENV, new PhoenixEnvironment(requestId, phoenixId));
-
-			if (requestId != null) {
-				PhoenixContext.getInstance().setRequestId(requestId);
-			}
-
-			if (referRequestId != null) {
-				PhoenixContext.getInstance().setReferRequestId(referRequestId);
-			}
-		} catch (RuntimeException e) {
-			m_logger.warn(e.getMessage(), e);
+			setToRequestAttribute(req, idHolder);
+		} catch (Exception e) {
+			m_logger.warn("Error initialize PhoenixContext", e);
 		}
 
 		try {
 			ctx.doFilter();
 		} finally {
-			if (requestId != null) {
-				res.setHeader(REQUEST_HEADER_NAME, requestId);
-			}
 			PhoenixContext.getInstance().clear();
+
+			setToResponseHeader(res, idHolder);
 		}
 	}
 
@@ -157,6 +163,10 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 	public void initialize() throws InitializationException {
 		m_ip = bytesToHex(Networks.forIp().getLocalAddress());
 		m_cookieDomain = readCookieDomain();
+	}
+
+	private boolean mobileHeaderPresent(HttpServletRequest req) {
+		return req.getHeader(PhoenixContext.MOBILE_REQUEST_ID) != null;
 	}
 
 	private String readCookieDomain() {
@@ -179,10 +189,67 @@ public class PhoenixEnvironmentFilter implements PhoenixFilterHandler, Initializ
 
 	}
 
-	private void setCookie(HttpServletResponse res, String cookieName, String cookieValue) {
+	void setCookie(HttpServletResponse res, String cookieName, String cookieValue) {
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		cookie.setPath("/");
 		cookie.setDomain(m_cookieDomain);
 		res.addCookie(cookie);
+	}
+
+	private void setToPhoenixContext(HttpServletRequest req, IdHolder idHolder) {
+		PhoenixContext.getInstance().setGuid(idHolder.getPhoenixId());
+		PhoenixContext.getInstance().setRequestId(idHolder.getRequestId());
+		PhoenixContext.getInstance().setReferRequestId(idHolder.getReferRequestId());
+	}
+
+	private void setToRequestAttribute(HttpServletRequest req, IdHolder idHolder) {
+		PhoenixEnvironment env = new PhoenixEnvironment(idHolder.getRequestId(), idHolder.getPhoenixId(),
+		      idHolder.getReferRequestId());
+		req.setAttribute(PhoenixEnvironment.ENV, env);
+	}
+
+	private void setToResponseHeader(HttpServletResponse res, IdHolder idHolder) {
+		if (idHolder != null) {
+			if (idHolder.getRequestId() != null) {
+				res.setHeader(REQUEST_HEADER_NAME, idHolder.getRequestId());
+			}
+
+			if (idHolder.getReferRequestId() != null) {
+				res.setHeader(REFER_REQUEST_HEADER_NAME, idHolder.getReferRequestId());
+			}
+		}
+	}
+
+	static class IdHolder {
+		private String m_requestId;
+
+		private String m_referRequestId;
+
+		private String m_phoenixId;
+
+		public String getPhoenixId() {
+			return m_phoenixId;
+		}
+
+		public String getReferRequestId() {
+			return m_referRequestId;
+		}
+
+		public String getRequestId() {
+			return m_requestId;
+		}
+
+		public void setPhoenixId(String phoenixId) {
+			m_phoenixId = phoenixId;
+		}
+
+		public void setReferRequestId(String referRequestId) {
+			m_referRequestId = referRequestId;
+		}
+
+		public void setRequestId(String requestId) {
+			m_requestId = requestId;
+		}
+
 	}
 }
