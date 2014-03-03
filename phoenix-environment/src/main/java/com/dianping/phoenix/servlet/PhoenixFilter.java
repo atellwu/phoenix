@@ -95,7 +95,7 @@ public class PhoenixFilter implements Filter {
 		// nothing to configure
 	}
 
-	static class Context implements PhoenixFilterContext {
+	public static class Context implements PhoenixFilterContext {
 		private HttpServletRequest m_request;
 
 		private HttpServletResponse m_response;
