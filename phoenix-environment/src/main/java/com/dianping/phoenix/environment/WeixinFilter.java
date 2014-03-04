@@ -17,7 +17,7 @@ public class WeixinFilter implements Filter {
 
 	private static final String REFER_REQUEST_ID = "rid";
 
-	private static final String PARAMETER_NAME = "parameter-name";
+	private static final String PARAMETER_NAME = "refer-request-id-name";
 
 	private String m_parameterName = REFER_REQUEST_ID;
 
