@@ -1,4 +1,4 @@
-package com.dianping.phoenix.service.config;
+package com.dianping.phoenix.config;
 
 import com.dianping.liger.config.ConfigContext;
 import com.dianping.phoenix.context.Context;

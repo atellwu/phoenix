@@ -3,6 +3,12 @@ package com.dianping.phoenix.config;
 import java.util.Date;
 
 public interface ConfigService {
+	public String getAppName();
+
+	public String getDataBaseDir();
+
+	public String getLogBaseDir();
+
 	public boolean getBoolean(String key, boolean defaultValue);
 
 	public Date getDate(String key, String format, Date defaultValue);

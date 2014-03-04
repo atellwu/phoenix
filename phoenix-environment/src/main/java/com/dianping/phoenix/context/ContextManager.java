@@ -8,7 +8,7 @@ public class ContextManager {
 	private static ThreadLocal<Context> s_contexts = new ThreadLocal<Context>() {
 		@Override
 		protected Context initialValue() {
-			return new DefaultContext().setEnvironment(getEnvironment());
+			return new DefaultContext(getEnvironment());
 		}
 	};
 

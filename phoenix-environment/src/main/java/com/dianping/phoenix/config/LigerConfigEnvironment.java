@@ -1,4 +1,4 @@
-package com.dianping.phoenix.service.config;
+package com.dianping.phoenix.config;
 
 import org.unidal.lookup.annotation.Inject;
 

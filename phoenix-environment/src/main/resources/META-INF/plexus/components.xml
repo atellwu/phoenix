@@ -7,6 +7,45 @@
 		<component>
 			<role>com.dianping.phoenix.log.LogInitializer</role>
 			<implementation>com.dianping.phoenix.log.LogInitializer</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.liger.config.Config</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.log.AppenderManager</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.log.AppenderManager</role>
+			<implementation>com.dianping.phoenix.log.DefaultAppenderManager</implementation>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.log.AppenderBuilder</role>
+			<role-hint>console</role-hint>
+			<implementation>com.dianping.phoenix.log.ConsoleAppenderBuilder</implementation>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.log.AppenderBuilder</role>
+			<role-hint>file</role-hint>
+			<implementation>com.dianping.phoenix.log.FileAppenderBuilder</implementation>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.config.ConfigServiceProvider</role>
+			<implementation>com.dianping.phoenix.config.LigerConfigServiceProvider</implementation>
+		</component>
+		<component>
+			<role>com.dianping.liger.config.ConfigContext</role>
+			<implementation>com.dianping.phoenix.config.LigerConfigContext</implementation>
+		</component>
+		<component>
+			<role>com.dianping.liger.config.ConfigEnvironment</role>
+			<implementation>com.dianping.phoenix.config.LigerConfigEnvironment</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.context.Environment</role>
+				</requirement>
+			</requirements>
 		</component>
 		<component>
 			<role>com.dianping.phoenix.servlet.PhoenixFilterHandler</role>

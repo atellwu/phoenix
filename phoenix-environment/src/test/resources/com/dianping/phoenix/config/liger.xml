@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <liger next-instance-id="1004">
+   <role id="tuangou-web" layer="application">
+      <service id="log">
+      	 <instance name="tuangou-web" ip="1.2.3.4">
+      	 	<property key="com.dianping.pigeon">info:file:pigeon</property>
+      	 </instance>
+      	 <archetype>
+      	 	<property key="com.dianping.cat">warn:file:cat</property>
+      	 </archetype>
+      </service>
+   </role>
    <role id="platform" layer="platform">
       <service id="pc">
          <instance name="default" lane="tuangou">
@@ -20,6 +30,11 @@
             <property key="102">false</property>
             <property key="104">false</property>
          </archetype>
+      </service>
+      <service id="log">
+      	 <archetype>
+      	 	<property key="appender">${app.name}/app.log</property>
+      	 </archetype>
       </service>
    </role>
    <role id="infrastructure" layer="infrastructure">

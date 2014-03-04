@@ -3,7 +3,24 @@ package com.dianping.phoenix.config;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.dianping.phoenix.context.Environment;
+
 public abstract class AbstractConfigService implements ConfigService {
+	@Override
+	public String getAppName() {
+		return getString(Environment.APP_NAME, "NONAME");
+	}
+
+	@Override
+	public String getDataBaseDir() {
+		return getString(Environment.DATA_BASE_DIR, ".");
+	}
+
+	@Override
+	public String getLogBaseDir() {
+		return getString(Environment.LOG_BASE_DIR, ".");
+	}
+
 	@Override
 	public long getLong(String key, long defaultValue) {
 		String value = getString(key, null);

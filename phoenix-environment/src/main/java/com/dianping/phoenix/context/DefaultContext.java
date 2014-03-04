@@ -8,6 +8,10 @@ public class DefaultContext implements Context {
 
 	private Map<String, String> m_attributes = new HashMap<String, String>();
 
+	public DefaultContext(Environment env) {
+		m_env = env;
+	}
+
 	@Override
 	public String getAttribute(String name) {
 		String value = m_attributes.get(name);
@@ -36,11 +40,6 @@ public class DefaultContext implements Context {
 		} else {
 			m_attributes.put(name, value);
 		}
-	}
-
-	public DefaultContext setEnvironment(Environment env) {
-		m_env = env;
-		return this;
 	}
 
 	@Override

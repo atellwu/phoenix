@@ -1,23 +1,22 @@
 package com.dianping.phoenix.context;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
 public interface Environment {
 	/**
-	 * Gets base directory of data files, such as configuration files, data files produced by applications and frameworks etc.
-	 * 
-	 * @return base directory of data
+	 * A name global unique application name. This is a base name for configuration, logging, tracking and other services.
 	 */
-	public String getDataBaseDir();
+	public String APP_NAME = "app.name";
 
 	/**
-	 * Gets base directory of log, such as application logs, business logs and frameworks logs.
-	 * 
-	 * @return base directory of log
+	 * Base directory of data files, such as configuration files, data files consumed/produced by applications and frameworks etc.
 	 */
-	public String getLogBaseDir();
+	public String DATA_BASE_DIR = "data.base.dir";
+
+	/**
+	 * Base directory of log, such as application logs, business logs and frameworks logs.
+	 */
+	public String LOG_BASE_DIR = "log.base.dir";
 
 	/**
 	 * Gets property value of given name, return <code>defaultValue</code> if property is not found.
@@ -37,15 +36,6 @@ public interface Environment {
 	 */
 	public Map<String, String> getAttributes();
 
-	/**
-	 * Loads properties from specified input stream and close the stream. If this method is called multiple times, then some
-	 * properties might be overridden by latter calls.
-	 * 
-	 * @param in
-	 *           stream to load properties from
-	 */
-	public void loadFrom(InputStream in) throws IOException;
-	
 	/**
 	 * Sets the value of the given attribute.
 	 * 
