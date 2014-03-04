@@ -10,15 +10,12 @@ import org.apache.log4j.PatternLayout;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.unidal.lookup.ContainerHolder;
-import org.unidal.lookup.annotation.Inject;
 import org.unidal.tuple.Pair;
 
 import com.dianping.phoenix.config.ConfigService;
+import com.dianping.phoenix.config.ConfigServiceFactory;
 
 public class DefaultAppenderManager extends ContainerHolder implements AppenderManager, Initializable {
-	@Inject
-	private ConfigService m_config;
-
 	private Map<Pair<String, String>, Pair<String[], Appender>> m_map = new LinkedHashMap<Pair<String, String>, Pair<String[], Appender>>();
 
 	private Layout m_layout;
@@ -62,7 +59,8 @@ public class DefaultAppenderManager extends ContainerHolder implements AppenderM
 
 	@Override
 	public void initialize() throws InitializationException {
-		String pattern = m_config.getString(LogConstants.KEY_CONVERSION_PATTERN,
+		ConfigService config = ConfigServiceFactory.getConfig();
+		String pattern = config.getString(LogConstants.KEY_CONVERSION_PATTERN,
 		      LogConstants.DEFAULT_VALUE_CONVERSION_PATTERN);
 
 		m_layout = new PatternLayout(pattern);

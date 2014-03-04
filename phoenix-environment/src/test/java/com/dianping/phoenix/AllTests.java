@@ -6,6 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.dianping.phoenix.config.ConfigTest;
 import com.dianping.phoenix.environment.PhoenixEnvironmentTest;
+import com.dianping.phoenix.log.LogTest;
 import com.dianping.phoenix.session.RequestEventDelegateTest;
 import com.dianping.phoenix.session.RequestIdHandlerTest;
 
@@ -13,6 +14,10 @@ import com.dianping.phoenix.session.RequestIdHandlerTest;
 @SuiteClasses({
 
 ConfigTest.class,
+
+LogTest.class,
+
+/***/
 
 PhoenixEnvironmentTest.class,
 
