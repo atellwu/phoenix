@@ -23,7 +23,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 		setTimeout(function() {
 			$scope.show_inited = true;
 			$(".chosen-select").chosen();
-		}, 1000);//由于angularjs加载option也是延迟的，所以这个操作得更迟才行。
+		}, 1000);// 由于angularjs加载option也是延迟的，所以这个操作得更迟才行。
 		return re;
 	};
 	var vsChanged = false;
@@ -54,6 +54,7 @@ module.controller('VsController', function($scope, DataService, $resource,
 					$scope.newVs = false;
 				}
 				// 展现出来
+
 				$('#VsController > div.main-content').show();
 				// 开始监听vs的修改
 				$scope.$watch('vs', function(newValue, oldValue) {
@@ -252,8 +253,28 @@ module.controller('VsController', function($scope, DataService, $resource,
 			}
 		})
 	}).error(function(data, status, headers, config) {
-//		app.appError("响应错误", data);
+		// app.appError("响应错误", data);
 	});
+
+	$scope.downLocation = function(index) {
+		$scope.setLocation(index, $scope.vs.locations.length - 1 - index);
+	}
+
+	$scope.topLocation = function(index) {
+		$scope.setLocation(index, -index);
+	}
+
+	$scope.setLocation = function(index0, index1) {
+		index1 += index0;
+		if (index0 >= 0 && index1 >= 0 && index0 <= $scope.vs.locations.length
+				&& index1 <= $scope.vs.locations.length) {
+			var location = $scope.vs.locations[index0];
+			$scope.vs.locations.splice(index0, 1);
+			$scope.vs.locations.splice(index1, 0, location);
+
+			vsChanged = true;
+		}
+	}
 
 	// 离开页面时，对比一下vs是否发生了修改
 	var onunload = function() {
