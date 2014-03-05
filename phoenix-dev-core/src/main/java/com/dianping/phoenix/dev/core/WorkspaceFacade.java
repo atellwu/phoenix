@@ -12,6 +12,7 @@ import org.unidal.lookup.ContainerHolder;
 import com.dianping.phoenix.dev.core.configure.Whiteboard;
 import com.dianping.phoenix.dev.core.model.workspace.entity.Workspace;
 import com.dianping.phoenix.dev.core.model.workspace.transform.DefaultSaxParser;
+import com.dianping.phoenix.dev.core.tools.velocity.PhoenixResourceLoader;
 import com.dianping.phoenix.dev.core.tools.wms.WorkspaceConstants;
 import com.dianping.phoenix.dev.core.tools.wms.WorkspaceService;
 
@@ -30,6 +31,7 @@ public class WorkspaceFacade extends ContainerHolder implements Initializable {
 	public void init(File wsDir) {
 		chooseWms("default").pullConfig(wsDir);
 		Whiteboard.INSTANCE.workspaceInitialized(wsDir);
+		PhoenixResourceLoader.setWsDir(wsDir);
 	}
 
 	public List<String> getProjectListByPattern(String pattern) {

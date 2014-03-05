@@ -33,6 +33,7 @@ import com.dianping.phoenix.deploy.DeployExecutor;
 import com.dianping.phoenix.deploy.DeployListener;
 import com.dianping.phoenix.deploy.DeployPolicy;
 import com.dianping.phoenix.deploy.DeployStatus;
+import com.dianping.phoenix.deploy.DeployType;
 import com.dianping.phoenix.deploy.agent.AgentContext;
 import com.dianping.phoenix.deploy.agent.AgentListener;
 import com.dianping.phoenix.deploy.agent.AgentProgress;
@@ -42,6 +43,7 @@ import com.dianping.phoenix.deploy.agent.AgentStatus;
 import com.dianping.phoenix.deploy.model.entity.DeployModel;
 import com.dianping.phoenix.deploy.model.entity.HostModel;
 import com.dianping.phoenix.deploy.model.entity.SegmentModel;
+import com.dianping.phoenix.service.resource.ResourceManager;
 
 public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 	@Inject
@@ -55,6 +57,9 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 
 	@Inject
 	private DeployPolicy m_policy;
+
+	@Inject
+	private ResourceManager m_resourceManager;
 
 	private Logger m_logger;
 
@@ -90,7 +95,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 	}
 
 	@Override
-	public synchronized void submit(DeployModel model, List<String> hosts, String warType, String logUri)
+	public synchronized void submit(DeployModel model, List<String> hosts, DeployType warType, String logUri)
 			throws Exception {
 		Object waitObj = new Object();
 		ControllerTask task = new ControllerTask(m_agentListener, model, hosts, warType, logUri, waitObj);
@@ -122,7 +127,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 
 		private AgentListener m_listener;
 
-		private String m_warType;
+		private DeployType m_warType;
 
 		private String m_logUri;
 
@@ -132,7 +137,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 
 		private boolean m_old;
 
-		public ControllerTask(AgentListener listener, DeployModel model, List<String> hosts, String warType,
+		public ControllerTask(AgentListener listener, DeployModel model, List<String> hosts, DeployType warType,
 				String logUri, Object waitObject) {
 			m_listener = listener;
 			m_model = model;
@@ -223,6 +228,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 			host.addSegment(new SegmentModel().setText(text));
 			return this;
 		}
+
 		private Pair<CountDownLatch, List<String>> submitNextBatch(Transaction t, boolean waitObjSwitch) {
 			Pair<CountDownLatch, List<String>> pair = null;
 			if (m_hostIndex < m_hosts.size()) {
@@ -231,22 +237,15 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 						if (waitObjSwitch) {
 							m_deployListener.onDeployPause(m_model.getId());
 							m_model.setStatus(DeployStatus.PAUSING.getName());
-							System.out.println(String.format("Status= %s, AutoContinue= %s, I will be paused.",
-									m_model.getStatus(), m_model.getPlan().isAutoContinue()));
 							synchronized (m_waitObj) {
 								m_waitObj.wait();
 							}
-						} else {
-							System.out.println(String.format("Status= %s, AutoContinue= %s, I will be paused.",
-									m_model.getStatus(), m_model.getPlan().isAutoContinue()));
 						}
 					} catch (Exception e) {
 						// ignore it;
 						e.printStackTrace();
 					}
-					System.out.println("Some one clicked continue, I will be continue.");
 				} else {
-					System.out.println("In auto mode, I will sleep for a while: " + m_interval);
 					if (m_interval > 0) {
 						try {
 							TimeUnit.SECONDS.sleep(m_interval);
@@ -261,17 +260,14 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 				}
 
 				int batchSize = m_policy.getBatchSize();
-				System.out.println("I will submit next roolout task now!");
 				pair = submitNextRolloutTask(t, batchSize);
-				System.out.println("Submitted Success!");
 			}
 			return pair;
 		}
+
 		private boolean cancelRestIfNeeded() {
 			if (DeployStatus.CANCELLING.getName().equals(m_model.getStatus())) {
-				System.out.println("Some one clicked cancel, I will cancel rest tasks.");
 				cancelResetTasks();
-				System.out.println("Canceled success!");
 				return true;
 			} else {
 				try {
@@ -283,13 +279,14 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 				return false;
 			}
 		}
+
 		@Override
 		public void run() {
 			if (m_old) {
 				loadDeployModel();
 			}
 
-			Transaction t = Cat.newTransaction(m_warType, m_model.getDomain() + ":" + m_model.getId());
+			Transaction t = Cat.newTransaction(m_warType.getName(), m_model.getDomain() + ":" + m_model.getId());
 			reportDeployInfosToCat();
 
 			Pair<CountDownLatch, List<String>> pair = m_old ? submitNextBatch(t, false) : submitNextRolloutTask(t, 1);
@@ -344,6 +341,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 				t.complete();
 			}
 		}
+
 		private void loadDeployModel() {
 			m_hosts = new ArrayList<String>();
 			for (HostModel host : m_model.getHosts().values()) {
@@ -366,8 +364,8 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 				}
 			}
 
-			Cat.getProducer().logEvent("WarType", m_warType, Event.SUCCESS, null);
-			Cat.getProducer().logEvent(m_warType, m_model.getVersion(), Event.SUCCESS, null);
+			Cat.getProducer().logEvent("WarType", m_warType.getName(), Event.SUCCESS, null);
+			Cat.getProducer().logEvent(m_warType.getName(), m_model.getVersion(), Event.SUCCESS, null);
 			Cat.getProducer().logEvent("DeployPolicy", m_policy.getDescription(), Event.SUCCESS, null);
 			Cat.getProducer().logEvent("AbortOnError", String.valueOf(m_model.isAbortOnError()), Event.SUCCESS, null);
 			Cat.getProducer().logEvent("SkipTest", String.valueOf(m_model.isSkipTest()), Event.SUCCESS, null);
@@ -426,7 +424,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 		}
 	}
 
-	static class RolloutContext implements AgentContext {
+	class RolloutContext implements AgentContext {
 		private ControllerTask m_controller;
 
 		private AgentListener m_listener;
@@ -443,9 +441,9 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 
 		private StringBuilder m_log = new StringBuilder(256);
 
-		private String m_warType;
+		private DeployType m_warType;
 
-		public RolloutContext(ControllerTask controller, AgentListener listener, DeployModel model, String warType,
+		public RolloutContext(ControllerTask controller, AgentListener listener, DeployModel model, DeployType warType,
 				String host) {
 			m_controller = controller;
 			m_listener = listener;
@@ -589,6 +587,7 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 				throw new IllegalStateException(String.format("Not implemented yet(%s)!", url));
 			}
 		}
+
 		@Override
 		public AgentContext print(String pattern, Object... args) {
 			if (m_log.length() == 0 && m_controller.getConfigManager().isShowLogTimestamp()) {
@@ -642,15 +641,17 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 
 			try {
 				switch (state) {
-					case CREATED :
-						m_listener.onStart(this);
-						break;
-					case SUCCESSFUL :
-						m_listener.onEnd(this, AgentStatus.SUCCESS);
-						break;
-					case FAILED :
-						m_listener.onEnd(this, AgentStatus.FAILED);
-						break;
+				case CREATED:
+					m_listener.onStart(this);
+					break;
+				case SUCCESSFUL:
+					m_listener.onEnd(this, AgentStatus.SUCCESS);
+					break;
+				case FAILED:
+					m_listener.onEnd(this, AgentStatus.FAILED);
+					break;
+				default:
+					break;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -676,19 +677,28 @@ public class DefaultDeployExecutor implements DeployExecutor, LogEnabled {
 		}
 
 		@Override
-		public String getWarType() {
+		public DeployType getWarType() {
 			return m_warType;
+		}
+
+		@Override
+		public void refreshInternalInformation() {
+			try {
+				m_resourceManager.refreshHostInternally(this);
+			} catch (Exception e) {
+				m_logger.error("Refresh internal host information failed.", e);
+			}
 		}
 	}
 
-	static class RolloutTask implements Task {
+	class RolloutTask implements Task {
 		private RolloutContext m_ctx;
 
 		private CountDownLatch m_latch;
 
 		private Transaction m_parent;
 
-		public RolloutTask(ControllerTask controller, AgentListener listener, DeployModel model, String warType,
+		public RolloutTask(ControllerTask controller, AgentListener listener, DeployModel model, DeployType warType,
 				String host, CountDownLatch latch, Transaction parent) {
 			m_ctx = new RolloutContext(controller, listener, model, warType, host);
 			m_latch = latch;

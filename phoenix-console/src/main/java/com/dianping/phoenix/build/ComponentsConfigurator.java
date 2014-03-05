@@ -3,7 +3,7 @@ package com.dianping.phoenix.build;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.unidal.dal.jdbc.datasource.JdbcDataSourceConfigurationManager;
+import org.unidal.dal.jdbc.datasource.JdbcDataSourceDescriptorManager;
 import org.unidal.initialization.DefaultModuleManager;
 import org.unidal.initialization.Module;
 import org.unidal.initialization.ModuleManager;
@@ -39,6 +39,10 @@ import com.dianping.phoenix.service.netty.AgentStatusFetcher;
 import com.dianping.phoenix.service.netty.DefaultAgentStatusFetcher;
 import com.dianping.phoenix.service.resource.MockResourceManager;
 import com.dianping.phoenix.service.resource.ResourceManager;
+import com.dianping.phoenix.service.resource.cmdb.DefaultDeviceManager;
+import com.dianping.phoenix.service.resource.cmdb.DeviceManager;
+import com.dianping.phoenix.service.resource.netty.AgentStatusFetcher;
+import com.dianping.phoenix.service.resource.netty.DefaultAgentStatusFetcher;
 
 public class ComponentsConfigurator extends AbstractResourceConfigurator {
 	public static void main(String[] args) {
@@ -60,7 +64,7 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 
 	private void defineDatabaseComponents(List<Component> all) {
 		// setup datasource configuration manager
-		all.add(C(JdbcDataSourceConfigurationManager.class) //
+		all.add(C(JdbcDataSourceDescriptorManager.class) //
 				.config(E("datasourceFile").value("/data/appdatas/phoenix/datasources.xml")));
 
 		// Phoenix database
@@ -87,7 +91,7 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 
 		for (DeployPolicy policy : DeployPolicy.values()) {
 			all.add(C(DeployExecutor.class, policy.getId(), DefaultDeployExecutor.class) //
-					.req(ConfigManager.class, DeployListener.class, AgentListener.class) //
+					.req(ConfigManager.class, DeployListener.class, AgentListener.class, ResourceManager.class) //
 					.config(E("policy").value(policy.name())));
 		}
 

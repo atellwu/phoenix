@@ -5,29 +5,30 @@
 	<parent>
 		<groupId>com.dianping.platform</groupId>
 		<artifactId>phoenix-parent</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>0.2.0</version>
 	</parent>
-	<groupId>com.dianping.platform</groupId>
 	<artifactId>phoenix-dev-agent</artifactId>
 	<name>phoenix-dev-agent</name>
-	<version>0.2.4-SNAPSHOT</version>
+	<version>0.2.5-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-exec</artifactId>
-			<version>1.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.unidal.framework</groupId>
 			<artifactId>web-framework</artifactId>
-			<version>2.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.unidal.framework</groupId>
 			<artifactId>test-framework</artifactId>
-			<version>2.0.3</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.unidal.webres</groupId>
+			<artifactId>WebResServer</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.platform</groupId>
+			<artifactId>phoenix-dev-core</artifactId>
+			<version>0.2.5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -36,25 +37,14 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.unidal.webres</groupId>
-			<artifactId>WebResServer</artifactId>
-			<version>1.2.0</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-exec</artifactId>
+			<version>1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>2.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.dianping.platform</groupId>
-			<artifactId>phoenix-dev-core</artifactId>
-			<version>0.2.4-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.unidal.framework</groupId>
-					<artifactId>test-framework</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<!-- for unit test -->
 		<dependency>

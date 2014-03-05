@@ -10,6 +10,7 @@ import org.unidal.web.mvc.payload.annotation.ObjectMeta;
 import com.dianping.phoenix.console.ConsolePage;
 import com.dianping.phoenix.deploy.DeployPlan;
 import com.dianping.phoenix.deploy.DeployPolicy;
+import com.dianping.phoenix.deploy.DeployType;
 
 public class Payload implements ActionPayload<ConsolePage, Action> {
 	private ConsolePage m_page;
@@ -62,9 +63,25 @@ public class Payload implements ActionPayload<ConsolePage, Action> {
 	@FieldMeta("getdomain")
 	private String m_domaininfo;
 
+	// ****************** args for cross-domain start
+	@FieldMeta("product")
+	private String m_product;
+
+	@FieldMeta("domain")
+	private List<String> m_domains;
+	// ****************** args for cross-domain end
+
 	@Override
 	public Action getAction() {
 		return m_action;
+	}
+
+	public String getProduct() {
+		return m_product;
+	}
+
+	public List<String> getDomains() {
+		return m_domains;
 	}
 
 	public String getDomain() {
@@ -130,7 +147,8 @@ public class Payload implements ActionPayload<ConsolePage, Action> {
 		}
 
 		if (m_type != null) {
-			m_plan.setWarType(m_type);
+			DeployType type = DeployType.get(m_type);
+			m_plan.setWarType(type);
 		}
 
 		if (m_action == Action.PROJECT) {
@@ -238,5 +256,13 @@ public class Payload implements ActionPayload<ConsolePage, Action> {
 
 	public void setDomaininfo(String domaininfo) {
 		m_domaininfo = domaininfo;
+	}
+
+	public void setDomains(List<String> domains) {
+		m_domains = domains;
+	}
+
+	public void setProduct(String product) {
+		m_product = product;
 	}
 }

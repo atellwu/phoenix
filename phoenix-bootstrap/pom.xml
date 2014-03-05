@@ -4,12 +4,10 @@
 	<parent>
 		<groupId>com.dianping.platform</groupId>
 		<artifactId>phoenix-parent</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>0.2.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.dianping.platform</groupId>
 	<artifactId>phoenix-bootstrap</artifactId>
-	<version>0.1-SNAPSHOT</version>
 	<name>phoenix-bootstrap</name>
 	<packaging>jar</packaging>
 	<dependencies>
@@ -70,7 +68,10 @@
 							<goal>dal-model</goal>
 						</goals>
 						<configuration>
-							<manifest>${basedir}/src/main/resources/META-INF/dal/model/rule-manifest.xml</manifest>
+							<manifest>
+							${basedir}/src/main/resources/META-INF/dal/model/rule-manifest.xml,
+							${basedir}/src/main/resources/META-INF/dal/model/meta-manifest.xml
+							</manifest>
 						</configuration>
 					</execution>
 				</executions>

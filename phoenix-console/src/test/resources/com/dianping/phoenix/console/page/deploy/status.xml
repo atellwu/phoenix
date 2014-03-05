@@ -1,4 +1,4 @@
-<deploy id="123" domain="sample-app" version="0.1-SNAPSHOT" abortOnError="true">
+<deploy id="1" domain="sample-app" version="0.1-SNAPSHOT" abortOnError="true">
 	<host ip="192.168.66.131">
 <segment step="step1" current-ticks="11" total-ticks="91"><![CDATA[
 First segment

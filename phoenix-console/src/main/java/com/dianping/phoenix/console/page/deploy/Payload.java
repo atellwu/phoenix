@@ -23,10 +23,13 @@ public class Payload implements ActionPayload<ConsolePage, Action> {
 	@FieldMeta("progress")
 	private String m_progress;
 
-	private Map<String, Integer> m_progressMap;
+	private Map<Integer, Map<String, Integer>> m_progressMap;
 
 	@FieldMeta("hosts")
 	private String m_hosts;
+
+	@FieldMeta("ids")
+	private String m_ids;
 
 	@Override
 	public Action getAction() {
@@ -46,7 +49,7 @@ public class Payload implements ActionPayload<ConsolePage, Action> {
 		return m_page;
 	}
 
-	public Map<String, Integer> getProgressMap() {
+	public Map<Integer, Map<String, Integer>> getProgressMap() {
 		return m_progressMap;
 	}
 
@@ -76,21 +79,34 @@ public class Payload implements ActionPayload<ConsolePage, Action> {
 		if (m_progress != null) {
 			List<String> parts = Splitters.by(',').noEmptyItem().trim().split(m_progress);
 
-			m_progressMap = new HashMap<String, Integer>(parts.size() * 2);
+			m_progressMap = new HashMap<Integer, Map<String, Integer>>();
 
 			try {
 				for (String part : parts) {
-					int pos = part.indexOf(':');
+					String[] tmp = part.split(":");
 
-					if (pos > 0) {
-						m_progressMap.put(part.substring(0, pos), Integer.parseInt(part.substring(pos + 1)));
-					} else {
-						m_progressMap.put(part, 0);
+					int id = Integer.valueOf(tmp[0]);
+					String ip = tmp[1];
+					int offset = tmp.length > 2 ? Integer.valueOf(tmp[2]) : 0;
+
+					Map<String, Integer> hostProgresses = m_progressMap.get(id);
+					if (hostProgresses == null) {
+						hostProgresses = new HashMap<String, Integer>();
+						m_progressMap.put(id, hostProgresses);
 					}
+					hostProgresses.put(ip, offset);
 				}
 			} catch (NumberFormatException e) {
 				ctx.addError("payload.progress", new IllegalArgumentException("Invalid progress: " + m_progress, e));
 			}
 		}
+	}
+
+	public String getIds() {
+		return m_ids;
+	}
+
+	public void setIds(String ids) {
+		m_ids = ids;
 	}
 }

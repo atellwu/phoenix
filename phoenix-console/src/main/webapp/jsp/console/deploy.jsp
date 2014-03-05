@@ -8,35 +8,63 @@
 <jsp:useBean id="model" type="com.dianping.phoenix.console.page.deploy.Model" scope="request" />
 
 <a:layout>
-	<w:error code="*"><h2>Error occurred: \${code} for deploy(${payload.id})</h2></w:error>
-	
-	<c:set var="deploy" value="${model.deploy}"/>
+	<w:error code="*">
+		<h2>Error occurred: \${code} for deploy(${payload.id})</h2>
+	</w:error>
+
+	<c:set var="deploy" value="${model.deploy}" />
+
+	<c:forEach var="deploy" items="${model.deploys}" varStatus="status">
+		<section id="header-${deploy.id}" class="deploy-header <c:if test="${!status.first}">hide</c:if>">
+			<div>
+				<strong style="color: #08C;">部署方式</strong>: ${w:showResult(model.policies, deploy.plan.policy, 'id', 'description')}&emsp;<strong style="color: #08C;">错误处理</strong>:
+				${w:translate(deploy.plan.abortOnError, 'true|false', '中断后续发布|继续后续发布', '')}&emsp; <strong style="color: #08C;">发布控制</strong>:
+				<c:choose>
+					<c:when test="${deploy.plan.autoContinue}">
+	                    	自动(${deploy.plan.deployInterval}秒)
+	                    </c:when>
+					<c:otherwise>
+	                    	手动
+	                    </c:otherwise>
+				</c:choose>
+				&emsp;<strong style="color: #08C;">冒烟测试服务</strong>: ${w:translate(deploy.plan.skipTest, 'false|true', '打开|关闭', '')}&emsp;<strong style="color: #08C;">类别</strong>: <span
+					style="text-transform: capitalize;">${deploy.plan.warType.name}</span>&emsp; <strong style="color: #08C;">版本</strong>: ${deploy.plan.version}
+			</div>
+		</section>
+	</c:forEach>
+	<hr>
 	<div class="row-fluid">
 		<div class="span4">
-			<div class="page-header">
-                <input type="hidden" id="deploy_id" value="${deploy.id}">
-				Rollout(${deploy.plan.warType}:${deploy.plan.version}) to ${deploy.domain}, <span id="deploy_status">${deploy.status}</span>
-			</div>
-			<div class="row-fluid">
-				<div class="span12 thumbnail" style="height: 440px; overflow: auto;">
-					<table class="table table-condensed nohover">
-						<thead>
-							<tr>
-								<th width="105">Machine</th>
-								<th></th>
-								<th>Progress</th>
-							</tr>
-						</thead>
-						<tbody>
-							<c:forEach var="entry" items="${deploy.hosts}" varStatus="status">
-								<c:set var="host" value="${entry.value}"/>
-								<tr class="host_status" id="${host.ip}" data-offset="${host.offset}">
-									<td>${host.ip}</td>
-									<td>
-                                        <i class="log-arrow icon-chevron-left<c:if test="${status.index > 0}"> hide</c:if>"></i>
-									</td>
-									<td>
-                                        <div class="progress ${
+			<div class="accordion" id="deploy-collapses" style="height: 430px; overflow: auto;">
+				<c:forEach var="deploy" items="${model.deploys}" varStatus="nav_status">
+					<c:if test="${nav_status.first}">
+						<c:set var="first_deploy" value="${deploy}"></c:set>
+					</c:if>
+					<div class="accordion-group">
+						<div class="accordion-heading">
+							<a class="accordion-toggle btn" style="text-align: left;" data-toggle="collapse" data-parent="#deploy-collapses" href="#deploy-${deploy.id}"
+								meta="${deploy.id}:${deploy.domain}">
+								<span class="label label-info" style="text-transform: capitalize;">${deploy.id}: ${deploy.domain}</span><span
+									class="pull-right label ${
+                                        	deploy.status eq 'successful' ? 'label-success' 
+	                                        	: (deploy.status eq 'failed' ? 'label-failed' 
+	                                        	: (deploy.status eq 'doing' ? 'label-doing' 
+	                                        	: (deploy.status eq 'cancelled' ? 'label-cancelled' 
+	                                        	: (deploy.status eq 'warning' ? 'label-warning' 
+	                                        	: ''))))
+	                                        }"
+									id="deploy_status_${deploy.id}">${deploy.status}</span>
+							</a>
+						</div>
+						<div id="deploy-${deploy.id}" class="accordion-body collapse <c:if test="${nav_status.first}">in</c:if>">
+							<div class="accordion-inner">
+								<ul class="nav nav-tabs nav-stacked" style="margin-bottom: 0;">
+									<c:forEach var="entry" items="${deploy.hosts}">
+										<c:set var="host" value="${entry.value}" />
+										<li class="host_status" id="${deploy.id}:${host.ip}" data-offset="${host.offset}"><a href="#">
+												${host.ip}
+												<div
+													class="pull-right progress ${
                                         	host.status eq 'successful' ? 'progress-success' 
 	                                        	: (host.status eq 'failed' ? 'progress-danger' 
 	                                        	: (host.status eq 'doing' ? 'progress-striped active' 
@@ -44,112 +72,48 @@
 	                                        	: (host.status eq 'warning' ? 'progress-warning' 
 	                                        	: ''))))
 	                                        }">
-                                            <div class="bar" style="width: ${host.progress}%;">
-                                                <div class="step" style="width: 250px;color: #000000;">${host.currentStep}</div>
-                                            </div>
-                                        </div>
-									</td>
-								</tr>
-							</c:forEach>
-						</tbody>
-					</table>
-				</div>
+													<div class="bar" style="width: ${host.progress}%;">
+														<div class="step" style="width: 200px; color: #000000;">${host.currentStep}</div>
+													</div>
+												</div>
+											</a></li>
+									</c:forEach>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</c:forEach>
 			</div>
+
 			<div class="row" style="margin-top: 5px;">
 				<p class="pull-right">
-					<span class="label label-pending">pending&nbsp;&nbsp;&nbsp;</span> 
-					<span class="label label-doing">doing&nbsp;&nbsp;</span> 
-					<span class="label label-warning">warning</span> 
-					<span class="label label-cancelled">cancelled</span> 
-					<span class="label label-success">success</span> 
-					<span class="label label-failed">failed&nbsp;</span>
+					<span class="label label-pending">pending&nbsp;&nbsp;&nbsp;</span> <span class="label label-doing">doing&nbsp;&nbsp;</span> <span class="label label-warning">warning</span> <span
+						class="label label-cancelled">cancelled</span> <span class="label label-success">success</span> <span class="label label-failed">failed&nbsp;</span>
 				</p>
 			</div>
-			<div id="result" style="display: none"></div>
-			
-			<button id="cancel" class="btn btn-danger pull-right" onclick="ctrl_cancel()">Cancel Rest</button>
-			<button id="continue" class="btn btn-primary pull-right" onclick="ctrl_continue()">Continue</button>
-			<button id="pause" class="btn btn-warning pull-right" onclick="ctrl_pause()">Pause</button>
+			<div>
+				<span id="current_selected" class="label label-inverse" style="margin-top: 7px; text-transform: capitalize;" meta="${first_deploy.id}">${first_deploy.domain}</span>
+				<button id="ctrl_cancel" class="btn btn-danger btn-small pull-right" style="margin: 0 0 0 5px;">Cancel Rest</button>
+				<button id="ctrl_continue" class="btn btn-primary btn-small pull-right" style="margin: 0 0 0 5px;">Continue</button>
+				<button id="ctrl_pause" class="btn btn-warning btn-small pull-right" style="margin: 0 0 0 5px;">Pause</button>
+			</div>
 		</div>
-		<script type="text/javascript">
-			$(document).ready(setButtonStatus);
-			
-			function setButtonStatus(){
-				var deployStatus = $("#deploy_status").text();
-				if(deployStatus=="successful" || deployStatus=="warning" || deployStatus=="failed") {
-					$("#cancel").hide();
-					$("#continue").hide();
-					$("#pause").hide();
-				} else if(deployStatus == "pausing"){
-					$("#pause").hide();
-					$("#cancel").show();
-					$("#continue").show();
-				} else if(deployStatus == "deploying"){
-					$("#pause").show();
-					$("#continue").hide();
-					$("#cancel").hide();
-				}
-			}
-			
-			function ctrl_cancel() {
-				$.ajax("", {
-					data : $.param({
-						"op" : "cancel",
-					}, true),
-					cache : false,
-					success : function(result) {
-					}
-				});
-			}
-	
-			function ctrl_continue() {
-				$.ajax("", {
-					data : $.param({
-						"op" : "continue",
-					}, true),
-					cache : false,
-					success : function(result) {
-					}
-				});
-			}
-
-			function ctrl_pause() {
-				$.ajax("", {
-					data : $.param({
-						"op" : "pause",
-					}, true),
-					cache : false,
-					success : function(result) {
-					}
-				});
-			}
-		</script>
 		<div class="span8">
 			<div class="row-fluid">
-				<div class="page-header">
-					<strong style="color:#08C;">部署方式</strong>：${w:showResult(model.policies, deploy.plan.policy, 'id', 'description')}&nbsp;&nbsp;&nbsp;&nbsp;
-                    <strong style="color:#08C;">错误处理</strong>：${w:translate(deploy.plan.abortOnError, 'true|false', '中断后续发布|继续后续发布', '')}&nbsp;&nbsp;&nbsp;&nbsp;
-                    <strong style="color:#08C;">发布控制</strong>：
-                    <c:choose>
-	                    <c:when test="${deploy.plan.autoContinue}">
-	                    	自动(${deploy.plan.deployInterval}秒)
-	                    </c:when>
-	                    <c:otherwise>
-	                    	手动
-	                    </c:otherwise>
-                    </c:choose>&nbsp;&nbsp;&nbsp;&nbsp;
-                    <strong style="color:#08C;">冒烟测试服务</strong>：${w:translate(deploy.plan.skipTest, 'false|true', '打开|关闭', '')}
-				</div>
-				<c:forEach var="entry" items="${deploy.hosts}" varStatus="status">
-					<c:set var="host" value="${entry.value}"/>
-					<div id="log-${host.ip}" data-spy="scroll" data-offset="0" style="height: 508px; line-height: 20px; overflow: auto;"
-						 class="terminal terminal-like<c:if test="${status.index > 0}"> hide</c:if>">
-						<c:forEach var="segment" items="${host.segments}">
-							<c:if test="${not empty segment.encodedText}">
-								<div class="terminal-like">${segment.encodedText}</div>
-							</c:if>
-						</c:forEach>
-					</div>
+				<c:set var="terminal_idx" value="first" />
+				<c:forEach var="deploy" items="${model.deploys}">
+					<c:forEach var="entry" items="${deploy.hosts}">
+						<c:set var="host" value="${entry.value}" />
+						<div data-spy="scroll" data-offset="0" style="height: 510px; line-height: 20px; overflow: auto;" class="terminal terminal-like <c:if test="${terminal_idx ne 'first'}">hide</c:if>"
+							id="log-${deploy.id}-${host.ip}">
+							<c:forEach var="segment" items="${host.segments}">
+								<c:if test="${not empty segment.encodedText}">
+									<div class="terminal-like">${segment.encodedText}</div>
+								</c:if>
+							</c:forEach>
+						</div>
+						<c:set var="terminal_idx" value="non-first" />
+					</c:forEach>
 				</c:forEach>
 			</div>
 		</div>

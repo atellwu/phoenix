@@ -4,24 +4,17 @@
 	<parent>
 		<groupId>com.dianping.platform</groupId>
 		<artifactId>phoenix-parent</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>0.2.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.dianping.platform</groupId>
 	<artifactId>phoenix-agent</artifactId>
-	<version>0.1-SNAPSHOT</version>
 	<name>phoenix-agent</name>
+	<version>0.2.2</version>
 	<packaging>war</packaging>
 	<dependencies>
 		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.2.2</version>
-		</dependency>
-		<dependency>
 			<groupId>org.unidal.framework</groupId>
 			<artifactId>web-framework</artifactId>
-			<version>2.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.unidal.framework</groupId>

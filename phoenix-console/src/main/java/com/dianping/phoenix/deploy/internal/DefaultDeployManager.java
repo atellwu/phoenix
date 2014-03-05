@@ -36,7 +36,7 @@ public class DefaultDeployManager extends ContainerHolder implements DeployManag
 
 	@Override
 	public int deploy(String domain, List<String> hosts, DeployPlan plan, String logUri) throws Exception {
-		check(plan.getWarType(), domain);
+		check(plan.getWarType().getName(), domain);
 
 		DeployExecutor executor = lookup(DeployExecutor.class, plan.getPolicy());
 		DeployModel model = m_deployListener.onCreate(domain, hosts, plan);
@@ -110,11 +110,15 @@ public class DefaultDeployManager extends ContainerHolder implements DeployManag
 				e1.printStackTrace();
 			}
 			e.continueDeploy(deployId);
-			return true;
 		} else {
 			deployOld(deployId);
 		}
-		return false;
+		DeployModel model = m_projectManager.findModel(deployId);
+		if (model != null && !DeployStatus.SUCCESS.getName().equals(model.getStatus())
+				&& !DeployStatus.WARNING.getName().equals(model.getStatus())) {
+			model.setStatus(DeployStatus.DEPLOYING.getName());
+		}
+		return true;
 	}
 
 	@Override

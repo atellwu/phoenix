@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+  <entity name="config" root="true">
+    <element name="event-expire-time" value-type="int" />
+    <element name="retry-queue-clean-interval" value-type="int" />
+    <element name="retry-queue-safe-length" value-type="int" />
+    <element name="max-l1-cache-size" value-type="int" />
+    <element name="max-retry-cache-size" value-type="int" />
+    <element name="max-l2-cache-size" value-type="int" />
+    <element name="record-file-timespan" value-type="int" />
+    <element name="record-file-write-queue-size" value-type="int" />
+    <element name="record-file-tmp-dir" value-type="String" />
+    <element name="record-file-target-dir" value-type="String" />
+    <element name="record-file-write-queue-scan-interval" value-type="int" />
+    <element name="record-file-write-stream-close-scan-interval" value-type="int" />
+    <element name="record-file-write-stream-multiply" value-type="int" />
+    <element name="handler-task-threads" value-type="int" />
+    <element name="handler-task-queue-capacity" value-type="int" />
+    <entity-ref name="hdfs" />
+  </entity>
+  <entity name="hdfs">
+    <attribute name="local-base-dir" value-type="String" />
+    <attribute name="server-uri" value-type="String" />
+    <entity-ref name="property" type="list" names="properties" xml-indent="true" />
+  </entity>
+  <entity name="property">
+    <attribute name="name" value-type="String" />
+    <attribute name="value" value-type="String" />
+  </entity>
+</model>
+

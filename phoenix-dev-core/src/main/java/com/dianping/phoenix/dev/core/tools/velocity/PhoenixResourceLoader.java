@@ -8,6 +8,8 @@ import java.io.InputStream;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
+import com.dianping.phoenix.dev.core.tools.wms.WorkspaceConstants;
+
 public class PhoenixResourceLoader extends ClasspathResourceLoader {
 
 	private static File wsDir;
@@ -19,7 +21,7 @@ public class PhoenixResourceLoader extends ClasspathResourceLoader {
 	@Override
 	public InputStream getResourceStream(String name) throws ResourceNotFoundException {
 
-		File resourceOnFS = new File(wsDir, name);
+		File resourceOnFS = new File(new File(wsDir, WorkspaceConstants.PHOENIX_CONFIG_FOLDER), name);
 		if (resourceOnFS.isFile()) {
 			try {
 				return new FileInputStream(resourceOnFS);
