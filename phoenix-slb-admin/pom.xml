@@ -8,9 +8,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.dianping.platform</groupId>
-    <artifactId>phoenix-load-balancer</artifactId>
+    <artifactId>phoenix-slb-admin</artifactId>
     <version>0.1.0</version>
-    <name>phoenix-load-balancer</name>
+    <name>phoenix-slb-admin</name>
     <packaging>war</packaging>
     <dependencies>
         <dependency>
