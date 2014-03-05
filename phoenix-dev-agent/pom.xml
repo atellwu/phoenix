@@ -9,6 +9,7 @@
 	</parent>
 	<groupId>com.dianping.platform</groupId>
 	<artifactId>phoenix-dev-agent</artifactId>
+	<name>phoenix-dev-agent</name>
 	<version>0.2.4-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<dependencies>
