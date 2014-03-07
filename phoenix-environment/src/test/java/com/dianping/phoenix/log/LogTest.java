@@ -10,7 +10,9 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
 
-import com.dianping.liger.config.Config;
+import com.dianping.liger.config.event.ConfigEventDispatcher;
+import com.dianping.liger.repository.EphemeralRepository;
+import com.dianping.liger.repository.Repository;
 import com.dianping.phoenix.context.ContextManager;
 import com.dianping.phoenix.context.Environment;
 
@@ -18,7 +20,7 @@ public class LogTest extends ComponentTestCase {
 	private static StringBuilder s_result = new StringBuilder();
 
 	@Test
-	public void testBootstrap() {
+	public void testBasicMode() {
 		LogInitializer initializer = lookup(LogInitializer.class);
 
 		initializer.bootstrap();
@@ -32,26 +34,31 @@ public class LogTest extends ComponentTestCase {
 	}
 
 	@Test
-	public void testInitialize() throws Exception {
+	public void testStandardMode() throws Exception {
+		defineComponent(Repository.class, EphemeralRepository.ID, EphemeralRepository.class) //
+		      .req(ConfigEventDispatcher.class);
 		defineComponent(AppenderBuilder.class, MockAppenderBuilder.ID, MockAppenderBuilder.class);
 
 		LogInitializer initializer = lookup(LogInitializer.class);
+		EphemeralRepository repository = (EphemeralRepository) lookup(Repository.class, EphemeralRepository.ID);
 
 		initializer.bootstrap();
 
-		Config config = lookup(Config.class);
+		// simulate environment & configuration in Liger
 		ContextManager.getEnvironment().setAttribute(Environment.APP_NAME, "Test");
-
-		config.setThreadLocalProperty("log[Test].a.b.c", "@warn:mock:c");
-		config.setThreadLocalProperty("log[Test].a.b.d", "debug:mock:d");
+		repository.setProperty("log", "Test", "a.b.c", "+warn,mock:c");
+		repository.setProperty("log", "Test", "a.b.d", "debug,mock:d,console");
 		initializer.initialize();
 
+		// developer code starts below
 		Logger c = Logger.getLogger("a.b.c");
 
 		c.debug("debug");
 		c.info("information");
 		c.warn("warning");
 		c.error("error");
+
+		checkResult("warning:error:");
 
 		Logger d = Logger.getLogger("a.b.d.e");
 
@@ -60,7 +67,25 @@ public class LogTest extends ComponentTestCase {
 		d.warn("warning");
 		d.error("error");
 
-		Assert.assertEquals("warning:error:debug:information:warning:error:", s_result.toString());
+		checkResult("debug:information:warning:error:");
+
+		// how about if a configuration item is updated
+		repository.setProperty("log", "Test", "a.b.d", "warn,mock:d");
+		repository.refresh();
+
+		d.debug("debug");
+		d.info("information");
+		d.warn("warning");
+		d.error("error");
+
+		checkResult("warning:error:");
+	}
+
+	private void checkResult(String expected) {
+		String actual = s_result.toString();
+
+		s_result.setLength(0);
+		Assert.assertEquals(expected, actual);
 	}
 
 	public static class MockAppenderBuilder implements AppenderBuilder {

@@ -1,0 +1,90 @@
+package "Application Framework" {
+
+class TuangouWeb {
+}
+
+class TuangouService {
+}
+
+}
+
+package "Service Framework" {
+
+package "Common Service" {
+
+class CounterService {
+}
+
+class LocationService {
+}
+
+class PictureService {
+}
+
+class MessageService {
+}
+
+class EmailService {
+}
+
+}
+
+package "Business Service" {
+
+class MerchantService {
+}
+
+class AccountService {
+}
+
+}
+
+}
+
+package "Phoenix Environment" {
+
+class Tracking {
++ Cat
+}
+
+class Context {
++ Thread local
++ Thread pool issues
+}
+
+class Environment {
++ app.properties
++ server.properties
++ paas-web.xml
+}
+
+class DependencyManagement {
++ interface/implementation binding
++ dependency definition
+}
+
+class AuthAndAuth {
++ Authenticating
++ Authorizing
++ Accounting
+}
+
+class Log {
++ Application Log
++ Business Log
++ Audit Log
+}
+
+class Config {
++ Liger (and adaptor for Lion)
+}
+
+}
+
+TuangouWeb ..> MerchantService
+TuangouService ...> CounterService
+MerchantService ..> LocationService
+MerchantService ..> PictureService
+CounterService ...> Config
+CounterService ...> Log
+EmailService ...> Config

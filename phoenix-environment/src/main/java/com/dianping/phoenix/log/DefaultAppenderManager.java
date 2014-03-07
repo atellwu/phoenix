@@ -32,16 +32,19 @@ public class DefaultAppenderManager extends ContainerHolder implements AppenderM
 
 		String[] oldParameters = value.getKey();
 
-		if (oldParameters != null && !oldParameters.equals(parameters)) {
+		if (oldParameters != null && !Arrays.equals(oldParameters, parameters)) {
 			throw new RuntimeException(String.format("Conflicting appenders(%s:%s:%s and %s:%s:%s) configured!", type,
 			      name, Arrays.asList(oldParameters), type, name, Arrays.asList(parameters)));
 		}
 
-		Appender appender = makeAppender(type, name, parameters);
+		if (value.getValue() == null) {
+			Appender appender = makeAppender(type, name, parameters);
 
-		value.setKey(parameters);
-		value.setValue(appender);
-		return appender;
+			value.setKey(parameters);
+			value.setValue(appender);
+		}
+
+		return value.getValue();
 	}
 
 	private Appender makeAppender(String type, String name, String[] parameters) {
