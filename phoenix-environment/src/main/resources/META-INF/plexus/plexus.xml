@@ -1,0 +1,8 @@
+<plexus>
+	<components>
+		<component>
+			<role>org.codehaus.plexus.logging.LoggerManager</role>
+			<implementation>com.dianping.phoenix.log.Log4jLoggerManager</implementation>
+		</component>
+	</components>
+</plexus>

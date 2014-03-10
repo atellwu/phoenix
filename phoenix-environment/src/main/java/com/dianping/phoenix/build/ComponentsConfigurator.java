@@ -21,7 +21,6 @@ import com.dianping.phoenix.log.ConsoleAppenderBuilder;
 import com.dianping.phoenix.log.DefaultAppenderManager;
 import com.dianping.phoenix.log.DefaultLoggerManager;
 import com.dianping.phoenix.log.FileAppenderBuilder;
-import com.dianping.phoenix.log.LogInitializer;
 import com.dianping.phoenix.log.LoggerManager;
 import com.dianping.phoenix.servlet.PhoenixFilterHandler;
 import com.dianping.phoenix.session.RequestEventDelegate;
@@ -56,9 +55,6 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 
 	private List<Component> defineLogComponents() {
 		List<Component> all = new ArrayList<Component>();
-
-		all.add(C(LogInitializer.class) //
-		      .req(LoggerManager.class));
 
 		all.add(C(LoggerManager.class, DefaultLoggerManager.class) //
 		      .req(Config.class, AppenderManager.class));

@@ -8,6 +8,7 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.spi.LoggerRepository;
+import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.unidal.helper.Splitters;
 import org.unidal.lookup.annotation.Inject;
@@ -17,7 +18,7 @@ import com.dianping.liger.config.event.ConfigEvent;
 import com.dianping.liger.config.event.InstancePropertiesListener;
 import com.dianping.phoenix.config.ConfigServiceFactory;
 
-public class DefaultLoggerManager implements LoggerManager {
+public class DefaultLoggerManager implements LoggerManager, LogEnabled {
 	@Inject
 	private Config m_config;
 
@@ -38,7 +39,7 @@ public class DefaultLoggerManager implements LoggerManager {
 		}
 
 		m_config.addListener(new InstancePropertiesListener("log", appName) {
-			@Override
+			@Override                                                                 
 			protected void handleAdd(ConfigEvent event, String key, String newValue) {
 				doAdd(key, newValue);
 			}
@@ -54,6 +55,11 @@ public class DefaultLoggerManager implements LoggerManager {
 				doAdd(key, newValue);
 			}
 		});
+	}
+
+	@Override
+	public void destroy() {
+		LogManager.getLoggerRepository().shutdown();
 	}
 
 	private void doAdd(String category, String value) {
@@ -95,6 +101,11 @@ public class DefaultLoggerManager implements LoggerManager {
 		}
 
 		logger.setLevel(Level.OFF);
+	}
+
+	@Override
+	public void enableLogging(Logger logger) {
+		m_logger = logger;
 	}
 
 	private Level toLevel(String level) {

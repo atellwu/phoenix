@@ -5,15 +5,6 @@
 			<implementation>com.dianping.phoenix.context.DefaultEnvironment</implementation>
 		</component>
 		<component>
-			<role>com.dianping.phoenix.log.LogInitializer</role>
-			<implementation>com.dianping.phoenix.log.LogInitializer</implementation>
-			<requirements>
-				<requirement>
-					<role>com.dianping.phoenix.log.LoggerManager</role>
-				</requirement>
-			</requirements>
-		</component>
-		<component>
 			<role>com.dianping.phoenix.log.LoggerManager</role>
 			<implementation>com.dianping.phoenix.log.DefaultLoggerManager</implementation>
 			<requirements>
