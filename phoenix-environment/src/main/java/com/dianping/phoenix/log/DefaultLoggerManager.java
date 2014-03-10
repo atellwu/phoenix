@@ -39,7 +39,7 @@ public class DefaultLoggerManager implements LoggerManager, LogEnabled {
 		}
 
 		m_config.addListener(new InstancePropertiesListener("log", appName) {
-			@Override                                                                 
+			@Override
 			protected void handleAdd(ConfigEvent event, String key, String newValue) {
 				doAdd(key, newValue);
 			}
@@ -59,7 +59,7 @@ public class DefaultLoggerManager implements LoggerManager, LogEnabled {
 
 	@Override
 	public void destroy() {
-		LogManager.getLoggerRepository().shutdown();
+		LogManager.shutdown();
 	}
 
 	private void doAdd(String category, String value) {
