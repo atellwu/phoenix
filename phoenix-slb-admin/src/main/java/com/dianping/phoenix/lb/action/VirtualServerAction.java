@@ -226,7 +226,6 @@ public class VirtualServerAction extends MenuAction {
         commonAspects = commonAspectService.listCommonAspects();
         if (vsListToTag != null) {
             for (String vs : vsListToTag) {
-                System.out.println(vs);
                 VirtualServer virtualServer = virtualServerService.findVirtualServer(vs);
                 Validate.notNull(virtualServer, "vs(" + vs + ") not found.");
                 tagIds.add(virtualServerService.tag(vs, virtualServer.getVersion(), pools, commonAspects));

@@ -1,7 +1,6 @@
 package com.dianping.phoenix.lb.configure;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Iterator;
 
 import org.apache.commons.io.FileUtils;
@@ -15,7 +14,9 @@ import com.dianping.phoenix.lb.config.transform.DefaultSaxParser;
 import com.dianping.phoenix.lb.constant.Constants;
 
 public class ConfigManager implements Initializable {
-    @Inject
+    private static final String SCRIPT_PATH = "/data/appdatas/phoenix-slb-admin/script/";
+
+	@Inject
     private String        m_configFile       = "/data/appdatas/phoenix/slb/config.xml";
 
     private RuntimeConfig m_config;
@@ -192,11 +193,12 @@ public class ConfigManager implements Initializable {
     }
 
     private File getScriptFile(String scriptFileName) {
-        URL scriptUrl = this.getClass().getClassLoader().getResource("script/" + scriptFileName);
-        if (scriptUrl == null) {
-            throw new RuntimeException(scriptFileName + " not found");
-        }
-        return new File(scriptUrl.getPath());
+//        URL scriptUrl = this.getClass().getClassLoader().getResource("script/" + scriptFileName);
+//        if (scriptUrl == null) {
+//            throw new RuntimeException(scriptFileName + " not found");
+//        }
+//        return new File(scriptUrl.getPath());
+        return new File(SCRIPT_PATH + scriptFileName);
     }
 
     private void makeShellScriptExecutable() {

@@ -211,13 +211,6 @@ public class DefaultTaskExecutor implements TaskExecutor {
         deployTaskService.updateDeployVsSummaryLog(deployVs);
     }
 
-    public static void main(String[] args) {
-        StringBuilder sb = new StringBuilder("");
-        sb.append('[').append("] ").append("xx").append(".\n");
-        System.out.print(sb.toString().trim());
-        System.out.print(sb.toString().trim());
-    }
-
     /**
      * 执行完，如果有错误<br>
      * 策略是错误跳过，则继续，和上面一样<br>

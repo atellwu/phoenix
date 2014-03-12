@@ -359,6 +359,28 @@
             </result>
         </action>
 
+        <action name="api/pool/{poolName}/addMember" class="apiAction"
+            method="addMember">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="api/pool/{poolName}/delMember" class="apiAction"
+            method="delMember">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="api/pool/{poolName}/deploy" class="apiAction"
+            method="deploy">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+
 
 
 
