@@ -28,6 +28,6 @@ public class Model extends ViewModel<AgentPage, Action, Context> {
     }
 
     public String getResponseInJson() {
-        return new DefaultJsonBuilder().buildJson(response);
+        return new DefaultJsonBuilder().build(response);
     }
 }
