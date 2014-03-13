@@ -23,7 +23,7 @@ public class MockResourceManager extends DefaultResourceManager {
 		domain.setName("user-web");
 
 		Host host = new Host();
-		host.setIp("192.168.22.114");// Don't use 127.0.0.1 or Localhost
+		host.setIp("192.168.22.73");// Don't use 127.0.0.1 or Localhost
 		host.setEnv("dev");
 		host.setOwner("tong.song");
 		host.setStatus("up");
