@@ -7,6 +7,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.junit.Before;
 import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
 
@@ -19,6 +20,11 @@ import com.dianping.phoenix.context.Environment;
 
 public class LogTest extends ComponentTestCase {
 	private static StringBuilder s_result = new StringBuilder();
+
+	@Before
+	public void before() {
+		Liger.reset();
+	}
 
 	private void checkResult(String expected) {
 		String actual = s_result.toString();
@@ -83,7 +89,6 @@ public class LogTest extends ComponentTestCase {
 		checkResult("warning:error:");
 
 		repository.reset();
-		Liger.reset();
 	}
 
 	@Test
@@ -105,8 +110,6 @@ public class LogTest extends ComponentTestCase {
 		d.error("error");
 
 		checkResult("warning:error:");
-
-		Liger.reset();
 	}
 
 	public static class MockAppenderBuilder implements AppenderBuilder {

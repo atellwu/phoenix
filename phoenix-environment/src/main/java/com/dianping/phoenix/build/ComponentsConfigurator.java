@@ -14,7 +14,11 @@ import com.dianping.phoenix.config.LigerConfigContext;
 import com.dianping.phoenix.config.LigerConfigEnvironment;
 import com.dianping.phoenix.config.LigerConfigServiceProvider;
 import com.dianping.phoenix.context.DefaultEnvironment;
+import com.dianping.phoenix.context.DefaultThreadLifecycleRemedy;
+import com.dianping.phoenix.context.DefaultThreadLocalRegistry;
 import com.dianping.phoenix.context.Environment;
+import com.dianping.phoenix.context.ThreadLifecycleRemedy;
+import com.dianping.phoenix.context.ThreadLocalRegistry;
 import com.dianping.phoenix.log.AppenderBuilder;
 import com.dianping.phoenix.log.AppenderManager;
 import com.dianping.phoenix.log.ConsoleAppenderBuilder;
@@ -31,13 +35,23 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 	public List<Component> defineComponents() {
 		List<Component> all = new ArrayList<Component>();
 
-		all.add(C(Environment.class, DefaultEnvironment.class));
-
 		all.addAll(defineLogComponents());
 		all.addAll(defineConfigComponents());
+		all.addAll(defineContextComponents());
 
 		all.add(C(PhoenixFilterHandler.class, RequestIdHandler.ID, RequestIdHandler.class));
 		all.add(C(RequestEventDelegate.class).is(PER_LOOKUP));
+
+		return all;
+	}
+
+	private List<Component> defineContextComponents() {
+		List<Component> all = new ArrayList<Component>();
+
+		all.add(C(Environment.class, DefaultEnvironment.class));
+		all.add(C(ThreadLocalRegistry.class, DefaultThreadLocalRegistry.class));
+		all.add(C(ThreadLifecycleRemedy.class, DefaultThreadLifecycleRemedy.class) //
+		      .req(ThreadLocalRegistry.class));
 
 		return all;
 	}
