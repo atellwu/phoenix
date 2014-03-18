@@ -1,0 +1,1 @@
+#foreach($server in $servers)$nginx.upstreamServer($server,$strategy)#end

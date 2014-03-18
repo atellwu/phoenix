@@ -1,0 +1,68 @@
+# gen-time: $nginx.nowTimeStamp()
+# vs-name : $config.name
+server {
+    listen       $config.server.listen;
+    server_name  $config.server.serverName;
+$nginx.properties($config.server.properties)
+    
+    location /{
+        dp_domain $nginx.poolName($config.name,$config.server.defaultPool);
+
+        set $hcv "-";
+        if ( $http_cookie ~* "_hc.v=(\S+)(;.*|$)"){
+            set $hcv $1;
+        }
+
+        set $dper "-";
+        if ( $http_cookie ~* "dper=(\S+)(;.*|$)"){
+            set $dper $1;
+        }
+
+#foreach( $aspect in $config.server.aspects)
+#if($aspect.pointCut == 'BEFORE')
+#foreach( $directive in $aspect.directives)
+        $nginx.directive($config.name,$directive)
+#end
+#end
+#end
+
+#foreach( $location in $config.server.locations)
+        location $nginx.locationMatchOp($location.matchType) $nginx.rewriteLocationIfNeeded($location.matchType, $location.pattern) {
+#foreach( $directive in $location.directives)
+            $nginx.directive($config.name,$directive)
+#end
+        }
+
+#end
+
+        error_page                    500 502 503 504  /50x.html;
+        location = /50x.html {
+            root                        html;
+        }
+
+        if ( !-f $request_filename ) {
+            proxy_pass                http://$dp_upstream;
+            break;
+        }
+
+#foreach( $aspect in $config.server.aspects)
+#if($aspect.pointCut == 'AFTER')
+#foreach( $directive in $aspect.directives)
+        $nginx.directive($config.name,$directive)
+#end
+#end
+#end
+
+    }
+}
+ 
+#foreach($upstream in $config.upstreams)
+#if($upstream.used)
+upstream $nginx.poolName($config.name,$upstream.name) {
+    $nginx.lbStrategy($upstream.lbStrategy)
+#foreach($server in $upstream.servers)
+    $nginx.upstreamServer($server, $upstream.lbStrategy)
+#end
+}
+#end
+#end

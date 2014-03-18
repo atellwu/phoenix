@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+
+    <!-- struts2中改变struts.xml默认路径, 这些本来struts会自动加载的文件，需要手动加载include。参考：http://my.oschina.net/jawayjiang/blog/88077 -->
+    <include file="struts-default.xml" />
+    <include file="struts-plugin.xml" />
+
+    <constant name="struts.velocity.toolboxlocation" value="WEB-INF/velocity/toolbox.xml" />
+    <constant name="struts.velocity.configfile" value="WEB-INF/velocity/velocity.properties" />
+
+    <constant name="struts.action.extension" value="" />
+    <!-- <constant name="struts.custom.properties" value="classpath:/struts.properties" 
+        /> -->
+    <constant name="struts.objectFactory"
+        value="org.apache.struts2.spring.StrutsSpringObjectFactory" />
+    <constant name="struts.patternMatcher" value="namedVariable" />
+    <constant name="struts.action.excludePattern" value="favicon.ico,.*/static/.*,.*/assets/.*" />
+
+    <constant name="struts.enable.SlashesInActionNames" value="true" />
+    <constant name="struts.mapper.alwaysSelectFullNamespace"
+        value="false" />
+    <constant name="struts.patternMatcher" value="regex" />
+
+    <package name="softbalance" namespace="/" extends="json-default">
+
+        <result-types>
+            <result-type name="velocity"
+                class="com.dianping.phoenix.lb.action.VelocityLayoutResult" />
+        </result-types>
+        <!-- Result fragment -->
+
+        <interceptors>
+            <interceptor-stack name="myStack">
+                <interceptor-ref name="timer" />
+                <interceptor-ref name="logger" />
+                <interceptor-ref name="defaultStack" />
+            </interceptor-stack>
+        </interceptors>
+
+        <action name="" class="virtualServerAction" method="index">
+            <result name="redirect" type="redirect">
+                <param name="location">vs/${virtualServerName}</param>
+            </result>
+            <result name="none" type="velocity">
+                /vs/none.htm
+            </result>
+        </action>
+        <action name="vs/list" class="virtualServerAction"
+            method="list">
+            <result name="success" type="json">
+                <param name="root">list</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/tag/addBatch" class="virtualServerAction"
+            method="addBatchTag">
+            <result name="redirect" type="redirect">
+                <param name="location"><![CDATA[/deploy#showInfluencing:${vsListToTagStr}&${tagIdsStr}]]></param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/save" class="virtualServerAction"
+            method="save">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/get" class="virtualServerAction"
+            method="get">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/remove" class="virtualServerAction"
+            method="remove">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/edit" class="virtualServerAction"
+            method="edit">
+            <result name="success" type="velocity">
+                /vs/virtualserver.htm
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/deploy" class="virtualServerAction"
+            method="deploy">
+            <result name="success" type="velocity">
+                /deploy.htm
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/preview" class="virtualServerAction"
+            method="preview">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/tag/add" class="virtualServerAction"
+            method="addTag">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/tag/list" class="virtualServerAction"
+            method="listTags">
+            <result name="success" type="json">
+                <param name="root">tags</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}/tag/get/{tagId}"
+            class="virtualServerAction" method="getNginxConfigByTagId">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="vs/{virtualServerName}" class="virtualServerAction"
+            method="show">
+            <result name="success" type="velocity">
+                /vs/virtualserver.htm
+            </result>
+        </action>
+
+        <action name="pool" class="poolAction" method="index">
+            <result name="redirect" type="redirect">
+                <param name="location">pool/${poolName}</param>
+            </result>
+            <result name="none" type="velocity">
+                /pool/none.htm
+            </result>
+        </action>
+        <action name="pool/{poolName}/save" class="poolAction"
+            method="save">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="pool/{poolName}/get" class="poolAction"
+            method="get">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="pool/{poolName}/remove" class="poolAction"
+            method="remove">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="pool/{poolName}/edit" class="poolAction"
+            method="edit">
+            <result name="success" type="velocity">
+                /pool/pool.htm
+            </result>
+        </action>
+        <action name="pool/{poolName}" class="poolAction" method="show">
+            <result name="success" type="velocity">
+                /pool/pool.htm
+            </result>
+        </action>
+
+
+        <action name="slbPool" class="slbPoolAction" method="index">
+            <result name="redirect" type="redirect">
+                <param name="location">slbPool/${slbPoolName}</param>
+            </result>
+            <result name="none" type="velocity">
+                /slbPool/none.htm
+            </result>
+        </action>
+        <action name="slbPool/{slbPoolName}/save" class="slbPoolAction"
+            method="save">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="slbPool/{slbPoolName}/get" class="slbPoolAction"
+            method="get">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="slbPool/{slbPoolName}/remove" class="slbPoolAction"
+            method="remove">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="slbPool/{slbPoolName}/edit" class="slbPoolAction"
+            method="edit">
+            <result name="success" type="velocity">
+                /slbPool/slbPool.htm
+            </result>
+        </action>
+        <action name="slbPool/{slbPoolName}" class="slbPoolAction"
+            method="show">
+            <result name="success" type="velocity">
+                /slbPool/slbPool.htm
+            </result>
+        </action>
+
+        <action name="aspect" class="aspectAction" method="index">
+            <result name="success" type="velocity">
+                /aspect/index.htm
+            </result>
+        </action>
+        <action name="aspect/save" class="aspectAction" method="save">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="aspect/get" class="aspectAction" method="get">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="aspect/edit" class="aspectAction" method="edit">
+            <result name="success" type="velocity">
+                /aspect/index.htm
+            </result>
+        </action>
+
+
+        <action name="base/propertiesDefinedInputs" class="definedInputAction">
+            <result name="success" type="json">
+                <param name="root">propertiesDefinedInputs</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="base/directiveDefinedInputs" class="definedInputAction">
+            <result name="success" type="json">
+                <param name="root">directiveDefinedInputs</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="base/listStrategies" class="strategyAction"
+            method="listStrategies">
+            <result name="success" type="json">
+                <param name="root">strategies</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="base/listPools" class="poolAction" method="listPools">
+            <result name="success" type="json">
+                <param name="root">pools</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="base/listSlbPools" class="slbPoolAction"
+            method="listSlbPools">
+            <result name="success" type="json">
+                <param name="root">slbPools</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="base/listAspects" class="aspectAction"
+            method="list">
+            <result name="success" type="json">
+                <param name="root">aspects</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+
+
+        <action name="deploy" class="deployListAction" method="list">
+            <result name="success" type="velocity">
+                /deployList/list.htm
+            </result>
+        </action>
+        <action name="deploy/batchTag" class="batchTagAction"
+            method="index">
+            <result name="success" type="velocity">
+                /batchTag/index.htm
+            </result>
+        </action>
+        <action name="deploy/list/{pageNum}" class="deployListAction"
+            method="list">
+            <result name="success" type="velocity">
+                /deployList/list.htm
+            </result>
+        </action>
+        <action name="deploy/task/add" class="deployAction"
+            method="addDeployTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{deployTaskId}/get" class="deployAction"
+            method="getDeployTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{deployTaskId}/status" class="deployAction"
+            method="getStatus">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{deployTaskId}/start" class="deployAction"
+            method="startDeployTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{deployTaskId}/update" class="deployAction"
+            method="updateDeployTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{deployTaskId}/pause" class="deployAction"
+            method="pauseDeployTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{deployTaskId}/stop" class="deployAction"
+            method="stopDeployTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{deployTaskId}/retry" class="deployAction"
+            method="retryDeployTask">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="deploy/task/{deployTaskId}" class="deployAction"
+            method="showDeployTask">
+            <result name="success" type="velocity">
+                /deploy/task.htm
+            </result>
+        </action>
+
+        <action name="api/pool/{poolName}/addMember" class="apiAction"
+            method="addMember">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="api/pool/{poolName}/delMember" class="apiAction"
+            method="delMember">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+        <action name="api/pool/{poolName}/deploy" class="apiAction"
+            method="deploy">
+            <result name="success" type="json">
+                <param name="root">dataMap</param>
+                <param name="encoding">UTF-8</param>
+            </result>
+        </action>
+
+
+
+
+
+    </package>
+
+</struts>

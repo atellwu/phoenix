@@ -25,7 +25,7 @@
 				<module>phoenix-dev-agent</module>
 				<module>phoenix-maven-plugin</module>
 				<module>phoenix-byteman</module>
-				<module>phoenix-load-balancer</module>
+				<module>phoenix-slb-admin</module>
 				<module>phoenix-environment</module>
 				<module>phoenix-session-service</module>
 			</modules>

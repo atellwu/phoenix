@@ -1,0 +1,8 @@
+if ($directive.getDynamicAttribute("if-condition")) {
+                 $nginx.rewriteProxyPassStringIfNeeded($vsName,$directive.getDynamicAttribute("if-statement"));
+            }
+#if($directive.getDynamicAttribute("else-statement"))
+            else {
+                 $nginx.rewriteProxyPassStringIfNeeded($vsName,$directive.getDynamicAttribute("else-statement"));
+            }
+#end

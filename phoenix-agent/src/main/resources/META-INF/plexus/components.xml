@@ -131,6 +131,26 @@
 			</requirements>
 		</component>
 		<component>
+			<role>com.dianping.phoenix.agent.core.task.processor.TaskProcessor</role>
+			<role-hint>tengine_upgrade</role-hint>
+			<implementation>com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeTaskProcessor</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.agent.core.task.processor.SemaphoreWrapper</role>
+					<role-hint>kernel</role-hint>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.agent.core.tx.TransactionManager</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.agent.core.task.workflow.Engine</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.agent.core.tx.LogFormatter</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
 			<role>com.dianping.phoenix.agent.core.task.processor.TaskProcessorFactory</role>
 			<implementation>com.dianping.phoenix.agent.core.task.processor.TaskProcessorFactory</implementation>
 		</component>
@@ -179,6 +199,20 @@
 			</requirements>
 		</component>
 		<component>
+			<role>com.dianping.phoenix.agent.core.task.workflow.Context</role>
+			<role-hint>tengine_ctx</role-hint>
+			<implementation>com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeContext</implementation>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.agent.core.shell.ScriptExecutor</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeStepProvider</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
 			<role>com.dianping.phoenix.agent.core.task.processor.kernel.upgrade.KernelUpgradeStepProvider</role>
 			<implementation>com.dianping.phoenix.agent.core.task.processor.kernel.upgrade.DefaultKernelUpgradeStepProvider</implementation>
 			<requirements>
@@ -196,6 +230,15 @@
 		<component>
 			<role>com.dianping.phoenix.agent.core.task.processor.upgrade.AgentUpgradeStepProvider</role>
 			<implementation>com.dianping.phoenix.agent.core.task.processor.upgrade.DefaultAgentUpgradeStepProvider</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.configure.ConfigManager</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.agent.core.task.processor.slb.ConfigUpgradeStepProvider</role>
+			<implementation>com.dianping.phoenix.agent.core.task.processor.slb.DefaultConfigUpgradeStepProvider</implementation>
 			<requirements>
 				<requirement>
 					<role>com.dianping.phoenix.configure.ConfigManager</role>
@@ -267,6 +310,15 @@
 				<requirement>
 					<role>com.dianping.phoenix.agent.page.nginx.JspViewer</role>
 				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.agent.core.Agent</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.agent.core.tx.TransactionManager</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.configure.ConfigManager</role>
+				</requirement>
 			</requirements>
 		</component>
 		<component>
@@ -275,6 +327,15 @@
 			<requirements>
 				<requirement>
 					<role>org.unidal.web.mvc.view.model.ModelHandler</role>
+				</requirement>
+			</requirements>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.configure.ConfigManager</role>
+			<implementation>com.dianping.phoenix.configure.ConfigManager</implementation>
+			<requirements>
+				<requirement>
+					<role>java.lang.String</role>
 				</requirement>
 			</requirements>
 		</component>

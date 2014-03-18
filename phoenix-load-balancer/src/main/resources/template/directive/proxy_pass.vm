@@ -1,1 +1,0 @@
-proxy_pass http://$directive.getDynamicAttribute("pool-name");

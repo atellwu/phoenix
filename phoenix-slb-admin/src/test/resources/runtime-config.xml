@@ -1,0 +1,26 @@
+<runtime-config>
+    <tengine-config-git-url-dev>ssh://git@code.dianpingoa.com/arch/phoenix-slb-tengine-config-dev.git</tengine-config-git-url-dev>
+    <tengine-config-git-url-product>ssh://git@code.dianpingoa.com/arch/phoenix-slb-tengine-config-product.git</tengine-config-git-url-product>
+    <tengine-config-git-url-ppe>ssh://git@code.dianpingoa.com/arch/phoenix-slb-tengine-config-ppe.git</tengine-config-git-url-ppe>
+    <model-git-url-dev>ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-dev.git</model-git-url-dev>
+    <model-git-url-product>ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-product.git</model-git-url-product>
+    <model-git-url-ppe>ssh://git@code.dianpingoa.com/arch/phoenix-slb-model-ppe.git</model-git-url-ppe>
+    <model-store-base-dir>/data/appdatas/phoenix/slb/model</model-store-base-dir>
+    <tengine-config-base-dir>/data/appdatas/phoenix/slb/tengine</tengine-config-base-dir>
+    <tengine-config-file-name>server.conf</tengine-config-file-name>
+    <deploy-log-url-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=log&deployId=%s]]></deploy-log-url-pattern>
+    <deploy-url-reload-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=deploy&deployId=%s&vs=%s&config=%s&version=%s&gitUrl=%s&reload=true]]></deploy-url-reload-pattern>
+    <deploy-url-dynamic-refresh-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=deploy&deployId=%s&vs=%s&config=%s&version=%s&gitUrl=%s&reload=false]]></deploy-url-dynamic-refresh-pattern>
+    <deploy-status-url-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=status&deployId=%s]]></deploy-status-url-pattern>
+    <agent-tengine-config-version-url-pattern><![CDATA[http://%s:3473/phoenix/agent/nginx?op=version&vs=%s]]></agent-tengine-config-version-url-pattern>
+    <nginx-check-config-folder>/usr/local/nginx/conf/</nginx-check-config-folder>
+    <nginx-check-config-file-name>server.conf</nginx-check-config-file-name>
+    <nginx-check-main-config-file-name>test.conf</nginx-check-main-config-file-name>
+    <nginx-dynamic-add-upstream-url-pattern>127.0.0.1:8866/upstream/%s</nginx-dynamic-add-upstream-url-pattern>
+    <nginx-dynamic-delete-upstream-url-pattern>127.0.0.1:8866/upstream/%s</nginx-dynamic-delete-upstream-url-pattern>
+    <nginx-dynamic-update-upstream-url-pattern>127.0.0.1:8866/upstream/%s</nginx-dynamic-update-upstream-url-pattern>
+    <deploy-getlog-retrycount>10</deploy-getlog-retrycount>
+    <deploy-connect-timeout>1000</deploy-connect-timeout>
+    <deploy-retry-interval>30000</deploy-retry-interval>
+    <env>dev</env>
+</runtime-config>
