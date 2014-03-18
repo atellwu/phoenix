@@ -1,7 +1,6 @@
-package com.dianping.phoenix.session.requestid.serverevent;
+package com.dianping.phoenix.session.server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -19,13 +18,10 @@ import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
 
 import com.dianping.phoenix.session.RequestEvent;
-import com.dianping.phoenix.session.requestid.serverevent.DefaultServerEventPublisher;
-import com.dianping.phoenix.session.requestid.serverevent.ServerEventPublisher;
-import com.dianping.phoenix.session.requestid.serverevent.SocketClientManager;
 
-public class ServerEventPublisherTest extends ComponentTestCase {
+public class DefaultServerEventPublisherTest extends ComponentTestCase {
 
-	private DefaultServerEventPublisher publiser;
+	private DefaultEventPublisher publiser;
 
 	@Before
 	public void before() {
@@ -61,7 +57,7 @@ public class ServerEventPublisherTest extends ComponentTestCase {
 	public void shouldAddNewServer() throws Exception {
 
 		super.defineComponent(SocketClientManager.class, FakeSocketClientManager.class);
-		publiser = (DefaultServerEventPublisher) lookup(ServerEventPublisher.class);
+		publiser = (DefaultEventPublisher) lookup(EventPublisher.class);
 		FakeSocketClientManager clientMgr = (FakeSocketClientManager) lookup(SocketClientManager.class);
 
 		final CountDownLatch latch = new CountDownLatch(1);
@@ -71,8 +67,6 @@ public class ServerEventPublisherTest extends ComponentTestCase {
 
 			@Override
 			public void sendToClients(RequestEvent event) {
-				// TODO Auto-generated method stub
-
 			}
 
 			@Override
@@ -88,7 +82,6 @@ public class ServerEventPublisherTest extends ComponentTestCase {
 
 			@Override
 			public void closeClients(List<InetSocketAddress> serverToClose) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -112,7 +105,7 @@ public class ServerEventPublisherTest extends ComponentTestCase {
 	public void shouldRemoveServer() throws Exception {
 
 		super.defineComponent(SocketClientManager.class, FakeSocketClientManager.class);
-		publiser = (DefaultServerEventPublisher) lookup(ServerEventPublisher.class);
+		publiser = (DefaultEventPublisher) lookup(EventPublisher.class);
 		FakeSocketClientManager clientMgr = (FakeSocketClientManager) lookup(SocketClientManager.class);
 
 		final CountDownLatch latch = new CountDownLatch(2);
@@ -127,8 +120,6 @@ public class ServerEventPublisherTest extends ComponentTestCase {
 
 			@Override
 			public void sendToClients(RequestEvent event) {
-				// TODO Auto-generated method stub
-
 			}
 
 			@Override
@@ -172,7 +163,7 @@ public class ServerEventPublisherTest extends ComponentTestCase {
 		event.setPhoenixId(phoenixId);
 
 		super.defineComponent(SocketClientManager.class, FakeSocketClientManager.class);
-		publiser = (DefaultServerEventPublisher) lookup(ServerEventPublisher.class);
+		publiser = (DefaultEventPublisher) lookup(EventPublisher.class);
 		FakeSocketClientManager clientMgr = (FakeSocketClientManager) lookup(SocketClientManager.class);
 
 		final CountDownLatch latch = new CountDownLatch(1);

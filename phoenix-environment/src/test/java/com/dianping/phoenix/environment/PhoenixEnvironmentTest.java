@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.junit.Assert;
-import org.junit.Test;
 
 public class PhoenixEnvironmentTest {
     private static final int THREAD_POOL_SIZE = 10;
@@ -14,7 +13,7 @@ public class PhoenixEnvironmentTest {
     private ExecutorService  executorService  = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
     @SuppressWarnings("unchecked")
-    @Test
+//    @Test
     public void testThreadLocal() throws Exception {
 
         int i = 0, N = 20;

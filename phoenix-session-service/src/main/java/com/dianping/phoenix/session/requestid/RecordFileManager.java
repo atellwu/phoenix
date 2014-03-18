@@ -2,7 +2,6 @@ package com.dianping.phoenix.session.requestid;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -38,6 +37,8 @@ public class RecordFileManager implements Initializable, LogEnabled {
 	private String m_ip;
 
 	private Logger m_logger;
+	
+	public static final String PHOENIX_MODE = "PHOENIX_MODE";
 
 	@Override
 	public void enableLogging(Logger logger) {
@@ -65,8 +66,6 @@ public class RecordFileManager implements Initializable, LogEnabled {
 	public void initialize() throws InitializationException {
 		this.m_writeQueueCache = new ConcurrentHashMap<Long, QueueAndOutputStream>();
 		m_ip = NetworkInterfaceManager.INSTANCE.getLocalHostAddress();
-
-		start();
 	}
 
 	// for unit test only
@@ -96,6 +95,45 @@ public class RecordFileManager implements Initializable, LogEnabled {
 		return fileName;
 	}
 
+	private void handleExpiredFile() {
+      for (Map.Entry<Long, QueueAndOutputStream> entry : m_writeQueueCache.entrySet()) {
+      	long aliveTime = m_config.getRecordFileTimespan() * m_config.getRecordFileWriteStreamMultiply();
+      	long startTimestamp = entry.getKey();
+      	QueueAndOutputStream queueAndStream = entry.getValue();
+      	if (System.currentTimeMillis() > startTimestamp + aliveTime) {
+      		m_logger.info(String.format("Closing stream of %d", startTimestamp));
+      		m_writeQueueCache.remove(entry.getKey());
+
+      		queueAndStream.close();
+      		queueAndStream.moveTmpFileToTarget();
+      	} else {
+      		queueAndStream.flush();
+      	}
+      }
+   }
+	
+	private void writeQueueToFile() {
+      for (Map.Entry<Long, QueueAndOutputStream> entry : m_writeQueueCache.entrySet()) {
+
+      	BlockingQueue<byte[]> queue = entry.getValue().queue;
+      	while (true) {
+      		byte[] buf = queue.poll();
+      		if (buf == null) {
+      			break;
+      		} else {
+      			try {
+      				entry.getValue().out.write(buf);
+      				if ("dev".equals(System.getProperty(PHOENIX_MODE))) {
+      					entry.getValue().out.flush();
+      				}
+      			} catch (Exception e) {
+      				m_logger.error(String.format("Error write record %s to file", new String(buf)), e);
+      			}
+      		}
+      	}
+      }
+   }
+	
 	class CleanTask implements Task {
 
 		@Override
@@ -107,19 +145,12 @@ public class RecordFileManager implements Initializable, LogEnabled {
 		public void run() {
 			while (!m_stop.get()) {
 
-				for (Map.Entry<Long, QueueAndOutputStream> entry : m_writeQueueCache.entrySet()) {
-					long aliveTime = m_config.getRecordFileTimespan() * m_config.getRecordFileWriteStreamMultiply();
-					long startTimestamp = entry.getKey();
-					if (System.currentTimeMillis() > startTimestamp + aliveTime) {
-						m_logger.info(String.format("Closing stream of %d", startTimestamp));
-						m_writeQueueCache.remove(entry.getKey());
-						QueueAndOutputStream queueAndStream = entry.getValue();
-
-						queueAndStream.close();
-						queueAndStream.moveTmpFileToTarget();
-					}
+				try {
+					handleExpiredFile();
+				} catch (Exception e) {
+					m_logger.error("Unexpected exception occurred", e);
 				}
-
+				
 				try {
 					Thread.sleep(m_config.getRecordFileWriteStreamCloseScanInterval());
 				} catch (InterruptedException e) {
@@ -143,12 +174,14 @@ public class RecordFileManager implements Initializable, LogEnabled {
 
 		private String path;
 
-		public QueueAndOutputStream(BlockingQueue<byte[]> queue, String path) throws FileNotFoundException {
+		public QueueAndOutputStream(BlockingQueue<byte[]> queue, String path) throws IOException {
 			this.queue = queue;
 			this.path = path;
 			this.file = new File(m_config.getRecordFileTmpDir(), path);
 
-			this.file.getParentFile().mkdirs();
+			if(!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
+				throw new RuntimeException("Can not create directory " + file.getParentFile().getCanonicalPath());
+			}
 
 			this.out = new BufferedOutputStream(new FileOutputStream(this.file, true));
 		}
@@ -158,6 +191,14 @@ public class RecordFileManager implements Initializable, LogEnabled {
 				this.out.close();
 			} catch (IOException e) {
 				m_logger.error(String.format("Error when closing file(%s)!", this.file), e);
+			}
+		}
+		
+		public void flush() {
+			try {
+				this.out.flush();
+			} catch (IOException e) {
+				m_logger.error(String.format("Error when flushing file(%s)!", this.file), e);
 			}
 		}
 
@@ -190,24 +231,7 @@ public class RecordFileManager implements Initializable, LogEnabled {
 		@Override
 		public void run() {
 			while (!m_stop.get()) {
-				for (Map.Entry<Long, QueueAndOutputStream> entry : m_writeQueueCache.entrySet()) {
-
-					BlockingQueue<byte[]> queue = entry.getValue().queue;
-					while (true) {
-						byte[] buf = queue.poll();
-						if (buf == null) {
-							break;
-						} else {
-							try {
-								entry.getValue().out.write(buf);
-								// TODO remove flush
-								entry.getValue().out.flush();
-							} catch (Exception e) {
-								m_logger.error(String.format("Error write record %s to file", new String(buf)), e);
-							}
-						}
-					}
-				}
+				writeQueueToFile();
 
 				try {
 					Thread.sleep(m_config.getRecordFileWriteQueueScanInterval());

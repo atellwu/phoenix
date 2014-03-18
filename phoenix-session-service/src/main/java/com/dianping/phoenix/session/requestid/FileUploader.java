@@ -99,7 +99,7 @@ public class FileUploader implements Initializable, Task, LogEnabled {
 			}
 
 			try {
-				TimeUnit.MINUTES.sleep(1);
+				TimeUnit.MILLISECONDS.sleep(m_configManager.getHdfsUploadInterval());
 			} catch (InterruptedException e) {
 				m_active.set(false);
 			}

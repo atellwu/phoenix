@@ -10,9 +10,14 @@ import org.mortbay.servlet.GzipFilter;
 
 import org.unidal.test.jetty.JettyServer;
 
+import com.dianping.phoenix.session.requestid.Bootstrap;
+
 @RunWith(JUnit4.class)
 public class TestServer extends JettyServer {
    public static void main(String[] args) throws Exception {
+   	
+   	System.setProperty(Bootstrap.DISABLE_HDFS, "");
+   	
       TestServer server = new TestServer();
 
       server.startServer();
@@ -23,6 +28,7 @@ public class TestServer extends JettyServer {
    @Before
    public void before() throws Exception {
       System.setProperty("devMode", "true");
+      System.setProperty(Bootstrap.DISABLE_HDFS, "");
       super.startServer();
    }
 
@@ -44,7 +50,7 @@ public class TestServer extends JettyServer {
    @Test
    public void startWebapp() throws Exception {
       // open the page in the default browser
-      display("/session/console");
+//      display("/session/console");
       waitForAnyKey();
    }
 }

@@ -1,4 +1,4 @@
-package com.dianping.phoenix.session.requestid.serverevent;
+package com.dianping.phoenix.session.server;
 
 import java.net.InetSocketAddress;
 import java.util.List;

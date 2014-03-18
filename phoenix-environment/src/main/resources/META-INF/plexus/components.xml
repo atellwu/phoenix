@@ -2,6 +2,11 @@
 	<components>
 		<component>
 			<role>com.dianping.phoenix.servlet.PhoenixFilterHandler</role>
+			<role-hint>phoenix-env</role-hint>
+			<implementation>com.dianping.phoenix.environment.PhoenixEnvironmentFilter</implementation>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.servlet.PhoenixFilterHandler</role>
 			<role-hint>request-id</role-hint>
 			<implementation>com.dianping.phoenix.session.RequestIdHandler</implementation>
 		</component>
@@ -9,6 +14,29 @@
 			<role>com.dianping.phoenix.session.RequestEventDelegate</role>
 			<implementation>com.dianping.phoenix.session.RequestEventDelegate</implementation>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.server.ServerAddressManager</role>
+			<implementation>com.dianping.phoenix.session.server.DefaultServerAddressManager</implementation>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.server.SocketClientManager</role>
+			<implementation>com.dianping.phoenix.session.server.DefaultSocketClientManager</implementation>
+			<configuration>
+				<m_strMode>Single</m_strMode>
+			</configuration>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.server.EventPublisher</role>
+			<implementation>com.dianping.phoenix.session.server.DefaultEventPublisher</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.session.server.SocketClientManager</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.session.server.ServerAddressManager</role>
+				</requirement>
+			</requirements>
 		</component>
 	</components>
 </plexus>

@@ -1,37 +1,26 @@
-package com.dianping.phoenix.session.requestid.serverevent;
+package com.dianping.phoenix.session.server;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.unidal.lookup.annotation.Inject;
 import org.unidal.lookup.util.StringUtils;
 
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.lion.client.LionException;
-import com.dianping.phoenix.configure.ConfigManager;
-import com.dianping.phoenix.session.server.ServerAddressManager;
-import com.dianping.phoenix.session.util.NetworkUtil;
 
 public class DefaultServerAddressManager implements ServerAddressManager, Initializable, LogEnabled {
-	
+
 	public final static String LION_KEY_SERVER_ADDRESS = "session-service.server.address";
 
 	private String m_serverString;
-
-	@Inject
-	private ConfigManager m_config;
 
 	private Logger m_logger;
 
@@ -40,17 +29,11 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 	private List<AddressChangeListener> m_listeners = Collections
 	      .synchronizedList(new ArrayList<ServerAddressManager.AddressChangeListener>());
 
-	private Set<InetAddress> m_localIps = new HashSet<InetAddress>();
-	
 	private ConfigCache lion;
 
 	@Override
 	public void enableLogging(Logger logger) {
 		m_logger = logger;
-	}
-
-	List<InetAddress> getLocalIps() {
-		return NetworkUtil.INSTANCE.getAllIp();
 	}
 
 	@Override
@@ -63,9 +46,7 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 
 	@Override
 	public void initialize() throws InitializationException {
-		m_localIps.addAll(getLocalIps());
-		m_logger.info("Local ips " + m_localIps);
-		
+
 		String serverAddr = null;
 		try {
 			serverAddr = getConfigFromLion();
@@ -74,10 +55,9 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 			throw new RuntimeException(e);
 		}
 
-		updateServerList(serverAddr);		
-		
+		updateServerList(serverAddr);
 	}
-	
+
 	private String getConfigFromLion() throws LionException {
 		lion = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
 
@@ -85,7 +65,7 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 		serverAddr = lion.getProperty(LION_KEY_SERVER_ADDRESS);
 		if (serverAddr == null) {
 			m_logger.error("Error get server address from lion");
-			throw new RuntimeException("Can not get server address from lion");
+			serverAddr = "127.0.0.1:7377";
 		}
 		lion.addChange(new ConfigChange() {
 
@@ -116,9 +96,7 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 					String[] hostPort = servers[i].split(":");
 					String host = hostPort[0].trim();
 					int port = Integer.parseInt(hostPort[1].trim());
-					if (!isThisServer(host, port)) {
-						newServerList.add(new InetSocketAddress(host, port));
-					}
+					newServerList.add(new InetSocketAddress(host, port));
 				}
 			} catch (Exception e) {
 				success = false;
@@ -129,10 +107,6 @@ public class DefaultServerAddressManager implements ServerAddressManager, Initia
 		}
 
 		return success;
-	}
-
-	private boolean isThisServer(String host, int port) throws UnknownHostException {
-		return m_localIps.contains(InetAddress.getByName(host)) && port == m_config.getPort();
 	}
 
 	void updateServerList(String newServerString) {
