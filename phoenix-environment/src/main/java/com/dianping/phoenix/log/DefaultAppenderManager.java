@@ -18,7 +18,9 @@ import com.dianping.phoenix.config.ConfigServiceFactory;
 public class DefaultAppenderManager extends ContainerHolder implements AppenderManager, Initializable {
 	private Map<Pair<String, String>, Pair<String[], Appender>> m_map = new LinkedHashMap<Pair<String, String>, Pair<String[], Appender>>();
 
-	private Layout m_layout;
+	private Layout m_appLayout;
+
+	private Layout m_bizLayout;
 
 	@Override
 	public Appender getAppender(String type, String name, String... parameters) {
@@ -49,7 +51,13 @@ public class DefaultAppenderManager extends ContainerHolder implements AppenderM
 
 	private Appender makeAppender(String type, String name, String[] parameters) {
 		AppenderBuilder builder = lookup(AppenderBuilder.class, type);
-		Appender appender = builder.build(m_layout, name, parameters);
+		Appender appender;
+
+		if (type.equals("biz")) {
+			appender = builder.build(m_bizLayout, name, parameters);
+		} else {
+			appender = builder.build(m_appLayout, name, parameters);
+		}
 
 		if (name == null) {
 			appender.setName(type);
@@ -63,9 +71,12 @@ public class DefaultAppenderManager extends ContainerHolder implements AppenderM
 	@Override
 	public void initialize() throws InitializationException {
 		ConfigService config = ConfigServiceFactory.getConfig();
-		String pattern = config.getString(LogConstants.KEY_CONVERSION_PATTERN,
-		      LogConstants.DEFAULT_VALUE_CONVERSION_PATTERN);
+		String appPattern = config.getString(LogConstants.KEY_APP_CONVERSION_PATTERN,
+		      LogConstants.DEFAULT_VALUE_APP_CONVERSION_PATTERN);
+		String bizPattern = config.getString(LogConstants.KEY_BIZ_CONVERSION_PATTERN,
+		      LogConstants.DEFAULT_VALUE_BIZ_CONVERSION_PATTERN);
 
-		m_layout = new PatternLayout(pattern);
+		m_appLayout = new PatternLayout(appPattern);
+		m_bizLayout = new PatternLayout(bizPattern);
 	}
 }

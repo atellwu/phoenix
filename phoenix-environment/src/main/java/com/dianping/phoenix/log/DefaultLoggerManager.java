@@ -1,8 +1,12 @@
 package com.dianping.phoenix.log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -11,6 +15,7 @@ import org.apache.log4j.spi.LoggerRepository;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.unidal.helper.Splitters;
+import org.unidal.helper.Threads;
 import org.unidal.lookup.annotation.Inject;
 
 import com.dianping.liger.config.Config;
@@ -25,12 +30,65 @@ public class DefaultLoggerManager implements LoggerManager, LogEnabled {
 	@Inject
 	private AppenderManager m_appenderManager;
 
+	private Set<Logger> m_loggers = new HashSet<Logger>();
+
 	private Parser m_parser = new Parser();
 
 	private Logger m_logger;
 
 	@Override
-	public void configure() {
+	public void destroy() {
+		LogManager.shutdown();
+	}
+
+	private void doAdd(String category, String value) {
+		Entry entry = m_parser.parse(category, value);
+		LoggerRepository repository = LogManager.getLoggerRepository();
+		org.apache.log4j.Logger logger = repository.getLogger(category);
+		int len = entry.size();
+
+		for (int i = 0; i < len; i++) {
+			String type = entry.getTypes().get(i);
+			String name = entry.getNames().get(i);
+			List<String> parameters = entry.getParametersList().get(i);
+			Appender appender = m_appenderManager.getAppender(type, name, parameters.toArray(new String[0]));
+
+			logger.addAppender(appender);
+		}
+
+		logger.setAdditivity(entry.isAdditivity());
+		logger.setLevel(toLevel(entry.getLevel()));
+
+		m_loggers.add(m_logger);
+	}
+
+	private void doRemove(String category, String value) {
+		Entry entry = m_parser.parse(category, value);
+		LoggerRepository repository = LogManager.getLoggerRepository();
+		org.apache.log4j.Logger logger = repository.getLogger(category);
+		int len = entry.size();
+
+		for (int i = 0; i < len; i++) {
+			String type = entry.getTypes().get(i);
+			String name = entry.getNames().get(i);
+			List<String> parameters = entry.getParametersList().get(i);
+			Appender appender = m_appenderManager.getAppender(type, name, parameters.toArray(new String[0]));
+
+			logger.removeAppender(appender);
+		}
+
+		logger.setAdditivity(false);
+		logger.setLevel(Level.OFF);
+		m_loggers.remove(logger);
+	}
+
+	@Override
+	public void enableLogging(Logger logger) {
+		m_logger = logger;
+	}
+
+	@Override
+	public void initialize() {
 		String appName = ConfigServiceFactory.getConfig().getAppName();
 		Map<String, String> properties = m_config.getInstanceProperties("log", appName);
 
@@ -55,57 +113,8 @@ public class DefaultLoggerManager implements LoggerManager, LogEnabled {
 				doAdd(key, newValue);
 			}
 		});
-	}
 
-	@Override
-	public void destroy() {
-		LogManager.shutdown();
-	}
-
-	private void doAdd(String category, String value) {
-		Entry entry = m_parser.parse(category, value);
-		LoggerRepository repository = LogManager.getLoggerRepository();
-		org.apache.log4j.Logger logger = repository.getLogger(category);
-		int len = entry.size();
-
-		for (int i = 0; i < len; i++) {
-			String type = entry.getTypes().get(i);
-			String name = entry.getNames().get(i);
-			List<String> parameters = entry.getParametersList().get(i);
-			Appender appender = m_appenderManager.getAppender(type, name, parameters.toArray(new String[0]));
-
-			logger.addAppender(appender);
-		}
-
-		logger.setAdditivity(entry.isAdditivity());
-		logger.setLevel(toLevel(entry.getLevel()));
-	}
-
-	private void doRemove(String category, String value) {
-		Entry entry = m_parser.parse(category, value);
-		LoggerRepository repository = LogManager.getLoggerRepository();
-		org.apache.log4j.Logger logger = repository.getLogger(category);
-		int len = entry.size();
-
-		for (int i = 0; i < len; i++) {
-			String type = entry.getTypes().get(i);
-			String name = entry.getNames().get(i);
-			List<String> parameters = entry.getParametersList().get(i);
-			Appender appender = m_appenderManager.getAppender(type, name, parameters.toArray(new String[0]));
-
-			logger.removeAppender(appender);
-		}
-
-		if (entry.isAdditivity()) {
-			logger.setAdditivity(false);
-		}
-
-		logger.setLevel(Level.OFF);
-	}
-
-	@Override
-	public void enableLogging(Logger logger) {
-		m_logger = logger;
+		Threads.forGroup("Phoenix").start(new RollingTrigger());
 	}
 
 	private Level toLevel(String level) {
@@ -204,6 +213,35 @@ public class DefaultLoggerManager implements LoggerManager, LogEnabled {
 			}
 
 			return entry;
+		}
+	}
+
+	public class RollingTrigger implements Runnable {
+		@Override
+		public void run() {
+			Calendar cal = Calendar.getInstance();
+
+			try {
+				while (true) {
+					int minute = cal.get(Calendar.MINUTE);
+					int second = cal.get(Calendar.SECOND);
+
+					if (minute == 0 && second == 0) {
+						triggerRolling();
+					}
+
+					TimeUnit.SECONDS.sleep(1);
+				}
+			} catch (InterruptedException e) {
+				// ignore it
+			}
+		}
+
+		private void triggerRolling() {
+			// trigger log4j to rolling precisely
+			for (Logger logger : m_loggers) {
+				logger.info("");
+			}
 		}
 	}
 }

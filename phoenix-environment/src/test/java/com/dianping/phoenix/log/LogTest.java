@@ -56,7 +56,7 @@ public class LogTest extends ComponentTestCase {
 		repository.setProperty("log", "Test", "a.b.c", "+warn,mock:c");
 		repository.setProperty("log", "Test", "a.b.d", "debug,mock:d,console");
 
-		lookup(LoggerManager.class).configure();
+		lookup(LoggerManager.class).initialize();
 
 		// developer code starts below
 		Logger c = Logger.getLogger("a.b.c");
@@ -92,6 +92,54 @@ public class LogTest extends ComponentTestCase {
 	}
 
 	@Test
+	public void testBizLog() throws Exception {
+		defineComponent(Repository.class, EphemeralRepository.ID, EphemeralRepository.class) //
+		      .req(ConfigEventDispatcher.class);
+		defineComponent(AppenderBuilder.class, MockAppenderBuilder.ID, MockAppenderBuilder.class);
+		defineComponent(BizLogger.class, MockBizLogger.class).is("per-lookup");
+
+		EphemeralRepository repository = (EphemeralRepository) lookup(Repository.class, EphemeralRepository.ID);
+
+		// simulate environment & configuration in Liger
+		ContextManager.getEnvironment().setAttribute(Environment.APP_NAME, "Test");
+		repository.setProperty("log", "Test", "tuangou", "info,mock:tuangou");
+		repository.setProperty("log", "Test", "booking", "info,mock:booking");
+
+		lookup(LoggerManager.class).initialize();
+
+		// developer code starts below
+		BizLogger c = BizLoggerManager.getLogger("tuangou");
+
+		c.add("k1", "v1");
+		c.add("k2", "v2");
+		c.flush();
+
+		checkResult("k1v1k2v2:");
+
+		BizLogger d = BizLoggerManager.getLogger("booking");
+
+		d.add("k1", "v1");
+		d.add("k2", "v2");
+		d.add("k3", "v3");
+		d.flush();
+
+		checkResult("k1v1k2v2k3v3:");
+
+		// how about if a configuration item is updated
+		repository.setProperty("log", "Test", "booking", "info,mock:booking2");
+		repository.refresh();
+
+		d.add("k1", "v1");
+		d.add("k2", "v2");
+		d.add("k3", "v3");
+		d.flush();
+
+		checkResult("k1v1k2v2k3v3:");
+
+		repository.reset();
+	}
+
+	@Test
 	public void testPlexusLog() throws Exception {
 		defineComponent(AppenderBuilder.class, MockAppenderBuilder.ID, MockAppenderBuilder.class);
 
@@ -99,7 +147,7 @@ public class LogTest extends ComponentTestCase {
 		ContextManager.getEnvironment().setAttribute(Environment.APP_NAME, "Test");
 		Liger.getConfig().setThreadLocalProperty("log[Test].com.dianping.phoenix.log", "warn,mock:e");
 
-		lookup(LoggerManager.class).configure();
+		lookup(LoggerManager.class).initialize();
 
 		org.codehaus.plexus.logging.Logger d = getContainer().getLoggerManager().getLoggerForComponent(
 		      getClass().getName());
@@ -132,6 +180,13 @@ public class LogTest extends ComponentTestCase {
 					return false;
 				}
 			};
+		}
+	}
+
+	public static class MockBizLogger extends DefaultBizLogger {
+		@Override
+		protected void addSystemFields() {
+			// do nothing
 		}
 	}
 }

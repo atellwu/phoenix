@@ -2,6 +2,7 @@ package com.dianping.phoenix.context;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class DefaultContext implements Context {
 	private Environment m_env;
@@ -24,13 +25,8 @@ public class DefaultContext implements Context {
 	}
 
 	@Override
-	public Map<String, String> getAttributes() {
-		return m_attributes;
-	}
-
-	@Override
-	public Environment getEnvironment() {
-		return m_env;
+	public Set<String> getAttributeNames() {
+		return m_attributes.keySet();
 	}
 
 	@Override

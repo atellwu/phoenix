@@ -1,7 +1,6 @@
 package com.dianping.phoenix.context;
 
-import java.util.Map;
-
+import java.util.Set;
 
 /**
  * Configuration context to store the attributes for the current thread only.
@@ -19,14 +18,7 @@ public interface Context {
 	/**
 	 * Gets all context attributes.
 	 */
-	public Map<String, String> getAttributes();
-	
-	/**
-	 * Gets the environment.
-	 * 
-	 * @return current environment
-	 */
-	public Environment getEnvironment();
+	public Set<String> getAttributeNames();
 
 	/**
 	 * Sets the value of the given attribute.

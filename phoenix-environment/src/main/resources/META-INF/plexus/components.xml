@@ -27,6 +27,16 @@
 			<implementation>com.dianping.phoenix.log.FileAppenderBuilder</implementation>
 		</component>
 		<component>
+			<role>com.dianping.phoenix.log.BizLogger</role>
+			<implementation>com.dianping.phoenix.log.DefaultBizLogger</implementation>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.log.AppenderBuilder</role>
+			<role-hint>biz</role-hint>
+			<implementation>com.dianping.phoenix.log.BizFileAppenderBuilder</implementation>
+		</component>
+		<component>
 			<role>com.dianping.phoenix.config.ConfigServiceProvider</role>
 			<implementation>com.dianping.phoenix.config.LigerConfigServiceProvider</implementation>
 		</component>

@@ -29,7 +29,7 @@ public abstract class AbstractConfigService implements ConfigService {
 
 	@Override
 	public String getDataBaseDir() {
-		return getEnv(Environment.DATA_BASE_DIR, ".");
+		return getEnv(Environment.DATA_BASE_DIR, "./target");
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public abstract class AbstractConfigService implements ConfigService {
 
 	@Override
 	public String getLogBaseDir() {
-		return getEnv(Environment.LOG_BASE_DIR, ".");
+		return getEnv(Environment.LOG_BASE_DIR, "./target");
 	}
 
 	@Override

@@ -12,9 +12,7 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.unidal.lookup.annotation.Inject;
 
-import com.dianping.phoenix.initialization.PhoenixInitializer;
-
-public class EnvironmentInitializer implements PhoenixInitializer, LogEnabled {
+public class EnvironmentManager implements LogEnabled {
 	@Inject
 	private Environment m_env;
 
@@ -25,8 +23,7 @@ public class EnvironmentInitializer implements PhoenixInitializer, LogEnabled {
 		m_logger = logger;
 	}
 
-	@Override
-	public void initialize() throws Exception {
+	public void configure() throws Exception {
 		prepareBaseDirs();
 		processAppProperties();
 		processServerProperties();

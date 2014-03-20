@@ -21,8 +21,11 @@ import com.dianping.phoenix.context.ThreadLifecycleRemedy;
 import com.dianping.phoenix.context.ThreadLocalRegistry;
 import com.dianping.phoenix.log.AppenderBuilder;
 import com.dianping.phoenix.log.AppenderManager;
+import com.dianping.phoenix.log.BizFileAppenderBuilder;
+import com.dianping.phoenix.log.BizLogger;
 import com.dianping.phoenix.log.ConsoleAppenderBuilder;
 import com.dianping.phoenix.log.DefaultAppenderManager;
+import com.dianping.phoenix.log.DefaultBizLogger;
 import com.dianping.phoenix.log.DefaultLoggerManager;
 import com.dianping.phoenix.log.FileAppenderBuilder;
 import com.dianping.phoenix.log.LoggerManager;
@@ -75,6 +78,9 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 		all.add(C(AppenderManager.class, DefaultAppenderManager.class));
 		all.add(C(AppenderBuilder.class, ConsoleAppenderBuilder.ID, ConsoleAppenderBuilder.class));
 		all.add(C(AppenderBuilder.class, FileAppenderBuilder.ID, FileAppenderBuilder.class));
+
+		all.add(C(BizLogger.class, DefaultBizLogger.class).is(PER_LOOKUP));
+		all.add(C(AppenderBuilder.class, BizFileAppenderBuilder.ID, BizFileAppenderBuilder.class));
 
 		return all;
 	}

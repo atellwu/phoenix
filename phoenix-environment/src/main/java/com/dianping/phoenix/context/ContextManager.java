@@ -1,11 +1,12 @@
 package com.dianping.phoenix.context;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.unidal.lookup.ContainerLoader;
 
 public class ContextManager {
 	private static volatile Environment s_environment;
 
-	private static ThreadLocal<Context> s_contexts = new ThreadLocal<Context>() {
+	private static ThreadLocal<Context> s_context = new ThreadLocal<Context>() {
 		@Override
 		protected Context initialValue() {
 			return new DefaultContext(getEnvironment());
@@ -13,7 +14,7 @@ public class ContextManager {
 	};
 
 	public static Context getContext() {
-		return s_contexts.get();
+		return s_context.get();
 	}
 
 	public static Environment getEnvironment() {
@@ -26,10 +27,21 @@ public class ContextManager {
 		if (s_environment == null) {
 			synchronized (ContextManager.class) {
 				if (s_environment == null) {
+					PlexusContainer container = ContainerLoader.getDefaultContainer();
+
 					try {
-						s_environment = ContainerLoader.getDefaultContainer().lookup(Environment.class);
+						s_environment = container.lookup(Environment.class);
+
 					} catch (Exception e) {
-						throw new IllegalStateException("Unable to load Environment due to " + e, e);
+						throw new RuntimeException("Error when looking up Environment!", e);
+					}
+
+					try {
+						ThreadLocalRegistry registry = container.lookup(ThreadLocalRegistry.class);
+
+						registry.register(s_context);
+					} catch (Exception e) {
+						throw new RuntimeException("Error when looking up Environment!", e);
 					}
 				}
 			}
@@ -37,6 +49,6 @@ public class ContextManager {
 	}
 
 	public static void resetContext() {
-		s_contexts.remove();
+		s_context.remove();
 	}
 }
