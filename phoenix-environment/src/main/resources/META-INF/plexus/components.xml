@@ -43,6 +43,14 @@
 		<component>
 			<role>com.dianping.liger.config.ConfigContext</role>
 			<implementation>com.dianping.phoenix.config.LigerConfigContext</implementation>
+			<requirements>
+				<requirement>
+					<role>com.dianping.phoenix.context.Environment</role>
+				</requirement>
+				<requirement>
+					<role>com.dianping.phoenix.context.ThreadLocalRegistry</role>
+				</requirement>
+			</requirements>
 		</component>
 		<component>
 			<role>com.dianping.liger.config.ConfigEnvironment</role>

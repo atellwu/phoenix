@@ -1,6 +1,6 @@
 package com.dianping.phoenix.context;
 
-import java.util.Map;
+import java.util.Set;
 
 public interface Environment {
 	/**
@@ -34,7 +34,7 @@ public interface Environment {
 	 * 
 	 * @return all environment attributes
 	 */
-	public Map<String, String> getAttributes();
+	public Set<String> getAttributeNames();
 
 	/**
 	 * Sets the value of the given attribute.

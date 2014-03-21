@@ -10,7 +10,7 @@ import com.dianping.liger.Liger;
 import com.dianping.liger.config.model.entity.LigerModel;
 import com.dianping.liger.config.model.transform.DefaultSaxParser;
 import com.dianping.liger.repository.git.GitRepositoryBuilder;
-import com.dianping.phoenix.context.ContextManager;
+import com.dianping.phoenix.context.Environment;
 
 public class ConfigTest extends ComponentTestCase {
 	@After
@@ -36,13 +36,14 @@ public class ConfigTest extends ComponentTestCase {
 	@Test
 	public void testLiger() throws Exception {
 		GitRepositoryBuilder builder = lookup(GitRepositoryBuilder.class);
+		Environment env = lookup(Environment.class);
 		LigerModel model = DefaultSaxParser.parse(getClass().getResourceAsStream("liger.xml"));
 		String ligerHome = "target/liger";
 
 		builder.buildClientRepository(ligerHome, model, "test resource");
 
 		Liger.initialize(ligerHome, null);
-		ContextManager.getEnvironment().setAttribute("lane", "membercard");
+		env.setAttribute("lane", "membercard");
 
 		// try with Liger
 		ConfigService cs = ConfigServiceFactory.getConfig();
@@ -68,6 +69,11 @@ public class ConfigTest extends ComponentTestCase {
 					} else {
 						return "unknown key: " + key;
 					}
+				}
+
+				@Override
+				protected String getEnv(String name, String defaultValue) {
+					return null;
 				}
 			};
 		}

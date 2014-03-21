@@ -3,7 +3,6 @@ package com.dianping.phoenix.config;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.dianping.phoenix.context.ContextManager;
 import com.dianping.phoenix.context.Environment;
 
 public abstract class AbstractConfigService implements ConfigService {
@@ -62,9 +61,7 @@ public abstract class AbstractConfigService implements ConfigService {
 		return defaultValue;
 	}
 
-	private String getEnv(String name, String defaultValue) {
-		return ContextManager.getEnvironment().getAttribute(name, defaultValue);
-	}
+	protected abstract String getEnv(String name, String defaultValue);
 
 	@Override
 	public float getFloat(String key, float defaultValue) {

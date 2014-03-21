@@ -11,9 +11,9 @@ public interface Context {
 	 * 
 	 * @param name
 	 *           attribute name
-	 * @return value of the attribute, null if not found.
+	 * @return value of the attribute, defaultValue will be returned if not found.
 	 */
-	public String getAttribute(String name);
+	public String getAttribute(String name, String defaultValue);
 
 	/**
 	 * Gets all context attributes.
@@ -21,12 +21,12 @@ public interface Context {
 	public Set<String> getAttributeNames();
 
 	/**
-	 * Sets the value of the given attribute.
+	 * Sets the value of the given attribute. Set a null value means remove the attribute.
 	 * 
 	 * @param name
 	 *           attribute name
 	 * @param value
-	 *           value to be set to the attribute
+	 *           value to be set to the attribute, or null to remove the attribute
 	 */
 	public void setAttribute(String name, String value);
 }

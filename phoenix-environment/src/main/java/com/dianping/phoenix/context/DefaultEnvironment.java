@@ -2,6 +2,7 @@ package com.dianping.phoenix.context;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class DefaultEnvironment implements Environment {
 	private Map<String, String> m_attributes = new HashMap<String, String>();
@@ -18,9 +19,8 @@ public class DefaultEnvironment implements Environment {
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Map<String, String> getAttributes() {
-		return (Map<String, String>) (Map) m_attributes;
+	public Set<String> getAttributeNames() {
+		return m_attributes.keySet();
 	}
 
 	@Override

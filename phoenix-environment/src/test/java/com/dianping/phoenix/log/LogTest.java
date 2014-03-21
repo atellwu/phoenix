@@ -15,7 +15,7 @@ import com.dianping.liger.Liger;
 import com.dianping.liger.config.event.ConfigEventDispatcher;
 import com.dianping.liger.repository.EphemeralRepository;
 import com.dianping.liger.repository.Repository;
-import com.dianping.phoenix.context.ContextManager;
+import com.dianping.phoenix.config.ConfigServiceFactory;
 import com.dianping.phoenix.context.Environment;
 
 public class LogTest extends ComponentTestCase {
@@ -24,6 +24,7 @@ public class LogTest extends ComponentTestCase {
 	@Before
 	public void before() {
 		Liger.reset();
+		ConfigServiceFactory.destroy();
 	}
 
 	private void checkResult(String expected) {
@@ -41,6 +42,8 @@ public class LogTest extends ComponentTestCase {
 		logger.info("information");
 		logger.warn("warning");
 		logger.error("error");
+
+		Liger.reset();
 	}
 
 	@Test
@@ -50,9 +53,10 @@ public class LogTest extends ComponentTestCase {
 		defineComponent(AppenderBuilder.class, MockAppenderBuilder.ID, MockAppenderBuilder.class);
 
 		EphemeralRepository repository = (EphemeralRepository) lookup(Repository.class, EphemeralRepository.ID);
+		Environment env = lookup(Environment.class);
 
 		// simulate environment & configuration in Liger
-		ContextManager.getEnvironment().setAttribute(Environment.APP_NAME, "Test");
+		env.setAttribute(Environment.APP_NAME, "Test");
 		repository.setProperty("log", "Test", "a.b.c", "+warn,mock:c");
 		repository.setProperty("log", "Test", "a.b.d", "debug,mock:d,console");
 
@@ -99,9 +103,10 @@ public class LogTest extends ComponentTestCase {
 		defineComponent(BizLogger.class, MockBizLogger.class).is("per-lookup");
 
 		EphemeralRepository repository = (EphemeralRepository) lookup(Repository.class, EphemeralRepository.ID);
+		Environment env = lookup(Environment.class);
 
 		// simulate environment & configuration in Liger
-		ContextManager.getEnvironment().setAttribute(Environment.APP_NAME, "Test");
+		env.setAttribute(Environment.APP_NAME, "Test");
 		repository.setProperty("log", "Test", "tuangou", "info,mock:tuangou");
 		repository.setProperty("log", "Test", "booking", "info,mock:booking");
 
@@ -144,7 +149,9 @@ public class LogTest extends ComponentTestCase {
 		defineComponent(AppenderBuilder.class, MockAppenderBuilder.ID, MockAppenderBuilder.class);
 
 		// simulate environment & configuration in Liger
-		ContextManager.getEnvironment().setAttribute(Environment.APP_NAME, "Test");
+		Environment env = lookup(Environment.class);
+
+		env.setAttribute(Environment.APP_NAME, "Test");
 		Liger.getConfig().setThreadLocalProperty("log[Test].com.dianping.phoenix.log", "warn,mock:e");
 
 		lookup(LoggerManager.class).initialize();

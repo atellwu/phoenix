@@ -5,23 +5,17 @@ import java.util.Map;
 import java.util.Set;
 
 public class DefaultContext implements Context {
-	private Environment m_env;
-
 	private Map<String, String> m_attributes = new HashMap<String, String>();
 
-	public DefaultContext(Environment env) {
-		m_env = env;
-	}
-
 	@Override
-	public String getAttribute(String name) {
+	public String getAttribute(String name, String defaultValue) {
 		String value = m_attributes.get(name);
 
-		if (value == null) {
-			value = m_env.getAttribute(name, null);
+		if (value != null) {
+			return value;
+		} else {
+			return defaultValue;
 		}
-
-		return value;
 	}
 
 	@Override
@@ -40,6 +34,6 @@ public class DefaultContext implements Context {
 
 	@Override
 	public String toString() {
-		return String.format("%s[attributes=%s, env=%s]", getClass().getSimpleName(), m_attributes, m_env);
+		return String.format("%s[attributes=%s]", getClass().getSimpleName(), m_attributes);
 	}
 }

@@ -63,7 +63,8 @@ public class ComponentsConfigurator extends AbstractResourceConfigurator {
 		List<Component> all = new ArrayList<Component>();
 
 		all.add(C(ConfigServiceProvider.class, LigerConfigServiceProvider.class));
-		all.add(C(ConfigContext.class, LigerConfigContext.class));
+		all.add(C(ConfigContext.class, LigerConfigContext.class) //
+		      .req(Environment.class, ThreadLocalRegistry.class));
 		all.add(C(ConfigEnvironment.class, LigerConfigEnvironment.class) //
 		      .req(Environment.class));
 
