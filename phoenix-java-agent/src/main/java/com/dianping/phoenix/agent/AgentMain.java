@@ -43,29 +43,8 @@ public class AgentMain {
 
 	public static void attach() throws Exception {
 		if (!s_initialized) {
-			URL url = Thread.currentThread().getContextClassLoader()
-			      .getResource(AgentMain.class.getName().replace('.', '/') + ".class");
-			String agentJar = null;
-
-			if (url.getProtocol().equals("jar") && url.getPath().startsWith("file:")) {
-				String path = url.getPath();
-				int pos = path.indexOf('!');
-
-				if (pos > 0) {
-					agentJar = path.substring("file:".length(), pos);
-				}
-			}
-
-			if (agentJar == null) { // for test purpose
-				if (new File("target/agent.jar").exists()) {
-					agentJar = new File("target/agent.jar").getCanonicalPath();
-				} else {
-					throw new IllegalStateException("Please run 'mvn package' to prepare agent jar!");
-				}
-			}
-
 			if (isDynamicAttachSupported()) {
-				System.setProperty("agentJar", agentJar);
+				String agentJar = getAgentJar();
 
 				for (com.sun.tools.attach.VirtualMachineDescriptor vmd : com.sun.tools.attach.VirtualMachine.list()) {
 					com.sun.tools.attach.VirtualMachine vm = com.sun.tools.attach.VirtualMachine.attach(vmd);
@@ -73,10 +52,34 @@ public class AgentMain {
 					vm.loadAgent(agentJar);
 				}
 			} else {
-				throw new IllegalStateException(
-				      "JavaAgent dynamic instrument is not supported, use -javaagent:<jar> instead!");
+				throw new IllegalStateException("Dynamic attach is not supported, use -javaagent:<jar> instead!");
 			}
 		}
+	}
+
+	private static String getAgentJar() throws IOException {
+		URL url = Thread.currentThread().getContextClassLoader()
+		      .getResource(AgentMain.class.getName().replace('.', '/') + ".class");
+		String agentJar = null;
+
+		if (url.getProtocol().equals("jar") && url.getPath().startsWith("file:")) {
+			String path = url.getPath();
+			int pos = path.indexOf('!');
+
+			if (pos > 0) {
+				agentJar = path.substring("file:".length(), pos);
+			}
+		}
+
+		if (agentJar == null) { // for test purpose
+			if (new File("target/agent.jar").exists()) {
+				agentJar = new File("target/agent.jar").getCanonicalPath();
+			} else {
+				throw new IllegalStateException("Please run 'mvn package' to prepare agent jar!");
+			}
+		}
+
+		return agentJar;
 	}
 
 	private static boolean isDynamicAttachSupported() {
@@ -93,7 +96,7 @@ public class AgentMain {
 	}
 
 	public static void premain(String agentArgs, Instrumentation instrument) throws Exception {
-		String agentJar = System.getProperty("agentJar");
+		String agentJar = getAgentJar();
 
 		instrument.addTransformer(newTransformer(), true);
 		instrument.appendToBootstrapClassLoaderSearch(new JarFile(agentJar));
@@ -162,7 +165,7 @@ public class AgentMain {
 	}
 
 	private boolean validateClass(URL url) {
-		// TODO
+		// TODO validate the class byte code before loading it
 		return true;
 	}
 

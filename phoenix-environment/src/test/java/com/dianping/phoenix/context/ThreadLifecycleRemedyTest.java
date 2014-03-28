@@ -1,6 +1,8 @@
 package com.dianping.phoenix.context;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import junit.framework.Assert;
@@ -8,10 +10,12 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
 
-public class ThreadLifecycleRemedyTest extends ComponentTestCase {
-	private static int s_tl_index = 0;
+import com.dianping.phoenix.agent.AgentMain;
 
-	private static int s_itl_index = 0;
+public class ThreadLifecycleRemedyTest extends ComponentTestCase {
+	private static int s_tl_index;
+
+	private static int s_itl_index;
 
 	private ThreadLocal<String> m_tl1 = new ThreadLocal<String>() {
 		@Override
@@ -33,10 +37,17 @@ public class ThreadLifecycleRemedyTest extends ComponentTestCase {
 	};
 
 	@Test
-	public void testRemedy() throws Exception {
+	public void testRemedyPool() throws Exception {
+		AgentMain.attach();
+
 		ThreadLocalRegistry registry = lookup(ThreadLocalRegistry.class);
 		StringBuilder sb = new StringBuilder();
-		ThreadPool pool = new ThreadPool(2);
+		ExecutorService pool = Executors.newFixedThreadPool(2);
+
+		s_itl_index = 0;
+		s_tl_index = 0;
+		m_tl1.remove();
+		m_itl1.remove();
 
 		// thread local
 		registry.register(m_tl1);
@@ -79,7 +90,7 @@ public class ThreadLifecycleRemedyTest extends ComponentTestCase {
 		sb.setLength(0);
 	}
 
-	private void check(StringBuilder sb, ThreadPool pool, ThreadLocal<String> tl, String expected)
+	private void check(StringBuilder sb, ExecutorService pool, ThreadLocal<String> tl, String expected)
 	      throws InterruptedException, ExecutionException {
 		Thread thread = new MockThread(sb, tl);
 		Future<?> future = pool.submit(thread);

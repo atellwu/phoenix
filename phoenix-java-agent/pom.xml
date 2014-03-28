@@ -30,6 +30,8 @@
 						<manifestEntries>
 							<Premain-Class>com.dianping.phoenix.agent.AgentMain</Premain-Class>
 							<Agent-Class>com.dianping.phoenix.agent.AgentMain</Agent-Class>
+							<Can-Redefine-Classes>true</Can-Redefine-Classes>
+							<Can-Retransform-Classes>true</Can-Retransform-Classes>
 						</manifestEntries>
 					</archive>
 				</configuration>

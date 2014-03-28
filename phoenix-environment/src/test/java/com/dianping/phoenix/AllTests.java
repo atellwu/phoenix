@@ -15,13 +15,13 @@ import com.dianping.phoenix.session.RequestIdHandlerTest;
 @RunWith(Suite.class)
 @SuiteClasses({
 
-ConfigTest.class,
-
-LogTest.class,
-
 ThreadLifecycleRemedyTest.class,
 
 ThreadPoolExecutorTest.class,
+
+ConfigTest.class,
+
+LogTest.class,
 
 /***/
 
