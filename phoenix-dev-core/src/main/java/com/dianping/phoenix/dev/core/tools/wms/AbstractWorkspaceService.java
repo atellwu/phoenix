@@ -51,8 +51,7 @@ public abstract class AbstractWorkspaceService implements WorkspaceService {
 
 	protected void copyGitFileToClasspath(Workspace model) throws IOException {
 		File wsDir = new File(model.getDir());
-		String[] filesToCopy = new String[]{"url-rules-main.vm", "url-rules-tuangou.vm", 
-				"url-rules-d.vm", "url-rules-s.vm","virtualServer.properties"};
+		String[] filesToCopy = new String[]{"virtualServer.properties"};
 		
 		for (int i = 0; i < filesToCopy.length; i++) {
 			File srcFile = null;

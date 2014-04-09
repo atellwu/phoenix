@@ -1,0 +1,13 @@
+<router-rules>
+
+#set($vs = ${ctx.getVirtualServer("mm")})
+<pool name='Default' url-pattern='${vs.defaultUrlPattern}' />
+
+#foreach($f5Pool in $ctx.localPoolList)
+<pool name='${f5Pool.poolName}' url-pattern='${f5Pool.url}' />
+#end
+
+<f5-rule target-pool='tuangou-mm-web'>
+	<pattern>.*</pattern>
+</f5-rule>
+</router-rules>

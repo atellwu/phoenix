@@ -3,12 +3,17 @@
 cd `dirname "$0"`
 HOME=`pwd`
 CONTAINER_HOME=$HOME/phoenix/phoenix-container
+JETTY_CLASSPATH=$HOME/phoenix/jetty_classpath
+
+mkdir -p $JETTY_CLASSPATH
+mv $CONTAINER_HOME/WEB-INF/lib $JETTY_CLASSPATH/ 
+mv $CONTAINER_HOME/WEB-INF/classes $JETTY_CLASSPATH/ 
 
 JAVA_OPTS="-server -Xms2048m -Xmx2048m -Xmn512m -Xss256k -XX:PermSize=128M -XX:MaxPermSize=128M -javaagent:`pwd`/phoenix/lib/byteman-2.1.2.jar=script:`pwd`/phoenix/meta/service-lion.btm"
 
 cd $HOME
 
-RUN_CMD="java -classpath \"$CONTAINER_HOME/WEB-INF/lib/*:$CONTAINER_HOME/WEB-INF/classes/\""
+RUN_CMD="java -classpath \"$JETTY_CLASSPATH/lib/*:$JETTY_CLASSPATH/classes/\""
 RUN_CMD="$RUN_CMD $JAVA_OPTS"
 RUN_CMD="$RUN_CMD com.dianping.phoenix.container.PhoenixServer $CONTAINER_HOME >boot.log 2>&1 &"
 echo $RUN_CMD

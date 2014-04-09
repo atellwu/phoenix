@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>phoenix-dev-agent</artifactId>
 	<name>phoenix-dev-agent</name>
-	<version>0.2.5-SNAPSHOT</version>
+	<version>0.2.7-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<dependencies>
 		<dependency>
@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>com.dianping.platform</groupId>
 			<artifactId>phoenix-dev-core</artifactId>
-			<version>0.2.5-SNAPSHOT</version>
+			<version>0.2.7-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
