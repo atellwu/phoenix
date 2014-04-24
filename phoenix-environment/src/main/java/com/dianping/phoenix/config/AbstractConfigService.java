@@ -8,7 +8,7 @@ import com.dianping.phoenix.context.Environment;
 public abstract class AbstractConfigService implements ConfigService {
 	@Override
 	public String getAppName() {
-		return getEnv(Environment.APP_NAME, "NONAME");
+		return getProperty(Environment.APP_NAME, "NONAME");
 	}
 
 	@Override
@@ -28,7 +28,7 @@ public abstract class AbstractConfigService implements ConfigService {
 
 	@Override
 	public String getDataBaseDir() {
-		return getEnv(Environment.DATA_BASE_DIR, "./target");
+		return getProperty(Environment.DATA_BASE_DIR, "./target");
 	}
 
 	@Override
@@ -61,7 +61,21 @@ public abstract class AbstractConfigService implements ConfigService {
 		return defaultValue;
 	}
 
-	protected abstract String getEnv(String name, String defaultValue);
+	/**
+	 * Gets property from app.properties or server.properties.
+	 * 
+	 * @param name
+	 *           property name
+	 * @param defaultValue
+	 *           default value if not property configured
+	 * @return property value
+	 */
+	protected abstract String getProperty(String name, String defaultValue);
+
+	@Override
+	public String getEnvType() {
+		return getProperty(Environment.ENV_TYPE, "dev");
+	}
 
 	@Override
 	public float getFloat(String key, float defaultValue) {
@@ -95,7 +109,7 @@ public abstract class AbstractConfigService implements ConfigService {
 
 	@Override
 	public String getLogBaseDir() {
-		return getEnv(Environment.LOG_BASE_DIR, "./target");
+		return getProperty(Environment.LOG_BASE_DIR, "./target");
 	}
 
 	@Override

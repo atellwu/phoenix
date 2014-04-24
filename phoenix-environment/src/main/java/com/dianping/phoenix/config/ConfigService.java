@@ -9,6 +9,8 @@ public interface ConfigService {
 
 	public String getLogBaseDir();
 
+	public String getEnvType();
+
 	public boolean getBoolean(String key, boolean defaultValue);
 
 	public Date getDate(String key, String format, Date defaultValue);

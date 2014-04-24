@@ -15,7 +15,7 @@ public class LigerConfigServiceProvider extends ContainerHolder implements Confi
 			}
 
 			@Override
-			protected String getEnv(String name, String defaultValue) {
+			protected String getProperty(String name, String defaultValue) {
 				Environment env = lookup(Environment.class);
 
 				return env.getAttribute(name, defaultValue);

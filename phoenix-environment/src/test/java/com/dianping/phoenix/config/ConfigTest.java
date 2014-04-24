@@ -72,7 +72,7 @@ public class ConfigTest extends ComponentTestCase {
 				}
 
 				@Override
-				protected String getEnv(String name, String defaultValue) {
+				protected String getProperty(String name, String defaultValue) {
 					return null;
 				}
 			};
