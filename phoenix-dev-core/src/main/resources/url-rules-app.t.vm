@@ -1,0 +1,22 @@
+<router-rules>
+
+#set($vs = ${ctx.getVirtualServer("app.t")})
+<pool name='Default' url-pattern='${vs.defaultUrlPattern}' />
+
+#foreach($f5Pool in $ctx.localPoolList)
+<pool name='${f5Pool.poolName}' url-pattern='${f5Pool.url}' />
+#end
+
+<f5-rule target-pool='tuan_tuangou-mapi-web'>
+	<pattern>^/searchdealgn.bin.*</pattern>
+	<pattern>^/dealgn.bin.*</pattern>
+	<pattern>^/createordergn.bin.*</pattern>
+	<pattern>^/confirmordergn.bin.*</pattern>
+	<pattern>^/couponlistgn.bin.*</pattern>
+	<pattern>^/usergn.bin.*</pattern>
+	<pattern>^/tuanprofilegn.bin.*</pattern>
+</f5-rule>
+<f5-rule target-pool='tuan_tuangou-mapi-sub-web'>
+	<pattern>.*</pattern>
+</f5-rule>
+</router-rules>

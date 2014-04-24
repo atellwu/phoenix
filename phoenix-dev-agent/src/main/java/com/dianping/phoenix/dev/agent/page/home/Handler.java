@@ -63,7 +63,7 @@ public class Handler implements PageHandler<Context> {
             if (checkWarUrls(param.wars, reqRes) && checkDeployPath(param.deployPath, param.forceDeploy, reqRes)) {
                 m_workspaceFacade.init(new File(param.deployPath));
                 try {
-                    m_workspaceFacade.create(convertToWorkspace(param));
+                    m_workspaceFacade.create(convertToWorkspace(param), param.defaultVirtualServer);
 
                     executeShell(new File(param.deployPath, "start.sh").getAbsolutePath());
 
@@ -153,7 +153,7 @@ public class Handler implements PageHandler<Context> {
     }
 
     private Workspace convertToWorkspace(ReqParam param) {
-        Workspace model = m_workspaceFacade.buildDefaultSkeletoModel();
+        Workspace model = m_workspaceFacade.buildDefaultSkeletoModel(param.deployPath);
         model.setFrom(WorkspaceConstants.FROM_AGENT);
 
         model.setDir(param.deployPath);
@@ -272,6 +272,7 @@ public class Handler implements PageHandler<Context> {
         private boolean  forceDeploy  = false;
         private int      startTimeout = START_TIMEOUT;
         private String   privateToken;
+        private String defaultVirtualServer;
     }
 
     public static void main(String[] args) throws Exception {
@@ -279,7 +280,11 @@ public class Handler implements PageHandler<Context> {
         param.wars = new String[] { "http://127.0.0.1/user-web-qa-0.0.3.war", "http://127.0.0.1/shop-web-qa-0.0.3.war" };
         param.returnUrl = "http://button.dp/phoenixStatus";
         Gson gson = new Gson();
-        System.out.println(gson.toJson(param));
+//        System.out.println(gson.toJson(param));
+        
+        ReqParam p = gson.fromJson("{\"defaultVirtualServer\":\"xx\", \"startTimeout\":10}", ReqParam.class);
+        System.out.println(p.defaultVirtualServer);
+        System.out.println(p.startTimeout);
 
         // ScriptExecutor scriptExecutor = new DefaultScriptExecutor();
         // scriptExecutor.exec("jps -lvm | echo 1", System.out, System.out);

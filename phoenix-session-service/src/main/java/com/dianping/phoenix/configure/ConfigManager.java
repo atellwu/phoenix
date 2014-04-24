@@ -15,10 +15,13 @@ import com.dianping.phoenix.configure.entity.Property;
 import com.dianping.phoenix.configure.transform.DefaultSaxParser;
 
 public class ConfigManager implements Initializable {
+
 	@Inject
-	private String m_configFile = "/data/appdatas/phoenix/session.xml";
+	private static String m_configFile = "/data/appdatas/phoenix/session-service/config.xml";
 
 	private Config m_config;
+
+	private int m_port;
 
 	public int getEventExpireTime() {
 		return m_config.getEventExpireTime();
@@ -50,6 +53,10 @@ public class ConfigManager implements Initializable {
 		return m_config.getHdfs().getServerUri();
 	}
 
+	public int getHdfsUploadInterval() {
+		return m_config.getHdfs().getHdfsUploadInterval();
+	}
+
 	public int getMaxL1CacheSize() {
 		return m_config.getMaxL1CacheSize();
 	}
@@ -60,6 +67,10 @@ public class ConfigManager implements Initializable {
 
 	public int getMaxRetryCacheSize() {
 		return m_config.getMaxRetryCacheSize();
+	}
+
+	public int getPort() {
+		return m_port;
 	}
 
 	public File getRecordFileTargetDir() {
@@ -98,8 +109,15 @@ public class ConfigManager implements Initializable {
 		return m_config.getRetryQueueSafeLength();
 	}
 
+	public String getServerListUpdateUrl() {
+		return m_config.getServerListUpdateUrl();
+	}
+
 	@Override
 	public void initialize() throws InitializationException {
+
+		m_configFile = System.getProperty("PHOENIX_SESSION_SERVICE_CONFIG_FILE", m_configFile);
+
 		try {
 			File file = new File(m_configFile);
 
@@ -128,4 +146,13 @@ public class ConfigManager implements Initializable {
 			recordFileTargetDir.mkdirs();
 		}
 	}
+
+	public void setPort(int port) {
+		m_port = port;
+	}
+
+	public static void setConfigFile(String configFile) {
+		m_configFile = configFile;
+	}
+
 }

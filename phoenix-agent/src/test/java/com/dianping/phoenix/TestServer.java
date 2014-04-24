@@ -40,7 +40,7 @@ public class TestServer extends JettyServer {
 	@Test
 	public void startWebapp() throws Exception {
 		// open the page in the default browser
-		display("/phoenix/agent/nginx");
+//		display("/phoenix/agent/nginx");
 		waitForAnyKey();
 	}
 }

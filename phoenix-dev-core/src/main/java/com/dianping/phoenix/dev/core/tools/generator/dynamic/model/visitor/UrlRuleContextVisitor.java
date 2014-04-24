@@ -17,45 +17,49 @@ import com.dianping.phoenix.dev.core.tools.utils.WebProjectFileFilter;
 
 public class UrlRuleContextVisitor extends AbstractVisitor<UrlRuleContext> {
 
-    private F5Manager f5Mgr;
-    private File      wsDir;
+	private F5Manager f5Mgr;
 
-    public UrlRuleContextVisitor(F5Manager f5Mgr) {
-        result = new UrlRuleContext();
-        this.f5Mgr = f5Mgr;
-    }
+	private File wsDir;
 
-    @Override
-    public void visitBizProject(BizProject bizProject) {
-        File parentProjectDir = new File(wsDir, bizProject.getName());
+	public UrlRuleContextVisitor(F5Manager f5Mgr) {
+		result = new UrlRuleContext();
+		this.f5Mgr = f5Mgr;
+	}
 
-        FileFilter webFilter = new WebProjectFileFilter();
-        List<File> webProjects = new ArrayList<File>(Arrays.asList(parentProjectDir.listFiles(webFilter)));
-        if (webFilter.accept(parentProjectDir)) {
-            webProjects.add(parentProjectDir);
-        }
+	@Override
+	public void visitBizProject(BizProject bizProject) {
+		File parentProjectDir = new File(wsDir, bizProject.getName());
 
-        PomParser pomParser = new PomParser();
-        for (File webProject : webProjects) {
-            F5Pool pool = f5Mgr.poolForProject(pomParser.getArtifactId(webProject));
-            if (pool != null) {
-                // web project
-                result.addLocalPool(pool);
-            }
-        }
-        super.visitBizProject(bizProject);
-    }
+		FileFilter webFilter = new WebProjectFileFilter();
+		List<File> webProjects = new ArrayList<File>(Arrays.asList(parentProjectDir.listFiles(webFilter)));
+		if (webFilter.accept(parentProjectDir)) {
+			webProjects.add(parentProjectDir);
+		}
 
-    @Override
-    public void visitVirtualServer(VirtualServer virtualServer) {
-        result.addVirtualServer(virtualServer);
-        super.visitVirtualServer(virtualServer);
-    }
+		PomParser pomParser = new PomParser();
+		for (File webProject : webProjects) {
+			String artifactId = pomParser.getArtifactId(webProject);
+			F5Pool pool = f5Mgr.poolForProject(artifactId);
+			System.out.println(String.format("F5 pool for %s is %s", artifactId,
+			      pool == null ? "null" : pool.getPoolName()));
+			if (pool != null) {
+				// web project
+				result.addLocalPool(pool);
+			}
+		}
+		super.visitBizProject(bizProject);
+	}
 
-    @Override
-    public void visitWorkspace(Workspace ws) {
-        wsDir = new File(ws.getDir());
-        super.visitWorkspace(ws);
-    }
+	@Override
+	public void visitVirtualServer(VirtualServer virtualServer) {
+		result.addVirtualServer(virtualServer);
+		super.visitVirtualServer(virtualServer);
+	}
+
+	@Override
+	public void visitWorkspace(Workspace ws) {
+		wsDir = new File(ws.getDir());
+		super.visitWorkspace(ws);
+	}
 
 }

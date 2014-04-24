@@ -29,7 +29,7 @@ public class ConfigManager implements Initializable {
     private final static String JBOSS_LOADER_CLASS  = "com.dianping.phoenix.bootstrap.Jboss4WebappLoader";
 
     public enum ContainerType {
-        TOMCAT, JBOSS
+        TOMCAT, JBOSS, NGINX,
     }
 
     @Inject
@@ -217,8 +217,10 @@ public class ConfigManager implements Initializable {
         } else if (runSh.exists()) {
             containerType = ContainerType.JBOSS;
         } else {
-//            throw new InitializationException(String.format(
-//                    "containerInstallPath %s does not have a valid tomcat or jboss installation", containerInstallPath));
+            // throw new InitializationException(String.format(
+            // "containerInstallPath %s does not have a valid tomcat or jboss installation",
+            // containerInstallPath));
+            containerType = ContainerType.NGINX;
         }
 
         // initialize pid
@@ -229,7 +231,7 @@ public class ConfigManager implements Initializable {
             loaderClass = TOMCAT_LOADER_CLASS;
             serverXmlList.add(new File(containerInstallPath + "/conf/server.xml"));
             serverXmlList.add(new File(containerInstallPath + "/conf/Catalina/localhost/"));
-        } else {
+        } else if (containerType == ContainerType.JBOSS) {
             loaderClass = JBOSS_LOADER_CLASS;
             serverXmlList.add(new File(String.format("%s/server/%s/deploy/jboss-web.deployer/server.xml",
                     containerInstallPath, m_config.getAgent().getJbossServerName())));
@@ -298,5 +300,19 @@ public class ConfigManager implements Initializable {
             throw new RuntimeException(scriptFileName + " not found");
         }
         return new File(scriptUrl.getPath());
+    }
+
+    public String getTengineConfigDocBasePattern() {
+        check();
+        return m_config.getAgent().getTengineConfigDocBasePattern();
+    }
+
+    public String getTengineConfigGitDocBasePattern() {
+        check();
+        return m_config.getAgent().getTengineConfigGitDocBasePattern();
+    }
+
+    public File getTengineScriptFile() {
+        return getScriptFile("tengine.sh");
     }
 }

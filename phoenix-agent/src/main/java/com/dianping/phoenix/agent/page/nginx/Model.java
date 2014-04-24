@@ -1,15 +1,33 @@
 package com.dianping.phoenix.agent.page.nginx;
 
-import com.dianping.phoenix.agent.AgentPage;
 import org.unidal.web.mvc.ViewModel;
 
-public class Model extends ViewModel<AgentPage, Action, Context> {
-	public Model(Context ctx) {
-		super(ctx);
-	}
+import com.dianping.phoenix.agent.AgentPage;
+import com.dianping.phoenix.agent.response.entity.Response;
+import com.dianping.phoenix.agent.response.transform.DefaultJsonBuilder;
 
-	@Override
-	public Action getDefaultAction() {
-		return Action.VIEW;
-	}
+public class Model extends ViewModel<AgentPage, Action, Context> {
+
+    private Response response;
+
+    public Model(Context ctx) {
+        super(ctx);
+    }
+
+    @Override
+    public Action getDefaultAction() {
+        return Action.VIEW;
+    }
+
+    public Response getResponse() {
+        return response;
+    }
+
+    public void setResponse(Response response) {
+        this.response = response;
+    }
+
+    public String getResponseInJson() {
+        return new DefaultJsonBuilder().build(response);
+    }
 }

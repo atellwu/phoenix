@@ -24,6 +24,9 @@ public class RecordFileManagerTest extends ComponentTestCase {
 
 	@Before
 	public void before() throws Exception {
+		
+		System.setProperty(RecordFileManager.PHOENIX_MODE, "dev");
+		
 		ConfigManager config = lookup(ConfigManager.class);
 		mgr = lookup(RecordFileManager.class);
 		File recordBaseDir = config.getRecordFileTmpDir();

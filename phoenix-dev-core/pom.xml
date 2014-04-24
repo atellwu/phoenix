@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>phoenix-dev-core</artifactId>
 	<name>phoenix-dev-core</name>
-	<version>0.2.5-SNAPSHOT</version>
+	<version>0.2.7-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.unidal.framework</groupId>

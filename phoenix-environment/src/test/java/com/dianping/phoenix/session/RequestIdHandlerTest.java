@@ -72,6 +72,7 @@ public class RequestIdHandlerTest extends JettyServer {
 		String referer = String.format("http://localhost:%s%s%s", getServerPort(), getContextPath(), lastPath);
 		URLConnection uc = new URL(url).openConnection();
 
+		uc.setConnectTimeout(1000);
 		uc.addRequestProperty("Host", "localhost:" + getServerPort());
 
 		if (lastPath != null) {
@@ -90,6 +91,9 @@ public class RequestIdHandlerTest extends JettyServer {
 
 		RequestIdHandler handler = (RequestIdHandler) lookup(PhoenixFilterHandler.class, RequestIdHandler.ID);
 		RequestEvent event = handler.take();
+
+		Assert.assertNotNull("No RequestEvent generated!", event);
+
 		String actual = String.format("%s:%s:%s:%s", event.getPhoenixId(), event.getRequestId(), event.getUrlDigest(),
 		      event.getRefererUrlDigest());
 

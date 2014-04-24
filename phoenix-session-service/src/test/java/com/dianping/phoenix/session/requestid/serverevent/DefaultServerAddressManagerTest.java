@@ -11,6 +11,8 @@ import java.util.List;
 import org.junit.Test;
 import org.unidal.lookup.ComponentTestCase;
 
+import com.dianping.phoenix.session.server.ServerAddressManager;
+
 public class DefaultServerAddressManagerTest extends ComponentTestCase {
 
 	private DefaultServerAddressManager mgr;
@@ -44,5 +46,5 @@ public class DefaultServerAddressManagerTest extends ComponentTestCase {
 		assertEquals(new InetSocketAddress("10.1.1.3", 6666), svrList.get(1));
 
 	}
-
+	
 }

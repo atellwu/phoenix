@@ -49,32 +49,32 @@
 		<component>
 			<role>com.dianping.phoenix.session.requestid.Bootstrap</role>
 			<implementation>com.dianping.phoenix.session.requestid.Bootstrap</implementation>
+		</component>
+		<component>
+			<role>com.dianping.phoenix.session.server.ServerAddressManager</role>
+			<implementation>com.dianping.phoenix.session.requestid.serverevent.DefaultServerAddressManager</implementation>
 			<requirements>
 				<requirement>
-					<role>com.dianping.phoenix.session.requestid.EventDelegateManager</role>
+					<role>com.dianping.phoenix.configure.ConfigManager</role>
 				</requirement>
 			</requirements>
 		</component>
 		<component>
-			<role>com.dianping.phoenix.session.requestid.serverevent.ServerAddressManager</role>
-			<implementation>com.dianping.phoenix.session.requestid.serverevent.DefaultServerAddressManager</implementation>
+			<role>com.dianping.phoenix.session.server.SocketClientManager</role>
+			<implementation>com.dianping.phoenix.session.server.DefaultSocketClientManager</implementation>
+			<configuration>
+				<m_strMode>Broadcast</m_strMode>
+			</configuration>
 		</component>
 		<component>
-			<role>com.dianping.phoenix.session.requestid.serverevent.SocketClientManager</role>
-			<implementation>com.dianping.phoenix.session.requestid.serverevent.DefaultSocketClientManager</implementation>
-		</component>
-		<component>
-			<role>com.dianping.phoenix.session.requestid.serverevent.ServerEventPublisher</role>
-			<implementation>com.dianping.phoenix.session.requestid.serverevent.DefaultServerEventPublisher</implementation>
+			<role>com.dianping.phoenix.session.server.EventPublisher</role>
+			<implementation>com.dianping.phoenix.session.server.DefaultEventPublisher</implementation>
 			<requirements>
 				<requirement>
-					<role>com.dianping.phoenix.session.requestid.serverevent.SocketClientManager</role>
+					<role>com.dianping.phoenix.session.server.SocketClientManager</role>
 				</requirement>
 				<requirement>
-					<role>com.dianping.phoenix.session.requestid.serverevent.ServerAddressManager</role>
-				</requirement>
-				<requirement>
-					<role>com.dianping.phoenix.session.requestid.EventDelegateManager</role>
+					<role>com.dianping.phoenix.session.server.ServerAddressManager</role>
 				</requirement>
 			</requirements>
 		</component>

@@ -7,7 +7,6 @@ import org.unidal.helper.Threads;
 import org.unidal.lookup.ComponentTestCase;
 
 public class FileUploaderTest extends ComponentTestCase {
-	@Test
 	public void test() throws IOException {
 		FileUploader uploader = lookup(FileUploader.class);
 

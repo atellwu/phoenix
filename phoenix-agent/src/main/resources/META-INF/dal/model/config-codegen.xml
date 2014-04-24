@@ -17,6 +17,8 @@
     <element name="dryrun-port" value-type="int" />
     <element name="kernel-doc-base-pattern" value-type="String" />
     <element name="agent-doc-base-pattern" value-type="String" />
+    <element name="tengine-config-git-doc-base-pattern" value-type="String" />
+    <element name="tengine-config-doc-base-pattern" value-type="String" />
     <element name="temp-script-dir" value-type="String" />
     <element name="domain-doc-base-keyword-pattern" value-type="String" />
     <element name="test-service-poll-interval" value-type="int" />

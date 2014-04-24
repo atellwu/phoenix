@@ -8,13 +8,13 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>phoenix-environment</artifactId>
+	<version>0.3.1</version>
 	<name>phoenix-environment</name>
-	<version>0.2.0-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>com.dianping.platform</groupId>
 			<artifactId>phoenix-java-agent</artifactId>
-			<version>1.0</version>
+			<version>0.2.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.dianping.liger</groupId>
@@ -33,8 +33,21 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.dianping.lion</groupId>
+			<artifactId>lion-client</artifactId>
+			<version>0.3.4.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.lion</groupId>
+			<artifactId>lion-${env}</artifactId>
+			<version>1.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.unidal.framework</groupId>
 			<artifactId>test-framework</artifactId>
+			<version>2.0.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -54,6 +67,45 @@
 			<version>4.8.1</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.dianping.data.warehouse</groupId>
+			<artifactId>dp-log</artifactId>
+			<version>1.0.6</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.2.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+	<properties>
+		<env>dev</env>
+	</properties>
 </project>
 
